@@ -2047,7 +2047,6 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public class SponsoredMessagesInfo {
-        public boolean faked;
         public long loadTime;
         public boolean loading;
         public ArrayList<MessageObject> messages;

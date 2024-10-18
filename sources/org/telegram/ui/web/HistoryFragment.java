@@ -276,7 +276,7 @@ public class HistoryFragment extends UniversalFragment {
     }
 
     @Override
-    protected void fillItems(ArrayList arrayList, UniversalAdapter universalAdapter) {
+    public void fillItems(ArrayList arrayList, UniversalAdapter universalAdapter) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getDefault());
         int i = 0;
@@ -328,7 +328,7 @@ public class HistoryFragment extends UniversalFragment {
     }
 
     @Override
-    protected void onClick(UItem uItem, View view, int i, float f, float f2) {
+    public void onClick(UItem uItem, View view, int i, float f, float f2) {
         if (uItem.instanceOf(AddressBarList.BookmarkView.Factory.class)) {
             if (this.actionBar.isActionModeShowed()) {
                 clickSelect(uItem, view);
@@ -340,7 +340,7 @@ public class HistoryFragment extends UniversalFragment {
     }
 
     @Override
-    protected boolean onLongClick(UItem uItem, View view, int i, float f, float f2) {
+    public boolean onLongClick(UItem uItem, View view, int i, float f, float f2) {
         return false;
     }
 }

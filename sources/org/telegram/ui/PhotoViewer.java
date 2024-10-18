@@ -422,6 +422,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     boolean fromCamera;
     private ImageView[] fullscreenButton;
     private int fullscreenedByButton;
+    private ActionBarMenuSubItem galleryButton;
     private GestureDetector2 gestureDetector;
     private GroupedPhotosListView groupedPhotosListView;
     public boolean hasCaptionForAllMedia;
@@ -11212,10 +11213,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
     }
 
-    public void lambda$setParentActivity$15(ActionBarMenuSubItem actionBarMenuSubItem, View view) {
+    public void lambda$setParentActivity$15(View view) {
         MessageObject messageObject = this.currentMessageObject;
         if (messageObject != null && messageObject.hasVideoQualities() && this.chooseDownloadQualityLayout.update(this.currentMessageObject)) {
-            actionBarMenuSubItem.openSwipeBack();
+            this.galleryButton.openSwipeBack();
             return;
         }
         ActionBar actionBar = this.actionBar;
@@ -16837,12 +16838,13 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         addSubItem.setColors(-328966, -328966);
         this.menuItem.addSubItem(14, R.drawable.msg_gif, LocaleController.getString(R.string.SaveToGIFs)).setColors(-328966, -328966);
         this.menuItem.addSubItem(4, R.drawable.msg_message, LocaleController.getString(R.string.ShowInChat)).setColors(-328966, -328966);
-        final ActionBarMenuSubItem colors = this.menuItem.addSwipeBackItem(R.drawable.msg_gallery, null, LocaleController.getString(R.string.SaveToGallery), this.chooseDownloadQualityLayout.layout).setColors(-328966, -328966);
+        ActionBarMenuSubItem colors = this.menuItem.addSwipeBackItem(R.drawable.msg_gallery, null, LocaleController.getString(R.string.SaveToGallery), this.chooseDownloadQualityLayout.layout).setColors(-328966, -328966);
+        this.galleryButton = colors;
         colors.setRightIcon(0);
-        colors.setOnClickListener(new View.OnClickListener() {
+        this.galleryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                PhotoViewer.this.lambda$setParentActivity$15(colors, view);
+                PhotoViewer.this.lambda$setParentActivity$15(view);
             }
         });
         this.menuItem.addSubItem(23, R.drawable.menu_reply, LocaleController.getString(R.string.Reply)).setColors(-328966, -328966);
