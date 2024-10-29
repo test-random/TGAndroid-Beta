@@ -216,6 +216,12 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         }
 
         @Override
+        public long getDialogId() {
+            BaseFragment baseFragment = ChatAttachAlertPhotoLayout.this.parentAlert.baseFragment;
+            return baseFragment instanceof ChatActivity ? ((ChatActivity) baseFragment).getDialogId() : super.getDialogId();
+        }
+
+        @Override
         public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
             PhotoAttachPhotoCell cellForIndex = ChatAttachAlertPhotoLayout.this.getCellForIndex(i);
             if (cellForIndex == null) {
@@ -1810,36 +1816,6 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         return true;
     }
 
-    private void clearSelectedPhotos() {
-        this.spoilerItem.setText(LocaleController.getString(R.string.EnablePhotoSpoiler));
-        this.spoilerItem.setAnimatedIcon(R.raw.photo_spoiler);
-        this.parentAlert.selectedMenuItem.showSubItem(1);
-        if (!selectedPhotos.isEmpty()) {
-            Iterator it = selectedPhotos.entrySet().iterator();
-            while (it.hasNext()) {
-                ((MediaController.PhotoEntry) ((Map.Entry) it.next()).getValue()).reset();
-            }
-            selectedPhotos.clear();
-            selectedPhotosOrder.clear();
-        }
-        if (!cameraPhotos.isEmpty()) {
-            int size = cameraPhotos.size();
-            for (int i = 0; i < size; i++) {
-                MediaController.PhotoEntry photoEntry = (MediaController.PhotoEntry) cameraPhotos.get(i);
-                new File(photoEntry.path).delete();
-                if (photoEntry.imagePath != null) {
-                    new File(photoEntry.imagePath).delete();
-                }
-                if (photoEntry.thumbPath != null) {
-                    new File(photoEntry.thumbPath).delete();
-                }
-            }
-            cameraPhotos.clear();
-        }
-        this.adapter.notifyDataSetChanged();
-        this.cameraAttachAdapter.notifyDataSetChanged();
-    }
-
     public PhotoAttachPhotoCell getCellForIndex(int i) {
         int childCount = this.gridView.getChildCount();
         for (int i2 = 0; i2 < childCount; i2++) {
@@ -2980,6 +2956,36 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         this.noGalleryPermissions = isNoGalleryPermissions;
         if (!isNoGalleryPermissions) {
             loadGalleryPhotos();
+        }
+        this.adapter.notifyDataSetChanged();
+        this.cameraAttachAdapter.notifyDataSetChanged();
+    }
+
+    public void clearSelectedPhotos() {
+        this.spoilerItem.setText(LocaleController.getString(R.string.EnablePhotoSpoiler));
+        this.spoilerItem.setAnimatedIcon(R.raw.photo_spoiler);
+        this.parentAlert.selectedMenuItem.showSubItem(1);
+        if (!selectedPhotos.isEmpty()) {
+            Iterator it = selectedPhotos.entrySet().iterator();
+            while (it.hasNext()) {
+                ((MediaController.PhotoEntry) ((Map.Entry) it.next()).getValue()).reset();
+            }
+            selectedPhotos.clear();
+            selectedPhotosOrder.clear();
+        }
+        if (!cameraPhotos.isEmpty()) {
+            int size = cameraPhotos.size();
+            for (int i = 0; i < size; i++) {
+                MediaController.PhotoEntry photoEntry = (MediaController.PhotoEntry) cameraPhotos.get(i);
+                new File(photoEntry.path).delete();
+                if (photoEntry.imagePath != null) {
+                    new File(photoEntry.imagePath).delete();
+                }
+                if (photoEntry.thumbPath != null) {
+                    new File(photoEntry.thumbPath).delete();
+                }
+            }
+            cameraPhotos.clear();
         }
         this.adapter.notifyDataSetChanged();
         this.cameraAttachAdapter.notifyDataSetChanged();

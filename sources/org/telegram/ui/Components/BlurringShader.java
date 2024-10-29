@@ -578,7 +578,10 @@ public class BlurringShader {
             canvas.rotate(i);
             float f2 = -this.padding;
             canvas.translate(f2 - (round / 2.0f), f2 - (round2 / 2.0f));
-            canvas.drawBitmap(bitmap, rect, rect2, (Paint) null);
+            try {
+                canvas.drawBitmap(bitmap, rect, rect2, (Paint) null);
+            } catch (Exception unused) {
+            }
             Utilities.stackBlurBitmap(createBitmap, 6);
             int i7 = this.padding;
             if (i7 > 0) {

@@ -14,6 +14,7 @@ import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ProductDetails;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -211,7 +212,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
         PremiumPreviewGiftSentBottomSheet.show(new ArrayList(Arrays.asList(user)));
     }
 
-    public void lambda$buyPremiumTier$4(final TLRPC.User user, Void r4) {
+    public void lambda$buyPremiumTier$4(final TLRPC.User user, Void r6) {
         Runnable runnable = this.closeParentSheet;
         if (runnable != null) {
             runnable.run();
@@ -224,6 +225,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
                 SendGiftSheet.lambda$buyPremiumTier$3(TLRPC.User.this);
             }
         }, 250L);
+        MessagesController.getInstance(this.currentAccount).getMainSettings().edit().putBoolean("show_gift_for_" + this.dialogId, true).putBoolean(Calendar.getInstance().get(1) + "show_gift_for_" + this.dialogId, true).apply();
     }
 
     public void lambda$buyPremiumTier$5(TLRPC.TL_error tL_error) {
@@ -331,7 +333,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
                     }
                 } else if (baseFragment instanceof ProfileActivity) {
                     if (z && parentLayout.getLastFragment() == baseFragment) {
-                        baseFragment.lambda$onBackPressed$300();
+                        baseFragment.lambda$onBackPressed$319();
                     }
                     baseFragment.removeSelfFromStack();
                 }

@@ -4632,7 +4632,7 @@ public abstract class AlertsCreator {
         }
         if (baseFragment instanceof ThemePreviewActivity) {
             Theme.applyPreviousTheme();
-            baseFragment.lambda$onBackPressed$300();
+            baseFragment.lambda$onBackPressed$319();
         }
         if (themeAccent == null) {
             processCreate(editTextBoldCursor, alertDialog, baseFragment);
@@ -5421,7 +5421,7 @@ public abstract class AlertsCreator {
         showOpenUrlAlert(baseFragment, str, z, z2, z3, false, progress, resourcesProvider);
     }
 
-    public static void showOpenUrlAlert(final org.telegram.ui.ActionBar.BaseFragment r21, final java.lang.String r22, boolean r23, final boolean r24, boolean r25, boolean r26, final org.telegram.messenger.browser.Browser.Progress r27, org.telegram.ui.ActionBar.Theme.ResourcesProvider r28) {
+    public static void showOpenUrlAlert(final org.telegram.ui.ActionBar.BaseFragment r22, final java.lang.String r23, boolean r24, final boolean r25, boolean r26, boolean r27, final org.telegram.messenger.browser.Browser.Progress r28, org.telegram.ui.ActionBar.Theme.ResourcesProvider r29) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.AlertsCreator.showOpenUrlAlert(org.telegram.ui.ActionBar.BaseFragment, java.lang.String, boolean, boolean, boolean, boolean, org.telegram.messenger.browser.Browser$Progress, org.telegram.ui.ActionBar.Theme$ResourcesProvider):void");
     }
 

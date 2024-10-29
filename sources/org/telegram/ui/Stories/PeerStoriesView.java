@@ -124,6 +124,7 @@ import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.CustomPopupMenu;
 import org.telegram.ui.Components.EditTextCaption;
 import org.telegram.ui.Components.EmojiPacksAlert;
+import org.telegram.ui.Components.HashtagActivity;
 import org.telegram.ui.Components.HintView;
 import org.telegram.ui.Components.InstantCameraView;
 import org.telegram.ui.Components.LayoutHelper;
@@ -703,7 +704,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
             }
             if (PeerStoriesView.this.mentionContainer.getAdapter() != null) {
                 PeerStoriesView.this.mentionContainer.setDialogId(PeerStoriesView.this.dialogId);
-                PeerStoriesView.this.mentionContainer.getAdapter().setUserOrChat(MessagesController.getInstance(PeerStoriesView.this.currentAccount).getUser(Long.valueOf(PeerStoriesView.this.dialogId)), null);
+                PeerStoriesView.this.mentionContainer.getAdapter().setUserOrChat(MessagesController.getInstance(PeerStoriesView.this.currentAccount).getUser(Long.valueOf(PeerStoriesView.this.dialogId)), MessagesController.getInstance(PeerStoriesView.this.currentAccount).getChat(Long.valueOf(-PeerStoriesView.this.dialogId)));
                 PeerStoriesView.this.mentionContainer.getAdapter().lambda$searchUsernameOrHashtag$7(charSequence, PeerStoriesView.this.chatActivityEnterView.getCursorPosition(), null, false, false);
             }
             PeerStoriesView.this.invalidate();
@@ -1270,12 +1271,20 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                 processExternalUrl(0, url, characterStyle, false);
                 return;
             }
+            if (url.contains("@")) {
+                StoryViewer storyViewer = this.val$storyViewer;
+                if (storyViewer != null) {
+                    storyViewer.presentFragment(new HashtagActivity(url));
+                    return;
+                }
+                return;
+            }
             Bundle bundle = new Bundle();
             bundle.putInt("type", 3);
             bundle.putString("hashtag", url);
-            StoryViewer storyViewer = this.val$storyViewer;
-            if (storyViewer != null) {
-                storyViewer.presentFragment(new MediaActivity(bundle, null));
+            StoryViewer storyViewer2 = this.val$storyViewer;
+            if (storyViewer2 != null) {
+                storyViewer2.presentFragment(new MediaActivity(bundle, null));
             }
         }
 
@@ -3751,6 +3760,11 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                 if (rectF.top < getMeasuredHeight() - 1) {
                     canvas.drawRect(0.0f, getMeasuredHeight(), getMeasuredWidth(), getMeasuredHeight() - 1, PeerStoriesView.this.resourcesProvider.getPaint("paintDivider"));
                 }
+            }
+
+            @Override
+            protected boolean isStories() {
+                return true;
             }
         };
         this.mentionContainer = mentionsContainerView;

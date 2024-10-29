@@ -845,14 +845,14 @@ public class TextCell extends FrameLayout {
         this.textView.setTextColor(i);
     }
 
-    public void setValue(String str, boolean z) {
+    public void setValue(CharSequence charSequence, boolean z) {
         CharSequence ellipsize;
         AnimatedTextView animatedTextView = this.valueTextView;
-        if (str == null) {
+        if (charSequence == null) {
             ellipsize = "";
         } else {
-            this.valueText = str;
-            ellipsize = TextUtils.ellipsize(str, animatedTextView.getPaint(), AndroidUtilities.displaySize.x / 2.5f, TextUtils.TruncateAt.END);
+            this.valueText = charSequence;
+            ellipsize = TextUtils.ellipsize(charSequence, animatedTextView.getPaint(), AndroidUtilities.displaySize.x / 2.5f, TextUtils.TruncateAt.END);
         }
         animatedTextView.setText(ellipsize, z);
     }

@@ -2517,12 +2517,15 @@ public class Bulletin {
     }
 
     public static Bulletin make(FrameLayout frameLayout, Layout layout, int i) {
-        return new Bulletin(null, frameLayout, layout, i);
+        return frameLayout == null ? new EmptyBulletin() : new Bulletin(null, frameLayout, layout, i);
     }
 
     public static Bulletin make(BaseFragment baseFragment, Layout layout, int i) {
         int i2;
         int i3;
+        if (baseFragment == null) {
+            return new EmptyBulletin();
+        }
         if (!(baseFragment instanceof ChatActivity)) {
             if (baseFragment instanceof DialogsActivity) {
                 i2 = -1;

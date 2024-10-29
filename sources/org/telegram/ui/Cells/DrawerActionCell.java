@@ -13,6 +13,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import java.util.Set;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.DocumentObject;
+import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.MediaDataController;
@@ -38,6 +40,7 @@ public class DrawerActionCell extends FrameLayout {
         BackupImageView backupImageView = new BackupImageView(context);
         this.imageView = backupImageView;
         backupImageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chats_menuItemIcon), PorterDuff.Mode.SRC_IN));
+        this.imageView.getImageReceiver().setFileLoadingPriority(3);
         TextView textView = new TextView(context);
         this.textView = textView;
         textView.setTextColor(Theme.getColor(Theme.key_chats_menuItemText));
@@ -122,11 +125,19 @@ public class DrawerActionCell extends FrameLayout {
             }
             textView.setText(charSequence);
             TLRPC.TL_attachMenuBotIcon sideAttachMenuBotIcon = MediaDataController.getSideAttachMenuBotIcon(tL_attachMenuBot);
-            if (sideAttachMenuBotIcon != null) {
-                this.imageView.setImage(ImageLocation.getForDocument(sideAttachMenuBotIcon.icon), "24_24", (Drawable) null, tL_attachMenuBot);
-            } else {
+            if (sideAttachMenuBotIcon == null) {
                 this.imageView.setImageResource(R.drawable.msg_bot);
+                return;
             }
+            TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(sideAttachMenuBotIcon.icon.thumbs, 72);
+            Drawable svgThumb = DocumentObject.getSvgThumb(sideAttachMenuBotIcon.icon.thumbs, Theme.key_emptyListPlaceholder, 0.2f);
+            BackupImageView backupImageView = this.imageView;
+            ImageLocation forDocument = ImageLocation.getForDocument(sideAttachMenuBotIcon.icon);
+            ImageLocation forDocument2 = ImageLocation.getForDocument(closestPhotoSizeWithSize, sideAttachMenuBotIcon.icon);
+            if (svgThumb == null) {
+                svgThumb = getContext().getResources().getDrawable(R.drawable.msg_bot).mutate();
+            }
+            backupImageView.setImage(forDocument, "24_24", forDocument2, "24_24", svgThumb, tL_attachMenuBot);
         } catch (Throwable th) {
             FileLog.e(th);
         }

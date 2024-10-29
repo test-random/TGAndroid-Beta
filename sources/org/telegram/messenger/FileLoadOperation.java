@@ -59,6 +59,7 @@ public class FileLoadOperation {
     private int datacenterId;
     private ArrayList<RequestInfo> delayedRequestInfos;
     private FileLoadOperationDelegate delegate;
+    private long documentId;
     private int downloadChunkSize;
     private int downloadChunkSizeAnimation;
     private int downloadChunkSizeBig;
@@ -303,7 +304,9 @@ public class FileLoadOperation {
                 } else {
                     TLRPC.TL_inputDocumentFileLocation tL_inputDocumentFileLocation = new TLRPC.TL_inputDocumentFileLocation();
                     this.location = tL_inputDocumentFileLocation;
-                    tL_inputDocumentFileLocation.id = imageLocation.documentId;
+                    long j5 = imageLocation.documentId;
+                    tL_inputDocumentFileLocation.id = j5;
+                    this.documentId = j5;
                     TLRPC.TL_fileLocationToBeDeprecated tL_fileLocationToBeDeprecated5 = imageLocation.location;
                     tL_inputDocumentFileLocation.volume_id = tL_fileLocationToBeDeprecated5.volume_id;
                     tL_inputDocumentFileLocation.local_id = tL_fileLocationToBeDeprecated5.local_id;
@@ -443,9 +446,74 @@ public class FileLoadOperation {
         Utilities.stageQueue.postRunnable(new Runnable() {
             @Override
             public final void run() {
-                FileLoadOperation.this.lambda$cancel$13(z);
+                FileLoadOperation.this.lambda$cancel$12(z);
             }
         });
+    }
+
+    public void lambda$cancel$12(boolean z) {
+        if (this.state != 3 && this.state != 2) {
+            this.state = 5;
+            cancelRequests(new Runnable() {
+                @Override
+                public final void run() {
+                    FileLoadOperation.this.lambda$cancelOnStage$13();
+                }
+            });
+        }
+        if (z) {
+            File file = this.cacheFileFinal;
+            if (file != null) {
+                try {
+                    if (!file.delete()) {
+                        this.cacheFileFinal.deleteOnExit();
+                    }
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            }
+            File file2 = this.cacheFileTemp;
+            if (file2 != null) {
+                try {
+                    if (!file2.delete()) {
+                        this.cacheFileTemp.deleteOnExit();
+                    }
+                } catch (Exception e2) {
+                    FileLog.e(e2);
+                }
+            }
+            File file3 = this.cacheFileParts;
+            if (file3 != null) {
+                try {
+                    if (!file3.delete()) {
+                        this.cacheFileParts.deleteOnExit();
+                    }
+                } catch (Exception e3) {
+                    FileLog.e(e3);
+                }
+            }
+            File file4 = this.cacheIvTemp;
+            if (file4 != null) {
+                try {
+                    if (!file4.delete()) {
+                        this.cacheIvTemp.deleteOnExit();
+                    }
+                } catch (Exception e4) {
+                    FileLog.e(e4);
+                }
+            }
+            File file5 = this.cacheFilePreload;
+            if (file5 != null) {
+                try {
+                    if (file5.delete()) {
+                        return;
+                    }
+                    this.cacheFilePreload.deleteOnExit();
+                } catch (Exception e5) {
+                    FileLog.e(e5);
+                }
+            }
+        }
     }
 
     private void cancelRequests(final Runnable runnable) {
@@ -839,74 +907,9 @@ public class FileLoadOperation {
         }
     }
 
-    public void lambda$cancel$12() {
+    public void lambda$cancelOnStage$13() {
         if (this.state == 5) {
             onFail(false, 1);
-        }
-    }
-
-    public void lambda$cancel$13(boolean z) {
-        if (this.state != 3 && this.state != 2) {
-            this.state = 5;
-            cancelRequests(new Runnable() {
-                @Override
-                public final void run() {
-                    FileLoadOperation.this.lambda$cancel$12();
-                }
-            });
-        }
-        if (z) {
-            File file = this.cacheFileFinal;
-            if (file != null) {
-                try {
-                    if (!file.delete()) {
-                        this.cacheFileFinal.deleteOnExit();
-                    }
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
-            }
-            File file2 = this.cacheFileTemp;
-            if (file2 != null) {
-                try {
-                    if (!file2.delete()) {
-                        this.cacheFileTemp.deleteOnExit();
-                    }
-                } catch (Exception e2) {
-                    FileLog.e(e2);
-                }
-            }
-            File file3 = this.cacheFileParts;
-            if (file3 != null) {
-                try {
-                    if (!file3.delete()) {
-                        this.cacheFileParts.deleteOnExit();
-                    }
-                } catch (Exception e3) {
-                    FileLog.e(e3);
-                }
-            }
-            File file4 = this.cacheIvTemp;
-            if (file4 != null) {
-                try {
-                    if (!file4.delete()) {
-                        this.cacheIvTemp.deleteOnExit();
-                    }
-                } catch (Exception e4) {
-                    FileLog.e(e4);
-                }
-            }
-            File file5 = this.cacheFilePreload;
-            if (file5 != null) {
-                try {
-                    if (file5.delete()) {
-                        return;
-                    }
-                    this.cacheFilePreload.deleteOnExit();
-                } catch (Exception e5) {
-                    FileLog.e(e5);
-                }
-            }
         }
     }
 
@@ -1036,7 +1039,7 @@ public class FileLoadOperation {
             return;
         }
         if (BuildVars.LOGS_ENABLED) {
-            FileLog.d("debug_loading:" + this.cacheFileFinal.getName() + " pause operation, clear requests");
+            FileLog.d("debug_loading: " + this.cacheFileFinal.getName() + " pause operation, clear requests");
         }
         clearOperation(null, false, true);
     }
@@ -1056,8 +1059,13 @@ public class FileLoadOperation {
         if (this.streamListeners == null) {
             return;
         }
-        FileLog.e("FileLoadOperation " + getFileName() + " removing stream listener " + this.stream);
+        FileLog.e("FileLoadOperation " + getFileName() + " removing stream listener " + fileLoadOperationStream);
         this.streamListeners.remove(fileLoadOperationStream);
+        if (this.isStory || !this.streamListeners.isEmpty()) {
+            return;
+        }
+        pause();
+        FileLoader.getInstance(this.currentAccount).cancelLoadFile(getFileName());
     }
 
     public void lambda$requestFileOffsets$20(TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -1623,6 +1631,10 @@ public class FileLoadOperation {
 
     public int getDatacenterId() {
         return this.initialDatacenterId;
+    }
+
+    public long getDocumentId() {
+        return this.documentId;
     }
 
     public float getDownloadedLengthFromOffset(float f) {

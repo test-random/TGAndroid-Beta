@@ -26,7 +26,7 @@ import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.ItemOptions;
 import org.telegram.ui.Components.LayoutHelper;
 
-public abstract class BusinessBotButton extends FrameLayout {
+public class BusinessBotButton extends FrameLayout {
     private final AvatarDrawable avatarDrawable;
     private final BackupImageView avatarView;
     private long botId;

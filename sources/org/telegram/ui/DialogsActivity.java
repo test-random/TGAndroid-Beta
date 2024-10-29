@@ -861,7 +861,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             } else {
                 baseFragment = baseFragmentArr[0];
             }
-            baseFragment.lambda$onBackPressed$300();
+            baseFragment.lambda$onBackPressed$319();
             if (dialogsActivityDelegate != null) {
                 ArrayList arrayList = new ArrayList();
                 arrayList.add(MessagesStorage.TopicKey.of(-j, 0L));
@@ -879,7 +879,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             } else {
                 baseFragment = baseFragmentArr[0];
             }
-            baseFragment.lambda$onBackPressed$300();
+            baseFragment.lambda$onBackPressed$319();
         }
 
         public void lambda$didFinishChatCreation$3(long j, final BaseFragment[] baseFragmentArr, Runnable runnable) {
@@ -1112,7 +1112,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (DialogsActivity.this.searchString == null) {
                 return true;
             }
-            DialogsActivity.this.lambda$onBackPressed$300();
+            DialogsActivity.this.lambda$onBackPressed$319();
             return false;
         }
 
@@ -3572,7 +3572,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public void lambda$createGroupForThis$52(ChannelCreateActivity channelCreateActivity, BaseFragment baseFragment) {
         removeSelfFromStack();
         channelCreateActivity.removeSelfFromStack();
-        baseFragment.lambda$onBackPressed$300();
+        baseFragment.lambda$onBackPressed$319();
     }
 
     public void lambda$createGroupForThis$53(Long l, final ChannelCreateActivity channelCreateActivity, final BaseFragment baseFragment, Runnable runnable) {
@@ -3658,7 +3658,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         DialogsActivityDelegate dialogsActivityDelegate = this.delegate;
         removeSelfFromStack();
         channelCreateActivity.removeSelfFromStack();
-        baseFragment.lambda$onBackPressed$300();
+        baseFragment.lambda$onBackPressed$319();
         if (dialogsActivityDelegate != null) {
             ArrayList arrayList = new ArrayList();
             arrayList.add(MessagesStorage.TopicKey.of(-l.longValue(), 0L));
@@ -3752,25 +3752,57 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         presentFragment(highlightFoundQuote);
     }
 
-    public void lambda$createSearchViewPager$136(TLRPC.User user, DialogInterface dialogInterface, int i) {
+    public void lambda$createSearchViewPager$136(View view, int i) {
+        BaseFragment mediaActivity;
+        String str;
+        Object obj = this.searchViewPager.hashtagSearchAdapter.getItem(i).object;
+        if (obj instanceof MessageObject) {
+            MessageObject messageObject = (MessageObject) obj;
+            Bundle bundle = new Bundle();
+            long dialogId = messageObject.getDialogId();
+            long dialogId2 = messageObject.getDialogId();
+            if (dialogId >= 0) {
+                str = "user_id";
+            } else {
+                dialogId2 = -dialogId2;
+                str = "chat_id";
+            }
+            bundle.putLong(str, dialogId2);
+            bundle.putInt("message_id", messageObject.getId());
+            mediaActivity = highlightFoundQuote(new ChatActivity(bundle), messageObject);
+        } else {
+            if (!(obj instanceof StoriesController.SearchStoriesList)) {
+                return;
+            }
+            StoriesController.SearchStoriesList searchStoriesList = (StoriesController.SearchStoriesList) obj;
+            Bundle bundle2 = new Bundle();
+            bundle2.putInt("type", 3);
+            bundle2.putString("hashtag", searchStoriesList.query);
+            bundle2.putInt("storiesCount", searchStoriesList.getCount());
+            mediaActivity = new MediaActivity(bundle2, null);
+        }
+        presentFragment(mediaActivity);
+    }
+
+    public void lambda$createSearchViewPager$137(TLRPC.User user, DialogInterface dialogInterface, int i) {
         getMediaDataController().removeWebapp(user.id);
     }
 
-    public boolean lambda$createSearchViewPager$137(View view, int i) {
+    public boolean lambda$createSearchViewPager$138(View view, int i) {
         Object topPeerObject = this.searchViewPager.botsSearchAdapter.getTopPeerObject(i);
         if (topPeerObject instanceof TLRPC.User) {
             final TLRPC.User user = (TLRPC.User) topPeerObject;
             new AlertDialog.Builder(getContext(), this.resourceProvider).setTitle(LocaleController.getString(R.string.AppsClearSearch)).setMessage(LocaleController.formatString(R.string.AppsClearSearchAlert, "\"" + UserObject.getUserName(user) + "\"")).setNegativeButton(LocaleController.getString(R.string.Cancel), null).setPositiveButton(LocaleController.getString(R.string.Remove), new DialogInterface.OnClickListener() {
                 @Override
                 public final void onClick(DialogInterface dialogInterface, int i2) {
-                    DialogsActivity.this.lambda$createSearchViewPager$136(user, dialogInterface, i2);
+                    DialogsActivity.this.lambda$createSearchViewPager$137(user, dialogInterface, i2);
                 }
             }).makeRed(-1).show();
         }
         return false;
     }
 
-    public void lambda$createSearchViewPager$138(View view, int i, float f, float f2) {
+    public void lambda$createSearchViewPager$139(View view, int i, float f, float f2) {
         if (view instanceof ProfileSearchCell) {
             ProfileSearchCell profileSearchCell = (ProfileSearchCell) view;
             if (profileSearchCell.isBlocked()) {
@@ -3786,7 +3818,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    public void lambda$createSearchViewPager$139(boolean z, ArrayList arrayList, ArrayList arrayList2, boolean z2) {
+    public void lambda$createSearchViewPager$140(boolean z, ArrayList arrayList, ArrayList arrayList2, boolean z2) {
         updateFiltersView(z, arrayList, arrayList2, z2, true);
     }
 
@@ -4073,7 +4105,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     public void lambda$didSelectResult$118(long j, int i, boolean z, TopicsFragment topicsFragment) {
         if (this.delegate == null) {
-            lambda$onBackPressed$300();
+            lambda$onBackPressed$319();
             return;
         }
         ArrayList arrayList = new ArrayList();
@@ -4372,7 +4404,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         this.viewPages[0].listView.setEmptyView(null);
         this.viewPages[0].progressView.setVisibility(4);
-        lambda$onBackPressed$300();
+        lambda$onBackPressed$319();
     }
 
     public void lambda$performSelectedDialogsAction$93(ArrayList arrayList, final int i, final HashSet hashSet, final boolean z) {
@@ -5188,7 +5220,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         showDialog(builder.create());
     }
 
-    private void onItemClick(android.view.View r22, int r23, androidx.recyclerview.widget.RecyclerView.Adapter r24, float r25, float r26) {
+    private void onItemClick(android.view.View r20, int r21, androidx.recyclerview.widget.RecyclerView.Adapter r22, float r23, float r24) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.DialogsActivity.onItemClick(android.view.View, int, androidx.recyclerview.widget.RecyclerView$Adapter, float, float):void");
     }
 
@@ -5465,7 +5497,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (this.viewPages != null && dialogs.isEmpty() && !this.hasStories) {
                     this.viewPages[0].listView.setEmptyView(null);
                     this.viewPages[0].progressView.setVisibility(4);
-                    lambda$onBackPressed$300();
+                    lambda$onBackPressed$319();
                 }
             }
             hideActionMode(z3);
@@ -7367,12 +7399,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 DialogsActivity.this.lambda$createSearchViewPager$135(view, i, f, f2);
             }
         });
+        this.searchViewPager.hashtagSearchListView.setOnItemClickListener(new RecyclerListView.OnItemClickListener() {
+            @Override
+            public final void onItemClick(View view, int i) {
+                DialogsActivity.this.lambda$createSearchViewPager$136(view, i);
+            }
+        });
         this.searchViewPager.botsSearchListView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListener() {
             @Override
             public final boolean onItemClick(View view, int i) {
-                boolean lambda$createSearchViewPager$137;
-                lambda$createSearchViewPager$137 = DialogsActivity.this.lambda$createSearchViewPager$137(view, i);
-                return lambda$createSearchViewPager$137;
+                boolean lambda$createSearchViewPager$138;
+                lambda$createSearchViewPager$138 = DialogsActivity.this.lambda$createSearchViewPager$138(view, i);
+                return lambda$createSearchViewPager$138;
             }
         });
         this.searchViewPager.searchListView.setOnItemClickListener(new RecyclerListView.OnItemClickListenerExtended() {
@@ -7388,7 +7426,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             @Override
             public final void onItemClick(View view, int i, float f, float f2) {
-                DialogsActivity.this.lambda$createSearchViewPager$138(view, i, f, f2);
+                DialogsActivity.this.lambda$createSearchViewPager$139(view, i, f, f2);
             }
         });
         this.searchViewPager.searchListView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListenerExtended() {
@@ -7424,7 +7462,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         this.searchViewPager.setFilteredSearchViewDelegate(new FilteredSearchView.Delegate() {
             @Override
             public final void updateFiltersView(boolean z, ArrayList arrayList, ArrayList arrayList2, boolean z2) {
-                DialogsActivity.this.lambda$createSearchViewPager$139(z, arrayList, arrayList2, z2);
+                DialogsActivity.this.lambda$createSearchViewPager$140(z, arrayList, arrayList2, z2);
             }
         });
         this.searchViewPager.setVisibility(8);
@@ -7674,7 +7712,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                         if (i9 != intValue || i9 == 0) {
                                             return;
                                         }
-                                        lambda$onBackPressed$300();
+                                        lambda$onBackPressed$319();
                                         return;
                                     }
                                     if (i == NotificationCenter.dialogFiltersUpdated) {
@@ -7894,8 +7932,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     @Override
-    public void lambda$onBackPressed$300() {
-        super.lambda$onBackPressed$300();
+    public void lambda$onBackPressed$319() {
+        super.lambda$onBackPressed$319();
         ItemOptions itemOptions = this.filterOptions;
         if (itemOptions != null) {
             itemOptions.dismiss();

@@ -75,6 +75,8 @@ public class TL_stars {
         public ArrayList<TLRPC.MessageMedia> extended_media = new ArrayList<>();
         public boolean failed;
         public int flags;
+        public boolean floodskip;
+        public int floodskip_number;
         public boolean gift;
         public int giveaway_post_id;
         public String id;
@@ -107,10 +109,13 @@ public class TL_stars {
                     tL_starsTransaction_layer182 = new TL_starsTransaction_layer188();
                     break;
                 case 178185410:
-                    tL_starsTransaction_layer182 = new TL_starsTransaction();
+                    tL_starsTransaction_layer182 = new TL_starsTransaction_layer191();
                     break;
                 case 766853519:
                     tL_starsTransaction_layer182 = new TL_starsTransaction_layer185();
+                    break;
+                case 903148150:
+                    tL_starsTransaction_layer182 = new TL_starsTransaction();
                     break;
                 case 1127934763:
                     tL_starsTransaction_layer182 = new TL_starsTransaction_layer186();
@@ -146,6 +151,9 @@ public class TL_stars {
                     break;
                 case -382740222:
                     tL_starsTransactionPeerUnsupported = new TL_starsTransactionPeerFragment();
+                    break;
+                case -110658899:
+                    tL_starsTransactionPeerUnsupported = new TL_starsTransactionPeerAPI();
                     break;
                 case 621656824:
                     tL_starsTransactionPeerUnsupported = new TL_starsTransactionPeerPremiumBot();
@@ -976,7 +984,7 @@ public class TL_stars {
     }
 
     public static class TL_starsTransaction extends StarsTransaction {
-        public static final int constructor = 178185410;
+        public static final int constructor = 903148150;
 
         @Override
         public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
@@ -988,6 +996,7 @@ public class TL_stars {
             this.gift = (readInt32 & 1024) != 0;
             this.reaction = (readInt32 & 2048) != 0;
             this.subscription = (readInt32 & 4096) != 0;
+            this.floodskip = (readInt32 & 32768) != 0;
             this.id = abstractSerializedData.readString(z);
             this.stars = abstractSerializedData.readInt64(z);
             this.date = abstractSerializedData.readInt32(z);
@@ -1037,11 +1046,14 @@ public class TL_stars {
             if ((this.flags & 16384) != 0) {
                 this.stargift = StarGift.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
             }
+            if ((this.flags & 32768) != 0) {
+                this.floodskip_number = abstractSerializedData.readInt32(z);
+            }
         }
 
         @Override
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(178185410);
+            abstractSerializedData.writeInt32(903148150);
             int i = this.refund ? this.flags | 8 : this.flags & (-9);
             this.flags = i;
             int i2 = this.pending ? i | 16 : i & (-17);
@@ -1054,7 +1066,9 @@ public class TL_stars {
             this.flags = i5;
             int i6 = this.subscription ? i5 | 4096 : i5 & (-4097);
             this.flags = i6;
-            abstractSerializedData.writeInt32(i6);
+            int i7 = this.floodskip ? i6 | 32768 : i6 & (-32769);
+            this.flags = i7;
+            abstractSerializedData.writeInt32(i7);
             abstractSerializedData.writeInt64(this.stars);
             abstractSerializedData.writeInt32(this.date);
             this.peer.serializeToStream(abstractSerializedData);
@@ -1081,8 +1095,8 @@ public class TL_stars {
                 abstractSerializedData.writeInt32(481674261);
                 int size = this.extended_media.size();
                 abstractSerializedData.writeInt32(size);
-                for (int i7 = 0; i7 < size; i7++) {
-                    this.extended_media.get(i7).serializeToStream(abstractSerializedData);
+                for (int i8 = 0; i8 < size; i8++) {
+                    this.extended_media.get(i8).serializeToStream(abstractSerializedData);
                 }
             }
             if ((this.flags & 4096) != 0) {
@@ -1093,6 +1107,9 @@ public class TL_stars {
             }
             if ((this.flags & 16384) != 0) {
                 this.stargift.serializeToStream(abstractSerializedData);
+            }
+            if ((this.flags & 32768) != 0) {
+                abstractSerializedData.writeInt32(this.floodskip_number);
             }
         }
     }
@@ -1109,6 +1126,19 @@ public class TL_stars {
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
             abstractSerializedData.writeInt32(-670195363);
             this.peer.serializeToStream(abstractSerializedData);
+        }
+    }
+
+    public static class TL_starsTransactionPeerAPI extends StarsTransactionPeer {
+        public static final int constructor = -110658899;
+
+        @Override
+        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            abstractSerializedData.writeInt32(-110658899);
         }
     }
 
@@ -1612,6 +1642,128 @@ public class TL_stars {
             }
             if ((this.flags & 8192) != 0) {
                 abstractSerializedData.writeInt32(this.giveaway_post_id);
+            }
+        }
+    }
+
+    public static class TL_starsTransaction_layer191 extends TL_starsTransaction {
+        public static final int constructor = 178185410;
+
+        @Override
+        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+            int readInt32 = abstractSerializedData.readInt32(z);
+            this.flags = readInt32;
+            this.refund = (readInt32 & 8) != 0;
+            this.pending = (readInt32 & 16) != 0;
+            this.failed = (readInt32 & 64) != 0;
+            this.gift = (readInt32 & 1024) != 0;
+            this.reaction = (readInt32 & 2048) != 0;
+            this.subscription = (readInt32 & 4096) != 0;
+            this.id = abstractSerializedData.readString(z);
+            this.stars = abstractSerializedData.readInt64(z);
+            this.date = abstractSerializedData.readInt32(z);
+            this.peer = StarsTransactionPeer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            if ((this.flags & 1) != 0) {
+                this.title = abstractSerializedData.readString(z);
+            }
+            if ((this.flags & 2) != 0) {
+                this.description = abstractSerializedData.readString(z);
+            }
+            if ((this.flags & 4) != 0) {
+                this.photo = TLRPC.WebDocument.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            }
+            if ((this.flags & 32) != 0) {
+                this.transaction_date = abstractSerializedData.readInt32(z);
+                this.transaction_url = abstractSerializedData.readString(z);
+            }
+            if ((this.flags & 128) != 0) {
+                this.bot_payload = abstractSerializedData.readByteArray(z);
+            }
+            if ((this.flags & 256) != 0) {
+                this.msg_id = abstractSerializedData.readInt32(z);
+            }
+            if ((this.flags & 512) != 0) {
+                int readInt322 = abstractSerializedData.readInt32(z);
+                if (readInt322 != 481674261) {
+                    if (z) {
+                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
+                    }
+                    return;
+                }
+                int readInt323 = abstractSerializedData.readInt32(z);
+                for (int i = 0; i < readInt323; i++) {
+                    TLRPC.MessageMedia TLdeserialize = TLRPC.MessageMedia.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                    if (TLdeserialize == null) {
+                        return;
+                    }
+                    this.extended_media.add(TLdeserialize);
+                }
+            }
+            if ((this.flags & 4096) != 0) {
+                this.subscription_period = abstractSerializedData.readInt32(z);
+            }
+            if ((this.flags & 8192) != 0) {
+                this.giveaway_post_id = abstractSerializedData.readInt32(z);
+            }
+            if ((this.flags & 16384) != 0) {
+                this.stargift = StarGift.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            }
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            abstractSerializedData.writeInt32(178185410);
+            int i = this.refund ? this.flags | 8 : this.flags & (-9);
+            this.flags = i;
+            int i2 = this.pending ? i | 16 : i & (-17);
+            this.flags = i2;
+            int i3 = this.failed ? i2 | 64 : i2 & (-65);
+            this.flags = i3;
+            int i4 = this.gift ? i3 | 1024 : i3 & (-1025);
+            this.flags = i4;
+            int i5 = this.reaction ? i4 | 2048 : i4 & (-2049);
+            this.flags = i5;
+            int i6 = this.subscription ? i5 | 4096 : i5 & (-4097);
+            this.flags = i6;
+            abstractSerializedData.writeInt32(i6);
+            abstractSerializedData.writeInt64(this.stars);
+            abstractSerializedData.writeInt32(this.date);
+            this.peer.serializeToStream(abstractSerializedData);
+            if ((this.flags & 1) != 0) {
+                abstractSerializedData.writeString(this.title);
+            }
+            if ((this.flags & 2) != 0) {
+                abstractSerializedData.writeString(this.description);
+            }
+            if ((this.flags & 4) != 0) {
+                this.photo.serializeToStream(abstractSerializedData);
+            }
+            if ((this.flags & 32) != 0) {
+                abstractSerializedData.writeInt32(this.transaction_date);
+                abstractSerializedData.writeString(this.transaction_url);
+            }
+            if ((this.flags & 128) != 0) {
+                abstractSerializedData.writeByteArray(this.bot_payload);
+            }
+            if ((this.flags & 256) != 0) {
+                abstractSerializedData.writeInt32(this.msg_id);
+            }
+            if ((this.flags & 512) != 0) {
+                abstractSerializedData.writeInt32(481674261);
+                int size = this.extended_media.size();
+                abstractSerializedData.writeInt32(size);
+                for (int i7 = 0; i7 < size; i7++) {
+                    this.extended_media.get(i7).serializeToStream(abstractSerializedData);
+                }
+            }
+            if ((this.flags & 4096) != 0) {
+                abstractSerializedData.writeInt32(this.subscription_period);
+            }
+            if ((this.flags & 8192) != 0) {
+                abstractSerializedData.writeInt32(this.giveaway_post_id);
+            }
+            if ((this.flags & 16384) != 0) {
+                this.stargift.serializeToStream(abstractSerializedData);
             }
         }
     }

@@ -96,7 +96,6 @@ import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Business.ChatAttachAlertQuickRepliesLayout;
-import org.telegram.ui.Business.QuickRepliesController;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AlertsCreator;
 import org.telegram.ui.Components.AnimationProperties;
@@ -185,6 +184,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
     private ChatAttachAlertDocumentLayout.DocumentSelectActivityDelegate documentsDelegate;
     private boolean documentsEnabled;
     protected ActionBarMenuItem doneItem;
+    private int editType;
     protected MessageObject editingMessageObject;
     private boolean enterCommentEventSent;
     private ArrayList exclusionRects;
@@ -2862,94 +2862,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
 
         @Override
         public void notifyDataSetChanged() {
-            int i;
-            this.buttonsCount = 0;
-            this.galleryButton = -1;
-            this.documentButton = -1;
-            this.musicButton = -1;
-            this.pollButton = -1;
-            this.contactButton = -1;
-            this.quickRepliesButton = -1;
-            this.locationButton = -1;
-            this.attachBotsStartRow = -1;
-            this.attachBotsEndRow = -1;
-            ChatAttachAlert chatAttachAlert = ChatAttachAlert.this;
-            if (chatAttachAlert.baseFragment instanceof ChatActivity) {
-                MessageObject messageObject = chatAttachAlert.editingMessageObject;
-                if (messageObject == null) {
-                    this.buttonsCount = 1;
-                    this.galleryButton = 0;
-                    if (chatAttachAlert.photosEnabled || ChatAttachAlert.this.videosEnabled) {
-                        BaseFragment baseFragment = ChatAttachAlert.this.baseFragment;
-                        if ((baseFragment instanceof ChatActivity) && !((ChatActivity) baseFragment).isInScheduleMode() && !((ChatActivity) ChatAttachAlert.this.baseFragment).isSecretChat() && ((ChatActivity) ChatAttachAlert.this.baseFragment).getChatMode() != 5) {
-                            ChatActivity chatActivity = (ChatActivity) ChatAttachAlert.this.baseFragment;
-                            this.attachBotsStartRow = this.buttonsCount;
-                            this.attachMenuBots.clear();
-                            Iterator<TLRPC.TL_attachMenuBot> it = MediaDataController.getInstance(ChatAttachAlert.this.currentAccount).getAttachMenuBots().bots.iterator();
-                            while (it.hasNext()) {
-                                TLRPC.TL_attachMenuBot next = it.next();
-                                if (next.show_in_attach_menu) {
-                                    if (MediaDataController.canShowAttachMenuBot(next, chatActivity.getCurrentChat() != null ? chatActivity.getCurrentChat() : chatActivity.getCurrentUser())) {
-                                        this.attachMenuBots.add(next);
-                                    }
-                                }
-                            }
-                            int size = this.buttonsCount + this.attachMenuBots.size();
-                            this.buttonsCount = size;
-                            this.attachBotsEndRow = size;
-                        }
-                    }
-                    int i2 = this.buttonsCount;
-                    this.buttonsCount = i2 + 1;
-                    this.documentButton = i2;
-                    if (ChatAttachAlert.this.plainTextEnabled) {
-                        int i3 = this.buttonsCount;
-                        this.buttonsCount = i3 + 1;
-                        this.locationButton = i3;
-                    }
-                    if (ChatAttachAlert.this.pollsEnabled) {
-                        int i4 = this.buttonsCount;
-                        this.buttonsCount = i4 + 1;
-                        this.pollButton = i4;
-                    }
-                    if (ChatAttachAlert.this.plainTextEnabled) {
-                        int i5 = this.buttonsCount;
-                        this.buttonsCount = i5 + 1;
-                        this.contactButton = i5;
-                    }
-                    BaseFragment baseFragment2 = ChatAttachAlert.this.baseFragment;
-                    TLRPC.User currentUser = baseFragment2 instanceof ChatActivity ? ((ChatActivity) baseFragment2).getCurrentUser() : null;
-                    BaseFragment baseFragment3 = ChatAttachAlert.this.baseFragment;
-                    if ((baseFragment3 instanceof ChatActivity) && ((ChatActivity) baseFragment3).getChatMode() == 0 && currentUser != null && !currentUser.bot && QuickRepliesController.getInstance(ChatAttachAlert.this.currentAccount).hasReplies()) {
-                        int i6 = this.buttonsCount;
-                        this.buttonsCount = i6 + 1;
-                        this.quickRepliesButton = i6;
-                    }
-                } else if ((!messageObject.isMusic() && !ChatAttachAlert.this.editingMessageObject.isDocument()) || !ChatAttachAlert.this.editingMessageObject.hasValidGroupId()) {
-                    int i7 = this.buttonsCount;
-                    this.galleryButton = i7;
-                    this.documentButton = i7 + 1;
-                    this.buttonsCount = i7 + 3;
-                    this.musicButton = i7 + 2;
-                } else if (!ChatAttachAlert.this.editingMessageObject.isMusic()) {
-                    int i8 = this.buttonsCount;
-                    this.buttonsCount = i8 + 1;
-                    this.documentButton = i8;
-                }
-                i = this.buttonsCount;
-                this.buttonsCount = i + 1;
-                this.musicButton = i;
-            } else {
-                this.galleryButton = 0;
-                i = 2;
-                this.buttonsCount = 2;
-                this.documentButton = 1;
-                if (chatAttachAlert.allowEnterCaption) {
-                    this.buttonsCount = 3;
-                    this.musicButton = i;
-                }
-            }
-            super.notifyDataSetChanged();
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ChatAttachAlert.ButtonsAdapter.notifyDataSetChanged():void");
         }
 
         @Override
@@ -3363,6 +3276,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         actionBarMenuItem3.setContentDescription(LocaleController.getString(i8));
         this.selectedMenuItem.setVisibility(4);
         this.selectedMenuItem.setAlpha(0.0f);
+        this.selectedMenuItem.setScaleX(0.6f);
+        this.selectedMenuItem.setScaleY(0.6f);
         this.selectedMenuItem.setSubMenuOpenSide(2);
         this.selectedMenuItem.setDelegate(new ActionBarMenuItem.ActionBarMenuItemDelegate() {
             @Override
@@ -4246,7 +4161,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         }, resourcesProvider);
     }
 
-    public boolean lambda$new$26(final android.content.Context r30, final org.telegram.ui.ActionBar.Theme.ResourcesProvider r31, final org.telegram.ui.ActionBar.BaseFragment r32, android.view.View r33) {
+    public boolean lambda$new$26(final android.content.Context r31, final org.telegram.ui.ActionBar.Theme.ResourcesProvider r32, final org.telegram.ui.ActionBar.BaseFragment r33, android.view.View r34) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ChatAttachAlert.lambda$new$26(android.content.Context, org.telegram.ui.ActionBar.Theme$ResourcesProvider, org.telegram.ui.ActionBar.BaseFragment, android.view.View):boolean");
     }
 
@@ -4876,6 +4791,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             }
             if (z4) {
                 this.selectedMenuItem.setVisibility(0);
+                this.selectedMenuItem.setClickable(true);
             }
         } else if (this.typeButtonsAvailable && this.frameLayout2.getTag() == null) {
             this.buttonsRecyclerView.setVisibility(0);
@@ -4952,6 +4868,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         }
         if (z4) {
             this.selectedMenuItem.setAlpha(z5 ? 1.0f : 0.0f);
+            this.selectedMenuItem.setScaleX(z5 ? 1.0f : 0.6f);
+            this.selectedMenuItem.setScaleY(z5 ? 1.0f : 0.6f);
         }
         if (z5) {
             return;
@@ -5222,6 +5140,10 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         if (this.optionsItem != null) {
             this.selectedTextView.setTranslationY(-AndroidUtilities.dp(8.0f));
             this.optionsItem.setVisibility(0);
+            this.optionsItem.setClickable(true);
+            this.optionsItem.setAlpha(1.0f);
+            this.optionsItem.setScaleX(1.0f);
+            this.optionsItem.setScaleY(1.0f);
         }
     }
 
@@ -5731,12 +5653,20 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         this.documentsDelegate = documentSelectActivityDelegate;
     }
 
-    public void setEditingMessageObject(MessageObject messageObject) {
-        if (this.editingMessageObject == messageObject) {
+    public void setEditingMessageObject(int i, MessageObject messageObject) {
+        ChatAttachAlertPhotoLayout chatAttachAlertPhotoLayout;
+        if (messageObject != null && (chatAttachAlertPhotoLayout = this.photoLayout) != null) {
+            chatAttachAlertPhotoLayout.clearSelectedPhotos();
+        }
+        if (this.editingMessageObject == messageObject && this.editType == i) {
             return;
         }
         this.editingMessageObject = messageObject;
-        if (messageObject != null) {
+        if (messageObject != null && messageObject.hasValidGroupId()) {
+            i = this.editingMessageObject.isMusic() ? 2 : this.editingMessageObject.isDocument() ? 1 : 0;
+        }
+        this.editType = i;
+        if (this.editingMessageObject != null) {
             this.maxSelectedPhotos = 1;
             this.allowOrder = false;
         } else {
@@ -5744,6 +5674,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             this.allowOrder = true;
         }
         this.buttonsAdapter.notifyDataSetChanged();
+        updateCountButton(0);
     }
 
     public void setImageUpdater(ImageUpdater imageUpdater) {
@@ -5805,9 +5736,12 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         this.mentionContainer.getAdapter().setAllowBots(false);
         this.mentionContainer.getAdapter().setAllowChats(false);
         this.mentionContainer.getAdapter().setSearchInDailogs(true);
-        if (this.baseFragment instanceof ChatActivity) {
-            this.mentionContainer.getAdapter().setChatInfo(((ChatActivity) this.baseFragment).getCurrentChatInfo());
-            this.mentionContainer.getAdapter().setNeedUsernames(((ChatActivity) this.baseFragment).getCurrentChat() != null);
+        BaseFragment baseFragment = this.baseFragment;
+        if (baseFragment instanceof ChatActivity) {
+            ChatActivity chatActivity = (ChatActivity) baseFragment;
+            this.mentionContainer.getAdapter().setUserOrChat(chatActivity.getCurrentUser(), chatActivity.getCurrentChat());
+            this.mentionContainer.getAdapter().setChatInfo(chatActivity.getCurrentChatInfo());
+            this.mentionContainer.getAdapter().setNeedUsernames(chatActivity.getCurrentChat() != null);
         } else {
             this.mentionContainer.getAdapter().setChatInfo(null);
             this.mentionContainer.getAdapter().setNeedUsernames(false);
@@ -5898,7 +5832,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         }
     }
 
-    public void updateCountButton(int r10) {
+    public void updateCountButton(int r11) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ChatAttachAlert.updateCountButton(int):void");
     }
 

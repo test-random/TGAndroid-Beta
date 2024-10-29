@@ -78,8 +78,12 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     private boolean messagesSearchEndReached;
     private int needMessagesSearch;
     private int nextSearchRate;
+    public String publicPostsHashtag;
+    public int publicPostsLastRate;
+    public int publicPostsTotalCount;
     private final Theme.ResourcesProvider resourcesProvider;
     private SearchAdapterHelper searchAdapterHelper;
+    private Runnable searchHashtagRunnable;
     private Runnable searchRunnable;
     private Runnable searchRunnable2;
     private boolean searchWas;
@@ -93,7 +97,10 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     public final int VIEW_TYPE_CATEGORY_LIST = 6;
     public final int VIEW_TYPE_ADD_BY_PHONE = 7;
     public final int VIEW_TYPE_INVITE_CONTACT_CELL = 8;
+    public final int VIEW_TYPE_PUBLIC_POST = 9;
+    private int searchHashtagRequest = -1;
     private ArrayList searchResult = new ArrayList();
+    public ArrayList publicPosts = new ArrayList();
     private final ArrayList searchContacts = new ArrayList();
     private final ArrayList searchTopics = new ArrayList();
     private ArrayList searchResultNames = new ArrayList();
@@ -446,39 +453,43 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
     }
 
-    public void lambda$onBindViewHolder$19(View view) {
+    public void lambda$onBindViewHolder$22(View view) {
         DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
         if (dialogsSearchAdapterDelegate != null) {
             dialogsSearchAdapterDelegate.needClearList();
         }
     }
 
-    public void lambda$onBindViewHolder$20(View view) {
+    public void lambda$onBindViewHolder$23(View view) {
+        openPublicPosts();
+    }
+
+    public void lambda$onBindViewHolder$24(View view) {
         DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
         if (dialogsSearchAdapterDelegate != null) {
             dialogsSearchAdapterDelegate.needClearList();
         }
     }
 
-    public void lambda$onBindViewHolder$21(View view) {
+    public void lambda$onBindViewHolder$25(View view) {
         DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
         if (dialogsSearchAdapterDelegate != null) {
             dialogsSearchAdapterDelegate.needClearList();
         }
     }
 
-    public void lambda$onBindViewHolder$22(GraySectionCell graySectionCell) {
+    public void lambda$onBindViewHolder$26(GraySectionCell graySectionCell) {
         boolean z = !this.phoneCollapsed;
         this.phoneCollapsed = z;
         graySectionCell.setRightText(LocaleController.getString(z ? R.string.ShowMore : R.string.ShowLess));
         notifyDataSetChanged();
     }
 
-    public void lambda$onBindViewHolder$23(int i) {
+    public void lambda$onBindViewHolder$27(int i) {
         notifyItemChanged(i + 3);
     }
 
-    public void lambda$onBindViewHolder$24(View view) {
+    public void lambda$onBindViewHolder$28(View view) {
         this.showMoreAnimation = false;
         this.showMoreHeader = null;
         if (view != null) {
@@ -486,7 +497,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
     }
 
-    public void lambda$onBindViewHolder$25(ArrayList arrayList, final int i, GraySectionCell graySectionCell) {
+    public void lambda$onBindViewHolder$29(ArrayList arrayList, final int i, GraySectionCell graySectionCell) {
         long elapsedRealtime = SystemClock.elapsedRealtime();
         if (elapsedRealtime - this.lastShowMoreUpdate < 300) {
             return;
@@ -527,7 +538,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public final void run() {
-                        DialogsSearchAdapter.this.lambda$onBindViewHolder$23(i);
+                        DialogsSearchAdapter.this.lambda$onBindViewHolder$27(i);
                     }
                 }, 350L);
             } else {
@@ -549,14 +560,14 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         Runnable runnable2 = new Runnable() {
             @Override
             public final void run() {
-                DialogsSearchAdapter.this.lambda$onBindViewHolder$24(view);
+                DialogsSearchAdapter.this.lambda$onBindViewHolder$28(view);
             }
         };
         this.cancelShowMoreAnimation = runnable2;
         AndroidUtilities.runOnUIThread(runnable2, 400L);
     }
 
-    public void lambda$onCreateViewHolder$17(View view, int i) {
+    public void lambda$onCreateViewHolder$20(View view, int i) {
         if (view instanceof HintDialogCell) {
             HintDialogCell hintDialogCell = (HintDialogCell) view;
             if (hintDialogCell.isBlocked()) {
@@ -574,7 +585,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
     }
 
-    public boolean lambda$onCreateViewHolder$18(View view, int i) {
+    public boolean lambda$onCreateViewHolder$21(View view, int i) {
         DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
         if (dialogsSearchAdapterDelegate == null) {
             return true;
@@ -650,6 +661,54 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         };
         this.searchRunnable2 = runnable;
         AndroidUtilities.runOnUIThread(runnable);
+    }
+
+    public void lambda$searchDialogs$17(int i, TLObject tLObject, String str) {
+        if (i == this.lastSearchId && (tLObject instanceof TLRPC.messages_Messages)) {
+            TLRPC.messages_Messages messages_messages = (TLRPC.messages_Messages) tLObject;
+            this.publicPostsTotalCount = messages_messages instanceof TLRPC.TL_messages_messages ? ((TLRPC.TL_messages_messages) messages_messages).messages.size() : messages_messages instanceof TLRPC.TL_messages_messagesSlice ? ((TLRPC.TL_messages_messagesSlice) messages_messages).count : 0;
+            this.publicPostsLastRate = messages_messages.next_rate;
+            this.publicPostsHashtag = str;
+            MessagesController.getInstance(this.currentAccount).putUsers(messages_messages.users, false);
+            MessagesController.getInstance(this.currentAccount).putChats(messages_messages.chats, false);
+            for (int i2 = 0; i2 < messages_messages.messages.size(); i2++) {
+                this.publicPosts.add(new MessageObject(this.currentAccount, messages_messages.messages.get(i2), false, true));
+            }
+            DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
+            if (dialogsSearchAdapterDelegate != null) {
+                dialogsSearchAdapterDelegate.searchStateChanged(this.waitingResponseCount > 0, true);
+            }
+            notifyDataSetChanged();
+        }
+    }
+
+    public void lambda$searchDialogs$18(final int i, final String str, final TLObject tLObject, TLRPC.TL_error tL_error) {
+        AndroidUtilities.runOnUIThread(new Runnable() {
+            @Override
+            public final void run() {
+                DialogsSearchAdapter.this.lambda$searchDialogs$17(i, tLObject, str);
+            }
+        });
+    }
+
+    public void lambda$searchDialogs$19(final int i, final String str) {
+        this.searchHashtagRunnable = null;
+        if (i != this.lastSearchId) {
+            return;
+        }
+        if (this.searchHashtagRequest >= 0) {
+            ConnectionsManager.getInstance(this.currentAccount).cancelRequest(this.searchHashtagRequest, true);
+        }
+        TLRPC.TL_channels_searchPosts tL_channels_searchPosts = new TLRPC.TL_channels_searchPosts();
+        tL_channels_searchPosts.hashtag = str;
+        tL_channels_searchPosts.limit = 3;
+        tL_channels_searchPosts.offset_peer = new TLRPC.TL_inputPeerEmpty();
+        this.searchHashtagRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_channels_searchPosts, new RequestDelegate() {
+            @Override
+            public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
+                DialogsSearchAdapter.this.lambda$searchDialogs$18(i, str, tLObject, tL_error);
+            }
+        });
     }
 
     public void lambda$searchDialogsInternal$11() {
@@ -1238,160 +1297,158 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     }
 
     public Object getItem(int i) {
-        ArrayList globalSearch;
         int i2;
         Object chat;
-        if (this.searchResultHashtags.isEmpty()) {
-            if (isRecentSearchDisplayed()) {
-                ?? hasHints = hasHints();
-                ArrayList arrayList = this.searchWas ? this.filtered2RecentSearchObjects : this.filteredRecentSearchObjects;
-                if (i > hasHints && (i2 = (i - 1) - (hasHints == true ? 1 : 0)) < arrayList.size()) {
-                    TLObject tLObject = ((RecentSearchObject) arrayList.get(i2)).object;
-                    if (tLObject instanceof TLRPC.User) {
-                        chat = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(((TLRPC.User) tLObject).id));
-                        if (chat == null) {
-                            return tLObject;
-                        }
-                    } else if (!(tLObject instanceof TLRPC.Chat) || (chat = MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(((TLRPC.Chat) tLObject).id))) == null) {
+        int i3;
+        if (!this.publicPosts.isEmpty()) {
+            if (i > 0 && i - 1 < this.publicPosts.size()) {
+                return this.publicPosts.get(i3);
+            }
+            i -= this.publicPosts.size() + 1;
+        }
+        if (!this.searchResultHashtags.isEmpty()) {
+            if (i > 0) {
+                return this.searchResultHashtags.get(i - 1);
+            }
+            return null;
+        }
+        if (isRecentSearchDisplayed()) {
+            ?? hasHints = hasHints();
+            ArrayList arrayList = this.searchWas ? this.filtered2RecentSearchObjects : this.filteredRecentSearchObjects;
+            if (i > hasHints && (i2 = (i - 1) - (hasHints == true ? 1 : 0)) < arrayList.size()) {
+                TLObject tLObject = ((RecentSearchObject) arrayList.get(i2)).object;
+                if (tLObject instanceof TLRPC.User) {
+                    chat = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(((TLRPC.User) tLObject).id));
+                    if (chat == null) {
                         return tLObject;
                     }
-                    return chat;
+                } else if (!(tLObject instanceof TLRPC.Chat) || (chat = MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(((TLRPC.Chat) tLObject).id))) == null) {
+                    return tLObject;
                 }
-                i -= getRecentItemsCount();
+                return chat;
             }
-            if (!this.searchTopics.isEmpty()) {
-                if (i <= 0 || i > this.searchTopics.size()) {
-                    i -= this.searchTopics.size() + 1;
-                } else {
-                    globalSearch = this.searchTopics;
-                }
+            i -= getRecentItemsCount();
+        }
+        if (!this.searchTopics.isEmpty()) {
+            if (i > 0 && i <= this.searchTopics.size()) {
+                return this.searchTopics.get(i - 1);
             }
-            if (!this.searchContacts.isEmpty()) {
-                if (i <= 0 || i > this.searchContacts.size()) {
-                    i -= this.searchContacts.size() + 1;
-                } else {
-                    globalSearch = this.searchContacts;
-                }
+            i -= this.searchTopics.size() + 1;
+        }
+        if (!this.searchContacts.isEmpty()) {
+            if (i > 0 && i <= this.searchContacts.size()) {
+                return this.searchContacts.get(i - 1);
             }
-            globalSearch = this.searchAdapterHelper.getGlobalSearch();
-            ArrayList localServerSearch = this.searchAdapterHelper.getLocalServerSearch();
-            ArrayList phoneSearch = this.searchAdapterHelper.getPhoneSearch();
-            int size = this.searchResult.size();
-            int size2 = localServerSearch.size();
-            if (size + size2 > 0 && (getRecentItemsCount() > 0 || !this.searchTopics.isEmpty())) {
-                if (i == 0) {
-                    return null;
-                }
-                i--;
-            }
-            int size3 = phoneSearch.size();
-            if (size3 > 3 && this.phoneCollapsed) {
-                size3 = 3;
-            }
-            int i3 = 0;
-            int size4 = globalSearch.isEmpty() ? 0 : globalSearch.size() + 1;
-            if (size4 > 4 && this.globalSearchCollapsed) {
-                size4 = 4;
-            }
-            if (i >= 0 && i < size) {
-                globalSearch = this.searchResult;
-                return globalSearch.get(i);
-            }
-            int i4 = i - size;
-            if (i4 >= 0 && i4 < size2) {
-                return localServerSearch.get(i4);
-            }
-            int i5 = i4 - size2;
-            if (i5 >= 0 && i5 < size3) {
-                return phoneSearch.get(i5);
-            }
-            i = i5 - size3;
-            if (i <= 0 || i >= size4) {
-                i -= size4;
-                int size5 = this.searchForumResultMessages.isEmpty() ? 0 : this.searchForumResultMessages.size() + 1;
-                if (i <= 0 || i > this.searchForumResultMessages.size()) {
-                    if (!this.localMessagesSearchEndReached && !this.searchForumResultMessages.isEmpty()) {
-                        i3 = 1;
-                    }
-                    i -= size5 + i3;
-                    if (!this.searchResultMessages.isEmpty()) {
-                        this.searchResultMessages.size();
-                    }
-                    if (i <= 0 || i > this.searchResultMessages.size()) {
-                        return null;
-                    }
-                    globalSearch = this.searchResultMessages;
-                } else {
-                    globalSearch = this.searchForumResultMessages;
-                }
-            }
-        } else {
-            if (i <= 0) {
+            i -= this.searchContacts.size() + 1;
+        }
+        ArrayList globalSearch = this.searchAdapterHelper.getGlobalSearch();
+        ArrayList localServerSearch = this.searchAdapterHelper.getLocalServerSearch();
+        ArrayList phoneSearch = this.searchAdapterHelper.getPhoneSearch();
+        int size = this.searchResult.size();
+        int size2 = localServerSearch.size();
+        if (size + size2 > 0 && (getRecentItemsCount() > 0 || !this.searchTopics.isEmpty() || !this.publicPosts.isEmpty())) {
+            if (i == 0) {
                 return null;
             }
-            globalSearch = this.searchResultHashtags;
+            i--;
         }
-        i--;
-        return globalSearch.get(i);
+        int size3 = phoneSearch.size();
+        if (size3 > 3 && this.phoneCollapsed) {
+            size3 = 3;
+        }
+        int i4 = 0;
+        int size4 = globalSearch.isEmpty() ? 0 : globalSearch.size() + 1;
+        if (size4 > 4 && this.globalSearchCollapsed) {
+            size4 = 4;
+        }
+        if (i >= 0 && i < size) {
+            return this.searchResult.get(i);
+        }
+        int i5 = i - size;
+        if (i5 >= 0 && i5 < size2) {
+            return localServerSearch.get(i5);
+        }
+        int i6 = i5 - size2;
+        if (i6 >= 0 && i6 < size3) {
+            return phoneSearch.get(i6);
+        }
+        int i7 = i6 - size3;
+        if (i7 > 0 && i7 < size4) {
+            return globalSearch.get(i7 - 1);
+        }
+        int i8 = i7 - size4;
+        int size5 = this.searchForumResultMessages.isEmpty() ? 0 : this.searchForumResultMessages.size() + 1;
+        if (i8 > 0 && i8 <= this.searchForumResultMessages.size()) {
+            return this.searchForumResultMessages.get(i8 - 1);
+        }
+        if (!this.localMessagesSearchEndReached && !this.searchForumResultMessages.isEmpty()) {
+            i4 = 1;
+        }
+        int i9 = i8 - (size5 + i4);
+        if (!this.searchResultMessages.isEmpty()) {
+            this.searchResultMessages.size();
+        }
+        if (i9 <= 0 || i9 > this.searchResultMessages.size()) {
+            return null;
+        }
+        return this.searchResultMessages.get(i9 - 1);
     }
 
     @Override
     public int getItemCount() {
-        int i;
         if (this.waitingResponseCount == 3) {
             return 0;
         }
+        int size = !this.publicPosts.isEmpty() ? this.publicPosts.size() + 1 : 0;
         if (!this.searchResultHashtags.isEmpty()) {
-            return this.searchResultHashtags.size() + 1;
+            return size + this.searchResultHashtags.size() + 1;
         }
         if (isRecentSearchDisplayed()) {
-            i = getRecentItemsCount();
+            size += getRecentItemsCount();
             if (!this.searchWas) {
-                return i;
+                return size;
             }
-        } else {
-            i = 0;
         }
         if (!this.searchTopics.isEmpty()) {
-            i = i + 1 + this.searchTopics.size();
+            size = size + 1 + this.searchTopics.size();
         }
         if (!this.searchContacts.isEmpty()) {
-            i += this.searchContacts.size() + 1;
+            size += this.searchContacts.size() + 1;
         }
-        int size = this.searchResult.size();
-        int size2 = this.searchAdapterHelper.getLocalServerSearch().size();
-        int i2 = i + size + size2;
-        int size3 = this.searchAdapterHelper.getGlobalSearch().size();
-        if (size3 > 3 && this.globalSearchCollapsed) {
-            size3 = 3;
+        int size2 = this.searchResult.size();
+        int size3 = this.searchAdapterHelper.getLocalServerSearch().size();
+        int i = size + size2 + size3;
+        int size4 = this.searchAdapterHelper.getGlobalSearch().size();
+        if (size4 > 3 && this.globalSearchCollapsed) {
+            size4 = 3;
         }
-        int size4 = this.searchAdapterHelper.getPhoneSearch().size();
-        int i3 = (size4 <= 3 || !this.phoneCollapsed) ? size4 : 3;
-        if (size + size2 > 0 && (getRecentItemsCount() > 0 || !this.searchTopics.isEmpty())) {
-            i2++;
+        int size5 = this.searchAdapterHelper.getPhoneSearch().size();
+        int i2 = (size5 <= 3 || !this.phoneCollapsed) ? size5 : 3;
+        if (size2 + size3 > 0 && (getRecentItemsCount() > 0 || !this.searchTopics.isEmpty() || !this.publicPosts.isEmpty())) {
+            i++;
         }
-        if (size3 != 0) {
-            i2 += size3 + 1;
+        if (size4 != 0) {
+            i += size4 + 1;
         }
-        if (i3 != 0) {
-            i2 += i3;
+        if (i2 != 0) {
+            i += i2;
         }
-        int size5 = this.searchForumResultMessages.size();
-        if (size5 != 0) {
-            i2 += size5 + 1 + (!this.localMessagesSearchEndReached ? 1 : 0);
+        int size6 = this.searchForumResultMessages.size();
+        if (size6 != 0) {
+            i += size6 + 1 + (!this.localMessagesSearchEndReached ? 1 : 0);
         }
         if (!this.localMessagesSearchEndReached) {
-            this.localMessagesLoadingRow = i2;
+            this.localMessagesLoadingRow = i;
         }
-        int size6 = (this.searchForumResultMessages.isEmpty() || this.localMessagesSearchEndReached) ? this.searchResultMessages.size() : 0;
-        if (size6 != 0) {
-            i2 += size6 + 1 + (!this.messagesSearchEndReached ? 1 : 0);
+        int size7 = (this.searchForumResultMessages.isEmpty() || this.localMessagesSearchEndReached) ? this.searchResultMessages.size() : 0;
+        if (size7 != 0) {
+            i += size7 + 1 + (!this.messagesSearchEndReached ? 1 : 0);
         }
         if (this.localMessagesSearchEndReached) {
-            this.localMessagesLoadingRow = i2;
+            this.localMessagesLoadingRow = i;
         }
-        this.currentItemCount = i2;
-        return i2;
+        this.currentItemCount = i;
+        return i;
     }
 
     @Override
@@ -1435,6 +1492,9 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         if (!this.searchWas || !this.searchResultHashtags.isEmpty()) {
             return false;
         }
+        if (!this.publicPosts.isEmpty()) {
+            i -= this.publicPosts.size() + 1;
+        }
         if (isRecentSearchDisplayed()) {
             ?? hasHints = hasHints();
             ArrayList arrayList = this.searchWas ? this.filtered2RecentSearchObjects : this.filteredRecentSearchObjects;
@@ -1462,7 +1522,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             }
             i -= size5 + 1;
         }
-        if (size + size2 > 0 && (getRecentItemsCount() > 0 || !this.searchTopics.isEmpty())) {
+        if (size + size2 > 0 && (getRecentItemsCount() > 0 || !this.searchTopics.isEmpty() || !this.publicPosts.isEmpty())) {
             if (i == 0) {
                 return false;
             }
@@ -1551,6 +1611,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 view = new GraySectionCell(this.mContext);
                 break;
             case 2:
+            case 9:
                 view = new DialogCell(null, this.mContext, false, true) {
                     @Override
                     public boolean isForumCell() {
@@ -1601,15 +1662,15 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 recyclerListView.setOnItemClickListener(new RecyclerListView.OnItemClickListener() {
                     @Override
                     public final void onItemClick(View view2, int i2) {
-                        DialogsSearchAdapter.this.lambda$onCreateViewHolder$17(view2, i2);
+                        DialogsSearchAdapter.this.lambda$onCreateViewHolder$20(view2, i2);
                     }
                 });
                 recyclerListView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListener() {
                     @Override
                     public final boolean onItemClick(View view2, int i2) {
-                        boolean lambda$onCreateViewHolder$18;
-                        lambda$onCreateViewHolder$18 = DialogsSearchAdapter.this.lambda$onCreateViewHolder$18(view2, i2);
-                        return lambda$onCreateViewHolder$18;
+                        boolean lambda$onCreateViewHolder$21;
+                        lambda$onCreateViewHolder$21 = DialogsSearchAdapter.this.lambda$onCreateViewHolder$21(view2, i2);
+                        return lambda$onCreateViewHolder$21;
                     }
                 });
                 this.innerListView = recyclerListView;
@@ -1626,6 +1687,8 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         view.setLayoutParams(i == 5 ? new RecyclerView.LayoutParams(-1, AndroidUtilities.dp(86.0f)) : new RecyclerView.LayoutParams(-1, -2));
         return new RecyclerListView.Holder(view);
     }
+
+    protected abstract void openPublicPosts();
 
     public void putRecentSearch(final long j, TLObject tLObject) {
         RecentSearchObject recentSearchObject = (RecentSearchObject) this.recentSearchObjectsById.get(j);
@@ -1666,12 +1729,13 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         });
     }
 
-    public void searchDialogs(final String str, int i) {
+    public void searchDialogs(final String str, int i, boolean z) {
         if (str != null && str.equals(this.lastSearchText) && (i == this.folderId || TextUtils.isEmpty(str))) {
             return;
         }
         this.lastSearchText = str;
         this.folderId = i;
+        final String str2 = null;
         if (this.searchRunnable != null) {
             Utilities.searchQueue.cancelRunnable(this.searchRunnable);
             this.searchRunnable = null;
@@ -1681,6 +1745,15 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             AndroidUtilities.cancelRunOnUIThread(runnable);
             this.searchRunnable2 = null;
         }
+        Runnable runnable2 = this.searchHashtagRunnable;
+        if (runnable2 != null) {
+            AndroidUtilities.cancelRunOnUIThread(runnable2);
+            this.searchHashtagRunnable = null;
+        }
+        if (this.searchHashtagRequest >= 0) {
+            ConnectionsManager.getInstance(this.currentAccount).cancelRequest(this.searchHashtagRequest, true);
+            this.searchHashtagRequest = -1;
+        }
         final String trim = str != null ? str.trim() : null;
         filterRecent(trim);
         if (TextUtils.isEmpty(trim)) {
@@ -1689,16 +1762,20 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             this.searchResult.clear();
             this.searchResultNames.clear();
             this.searchResultHashtags.clear();
+            this.publicPostsTotalCount = 0;
+            this.publicPostsLastRate = 0;
+            this.publicPostsHashtag = null;
+            this.publicPosts.clear();
             this.searchAdapterHelper.mergeResults(null, null);
             int i2 = this.dialogsType;
             if (i2 != 15) {
                 SearchAdapterHelper searchAdapterHelper = this.searchAdapterHelper;
-                boolean z = i2 != 11;
                 boolean z2 = i2 != 11;
-                boolean z3 = i2 == 2 || i2 == 11;
-                boolean z4 = i2 == 0;
+                boolean z3 = i2 != 11;
+                boolean z4 = i2 == 2 || i2 == 11;
+                boolean z5 = i2 == 0;
                 DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
-                searchAdapterHelper.queryServerSearch(null, true, true, z, z2, z3, 0L, z4, 0, 0, dialogsSearchAdapterDelegate != null ? dialogsSearchAdapterDelegate.getSearchForumDialogId() : 0L);
+                searchAdapterHelper.queryServerSearch(null, true, true, z2, z3, z4, 0L, z5, 0, 0, dialogsSearchAdapterDelegate != null ? dialogsSearchAdapterDelegate.getSearchForumDialogId() : 0L);
             }
             this.searchWas = false;
             this.lastSearchId = 0;
@@ -1725,6 +1802,10 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             return;
         }
         this.searchAdapterHelper.mergeResults(this.searchResult, this.filtered2RecentSearchObjects);
+        this.publicPostsTotalCount = 0;
+        this.publicPostsLastRate = 0;
+        this.publicPostsHashtag = null;
+        this.publicPosts.clear();
         if (this.needMessagesSearch != 2 && trim.startsWith("#") && trim.length() == 1) {
             this.messagesSearchEndReached = true;
             if (this.searchAdapterHelper.loadRecentHashtags()) {
@@ -1756,15 +1837,37 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         if (dialogsSearchAdapterDelegate4 != null) {
             dialogsSearchAdapterDelegate4.searchStateChanged(true, false);
         }
+        if (z && trim != null) {
+            String trim2 = trim.trim();
+            if (trim2.length() > 1 && (trim2.charAt(0) == '#' || trim2.charAt(0) == '$')) {
+                int indexOf = trim2.indexOf(64);
+                String substring = trim2.substring(1);
+                if (indexOf >= 0) {
+                    trim2.substring(indexOf + 1);
+                }
+                str2 = substring;
+            }
+        }
         DispatchQueue dispatchQueue = Utilities.searchQueue;
-        Runnable runnable2 = new Runnable() {
+        Runnable runnable3 = new Runnable() {
             @Override
             public final void run() {
                 DialogsSearchAdapter.this.lambda$searchDialogs$16(trim, i4, str);
             }
         };
-        this.searchRunnable = runnable2;
-        dispatchQueue.postRunnable(runnable2, 300L);
+        this.searchRunnable = runnable3;
+        dispatchQueue.postRunnable(runnable3, 300L);
+        if (str2 != null) {
+            this.waitingResponseCount++;
+            Runnable runnable4 = new Runnable() {
+                @Override
+                public final void run() {
+                    DialogsSearchAdapter.this.lambda$searchDialogs$19(i4, str2);
+                }
+            };
+            this.searchHashtagRunnable = runnable4;
+            AndroidUtilities.runOnUIThread(runnable4, 300L);
+        }
     }
 
     public void setDelegate(DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate) {

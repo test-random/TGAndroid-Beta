@@ -1111,6 +1111,11 @@ public class MessageSendPreview extends Dialog implements NotificationCenter.Not
                     }
 
                     @Override
+                    public boolean canPerformReply() {
+                        return canPerformActions();
+                    }
+
+                    @Override
                     public void didLongPress(ChatMessageCell chatMessageCell, float f, float f2) {
                         ChatMessageCell.ChatMessageCellDelegate.CC.$default$didLongPress(this, chatMessageCell, f, f2);
                     }
@@ -1251,8 +1256,8 @@ public class MessageSendPreview extends Dialog implements NotificationCenter.Not
                     }
 
                     @Override
-                    public void didPressReplyMessage(ChatMessageCell chatMessageCell, int i3) {
-                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressReplyMessage(this, chatMessageCell, i3);
+                    public void didPressReplyMessage(ChatMessageCell chatMessageCell, int i3, float f, float f2, boolean z) {
+                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressReplyMessage(this, chatMessageCell, i3, f, f2, z);
                     }
 
                     @Override

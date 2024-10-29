@@ -15,6 +15,7 @@ public abstract class ChatSearchTabs extends BlurredFrameLayout {
     private float actionBarTagsT;
     private Paint backgroundPaint2;
     public boolean showWithCut;
+    private boolean shown;
     public float shownT;
     public ViewPagerFixed.TabsView tabs;
 
@@ -45,6 +46,11 @@ public abstract class ChatSearchTabs extends BlurredFrameLayout {
 
     public int getCurrentHeight() {
         return (int) (getMeasuredHeight() * this.shownT);
+    }
+
+    @Override
+    public boolean isShown() {
+        return this.shown;
     }
 
     protected abstract void onShownUpdate(boolean z);
@@ -86,6 +92,7 @@ public abstract class ChatSearchTabs extends BlurredFrameLayout {
     }
 
     public void show(final boolean z) {
+        this.shown = z;
         ValueAnimator valueAnimator = this.actionBarTagsAnimator;
         if (valueAnimator != null) {
             this.actionBarTagsAnimator = null;

@@ -684,7 +684,7 @@ public abstract class MentionsContainerView extends BlurredFrameLayout implement
                 AndroidUtilities.cancelRunOnUIThread(MentionsContainerView.this.updateVisibilityRunnable);
                 AndroidUtilities.runOnUIThread(MentionsContainerView.this.updateVisibilityRunnable, r2.getFragmentBeginToShow() ? 0L : 100L);
             }
-        }, resourcesProvider);
+        }, resourcesProvider, isStories());
         this.adapter = mentionsAdapter;
         PaddedListAdapter paddedListAdapter = new PaddedListAdapter(mentionsAdapter);
         this.paddedAdapter = paddedListAdapter;
@@ -739,6 +739,7 @@ public abstract class MentionsContainerView extends BlurredFrameLayout implement
         CharSequence charSequence;
         StringBuilder sb;
         String publicUsername;
+        CharSequence charSequence2;
         if (i == 0 || getAdapter().isBannedInline()) {
             return;
         }
@@ -746,73 +747,96 @@ public abstract class MentionsContainerView extends BlurredFrameLayout implement
         Object item = getAdapter().getItem(i2);
         int resultStartPosition = getAdapter().getResultStartPosition();
         int resultLength = getAdapter().getResultLength();
-        if (item instanceof TLRPC.TL_document) {
-            if (view instanceof StickerCell) {
-                ((StickerCell) view).getSendAnimationData();
+        String str = "";
+        if (getAdapter().isLocalHashtagHint(i2)) {
+            TLRPC.Chat chat = getAdapter().chat;
+            if (chat == null && getAdapter().parentFragment != null) {
+                chat = getAdapter().parentFragment.getCurrentChat();
             }
-            TLRPC.TL_document tL_document = (TLRPC.TL_document) item;
-            delegate.onStickerSelected(tL_document, MessageObject.findAnimatedEmojiEmoticon(tL_document), getAdapter().getItemParent(i2));
+            StringBuilder sb2 = new StringBuilder();
+            sb2.append(getAdapter().getHashtagHint());
+            if (chat != null) {
+                str = "@" + ChatObject.getPublicUsername(chat);
+            }
+            sb2.append(str);
+            sb2.append(" ");
+            charSequence2 = sb2.toString();
         } else {
-            if (item instanceof TLRPC.Chat) {
-                publicUsername = ChatObject.getPublicUsername((TLRPC.Chat) item);
-                if (publicUsername != null) {
-                    sb = new StringBuilder();
-                    sb.append("@");
-                    sb.append(publicUsername);
-                    sb.append(" ");
-                    charSequence = sb.toString();
-                }
-            } else if (item instanceof TLRPC.User) {
-                TLRPC.User user = (TLRPC.User) item;
-                if (UserObject.getPublicUsername(user) != null) {
-                    sb = new StringBuilder();
-                    sb.append("@");
-                    publicUsername = UserObject.getPublicUsername(user);
-                    sb.append(publicUsername);
-                    sb.append(" ");
-                    charSequence = sb.toString();
+            if (!getAdapter().isGlobalHashtagHint(i2)) {
+                if (item instanceof TLRPC.TL_document) {
+                    if (view instanceof StickerCell) {
+                        ((StickerCell) view).getSendAnimationData();
+                    }
+                    TLRPC.TL_document tL_document = (TLRPC.TL_document) item;
+                    delegate.onStickerSelected(tL_document, MessageObject.findAnimatedEmojiEmoticon(tL_document), getAdapter().getItemParent(i2));
                 } else {
-                    SpannableString spannableString = new SpannableString(UserObject.getFirstName(user, false) + " ");
-                    spannableString.setSpan(new URLSpanUserMention("" + user.id, 3), 0, spannableString.length(), 33);
-                    delegate.replaceText(resultStartPosition, resultLength, spannableString, false);
-                }
-            } else if (item instanceof String) {
-                charSequence = item + " ";
-            } else if (item instanceof MediaDataController.KeywordResult) {
-                String str = ((MediaDataController.KeywordResult) item).emoji;
-                delegate.addEmojiToRecent(str);
-                if (str != null) {
-                    if (str.startsWith("animated_")) {
-                        try {
-                            fontMetricsInt = delegate.getFontMetrics();
-                        } catch (Exception e) {
-                            FileLog.e((Throwable) e, false);
-                            fontMetricsInt = null;
+                    if (item instanceof TLRPC.Chat) {
+                        publicUsername = ChatObject.getPublicUsername((TLRPC.Chat) item);
+                        if (publicUsername != null) {
+                            sb = new StringBuilder();
+                            sb.append("@");
+                            sb.append(publicUsername);
+                            sb.append(" ");
+                            charSequence = sb.toString();
                         }
-                        long parseLong = Long.parseLong(str.substring(9));
-                        TLRPC.Document findDocument = AnimatedEmojiDrawable.findDocument(UserConfig.selectedAccount, parseLong);
-                        SpannableString spannableString2 = new SpannableString(MessageObject.findAnimatedEmojiEmoticon(findDocument));
-                        spannableString2.setSpan(findDocument != null ? new AnimatedEmojiSpan(findDocument, fontMetricsInt) : new AnimatedEmojiSpan(parseLong, fontMetricsInt), 0, spannableString2.length(), 33);
-                        delegate.replaceText(resultStartPosition, resultLength, spannableString2, false);
+                    } else if (item instanceof TLRPC.User) {
+                        TLRPC.User user = (TLRPC.User) item;
+                        if (UserObject.getPublicUsername(user) != null) {
+                            sb = new StringBuilder();
+                            sb.append("@");
+                            publicUsername = UserObject.getPublicUsername(user);
+                            sb.append(publicUsername);
+                            sb.append(" ");
+                            charSequence = sb.toString();
+                        } else {
+                            SpannableString spannableString = new SpannableString(UserObject.getFirstName(user, false) + " ");
+                            spannableString.setSpan(new URLSpanUserMention("" + user.id, 3), 0, spannableString.length(), 33);
+                            delegate.replaceText(resultStartPosition, resultLength, spannableString, false);
+                        }
+                    } else if (item instanceof String) {
+                        charSequence = item + " ";
+                    } else if (item instanceof MediaDataController.KeywordResult) {
+                        String str2 = ((MediaDataController.KeywordResult) item).emoji;
+                        delegate.addEmojiToRecent(str2);
+                        if (str2 != null && str2.startsWith("animated_")) {
+                            try {
+                                try {
+                                    fontMetricsInt = delegate.getFontMetrics();
+                                } catch (Exception e) {
+                                    FileLog.e((Throwable) e, false);
+                                    fontMetricsInt = null;
+                                }
+                                long parseLong = Long.parseLong(str2.substring(9));
+                                TLRPC.Document findDocument = AnimatedEmojiDrawable.findDocument(UserConfig.selectedAccount, parseLong);
+                                SpannableString spannableString2 = new SpannableString(MessageObject.findAnimatedEmojiEmoticon(findDocument));
+                                spannableString2.setSpan(findDocument != null ? new AnimatedEmojiSpan(findDocument, fontMetricsInt) : new AnimatedEmojiSpan(parseLong, fontMetricsInt), 0, spannableString2.length(), 33);
+                                delegate.replaceText(resultStartPosition, resultLength, spannableString2, false);
+                            } catch (Exception unused) {
+                            }
+                            updateVisibility(false);
+                        }
+                        delegate.replaceText(resultStartPosition, resultLength, str2, true);
                         updateVisibility(false);
                     }
+                    delegate.replaceText(resultStartPosition, resultLength, charSequence, false);
                 }
-                delegate.replaceText(resultStartPosition, resultLength, str, true);
-                updateVisibility(false);
-            }
-            delegate.replaceText(resultStartPosition, resultLength, charSequence, false);
-        }
-        if (item instanceof TLRPC.BotInlineResult) {
-            TLRPC.BotInlineResult botInlineResult = (TLRPC.BotInlineResult) item;
-            if ((!botInlineResult.type.equals("photo") || (botInlineResult.photo == null && botInlineResult.content == null)) && ((!botInlineResult.type.equals("gif") || (botInlineResult.document == null && botInlineResult.content == null)) && (!botInlineResult.type.equals("video") || botInlineResult.document == null))) {
-                delegate.sendBotInlineResult(botInlineResult, true, 0);
+                if (item instanceof TLRPC.BotInlineResult) {
+                    TLRPC.BotInlineResult botInlineResult = (TLRPC.BotInlineResult) item;
+                    if ((!botInlineResult.type.equals("photo") || (botInlineResult.photo == null && botInlineResult.content == null)) && ((!botInlineResult.type.equals("gif") || (botInlineResult.document == null && botInlineResult.content == null)) && (!botInlineResult.type.equals("video") || botInlineResult.document == null))) {
+                        delegate.sendBotInlineResult(botInlineResult, true, 0);
+                        return;
+                    }
+                    ArrayList arrayList = new ArrayList(getAdapter().getSearchResultBotContext());
+                    this.botContextResults = arrayList;
+                    PhotoViewer.getInstance().setParentActivity(this.baseFragment, this.resourcesProvider);
+                    PhotoViewer.getInstance().openPhotoForSelect(arrayList, getAdapter().getItemPosition(i2), 3, false, this.botContextProvider, null);
+                    return;
+                }
                 return;
             }
-            ArrayList arrayList = new ArrayList(getAdapter().getSearchResultBotContext());
-            this.botContextResults = arrayList;
-            PhotoViewer.getInstance().setParentActivity(this.baseFragment, this.resourcesProvider);
-            PhotoViewer.getInstance().openPhotoForSelect(arrayList, getAdapter().getItemPosition(i2), 3, false, this.botContextProvider, null);
+            charSequence2 = getAdapter().getHashtagHint() + " ";
         }
+        delegate.replaceText(resultStartPosition, resultLength, charSequence2, false);
     }
 
     public boolean lambda$withDelegate$5(View view, MotionEvent motionEvent) {
@@ -1046,6 +1070,10 @@ public abstract class MentionsContainerView extends BlurredFrameLayout implement
         RecyclerView.LayoutManager layoutManager = this.listView.getLayoutManager();
         LinearLayoutManager linearLayoutManager = this.linearLayoutManager;
         return layoutManager == linearLayoutManager && linearLayoutManager.getReverseLayout();
+    }
+
+    protected boolean isStories() {
+        return false;
     }
 
     protected void onAnimationScroll() {

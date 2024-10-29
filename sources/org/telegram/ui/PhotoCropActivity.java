@@ -237,7 +237,7 @@ public class PhotoCropActivity extends BaseFragment {
                         PhotoCropActivity.this.doneButtonPressed = true;
                     }
                 }
-                PhotoCropActivity.this.lambda$onBackPressed$300();
+                PhotoCropActivity.this.lambda$onBackPressed$319();
             }
         });
         this.actionBar.createMenu().addItemWithWidth(1, R.drawable.ic_ab_done, AndroidUtilities.dp(56.0f), LocaleController.getString(R.string.Done));

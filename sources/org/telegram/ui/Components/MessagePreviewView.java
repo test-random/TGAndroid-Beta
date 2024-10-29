@@ -402,6 +402,11 @@ public abstract class MessagePreviewView extends FrameLayout {
                         }
 
                         @Override
+                        public boolean canPerformReply() {
+                            return canPerformActions();
+                        }
+
+                        @Override
                         public void didLongPress(ChatMessageCell chatMessageCell2, float f, float f2) {
                             ChatMessageCell.ChatMessageCellDelegate.CC.$default$didLongPress(this, chatMessageCell2, f, f2);
                         }
@@ -542,8 +547,8 @@ public abstract class MessagePreviewView extends FrameLayout {
                         }
 
                         @Override
-                        public void didPressReplyMessage(ChatMessageCell chatMessageCell2, int i2) {
-                            ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressReplyMessage(this, chatMessageCell2, i2);
+                        public void didPressReplyMessage(ChatMessageCell chatMessageCell2, int i2, float f, float f2, boolean z) {
+                            ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressReplyMessage(this, chatMessageCell2, i2, f, f2, z);
                         }
 
                         @Override
@@ -802,6 +807,11 @@ public abstract class MessagePreviewView extends FrameLayout {
                     }
 
                     @Override
+                    public boolean canPerformReply() {
+                        return canPerformActions();
+                    }
+
+                    @Override
                     public void didLongPress(ChatMessageCell chatMessageCell2, float f, float f2) {
                         ChatMessageCell.ChatMessageCellDelegate.CC.$default$didLongPress(this, chatMessageCell2, f, f2);
                     }
@@ -942,8 +952,8 @@ public abstract class MessagePreviewView extends FrameLayout {
                     }
 
                     @Override
-                    public void didPressReplyMessage(ChatMessageCell chatMessageCell2, int i3) {
-                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressReplyMessage(this, chatMessageCell2, i3);
+                    public void didPressReplyMessage(ChatMessageCell chatMessageCell2, int i3, float f, float f2, boolean z) {
+                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressReplyMessage(this, chatMessageCell2, i3, f, f2, z);
                     }
 
                     @Override

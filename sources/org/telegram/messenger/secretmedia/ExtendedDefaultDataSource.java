@@ -12,13 +12,20 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.FileDataSource;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.android.exoplayer2.upstream.TransferListener;
+import com.google.android.exoplayer2.upstream.cache.Cache;
+import com.google.android.exoplayer2.upstream.cache.CacheSpan;
+import com.google.android.exoplayer2.upstream.cache.ContentMetadata;
+import com.google.android.exoplayer2.upstream.cache.ContentMetadataMutations;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
+import java.util.Set;
 import org.telegram.messenger.FileStreamLoadOperation;
 
 public final class ExtendedDefaultDataSource implements DataSource {
@@ -29,6 +36,7 @@ public final class ExtendedDefaultDataSource implements DataSource {
     private static final String TAG = "ExtendedDefaultDataSource";
     private DataSource assetDataSource;
     private final DataSource baseDataSource;
+    private final Cache cache;
     private DataSource contentDataSource;
     private final Context context;
     private DataSource dataSchemeDataSource;
@@ -42,6 +50,76 @@ public final class ExtendedDefaultDataSource implements DataSource {
     private final List<TransferListener> transferListeners;
 
     public ExtendedDefaultDataSource(Context context, DataSource dataSource, LongSparseArray<Uri> longSparseArray) {
+        this.cache = new Cache() {
+            public NavigableSet<CacheSpan> addListener(String str, Cache.Listener listener) {
+                return null;
+            }
+
+            public void applyContentMetadataMutations(String str, ContentMetadataMutations contentMetadataMutations) {
+            }
+
+            public void commitFile(File file, long j) {
+            }
+
+            public long getCacheSpace() {
+                return 0L;
+            }
+
+            public long getCachedBytes(String str, long j, long j2) {
+                return 0L;
+            }
+
+            public long getCachedLength(String str, long j, long j2) {
+                return 0L;
+            }
+
+            public NavigableSet<CacheSpan> getCachedSpans(String str) {
+                return null;
+            }
+
+            public ContentMetadata getContentMetadata(String str) {
+                return null;
+            }
+
+            public Set<String> getKeys() {
+                return null;
+            }
+
+            public long getUid() {
+                return 0L;
+            }
+
+            public boolean isCached(String str, long j, long j2) {
+                return false;
+            }
+
+            public void release() {
+            }
+
+            public void releaseHoleSpan(CacheSpan cacheSpan) {
+            }
+
+            public void removeListener(String str, Cache.Listener listener) {
+            }
+
+            public void removeResource(String str) {
+            }
+
+            public void removeSpan(CacheSpan cacheSpan) {
+            }
+
+            public File startFile(String str, long j, long j2) {
+                return null;
+            }
+
+            public CacheSpan startReadWrite(String str, long j, long j2) {
+                return null;
+            }
+
+            public CacheSpan startReadWriteNonBlocking(String str, long j, long j2) {
+                return null;
+            }
+        };
         this.context = context.getApplicationContext();
         this.baseDataSource = (DataSource) Assertions.checkNotNull(dataSource);
         this.transferListeners = new ArrayList();

@@ -4256,6 +4256,10 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                 StoryRecorder.this.lambda$initViews$9((Integer) obj);
             }
         });
+        long j = this.selectedDialogId;
+        if (j != 0) {
+            this.captionEdit.setDialogId(j);
+        }
         this.captionEdit.setOnPremiumHint(new Utilities.Callback() {
             @Override
             public final void run(Object obj) {
@@ -7652,6 +7656,10 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
 
     public StoryRecorder selectedPeerId(long j) {
         this.selectedDialogId = j;
+        CaptionStory captionStory = this.captionEdit;
+        if (captionStory != null) {
+            captionStory.setDialogId(j);
+        }
         return this;
     }
 

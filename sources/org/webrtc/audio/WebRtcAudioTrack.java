@@ -168,6 +168,7 @@ public class WebRtcAudioTrack {
         AudioFormat build;
         AudioTrack.Builder audioFormat;
         AudioTrack.Builder bufferSizeInBytes;
+        AudioTrack.Builder performanceMode;
         AudioTrack.Builder transferMode;
         AudioTrack.Builder sessionId;
         AudioTrack build2;
@@ -180,7 +181,8 @@ public class WebRtcAudioTrack {
         build = channelMask.build();
         audioFormat = audioAttributes2.setAudioFormat(build);
         bufferSizeInBytes = audioFormat.setBufferSizeInBytes(i3);
-        transferMode = WebRtcAudioTrack$$ExternalSyntheticApiModelOutline3.m(bufferSizeInBytes, 1).setTransferMode(1);
+        performanceMode = bufferSizeInBytes.setPerformanceMode(1);
+        transferMode = performanceMode.setTransferMode(1);
         sessionId = transferMode.setSessionId(0);
         build2 = sessionId.build();
         return build2;
@@ -204,16 +206,26 @@ public class WebRtcAudioTrack {
         AudioAttributes.Builder usage;
         AudioAttributes.Builder contentType;
         AudioAttributes build;
+        int usage2;
+        int contentType2;
+        int flags;
+        int contentType3;
+        int usage3;
         usage = new AudioAttributes.Builder().setUsage(DEFAULT_USAGE);
         contentType = usage.setContentType(1);
         if (audioAttributes != null) {
-            if (WebRtcAudioTrack$$ExternalSyntheticApiModelOutline4.m(audioAttributes) != 0) {
-                contentType.setUsage(WebRtcAudioTrack$$ExternalSyntheticApiModelOutline4.m(audioAttributes));
+            usage2 = audioAttributes.getUsage();
+            if (usage2 != 0) {
+                usage3 = audioAttributes.getUsage();
+                contentType.setUsage(usage3);
             }
-            if (WebRtcAudioTrack$$ExternalSyntheticApiModelOutline5.m(audioAttributes) != 0) {
-                contentType.setContentType(WebRtcAudioTrack$$ExternalSyntheticApiModelOutline5.m(audioAttributes));
+            contentType2 = audioAttributes.getContentType();
+            if (contentType2 != 0) {
+                contentType3 = audioAttributes.getContentType();
+                contentType.setContentType(contentType3);
             }
-            contentType.setFlags(WebRtcAudioTrack$$ExternalSyntheticApiModelOutline6.m(audioAttributes));
+            flags = audioAttributes.getFlags();
+            contentType.setFlags(flags);
             if (Build.VERSION.SDK_INT >= 29) {
                 contentType = applyAttributesOnQOrHigher(contentType, audioAttributes);
             }

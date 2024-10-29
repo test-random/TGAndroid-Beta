@@ -13,11 +13,14 @@ import java.util.Random;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DialogObject;
+import org.telegram.messenger.FileLoader;
+import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.GroupCallUserCell;
 import org.telegram.ui.Stories.StoriesGradientTools;
@@ -316,13 +319,17 @@ public class AvatarsDrawable {
     }
 
     public void setObject(int i, int i2, TLObject tLObject) {
+        TLRPC.User user;
         TLRPC.Chat chat;
-        TLRPC.Chat chat2;
+        ImageReceiver imageReceiver;
+        ImageLocation forPhoto;
+        String str;
+        ImageLocation forPhoto2;
+        StringBuilder sb;
         DrawingState drawingState;
-        long j = 0;
+        long j;
         this.animatingStates[i].id = 0L;
         DrawingState drawingState2 = this.animatingStates[i];
-        TLRPC.User user = null;
         drawingState2.participant = null;
         if (tLObject == null) {
             drawingState2.imageReceiver.setImageBitmap((Drawable) null);
@@ -334,61 +341,91 @@ public class AvatarsDrawable {
                 this.animatingStates[i].participant = tL_groupCallParticipant;
                 long peerId = MessageObject.getPeerId(tL_groupCallParticipant.peer);
                 if (DialogObject.isUserDialog(peerId)) {
-                    TLRPC.User user2 = MessagesController.getInstance(i2).getUser(Long.valueOf(peerId));
-                    this.animatingStates[i].avatarDrawable.setInfo(i2, user2);
-                    user = user2;
-                    chat2 = null;
+                    user = MessagesController.getInstance(i2).getUser(Long.valueOf(peerId));
+                    this.animatingStates[i].avatarDrawable.setInfo(i2, user);
+                    chat = null;
                 } else {
-                    chat2 = MessagesController.getInstance(i2).getChat(Long.valueOf(-peerId));
+                    TLRPC.Chat chat2 = MessagesController.getInstance(i2).getChat(Long.valueOf(-peerId));
                     this.animatingStates[i].avatarDrawable.setInfo(i2, chat2);
+                    chat = chat2;
+                    user = null;
                 }
-                if (this.currentStyle == 4) {
-                    if (peerId == AccountInstance.getInstance(i2).getUserConfig().getClientUserId()) {
-                        drawingState = this.animatingStates[i];
-                    } else if (this.isInCall) {
-                        drawingState = this.animatingStates[i];
-                        j = tL_groupCallParticipant.lastActiveDate;
-                    } else {
-                        drawingState = this.animatingStates[i];
-                    }
+                if (this.currentStyle != 4) {
+                    drawingState = this.animatingStates[i];
+                } else if (peerId == AccountInstance.getInstance(i2).getUserConfig().getClientUserId()) {
+                    this.animatingStates[i].lastSpeakTime = 0L;
+                    this.animatingStates[i].id = peerId;
+                } else if (this.isInCall) {
+                    drawingState = this.animatingStates[i];
+                    j = tL_groupCallParticipant.lastActiveDate;
                     drawingState.lastSpeakTime = j;
                     this.animatingStates[i].id = peerId;
-                    chat = chat2;
                 } else {
                     drawingState = this.animatingStates[i];
                 }
                 j = tL_groupCallParticipant.active_date;
                 drawingState.lastSpeakTime = j;
                 this.animatingStates[i].id = peerId;
-                chat = chat2;
             } else if (tLObject instanceof TLRPC.User) {
-                TLRPC.User user3 = (TLRPC.User) tLObject;
-                if (user3.self && this.showSavedMessages) {
+                user = (TLRPC.User) tLObject;
+                if (user.self && this.showSavedMessages) {
                     this.animatingStates[i].avatarDrawable.setAvatarType(1);
                     this.animatingStates[i].avatarDrawable.setScaleSize(0.6f);
                 } else {
                     this.animatingStates[i].avatarDrawable.setAvatarType(0);
                     this.animatingStates[i].avatarDrawable.setScaleSize(1.0f);
-                    this.animatingStates[i].avatarDrawable.setInfo(i2, user3);
+                    this.animatingStates[i].avatarDrawable.setInfo(i2, user);
                 }
-                this.animatingStates[i].id = user3.id;
-                user = user3;
+                this.animatingStates[i].id = user.id;
                 chat = null;
-            } else {
+            } else if (tLObject instanceof TLRPC.Chat) {
                 chat = (TLRPC.Chat) tLObject;
                 this.animatingStates[i].avatarDrawable.setAvatarType(0);
                 this.animatingStates[i].avatarDrawable.setScaleSize(1.0f);
                 this.animatingStates[i].avatarDrawable.setInfo(i2, chat);
                 this.animatingStates[i].id = -chat.id;
+                user = null;
+            } else {
+                user = null;
+                chat = null;
             }
-            if (user == null) {
+            int size = getSize();
+            if (tLObject instanceof TL_stories.StoryItem) {
+                TL_stories.StoryItem storyItem = (TL_stories.StoryItem) tLObject;
+                this.animatingStates[i].id = storyItem.id;
+                TLRPC.MessageMedia messageMedia = storyItem.media;
+                TLRPC.Document document = messageMedia.document;
+                if (document != null) {
+                    TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(document.thumbs, 50, true, null, false);
+                    TLRPC.PhotoSize closestPhotoSizeWithSize2 = FileLoader.getClosestPhotoSizeWithSize(storyItem.media.document.thumbs, 50, true, closestPhotoSizeWithSize, true);
+                    imageReceiver = this.animatingStates[i].imageReceiver;
+                    forPhoto = ImageLocation.getForDocument(closestPhotoSizeWithSize2, storyItem.media.document);
+                    str = size + "_" + size;
+                    forPhoto2 = ImageLocation.getForDocument(closestPhotoSizeWithSize, storyItem.media.document);
+                    sb = new StringBuilder();
+                } else {
+                    TLRPC.Photo photo = messageMedia.photo;
+                    if (photo != null) {
+                        TLRPC.PhotoSize closestPhotoSizeWithSize3 = FileLoader.getClosestPhotoSizeWithSize(photo.sizes, 50, true, null, false);
+                        TLRPC.PhotoSize closestPhotoSizeWithSize4 = FileLoader.getClosestPhotoSizeWithSize(storyItem.media.photo.sizes, 50, true, closestPhotoSizeWithSize3, true);
+                        imageReceiver = this.animatingStates[i].imageReceiver;
+                        forPhoto = ImageLocation.getForPhoto(closestPhotoSizeWithSize4, storyItem.media.photo);
+                        str = size + "_" + size;
+                        forPhoto2 = ImageLocation.getForPhoto(closestPhotoSizeWithSize3, storyItem.media.photo);
+                        sb = new StringBuilder();
+                    }
+                }
+                sb.append(size);
+                sb.append("_");
+                sb.append(size);
+                imageReceiver.setImage(forPhoto, str, forPhoto2, sb.toString(), 0L, null, storyItem, 0);
+            } else if (user == null) {
                 this.animatingStates[i].imageReceiver.setForUserOrChat(chat, this.animatingStates[i].avatarDrawable);
             } else if (user.self && this.showSavedMessages) {
                 this.animatingStates[i].imageReceiver.setImageBitmap(this.animatingStates[i].avatarDrawable);
             } else {
                 this.animatingStates[i].imageReceiver.setForUserOrChat(user, this.animatingStates[i].avatarDrawable);
             }
-            int size = getSize();
             this.animatingStates[i].imageReceiver.setRoundRadius(size / 2);
             float f = size;
             this.animatingStates[i].imageReceiver.setImageCoords(0.0f, 0.0f, f, f);

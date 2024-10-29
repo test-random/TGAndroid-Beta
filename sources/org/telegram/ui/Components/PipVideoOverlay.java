@@ -100,6 +100,7 @@ public class PipVideoOverlay {
     private ImageView playPauseButton;
     private boolean postedDismissControls;
     private ScaleGestureDetector scaleGestureDetector;
+    private SeekSpeedDrawable seekSpeedDrawable;
     private float videoProgress;
     private VideoProgressView videoProgressView;
     private WindowManager.LayoutParams windowLayoutParams;
@@ -437,9 +438,10 @@ public class PipVideoOverlay {
 
     public void cancelRewind() {
         PhotoViewer photoViewer = this.photoViewer;
-        if (photoViewer != null && photoViewer.getVideoPlayerRewinder().rewindCount > 0) {
-            this.photoViewer.getVideoPlayerRewinder().cancelRewind();
+        if (photoViewer == null || photoViewer.getVideoPlayerRewinder() == null) {
+            return;
         }
+        this.photoViewer.getVideoPlayerRewinder().cancelRewind();
     }
 
     private WindowManager.LayoutParams createWindowLayoutParams(boolean z) {
@@ -652,7 +654,7 @@ public class PipVideoOverlay {
 
     public void lambda$new$5() {
         PhotoViewer photoViewer = this.photoViewer;
-        if (photoViewer != null && photoViewer.getVideoPlayerRewinder().rewindCount > 0) {
+        if (photoViewer != null && photoViewer.getVideoPlayerRewinder().rewinding) {
             AndroidUtilities.runOnUIThread(this.dismissControlsCallback, 1500L);
             return;
         }
@@ -958,9 +960,9 @@ public class PipVideoOverlay {
                 return;
             }
             if (this.photoViewerWebView != null) {
-                this.photoViewer.getVideoPlayerRewinder().startRewind(this.photoViewerWebView, z, this.photoViewer.getCurrentVideoSpeed());
+                this.photoViewer.getVideoPlayerRewinder().startRewind(this.photoViewerWebView, z, this.longClickStartPoint[0], this.photoViewer.getCurrentVideoSpeed(), this.seekSpeedDrawable);
             } else {
-                this.photoViewer.getVideoPlayerRewinder().startRewind(videoPlayer, z, this.photoViewer.getCurrentVideoSpeed());
+                this.photoViewer.getVideoPlayerRewinder().startRewind(videoPlayer, z, this.longClickStartPoint[0], this.photoViewer.getCurrentVideoSpeed(), this.seekSpeedDrawable);
             }
             if (this.isShowingControls) {
                 return;

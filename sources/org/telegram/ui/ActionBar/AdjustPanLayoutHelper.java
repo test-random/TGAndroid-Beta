@@ -47,6 +47,7 @@ public abstract class AdjustPanLayoutHelper {
     int previousStartOffset;
     private View resizableView;
     private View resizableViewToSet;
+    public boolean showingKeyboard;
     long startAfter;
     float to;
     private boolean useInsetsAnimator;
@@ -249,6 +250,10 @@ public abstract class AdjustPanLayoutHelper {
         return this.animationInProgress;
     }
 
+    protected boolean applyTranslation() {
+        return true;
+    }
+
     public void delayAnimation() {
         this.needDelay = true;
     }
@@ -357,7 +362,9 @@ public abstract class AdjustPanLayoutHelper {
         this.resizableView.requestLayout();
         boolean z = this.isKeyboardVisible;
         onPanTranslationUpdate(0.0f, z ? 1.0f : 0.0f, z);
-        this.parent.setTranslationY(0.0f);
+        if (applyTranslation()) {
+            this.parent.setTranslationY(0.0f);
+        }
         onTransitionEnd();
     }
 
@@ -366,7 +373,9 @@ public abstract class AdjustPanLayoutHelper {
             f = 1.0f - f;
         }
         float f2 = (int) ((this.from * f) + (this.to * (1.0f - f)));
-        this.parent.setTranslationY(f2);
+        if (applyTranslation()) {
+            this.parent.setTranslationY(f2);
+        }
         onPanTranslationUpdate(-f2, f, this.isKeyboardVisible);
     }
 }

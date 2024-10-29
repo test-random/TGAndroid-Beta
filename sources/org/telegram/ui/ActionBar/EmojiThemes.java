@@ -219,9 +219,16 @@ public class EmojiThemes {
     }
 
     private int getOrDefault(SparseIntArray sparseIntArray, int i) {
-        int indexOfKey;
-        if (sparseIntArray != null && (indexOfKey = sparseIntArray.indexOfKey(i)) >= 0) {
-            return sparseIntArray.valueAt(indexOfKey);
+        if (sparseIntArray == null) {
+            return Theme.getDefaultColor(i);
+        }
+        try {
+            int indexOfKey = sparseIntArray.indexOfKey(i);
+            if (indexOfKey >= 0) {
+                return sparseIntArray.valueAt(indexOfKey);
+            }
+        } catch (Exception e) {
+            FileLog.e(e);
         }
         return Theme.getDefaultColor(i);
     }
@@ -419,7 +426,6 @@ public class EmojiThemes {
     public SparseIntArray getPreviewColors(int i, int i2) {
         Theme.ThemeAccent themeAccent;
         SparseIntArray themeFileValues;
-        int i3;
         SparseIntArray sparseIntArray = ((ThemeItem) this.items.get(i2)).currentPreviewColors;
         if (sparseIntArray != null) {
             return sparseIntArray;
@@ -454,7 +460,7 @@ public class EmojiThemes {
             String str = themeInfo.assetName;
             themeFileValues = str != null ? Theme.getThemeFileValues(null, str, strArr) : new SparseIntArray();
         }
-        int i4 = 0;
+        int i3 = 0;
         ((ThemeItem) this.items.get(i2)).wallpaperLink = strArr[0];
         if (themeAccent != null) {
             SparseIntArray clone = themeFileValues.clone();
@@ -462,19 +468,29 @@ public class EmojiThemes {
             themeFileValues = clone;
         }
         SparseIntArray fallbackKeys = Theme.getFallbackKeys();
-        ((ThemeItem) this.items.get(i2)).currentPreviewColors = new SparseIntArray();
+        SparseIntArray sparseIntArray2 = new SparseIntArray();
+        ((ThemeItem) this.items.get(i2)).currentPreviewColors = sparseIntArray2;
         while (true) {
-            int[] iArr = previewColorKeys;
-            if (i4 >= iArr.length) {
-                return ((ThemeItem) this.items.get(i2)).currentPreviewColors;
+            try {
+                int[] iArr = previewColorKeys;
+                if (i3 >= iArr.length) {
+                    break;
+                }
+                int i4 = iArr[i3];
+                int indexOfKey = themeFileValues.indexOfKey(i4);
+                if (indexOfKey < 0) {
+                    int i5 = fallbackKeys.get(i4, -1);
+                    if (i5 >= 0 && (indexOfKey = themeFileValues.indexOfKey(i5)) >= 0) {
+                    }
+                    i3++;
+                }
+                sparseIntArray2.put(i4, themeFileValues.valueAt(indexOfKey));
+                i3++;
+            } catch (Exception e) {
+                FileLog.e(e);
             }
-            int i5 = iArr[i4];
-            int indexOfKey = themeFileValues.indexOfKey(i5);
-            if (indexOfKey >= 0 || ((i3 = fallbackKeys.get(i5, -1)) >= 0 && (indexOfKey = themeFileValues.indexOfKey(i3)) >= 0)) {
-                ((ThemeItem) this.items.get(i2)).currentPreviewColors.put(i5, themeFileValues.valueAt(indexOfKey));
-            }
-            i4++;
         }
+        return sparseIntArray2;
     }
 
     public int getSettingsIndex(int i) {

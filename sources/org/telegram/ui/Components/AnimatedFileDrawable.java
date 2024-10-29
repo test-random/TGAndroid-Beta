@@ -190,7 +190,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         this(file, z, j, i, document, imageLocation, obj, j2, i2, z2, 0, 0, cacheOptions);
     }
 
-    static int access$1010(AnimatedFileDrawable animatedFileDrawable) {
+    static int access$1310(AnimatedFileDrawable animatedFileDrawable) {
         int i = animatedFileDrawable.pendingRemoveLoadingFramesReset;
         animatedFileDrawable.pendingRemoveLoadingFramesReset = i - 1;
         return i;
@@ -980,7 +980,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         if (this.isRunning) {
             Bitmap bitmap = this.renderingBitmap;
             if (bitmap != null || this.nextRenderingBitmap != null) {
-                if (this.nextRenderingBitmap == null || (bitmap != null && (Math.abs(j - this.lastFrameTime) < this.invalidateAfter || this.skipFrameUpdate))) {
+                if (this.nextRenderingBitmap == null || (bitmap != null && (Math.abs(j - this.lastFrameTime) < this.invalidateAfter || this.skipFrameUpdate || this.pendingSeekToUI >= 0))) {
                     invalidateInternal();
                     return;
                 }

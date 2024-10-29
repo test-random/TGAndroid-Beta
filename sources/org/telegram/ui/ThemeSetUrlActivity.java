@@ -325,7 +325,7 @@ public class ThemeSetUrlActivity extends BaseFragment implements NotificationCen
             FileLog.e(e);
         }
         Theme.setThemeUploadInfo(this.themeInfo, this.themeAccent, tL_theme, this.currentAccount, false);
-        lambda$onBackPressed$300();
+        lambda$onBackPressed$319();
     }
 
     public void lambda$saveTheme$11(TLRPC.TL_error tL_error, TLRPC.TL_account_updateTheme tL_account_updateTheme) {
@@ -400,7 +400,7 @@ public class ThemeSetUrlActivity extends BaseFragment implements NotificationCen
             String obj2 = this.linkField.getText().toString();
             String obj3 = this.nameField.getText().toString();
             if (str2.equals(obj2) && str4.equals(obj3)) {
-                lambda$onBackPressed$300();
+                lambda$onBackPressed$319();
                 return;
             }
             this.progressDialog = new AlertDialog(getParentActivity(), 3);
@@ -487,7 +487,7 @@ public class ThemeSetUrlActivity extends BaseFragment implements NotificationCen
             @Override
             public void onItemClick(int i2) {
                 if (i2 == -1) {
-                    ThemeSetUrlActivity.this.lambda$onBackPressed$300();
+                    ThemeSetUrlActivity.this.lambda$onBackPressed$319();
                 } else if (i2 == 1) {
                     ThemeSetUrlActivity.this.saveTheme();
                 }
@@ -714,7 +714,7 @@ public class ThemeSetUrlActivity extends BaseFragment implements NotificationCen
                     FileLog.e(e);
                 }
                 Theme.applyTheme(this.themeInfo, false);
-                lambda$onBackPressed$300();
+                lambda$onBackPressed$319();
                 return;
             }
             return;

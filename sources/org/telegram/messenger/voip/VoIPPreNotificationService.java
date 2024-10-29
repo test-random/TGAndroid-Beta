@@ -166,7 +166,7 @@ public class VoIPPreNotificationService {
             }
             pendingVoIP = null;
         }
-        dismiss(context);
+        dismiss(context, true);
     }
 
     public static void decline(Context context, int i) {
@@ -193,10 +193,10 @@ public class VoIPPreNotificationService {
                 VoIPPreNotificationService.lambda$decline$4(intExtra, tLObject, tL_error);
             }
         }, 2);
-        dismiss(context);
+        dismiss(context, false);
     }
 
-    public static void dismiss(Context context) {
+    public static void dismiss(Context context, boolean z) {
         FileLog.d("VoIPPreNotification.dismiss()");
         pendingVoIP = null;
         pendingCall = null;
@@ -206,6 +206,12 @@ public class VoIPPreNotificationService {
         }
         ((NotificationManager) context.getSystemService("notification")).cancel(203);
         stopRinging();
+        if (z) {
+            return;
+        }
+        for (int i = 0; i < 4; i++) {
+            MessagesController.getInstance(i).ignoreSetOnline = false;
+        }
     }
 
     public static State getState() {
@@ -237,7 +243,7 @@ public class VoIPPreNotificationService {
         if (state != null) {
             state.destroy();
         }
-        dismiss(context);
+        dismiss(context, false);
     }
 
     public static void lambda$acknowledge$3(final Context context, final Runnable runnable, final TLObject tLObject, final TLRPC.TL_error tL_error) {
@@ -301,20 +307,20 @@ public class VoIPPreNotificationService {
             context.startService(pendingVoIP);
         }
         pendingVoIP = null;
-        dismiss(context);
+        dismiss(context, true);
         return true;
     }
 
     public static void show(final Context context, final Intent intent, final TLRPC.PhoneCall phoneCall) {
         FileLog.d("VoIPPreNotification.show()");
         if (phoneCall == null || intent == null) {
-            dismiss(context);
+            dismiss(context, false);
             FileLog.d("VoIPPreNotification.show(): call or intent is null");
             return;
         }
         TLRPC.PhoneCall phoneCall2 = pendingCall;
         if (phoneCall2 == null || phoneCall2.id != phoneCall.id) {
-            dismiss(context);
+            dismiss(context, false);
             pendingVoIP = intent;
             pendingCall = phoneCall;
             final int intExtra = intent.getIntExtra("account", UserConfig.selectedAccount);

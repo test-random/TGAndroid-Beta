@@ -619,10 +619,10 @@ public abstract class Browser {
     }
 
     public static boolean openAsInternalIntent(Context context, String str) {
-        return openAsInternalIntent(context, str, false, null);
+        return openAsInternalIntent(context, str, false, false, null);
     }
 
-    public static boolean openAsInternalIntent(Context context, String str, boolean z, Progress progress) {
+    public static boolean openAsInternalIntent(Context context, String str, boolean z, boolean z2, Progress progress) {
         LaunchActivity launchActivity;
         if (str == null) {
             return false;
@@ -643,6 +643,7 @@ public abstract class Browser {
         intent.putExtra("create_new_tab", true);
         intent.putExtra("com.android.browser.application_id", context.getPackageName());
         intent.putExtra("force_not_internal_apps", z);
+        intent.putExtra("force_request", z2);
         launchActivity.onNewIntent(intent, progress);
         return true;
     }
@@ -705,15 +706,15 @@ public abstract class Browser {
     }
 
     public static void openUrl(Context context, Uri uri, boolean z, boolean z2) {
-        openUrl(context, uri, z, z2, false, null, null, false, true);
+        openUrl(context, uri, z, z2, false, null, null, false, true, false);
     }
 
     public static void openUrl(Context context, Uri uri, boolean z, boolean z2, Progress progress) {
-        openUrl(context, uri, z, z2, false, progress, null, false, true);
+        openUrl(context, uri, z, z2, false, progress, null, false, true, false);
     }
 
-    public static void openUrl(final android.content.Context r21, final android.net.Uri r22, boolean r23, boolean r24, boolean r25, final org.telegram.messenger.browser.Browser.Progress r26, java.lang.String r27, boolean r28, boolean r29) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.browser.Browser.openUrl(android.content.Context, android.net.Uri, boolean, boolean, boolean, org.telegram.messenger.browser.Browser$Progress, java.lang.String, boolean, boolean):void");
+    public static void openUrl(final android.content.Context r21, final android.net.Uri r22, boolean r23, boolean r24, boolean r25, final org.telegram.messenger.browser.Browser.Progress r26, java.lang.String r27, boolean r28, boolean r29, boolean r30) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.browser.Browser.openUrl(android.content.Context, android.net.Uri, boolean, boolean, boolean, org.telegram.messenger.browser.Browser$Progress, java.lang.String, boolean, boolean, boolean):void");
     }
 
     public static void openUrl(Context context, String str) {

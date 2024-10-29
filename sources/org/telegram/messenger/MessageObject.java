@@ -187,6 +187,7 @@ public class MessageObject {
     private boolean hasUnwrappedEmoji;
     public boolean hasWideCode;
     public boolean hideSendersName;
+    public VideoPlayer.VideoUri highestQuality;
     public ArrayList<String> highlightedWords;
     public boolean isDateObject;
     public boolean isDownloadingFile;
@@ -208,6 +209,7 @@ public class MessageObject {
     public boolean isStoryPushHidden;
     public boolean isStoryReactionPush;
     public boolean isTopicMainMessage;
+    public boolean isVideoConversionObject;
     public Object lastGeoWebFileLoaded;
     public Object lastGeoWebFileSet;
     public int lastLineWidth;
@@ -231,6 +233,7 @@ public class MessageObject {
     public CharSequence messageTextForReply;
     public CharSequence messageTextShort;
     public CharSequence messageTrimmedToHighlight;
+    public boolean messageTrimmedToHighlightCut;
     public String monthKey;
     public boolean notime;
     public int overrideLinkColor;
@@ -294,6 +297,7 @@ public class MessageObject {
     public ArrayList<TextLayoutBlock> textLayoutBlocks;
     public int textWidth;
     public float textXOffset;
+    public VideoPlayer.VideoUri thumbQuality;
     public Drawable[] topicIconDrawable;
     public int totalAnimatedEmojiCount;
     public boolean translated;
@@ -302,6 +306,7 @@ public class MessageObject {
     public boolean useCustomPhoto;
     public CharSequence vCardData;
     public VideoEditedInfo videoEditedInfo;
+    public ArrayList<VideoPlayer.Quality> videoQualities;
     private Boolean videoQualitiesCached;
     public boolean viewsReloaded;
     public int wantedBotKeyboardWidth;
@@ -1260,6 +1265,7 @@ public class MessageObject {
         this.actionDeleteGroupEventId = -1L;
         this.overrideLinkColor = -1;
         this.overrideLinkEmoji = -1L;
+        this.messageTrimmedToHighlightCut = true;
         this.topicIconDrawable = new Drawable[1];
         this.spoiledLoginCode = false;
         this.translated = false;
@@ -1300,6 +1306,7 @@ public class MessageObject {
         this.actionDeleteGroupEventId = -1L;
         this.overrideLinkColor = -1;
         this.overrideLinkEmoji = -1L;
+        this.messageTrimmedToHighlightCut = true;
         this.topicIconDrawable = new Drawable[1];
         this.spoiledLoginCode = false;
         this.translated = false;
@@ -1367,7 +1374,7 @@ public class MessageObject {
         this(i, message, null, null, null, null, null, z, z2, 0L);
     }
 
-    public MessageObject(int r38, org.telegram.tgnet.TLRPC.TL_channelAdminLogEvent r39, java.util.ArrayList<org.telegram.messenger.MessageObject> r40, java.util.HashMap<java.lang.String, java.util.ArrayList<org.telegram.messenger.MessageObject>> r41, org.telegram.tgnet.TLRPC.Chat r42, int[] r43, boolean r44) {
+    public MessageObject(int r37, org.telegram.tgnet.TLRPC.TL_channelAdminLogEvent r38, java.util.ArrayList<org.telegram.messenger.MessageObject> r39, java.util.HashMap<java.lang.String, java.util.ArrayList<org.telegram.messenger.MessageObject>> r40, org.telegram.tgnet.TLRPC.Chat r41, int[] r42, boolean r43) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessageObject.<init>(int, org.telegram.tgnet.TLRPC$TL_channelAdminLogEvent, java.util.ArrayList, java.util.HashMap, org.telegram.tgnet.TLRPC$Chat, int[], boolean):void");
     }
 
@@ -1377,6 +1384,7 @@ public class MessageObject {
         this.actionDeleteGroupEventId = -1L;
         this.overrideLinkColor = -1;
         this.overrideLinkEmoji = -1L;
+        this.messageTrimmedToHighlightCut = true;
         this.topicIconDrawable = new Drawable[1];
         this.spoiledLoginCode = false;
         this.translated = false;
@@ -1640,6 +1648,9 @@ public class MessageObject {
     }
 
     public static boolean canEditMessageScheduleTime(int i, TLRPC.Message message, TLRPC.Chat chat) {
+        if (message.video_processing_pending) {
+            return false;
+        }
         if (chat == null && message.peer_id.channel_id != 0 && (chat = MessagesController.getInstance(i).getChat(Long.valueOf(message.peer_id.channel_id))) == null) {
             return false;
         }
@@ -2685,6 +2696,48 @@ public class MessageObject {
         return sb.toString();
     }
 
+    public static String getVideoCodec(TLRPC.Document document) {
+        if (document == null) {
+            return null;
+        }
+        int size = document.attributes.size();
+        for (int i = 0; i < size; i++) {
+            TLRPC.DocumentAttribute documentAttribute = document.attributes.get(i);
+            if (documentAttribute instanceof TLRPC.TL_documentAttributeVideo) {
+                return ((TLRPC.TL_documentAttributeVideo) documentAttribute).video_codec;
+            }
+        }
+        return null;
+    }
+
+    public static int getVideoHeight(TLRPC.Document document) {
+        if (document == null) {
+            return 0;
+        }
+        int size = document.attributes.size();
+        for (int i = 0; i < size; i++) {
+            TLRPC.DocumentAttribute documentAttribute = document.attributes.get(i);
+            if (documentAttribute instanceof TLRPC.TL_documentAttributeVideo) {
+                return documentAttribute.h;
+            }
+        }
+        return 0;
+    }
+
+    public static int getVideoWidth(TLRPC.Document document) {
+        if (document == null) {
+            return 0;
+        }
+        int size = document.attributes.size();
+        for (int i = 0; i < size; i++) {
+            TLRPC.DocumentAttribute documentAttribute = document.attributes.get(i);
+            if (documentAttribute instanceof TLRPC.TL_documentAttributeVideo) {
+                return documentAttribute.w;
+            }
+        }
+        return 0;
+    }
+
     public static double getWebDocumentDuration(TLRPC.WebDocument webDocument) {
         int i;
         if (webDocument == null) {
@@ -2724,13 +2777,17 @@ public class MessageObject {
     }
 
     private void handleFoundWords(ArrayList<String> arrayList, String[] strArr, boolean z) {
+        handleFoundWords(arrayList, strArr, z, true);
+    }
+
+    private void handleFoundWords(ArrayList<String> arrayList, String[] strArr, boolean z, boolean z2) {
         TLRPC.Message message;
         TLRPC.MessageReplyHeader messageReplyHeader;
-        boolean z2;
+        boolean z3;
         if (arrayList.isEmpty()) {
             return;
         }
-        boolean z3 = false;
+        boolean z4 = false;
         for (int i = 0; i < arrayList.size(); i++) {
             int i2 = 0;
             while (true) {
@@ -2738,32 +2795,32 @@ public class MessageObject {
                     break;
                 }
                 if (arrayList.get(i).contains(strArr[i2])) {
-                    z3 = true;
+                    z4 = true;
                     break;
                 }
                 i2++;
             }
-            if (z3) {
+            if (z4) {
                 break;
             }
         }
-        if (z3) {
+        if (z4) {
             int i3 = 0;
             while (i3 < arrayList.size()) {
                 int i4 = 0;
                 while (true) {
                     if (i4 >= strArr.length) {
-                        z2 = false;
+                        z3 = false;
                         break;
                     } else {
                         if (arrayList.get(i3).contains(strArr[i4])) {
-                            z2 = true;
+                            z3 = true;
                             break;
                         }
                         i4++;
                     }
                 }
-                if (!z2) {
+                if (!z3) {
                     arrayList.remove(i3);
                     i3--;
                 }
@@ -2802,12 +2859,13 @@ public class MessageObject {
             if (indexOf < 0) {
                 indexOf = 0;
             }
-            if (length > 120) {
+            if (length > 120 && z2) {
                 float f = 120;
                 int max = Math.max(0, indexOf - ((int) (0.1f * f)));
                 replaceMultipleCharSequence = replaceMultipleCharSequence.subSequence(max, Math.min(length, (indexOf - max) + indexOf + ((int) (f * 0.9f))));
             }
             this.messageTrimmedToHighlight = replaceMultipleCharSequence;
+            this.messageTrimmedToHighlightCut = z2;
         }
     }
 
@@ -4035,7 +4093,7 @@ public class MessageObject {
         if (getMedia(this.messageOwner) instanceof TLRPC.TL_messageMediaPhoto) {
             return true;
         }
-        return (!(getMedia(this.messageOwner) instanceof TLRPC.TL_messageMediaDocument) || isVoice() || isSticker() || isAnimatedSticker() || isRoundVideo()) ? false : true;
+        return getMedia(this.messageOwner) instanceof TLRPC.TL_messageMediaDocument ? (isVoice() || isSticker() || isAnimatedSticker() || isRoundVideo()) ? false : true : isMediaEmpty();
     }
 
     public boolean canEditMessage(TLRPC.Chat chat) {
@@ -4224,7 +4282,6 @@ public class MessageObject {
     public void checkMediaExistance(boolean z) {
         boolean exists;
         int i;
-        TLRPC.Photo photo;
         File pathToAttach;
         this.attachPathExists = false;
         this.mediaExists = false;
@@ -4263,30 +4320,35 @@ public class MessageObject {
                 }
             }
         }
-        if (this.mediaExists) {
-            return;
-        }
-        TLObject document = getDocument();
-        if (document != null) {
-            if (!isWallpaper()) {
-                pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(document, null, false, z);
-            }
-            pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(document, null, true, z);
-        } else {
-            int i3 = this.type;
-            if (i3 == 0) {
-                document = FileLoader.getClosestPhotoSizeWithSize(this.photoThumbs, AndroidUtilities.getPhotoSize());
-                if (document == null) {
-                    return;
+        if (!this.mediaExists) {
+            TLObject document = getDocument();
+            if (document != null) {
+                if (!isWallpaper()) {
+                    pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(document, null, false, z);
+                    this.mediaExists = pathToAttach.exists();
                 }
                 pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(document, null, true, z);
-            } else if (i3 != 11 || (photo = this.messageOwner.action.photo) == null || photo.video_sizes.isEmpty()) {
-                return;
+                this.mediaExists = pathToAttach.exists();
             } else {
-                pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(photo.video_sizes.get(0), null, true, z);
+                int i3 = this.type;
+                if (i3 == 0) {
+                    document = FileLoader.getClosestPhotoSizeWithSize(this.photoThumbs, AndroidUtilities.getPhotoSize());
+                    if (document == null) {
+                        return;
+                    }
+                    pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(document, null, true, z);
+                    this.mediaExists = pathToAttach.exists();
+                } else if (i3 == 11) {
+                    TLRPC.Photo photo = this.messageOwner.action.photo;
+                    if (photo == null || photo.video_sizes.isEmpty()) {
+                        return;
+                    }
+                    pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(photo.video_sizes.get(0), null, true, z);
+                    this.mediaExists = pathToAttach.exists();
+                }
             }
         }
-        this.mediaExists = pathToAttach.exists();
+        updateQualitiesCached(z);
     }
 
     public void copyStableParams(MessageObject messageObject) {
@@ -4747,8 +4809,9 @@ public class MessageObject {
     }
 
     public TLRPC.Document getDocument() {
+        VideoPlayer.VideoUri videoUri;
         TLRPC.Document document = this.emojiAnimatedSticker;
-        return document != null ? document : getDocument(this.messageOwner);
+        return document != null ? document : (!hasVideoQualities() || (videoUri = this.highestQuality) == null) ? getDocument(this.messageOwner) : videoUri.document;
     }
 
     public String getDocumentName() {
@@ -4842,7 +4905,7 @@ public class MessageObject {
     }
 
     public String getFileName() {
-        return getFileName(this.messageOwner);
+        return getDocument() != null ? getFileName(getDocument()) : getFileName(this.messageOwner);
     }
 
     public Long getForwardedFromId() {
@@ -5354,10 +5417,6 @@ public class MessageObject {
         }
     }
 
-    public int getUnradFlags() {
-        return getUnreadFlags(this.messageOwner);
-    }
-
     public CharSequence getVoiceTranscription() {
         String str;
         TLRPC.Message message = this.messageOwner;
@@ -5568,10 +5627,25 @@ public class MessageObject {
     }
 
     public boolean hasVideoQualities() {
+        TLRPC.MessageMedia messageMedia;
         if (this.videoQualitiesCached == null) {
             try {
                 TLRPC.Message message = this.messageOwner;
-                this.videoQualitiesCached = Boolean.valueOf(message != null && VideoPlayer.hasQualities(this.currentAccount, message.media));
+                boolean z = false;
+                if (message != null && (messageMedia = message.media) != null && messageMedia.document != null && !messageMedia.alt_documents.isEmpty()) {
+                    int i = this.currentAccount;
+                    TLRPC.Message message2 = this.messageOwner;
+                    ArrayList<VideoPlayer.Quality> qualities = VideoPlayer.getQualities(i, message2 != null ? message2.media : null);
+                    this.videoQualities = qualities;
+                    if (qualities != null && qualities.size() > 1) {
+                        z = true;
+                    }
+                    this.videoQualitiesCached = Boolean.valueOf(z);
+                    this.highestQuality = VideoPlayer.getQualityForPlayer(this.videoQualities);
+                    this.thumbQuality = VideoPlayer.getQualityForThumb(this.videoQualities);
+                }
+                this.videoQualitiesCached = Boolean.FALSE;
+                return false;
             } catch (Exception e) {
                 FileLog.e(e);
                 this.videoQualitiesCached = Boolean.FALSE;
@@ -5677,6 +5751,11 @@ public class MessageObject {
         return (getDocument() == null || isVideo() || isMusic() || isVoice() || isAnyKindOfSticker()) ? false : true;
     }
 
+    public boolean isEdited() {
+        TLRPC.Message message = this.messageOwner;
+        return (message == null || (message.flags & 32768) == 0 || message.edit_date == 0 || message.edit_hide) ? false : true;
+    }
+
     public boolean isEditing() {
         TLRPC.Message message = this.messageOwner;
         return message.send_state == 3 && message.id > 0;
@@ -5746,7 +5825,11 @@ public class MessageObject {
     }
 
     public boolean isFromGroup() {
-        TLRPC.Peer peer = this.messageOwner.peer_id;
+        TLRPC.Message message = this.messageOwner;
+        if (message == null) {
+            return false;
+        }
+        TLRPC.Peer peer = message.peer_id;
         TLRPC.Chat chat = null;
         if (peer != null) {
             long j = peer.channel_id;
@@ -5968,7 +6051,14 @@ public class MessageObject {
 
     public boolean isSendError() {
         TLRPC.Message message = this.messageOwner;
-        return (message.send_state == 2 && message.id < 0) || (this.scheduled && message.id > 0 && message.date < ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() + (-60));
+        if (message.send_state != 2 || message.id >= 0) {
+            if (this.scheduled && message.id > 0) {
+                if (message.date < ConnectionsManager.getInstance(this.currentAccount).getCurrentTime() - (this.messageOwner.video_processing_pending ? 300 : 60)) {
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     public boolean isSending() {
@@ -6068,7 +6158,8 @@ public class MessageObject {
     }
 
     public boolean isUnread() {
-        return this.messageOwner.unread;
+        TLRPC.Message message = this.messageOwner;
+        return message != null && message.unread;
     }
 
     public boolean isUnsupported() {
@@ -6274,6 +6365,11 @@ public class MessageObject {
             staticLayout = new StaticLayout(voiceTranscription, Theme.chat_msgTextPaint, dp, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
         }
         return staticLayout.getHeight();
+    }
+
+    public boolean mediaExists() {
+        VideoPlayer.VideoUri videoUri;
+        return (!hasVideoQualities() || (videoUri = this.highestQuality) == null) ? this.mediaExists : videoUri.isCached();
     }
 
     public boolean needDrawAvatar() {
@@ -6627,16 +6723,21 @@ public class MessageObject {
     }
 
     public void setQuery(String str) {
+        setQuery(str, true);
+    }
+
+    public void setQuery(String str, boolean z) {
         String str2;
         int indexOf;
         if (TextUtils.isEmpty(str)) {
             this.highlightedWords = null;
             this.messageTrimmedToHighlight = null;
+            this.messageTrimmedToHighlightCut = true;
             return;
         }
         ArrayList<String> arrayList = new ArrayList<>();
         String lowerCase = str.trim().toLowerCase();
-        String[] split = lowerCase.split("\\P{L}+");
+        String[] split = lowerCase.split("[^\\p{L}#$]+");
         ArrayList arrayList2 = new ArrayList();
         TLRPC.MessageReplyHeader messageReplyHeader = this.messageOwner.reply_to;
         if (messageReplyHeader != null && !TextUtils.isEmpty(messageReplyHeader.quote_text)) {
@@ -6646,7 +6747,7 @@ public class MessageObject {
                 handleFoundWords(arrayList, split, true);
                 return;
             }
-            arrayList2.addAll(Arrays.asList(lowerCase2.split("\\P{L}+")));
+            arrayList2.addAll(Arrays.asList(lowerCase2.split("[^\\p{L}#$]+")));
         }
         if (!TextUtils.isEmpty(this.messageOwner.message)) {
             String lowerCase3 = this.messageOwner.message.trim().toLowerCase();
@@ -6655,14 +6756,14 @@ public class MessageObject {
                 handleFoundWords(arrayList, split, false);
                 return;
             }
-            arrayList2.addAll(Arrays.asList(lowerCase3.split("\\P{L}+")));
+            arrayList2.addAll(Arrays.asList(lowerCase3.split("[^\\p{L}#$]+")));
         }
         if (getDocument() != null) {
             String lowerCase4 = FileLoader.getDocumentFileName(getDocument()).toLowerCase();
             if (lowerCase4.contains(lowerCase) && !arrayList.contains(lowerCase)) {
                 arrayList.add(lowerCase);
             }
-            arrayList2.addAll(Arrays.asList(lowerCase4.split("\\P{L}+")));
+            arrayList2.addAll(Arrays.asList(lowerCase4.split("[^\\p{L}#$]+")));
         }
         if ((getMedia(this.messageOwner) instanceof TLRPC.TL_messageMediaWebPage) && (getMedia(this.messageOwner).webpage instanceof TLRPC.TL_webPage)) {
             TLRPC.WebPage webPage = getMedia(this.messageOwner).webpage;
@@ -6675,7 +6776,7 @@ public class MessageObject {
                 if (lowerCase5.contains(lowerCase) && !arrayList.contains(lowerCase)) {
                     arrayList.add(lowerCase);
                 }
-                arrayList2.addAll(Arrays.asList(lowerCase5.split("\\P{L}+")));
+                arrayList2.addAll(Arrays.asList(lowerCase5.split("[^\\p{L}#$]+")));
             }
         }
         String musicAuthor = getMusicAuthor();
@@ -6684,7 +6785,7 @@ public class MessageObject {
             if (lowerCase6.contains(lowerCase) && !arrayList.contains(lowerCase)) {
                 arrayList.add(lowerCase);
             }
-            arrayList2.addAll(Arrays.asList(lowerCase6.split("\\P{L}+")));
+            arrayList2.addAll(Arrays.asList(lowerCase6.split("[^\\p{L}#$]+")));
         }
         for (String str4 : split) {
             if (str4.length() >= 2) {
@@ -6706,7 +6807,7 @@ public class MessageObject {
                 }
             }
         }
-        handleFoundWords(arrayList, split, false);
+        handleFoundWords(arrayList, split, false, z);
     }
 
     public void setType() {
@@ -6790,6 +6891,20 @@ public class MessageObject {
 
     public void updateMessageText() {
         updateMessageText(MessagesController.getInstance(this.currentAccount).getUsers(), MessagesController.getInstance(this.currentAccount).getChats(), null, null);
+    }
+
+    public void updateQualitiesCached(boolean z) {
+        ArrayList<VideoPlayer.Quality> arrayList = this.videoQualities;
+        if (arrayList == null) {
+            return;
+        }
+        Iterator<VideoPlayer.Quality> it = arrayList.iterator();
+        while (it.hasNext()) {
+            Iterator it2 = it.next().uris.iterator();
+            while (it2.hasNext()) {
+                ((VideoPlayer.VideoUri) it2.next()).updateCached(z);
+            }
+        }
     }
 
     public boolean updateTranslation() {

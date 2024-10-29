@@ -2331,12 +2331,13 @@ public class TL_stories {
     }
 
     public static class TL_stories_searchPosts extends TLObject {
-        public static final int constructor = 1827279210;
+        public static final int constructor = -780072697;
         public MediaArea area;
         public int flags;
         public String hashtag;
         public int limit;
         public String offset;
+        public TLRPC.InputPeer peer;
 
         @Override
         public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
@@ -2345,13 +2346,16 @@ public class TL_stories {
 
         @Override
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1827279210);
+            abstractSerializedData.writeInt32(-780072697);
             abstractSerializedData.writeInt32(this.flags);
             if ((this.flags & 1) != 0) {
                 abstractSerializedData.writeString(this.hashtag);
             }
             if ((this.flags & 2) != 0) {
                 this.area.serializeToStream(abstractSerializedData);
+            }
+            if ((this.flags & 4) != 0) {
+                this.peer.serializeToStream(abstractSerializedData);
             }
             abstractSerializedData.writeString(this.offset);
             abstractSerializedData.writeInt32(this.limit);

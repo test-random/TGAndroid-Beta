@@ -830,7 +830,7 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
             tL_inputStickerSetID.id = stickerSet.id;
             tL_inputStickerSetID.access_hash = stickerSet.access_hash;
             if (this.currentType != 5) {
-                create = new StickersAlert(getParentActivity(), this, tL_inputStickerSetID, (TLRPC.TL_messages_stickerSet) null, (StickersAlert.StickersAlertDelegate) null);
+                create = new StickersAlert(getParentActivity(), this, tL_inputStickerSetID, null, null, false);
                 showDialog(create);
                 return;
             } else {
@@ -918,7 +918,7 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
             }
             TLRPC.StickerSet stickerSet2 = tL_messages_stickerSet.set;
             if (stickerSet2 == null || !stickerSet2.emojis) {
-                create = new StickersAlert(getParentActivity(), this, (TLRPC.InputStickerSet) null, tL_messages_stickerSet, (StickersAlert.StickersAlertDelegate) null);
+                create = new StickersAlert(getParentActivity(), this, null, tL_messages_stickerSet, null, false);
             } else {
                 ArrayList arrayList3 = new ArrayList();
                 TLRPC.TL_inputStickerSetID tL_inputStickerSetID2 = new TLRPC.TL_inputStickerSetID();
@@ -1046,7 +1046,7 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
                     public void onItemClick(int i3) {
                         if (i3 == -1) {
                             if (StickersActivity.this.onBackPressed()) {
-                                StickersActivity.this.lambda$onBackPressed$300();
+                                StickersActivity.this.lambda$onBackPressed$319();
                             }
                         } else if (i3 == 0 || i3 == 1 || i3 == 2) {
                             if (StickersActivity.this.needReorder) {
@@ -1149,7 +1149,7 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
             public void onItemClick(int i3) {
                 if (i3 == -1) {
                     if (StickersActivity.this.onBackPressed()) {
-                        StickersActivity.this.lambda$onBackPressed$300();
+                        StickersActivity.this.lambda$onBackPressed$319();
                     }
                 } else if (i3 == 0 || i3 == 1 || i3 == 2) {
                     if (StickersActivity.this.needReorder) {

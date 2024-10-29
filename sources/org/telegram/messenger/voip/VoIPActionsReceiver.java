@@ -22,7 +22,7 @@ public class VoIPActionsReceiver extends BroadcastReceiver {
                     return;
                 }
                 if ((packageName + ".HIDE_CALL").equals(intent.getAction())) {
-                    VoIPPreNotificationService.dismiss(context);
+                    VoIPPreNotificationService.dismiss(context, false);
                     return;
                 }
                 return;

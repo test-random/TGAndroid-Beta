@@ -2628,7 +2628,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             Activity activity = ChatActivityEnterView.this.parentActivity;
             ChatActivityEnterView chatActivityEnterView = ChatActivityEnterView.this;
             BaseFragment baseFragment2 = baseFragment;
-            StickersAlert stickersAlert = new StickersAlert(activity, baseFragment2, inputStickerSet, null, chatActivityEnterView, chatActivityEnterView.resourcesProvider);
+            StickersAlert stickersAlert = new StickersAlert(activity, baseFragment2, inputStickerSet, null, chatActivityEnterView, chatActivityEnterView.resourcesProvider, false);
             baseFragment.showDialog(stickersAlert);
             if (z) {
                 stickersAlert.enableEditMode();
@@ -8372,7 +8372,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         }
         TLRPC.User user = this.accountInstance.getMessagesController().getUser(Long.valueOf(j));
         if (user == null) {
-            dialogsActivity.lambda$onBackPressed$300();
+            dialogsActivity.lambda$onBackPressed$319();
             return true;
         }
         long j3 = ((MessagesStorage.TopicKey) arrayList.get(0)).dialogId;
@@ -8394,7 +8394,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 return true;
             }
         }
-        dialogsActivity.lambda$onBackPressed$300();
+        dialogsActivity.lambda$onBackPressed$319();
         return true;
     }
 
@@ -8422,7 +8422,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             tL_messages_sendBotRequestedPeer.requested_peers.add(MessagesController.getInstance(this.currentAccount).getInputPeer(((MessagesStorage.TopicKey) arrayList.get(0)).dialogId));
             ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_sendBotRequestedPeer, null);
         }
-        dialogsActivity.lambda$onBackPressed$300();
+        dialogsActivity.lambda$onBackPressed$319();
         return true;
     }
 
@@ -8731,7 +8731,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     ChatActivityEnterView.this.lambda$openWebViewMenu$24();
                 }
             });
-            Browser.openAsInternalIntent(getContext(), this.botMenuWebViewUrl, false, progress);
+            Browser.openAsInternalIntent(getContext(), this.botMenuWebViewUrl, false, false, progress);
             return;
         }
         if (AndroidUtilities.isTablet()) {

@@ -2,11 +2,13 @@ package org.telegram.ui.Adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.collection.LongSparseArray;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,16 +45,22 @@ import org.telegram.ui.Cells.ContextLinkCell;
 import org.telegram.ui.Cells.MentionCell;
 import org.telegram.ui.Cells.StickerCell;
 import org.telegram.ui.ChatActivity;
+import org.telegram.ui.Components.AvatarDrawable;
+import org.telegram.ui.Components.BackupImageView;
+import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.EmojiView;
+import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
+import org.telegram.ui.PremiumPreviewFragment;
 
 public class MentionsAdapter extends RecyclerListView.SelectionAdapter implements NotificationCenter.NotificationCenterDelegate {
     private LongSparseArray botInfo;
     private int botsCount;
+    private HashtagHint bottomHint;
     private Runnable cancelDelayRunnable;
     private int channelLastReqId;
     private int channelReqId;
-    private TLRPC.Chat chat;
+    public TLRPC.Chat chat;
     private Runnable checkAgainRunnable;
     private boolean contextMedia;
     private int contextQueryReqid;
@@ -62,6 +70,8 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
     private MentionsAdapterDelegate delegate;
     private long dialog_id;
     private TLRPC.User foundContextBot;
+    private String hintHashtag;
+    private boolean hintHashtagDivider;
     private TLRPC.ChatFull info;
     private boolean isDarkTheme;
     private boolean isSearchingMentions;
@@ -74,12 +84,12 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
     private String lastSticker;
     private String lastText;
     private boolean lastUsernameOnly;
-    private Context mContext;
+    private final Context mContext;
     private EmojiView.ChooseStickerActionTracker mentionsStickersActionTracker;
     private ArrayList messages;
     private String nextQueryOffset;
     private boolean noUserName;
-    private ChatActivity parentFragment;
+    public ChatActivity parentFragment;
     private ArrayList quickReplies;
     private String quickRepliesQuery;
     private final Theme.ResourcesProvider resourcesProvider;
@@ -102,7 +112,9 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
     private String searchingContextUsername;
     private ArrayList stickers;
     private HashMap stickersMap;
+    private final boolean stories;
     private long threadMessageId;
+    private HashtagHint topHint;
     private TLRPC.User user;
     private boolean visibleByStickersSearch;
     private boolean allowStickers = true;
@@ -312,6 +324,72 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
         }
     }
 
+    public static class HashtagHint extends LinearLayout {
+        private final AvatarDrawable avatarDrawable;
+        private final BackupImageView imageView;
+        private final Theme.ResourcesProvider resourcesProvider;
+        private final LinearLayout textLayout;
+        private final TextView textView;
+        private final TextView titleView;
+        private final boolean transparent;
+
+        public HashtagHint(Context context, boolean z, Theme.ResourcesProvider resourcesProvider) {
+            super(context);
+            this.avatarDrawable = new AvatarDrawable();
+            this.resourcesProvider = resourcesProvider;
+            this.transparent = z;
+            setOrientation(0);
+            BackupImageView backupImageView = new BackupImageView(context);
+            this.imageView = backupImageView;
+            backupImageView.setRoundRadius(AndroidUtilities.dp(28.0f));
+            addView(backupImageView, LayoutHelper.createLinear(28, 28, 19, 12, 0, 12, 0));
+            LinearLayout linearLayout = new LinearLayout(context);
+            this.textLayout = linearLayout;
+            linearLayout.setOrientation(1);
+            addView(linearLayout, LayoutHelper.createLinear(-1, -2, 55, 0, 4, 12, 4));
+            TextView textView = new TextView(context);
+            this.titleView = textView;
+            textView.setTextSize(1, 15.0f);
+            int i = Theme.key_windowBackgroundWhiteBlackText;
+            textView.setTextColor(Theme.getColor(i, resourcesProvider));
+            linearLayout.addView(textView, LayoutHelper.createLinear(-1, -2));
+            TextView textView2 = new TextView(context);
+            this.textView = textView2;
+            textView2.setTextSize(1, 13.0f);
+            textView2.setTextColor(z ? Theme.multAlpha(Theme.getColor(i, resourcesProvider), 0.5f) : Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2, resourcesProvider));
+            linearLayout.addView(textView2, LayoutHelper.createLinear(-1, -2));
+        }
+
+        @Override
+        protected void onMeasure(int i, int i2) {
+            super.onMeasure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(i), 1073741824), i2);
+        }
+
+        public void set(int i, String str, TLRPC.Chat chat) {
+            TextView textView;
+            int i2;
+            if (str == null) {
+                return;
+            }
+            if (i == 0) {
+                CombinedDrawable combinedDrawable = new CombinedDrawable(Theme.createRoundRectDrawable(AndroidUtilities.dp(28.0f), Theme.getColor(Theme.key_featuredStickers_addButton, this.resourcesProvider)), getContext().getResources().getDrawable(R.drawable.menu_hashtag).mutate());
+                combinedDrawable.setIconOffset(AndroidUtilities.dp(-0.66f), 0);
+                combinedDrawable.setIconSize(AndroidUtilities.dp(20.0f), AndroidUtilities.dp(20.0f));
+                this.imageView.setImageDrawable(combinedDrawable);
+                this.titleView.setText(LocaleController.formatString(R.string.HashtagSuggestion1Title, str));
+                textView = this.textView;
+                i2 = R.string.HashtagSuggestion1Text;
+            } else {
+                this.avatarDrawable.setInfo(chat);
+                this.imageView.setForUserOrChat(chat, this.avatarDrawable);
+                this.titleView.setText(PremiumPreviewFragment.applyNewSpan(LocaleController.formatString(R.string.HashtagSuggestion2Title, str + "@" + ChatObject.getPublicUsername(chat)), 8));
+                textView = this.textView;
+                i2 = R.string.HashtagSuggestion2Text;
+            }
+            textView.setText(LocaleController.getString(i2));
+        }
+    }
+
     public interface MentionsAdapterDelegate {
         void needChangePanelVisibility(boolean z);
 
@@ -332,12 +410,13 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
         }
     }
 
-    public MentionsAdapter(Context context, boolean z, long j, long j2, MentionsAdapterDelegate mentionsAdapterDelegate, Theme.ResourcesProvider resourcesProvider) {
+    public MentionsAdapter(Context context, boolean z, long j, long j2, MentionsAdapterDelegate mentionsAdapterDelegate, Theme.ResourcesProvider resourcesProvider, boolean z2) {
         this.resourcesProvider = resourcesProvider;
         this.mContext = context;
         this.delegate = mentionsAdapterDelegate;
         this.isDarkTheme = z;
         this.dialog_id = j;
+        this.stories = z2;
         this.threadMessageId = j2;
         SearchAdapterHelper searchAdapterHelper = new SearchAdapterHelper(true);
         this.searchAdapterHelper = searchAdapterHelper;
@@ -1062,7 +1141,17 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
         return this.foundContextBot;
     }
 
+    public String getHashtagHint() {
+        return this.hintHashtag;
+    }
+
     public Object getItem(int i) {
+        if (this.hintHashtag != null) {
+            if (i < 2) {
+                return null;
+            }
+            i -= 2;
+        }
         ArrayList arrayList = this.stickers;
         if (arrayList != null) {
             if (i < 0 || i >= arrayList.size()) {
@@ -1148,44 +1237,16 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
     }
 
     public int getItemCountInternal() {
-        int i = 1;
-        if (this.foundContextBot != null && !this.inlineMediaEnabled) {
-            return 1;
-        }
-        ArrayList arrayList = this.stickers;
-        if (arrayList != null) {
-            return arrayList.size();
-        }
-        ArrayList arrayList2 = this.searchResultBotContext;
-        if (arrayList2 != null) {
-            int size = arrayList2.size();
-            if (this.searchResultBotContextSwitch == null && this.searchResultBotWebViewSwitch == null) {
-                i = 0;
-            }
-            return size + i;
-        }
-        ArrayList arrayList3 = this.searchResultUsernames;
-        if (arrayList3 != null) {
-            return arrayList3.size();
-        }
-        ArrayList arrayList4 = this.searchResultHashtags;
-        if (arrayList4 != null) {
-            return arrayList4.size();
-        }
-        if (this.searchResultCommands == null && this.quickReplies == null) {
-            ArrayList arrayList5 = this.searchResultSuggestions;
-            if (arrayList5 != null) {
-                return arrayList5.size();
-            }
-            return 0;
-        }
-        ArrayList arrayList6 = this.quickReplies;
-        int size2 = arrayList6 == null ? 0 : arrayList6.size();
-        ArrayList arrayList7 = this.searchResultCommands;
-        return size2 + (arrayList7 != null ? arrayList7.size() : 0);
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.MentionsAdapter.getItemCountInternal():int");
     }
 
     public Object getItemParent(int i) {
+        if (this.hintHashtag != null) {
+            if (i < 2) {
+                return null;
+            }
+            i -= 2;
+        }
         ArrayList arrayList = this.stickers;
         if (arrayList == null || i < 0 || i >= arrayList.size()) {
             return null;
@@ -1194,11 +1255,23 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
     }
 
     public int getItemPosition(int i) {
+        if (this.hintHashtag != null) {
+            if (i < 2) {
+                return 0;
+            }
+            i -= 2;
+        }
         return this.searchResultBotContext != null ? (this.searchResultBotContextSwitch == null && this.searchResultBotWebViewSwitch == null) ? i : i - 1 : i;
     }
 
     @Override
     public int getItemViewType(int i) {
+        if (this.hintHashtag != null) {
+            if (i < 2) {
+                return 6;
+            }
+            i -= 2;
+        }
         if (this.stickers != null) {
             return 4;
         }
@@ -1246,6 +1319,14 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
     @Override
     public boolean isEnabled(RecyclerView.ViewHolder viewHolder) {
         return (this.foundContextBot == null || this.inlineMediaEnabled) && this.stickers == null;
+    }
+
+    public boolean isGlobalHashtagHint(int i) {
+        return this.hintHashtag != null && i == 0;
+    }
+
+    public boolean isLocalHashtagHint(int i) {
+        return this.hintHashtag != null && i == 1;
     }
 
     public boolean isLongClickEnabled() {
@@ -1306,9 +1387,13 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
+        ChatActivity chatActivity;
         String formatString;
         int i2;
         TLRPC.TL_chatBannedRights tL_chatBannedRights;
+        if (this.hintHashtag != null) {
+            i -= 2;
+        }
         int itemViewType = viewHolder.getItemViewType();
         if (itemViewType == 4) {
             StickerCell stickerCell = (StickerCell) viewHolder.itemView;
@@ -1369,6 +1454,24 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
             ((ContextLinkCell) viewHolder.itemView).setLink((TLRPC.BotInlineResult) this.searchResultBotContext.get(i), this.foundContextBot, this.contextMedia, i != this.searchResultBotContext.size() - 1, z && i == 0, "gif".equals(this.searchingContextUsername));
             return;
         }
+        if (itemViewType == 6) {
+            HashtagHint hashtagHint = (HashtagHint) viewHolder.itemView;
+            int i3 = i + 2;
+            if (i3 == 0) {
+                this.topHint = hashtagHint;
+            } else {
+                this.bottomHint = hashtagHint;
+            }
+            TLRPC.Chat chat = this.chat;
+            if (chat == null && (chatActivity = this.parentFragment) != null) {
+                chat = chatActivity.getCurrentChat();
+            }
+            hashtagHint.set(i3, this.hintHashtag, chat);
+            return;
+        }
+        if (itemViewType == 7) {
+            return;
+        }
         MentionCell mentionCell = (MentionCell) viewHolder.itemView;
         ArrayList arrayList2 = this.searchResultUsernames;
         if (arrayList2 != null) {
@@ -1407,6 +1510,7 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view;
+        View view2;
         if (i == 0) {
             MentionCell mentionCell = new MentionCell(this.mContext, this.resourcesProvider);
             mentionCell.setIsDarkTheme(this.isDarkTheme);
@@ -1420,16 +1524,34 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
                 }
             });
             view = contextLinkCell;
-        } else if (i == 2) {
-            view = new BotSwitchCell(this.mContext);
-        } else if (i != 3) {
-            view = i != 5 ? new StickerCell(this.mContext, this.resourcesProvider) : new QuickRepliesActivity.QuickReplyView(this.mContext, false, this.resourcesProvider);
+        } else if (i != 2) {
+            if (i == 3) {
+                TextView textView = new TextView(this.mContext);
+                textView.setPadding(AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f));
+                textView.setTextSize(1, 14.0f);
+                textView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
+                view2 = textView;
+            } else if (i == 5) {
+                view = new QuickRepliesActivity.QuickReplyView(this.mContext, false, this.resourcesProvider);
+            } else if (i == 6) {
+                view = new HashtagHint(this.mContext, this.stories, this.resourcesProvider);
+            } else if (i != 7) {
+                view = new StickerCell(this.mContext, this.resourcesProvider);
+            } else {
+                View view3 = new View(this.mContext) {
+                    @Override
+                    protected void onMeasure(int i2, int i3) {
+                        super.onMeasure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(i2), 1073741824), View.MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(8.0f), 1073741824));
+                    }
+                };
+                CombinedDrawable combinedDrawable = new CombinedDrawable(new ColorDrawable(this.stories ? Theme.multAlpha(-1, 0.15f) : Theme.getColor(Theme.key_windowBackgroundGray, this.resourcesProvider)), Theme.getThemedDrawable(this.mContext, R.drawable.greydivider, Theme.getColor(Theme.key_windowBackgroundGrayShadow, this.resourcesProvider)), 0, 0);
+                combinedDrawable.setFullsize(true);
+                view3.setBackground(combinedDrawable);
+                view2 = view3;
+            }
+            view = view2;
         } else {
-            TextView textView = new TextView(this.mContext);
-            textView.setPadding(AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f));
-            textView.setTextSize(1, 14.0f);
-            textView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
-            view = textView;
+            view = new BotSwitchCell(this.mContext);
         }
         return new RecyclerListView.Holder(view);
     }
@@ -1487,7 +1609,7 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
         searchForContextBotResults(true, user, str2, this.nextQueryOffset);
     }
 
-    public void lambda$searchUsernameOrHashtag$7(final java.lang.CharSequence r26, final int r27, final java.util.ArrayList r28, final boolean r29, final boolean r30) {
+    public void lambda$searchUsernameOrHashtag$7(final java.lang.CharSequence r30, final int r31, final java.util.ArrayList r32, final boolean r33, final boolean r34) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.MentionsAdapter.lambda$searchUsernameOrHashtag$7(java.lang.CharSequence, int, java.util.ArrayList, boolean, boolean):void");
     }
 

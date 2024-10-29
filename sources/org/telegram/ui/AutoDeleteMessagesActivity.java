@@ -246,7 +246,7 @@ public class AutoDeleteMessagesActivity extends BaseFragment implements Notifica
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    AutoDeleteMessagesActivity.this.lambda$onBackPressed$300();
+                    AutoDeleteMessagesActivity.this.lambda$onBackPressed$319();
                 }
             }
         });

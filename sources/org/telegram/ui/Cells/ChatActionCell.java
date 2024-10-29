@@ -185,6 +185,21 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     private Drawable wallpaperPreviewDrawable;
     private boolean wasLayout;
 
+    public class AnonymousClass1 extends ClickableSpan {
+        final CharacterStyle val$link;
+
+        AnonymousClass1(CharacterStyle characterStyle) {
+            r2 = characterStyle;
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (ChatActionCell.this.delegate != null) {
+                ChatActionCell.this.openLink(r2);
+            }
+        }
+    }
+
     public interface ChatActionCellDelegate {
 
         public abstract class CC {
@@ -305,6 +320,9 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     public interface ThemeDelegate extends Theme.ResourcesProvider {
 
         public abstract class CC {
+            public static void $default$applyServiceShaderMatrix(ThemeDelegate themeDelegate, int i, int i2, float f, float f2) {
+                Theme.applyServiceShaderMatrix(i, i2, f, f2);
+            }
         }
     }
 
@@ -873,10 +891,18 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     private float getUploadingInfoProgress(MessageObject messageObject) {
         MessagesController messagesController;
         String str;
-        if (messageObject == null || messageObject.type != 22 || (str = (messagesController = MessagesController.getInstance(this.currentAccount)).uploadingWallpaper) == null || !TextUtils.equals(messageObject.messageOwner.action.wallpaper.uploadingImage, str)) {
+        if (messageObject == null) {
             return 1.0f;
         }
-        return messagesController.uploadingWallpaperInfo.uploadingProgress;
+        try {
+            if (messageObject.type == 22 && (str = (messagesController = MessagesController.getInstance(this.currentAccount)).uploadingWallpaper) != null && TextUtils.equals(messageObject.messageOwner.action.wallpaper.uploadingImage, str)) {
+                return messagesController.uploadingWallpaperInfo.uploadingProgress;
+            }
+            return 1.0f;
+        } catch (Exception e) {
+            FileLog.e(e);
+            return 1.0f;
+        }
     }
 
     private boolean isButtonLayout(MessageObject messageObject) {
@@ -1306,15 +1332,21 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         }
         if (this.accessibilityText == null) {
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(!TextUtils.isEmpty(this.customText) ? this.customText : messageObject.messageText);
-            for (final CharacterStyle characterStyle : (CharacterStyle[]) spannableStringBuilder.getSpans(0, spannableStringBuilder.length(), ClickableSpan.class)) {
+            for (CharacterStyle characterStyle : (CharacterStyle[]) spannableStringBuilder.getSpans(0, spannableStringBuilder.length(), ClickableSpan.class)) {
                 int spanStart = spannableStringBuilder.getSpanStart(characterStyle);
                 int spanEnd = spannableStringBuilder.getSpanEnd(characterStyle);
                 spannableStringBuilder.removeSpan(characterStyle);
                 spannableStringBuilder.setSpan(new ClickableSpan() {
+                    final CharacterStyle val$link;
+
+                    AnonymousClass1(CharacterStyle characterStyle2) {
+                        r2 = characterStyle2;
+                    }
+
                     @Override
                     public void onClick(View view) {
                         if (ChatActionCell.this.delegate != null) {
-                            ChatActionCell.this.openLink(characterStyle);
+                            ChatActionCell.this.openLink(r2);
                         }
                     }
                 }, spanStart, spanEnd, 33);

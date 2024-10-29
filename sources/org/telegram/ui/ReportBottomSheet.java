@@ -974,12 +974,12 @@ public class ReportBottomSheet extends BottomSheet {
         if (context == null) {
             return;
         }
-        TLRPC.TL_channels_reportSponsoredMessage tL_channels_reportSponsoredMessage = new TLRPC.TL_channels_reportSponsoredMessage();
-        tL_channels_reportSponsoredMessage.channel = MessagesController.getInstance(currentAccount).getInputChannel(-dialogId);
+        TLRPC.TL_messages_reportSponsoredMessage tL_messages_reportSponsoredMessage = new TLRPC.TL_messages_reportSponsoredMessage();
+        tL_messages_reportSponsoredMessage.peer = MessagesController.getInstance(currentAccount).getInputPeer(dialogId);
         final byte[] bArr = messageObject.sponsoredId;
-        tL_channels_reportSponsoredMessage.random_id = bArr;
-        tL_channels_reportSponsoredMessage.option = new byte[0];
-        ConnectionsManager.getInstance(currentAccount).sendRequest(tL_channels_reportSponsoredMessage, new RequestDelegate() {
+        tL_messages_reportSponsoredMessage.random_id = bArr;
+        tL_messages_reportSponsoredMessage.option = new byte[0];
+        ConnectionsManager.getInstance(currentAccount).sendRequest(tL_messages_reportSponsoredMessage, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ReportBottomSheet.lambda$openSponsored$15(context, resourcesProvider, dialogId, bArr, chatActivity, messageObject, currentAccount, tLObject, tL_error);
@@ -995,8 +995,8 @@ public class ReportBottomSheet extends BottomSheet {
         TLRPC.TL_messages_report tL_messages_report;
         ?? r8;
         if (this.sponsored) {
-            r8 = new TLRPC.TL_channels_reportSponsoredMessage();
-            r8.channel = MessagesController.getInstance(this.currentAccount).getInputChannel(-this.dialogId);
+            r8 = new TLRPC.TL_messages_reportSponsoredMessage();
+            r8.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
             r8.random_id = this.sponsoredId;
             r8.option = bArr;
         } else {

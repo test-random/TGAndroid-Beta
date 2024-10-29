@@ -209,7 +209,7 @@ public class ArchivedStickersActivity extends BaseFragment implements Notificati
         }
         TLRPC.InputStickerSet inputStickerSet = tL_inputStickerSetShortName;
         inputStickerSet.access_hash = stickerSetCovered.set.access_hash;
-        StickersAlert stickersAlert = new StickersAlert(getParentActivity(), this, inputStickerSet, (TLRPC.TL_messages_stickerSet) null, (StickersAlert.StickersAlertDelegate) null);
+        StickersAlert stickersAlert = new StickersAlert(getParentActivity(), this, inputStickerSet, null, null, false);
         stickersAlert.setInstallDelegate(new StickersAlert.StickersAlertInstallDelegate() {
             @Override
             public void onStickerSetInstalled() {
@@ -331,7 +331,7 @@ public class ArchivedStickersActivity extends BaseFragment implements Notificati
             @Override
             public void onItemClick(int i3) {
                 if (i3 == -1) {
-                    ArchivedStickersActivity.this.lambda$onBackPressed$300();
+                    ArchivedStickersActivity.this.lambda$onBackPressed$319();
                 }
             }
         });

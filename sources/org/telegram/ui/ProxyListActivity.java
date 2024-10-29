@@ -162,7 +162,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                     return;
                 }
             } else if (ProxyListActivity.this.selectedItems.isEmpty()) {
-                ProxyListActivity.this.lambda$onBackPressed$300();
+                ProxyListActivity.this.lambda$onBackPressed$319();
                 return;
             }
             ProxyListActivity.this.listAdapter.clearSelected();
@@ -957,7 +957,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    ProxyListActivity.this.lambda$onBackPressed$300();
+                    ProxyListActivity.this.lambda$onBackPressed$319();
                 }
             }
         });

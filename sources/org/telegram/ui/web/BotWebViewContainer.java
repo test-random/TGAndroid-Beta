@@ -498,6 +498,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         public final boolean bot;
         private BotWebViewContainer botWebViewContainer;
         private BrowserHistory.Entry currentHistoryEntry;
+        private BottomSheet currentSheet;
         private String currentUrl;
         public boolean dangerousUrl;
         public boolean errorShown;
@@ -560,55 +561,8 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                 MyWebView.this.loadUrl(str);
             }
 
-            public void lambda$onLongClick$1(final String str) {
-                String str2;
-                BottomSheet.Builder builder = new BottomSheet.Builder(MyWebView.this.getContext(), false, null);
-                try {
-                    Uri parse = Uri.parse(str);
-                    str2 = Browser.replaceHostname(parse, Browser.IDN_toUnicode(parse.getHost()), null);
-                } catch (Exception e) {
-                    try {
-                        FileLog.e((Throwable) e, false);
-                        str2 = str;
-                    } catch (Exception e2) {
-                        e = e2;
-                        str2 = str;
-                        FileLog.e(e);
-                        builder.setTitleMultipleLines(true);
-                        builder.setTitle(str2);
-                        builder.setItems(new CharSequence[]{LocaleController.getString(R.string.OpenInTelegramBrowser), LocaleController.getString(R.string.OpenInSystemBrowser), LocaleController.getString(R.string.Copy)}, new DialogInterface.OnClickListener() {
-                            @Override
-                            public final void onClick(DialogInterface dialogInterface, int i) {
-                                BotWebViewContainer.MyWebView.AnonymousClass1.this.lambda$onLongClick$0(str, dialogInterface, i);
-                            }
-                        });
-                        builder.show();
-                    }
-                }
-                try {
-                    str2 = URLDecoder.decode(str2.replaceAll("\\+", "%2b"), "UTF-8");
-                } catch (Exception e3) {
-                    e = e3;
-                    FileLog.e(e);
-                    builder.setTitleMultipleLines(true);
-                    builder.setTitle(str2);
-                    builder.setItems(new CharSequence[]{LocaleController.getString(R.string.OpenInTelegramBrowser), LocaleController.getString(R.string.OpenInSystemBrowser), LocaleController.getString(R.string.Copy)}, new DialogInterface.OnClickListener() {
-                        @Override
-                        public final void onClick(DialogInterface dialogInterface, int i) {
-                            BotWebViewContainer.MyWebView.AnonymousClass1.this.lambda$onLongClick$0(str, dialogInterface, i);
-                        }
-                    });
-                    builder.show();
-                }
-                builder.setTitleMultipleLines(true);
-                builder.setTitle(str2);
-                builder.setItems(new CharSequence[]{LocaleController.getString(R.string.OpenInTelegramBrowser), LocaleController.getString(R.string.OpenInSystemBrowser), LocaleController.getString(R.string.Copy)}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public final void onClick(DialogInterface dialogInterface, int i) {
-                        BotWebViewContainer.MyWebView.AnonymousClass1.this.lambda$onLongClick$0(str, dialogInterface, i);
-                    }
-                });
-                builder.show();
+            public void lambda$onLongClick$1(final java.lang.String r8) {
+                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.web.BotWebViewContainer.MyWebView.AnonymousClass1.lambda$onLongClick$1(java.lang.String):void");
             }
 
             public void lambda$onLongClick$2(String str, DialogInterface dialogInterface, int i) {
@@ -680,7 +634,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                                 BotWebViewContainer.MyWebView.AnonymousClass1.this.lambda$onLongClick$2(str, dialogInterface, i);
                             }
                         });
-                        builder.show();
+                        MyWebView.this.currentSheet = builder.show();
                     }
                 }
                 try {
@@ -696,7 +650,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                             BotWebViewContainer.MyWebView.AnonymousClass1.this.lambda$onLongClick$2(str, dialogInterface, i);
                         }
                     });
-                    builder.show();
+                    MyWebView.this.currentSheet = builder.show();
                 }
                 builder.setTitleMultipleLines(true);
                 builder.setTitle(str2);
@@ -706,7 +660,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                         BotWebViewContainer.MyWebView.AnonymousClass1.this.lambda$onLongClick$2(str, dialogInterface, i);
                     }
                 });
-                builder.show();
+                MyWebView.this.currentSheet = builder.show();
             }
 
             @Override
@@ -866,6 +820,10 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
             @Override
             public void onPageStarted(WebView webView, String str, Bitmap bitmap) {
                 String str2;
+                if (MyWebView.this.currentSheet != null) {
+                    MyWebView.this.currentSheet.dismiss();
+                    MyWebView.this.currentSheet = null;
+                }
                 MyWebView.this.currentHistoryEntry = null;
                 MyWebView.this.currentUrl = str;
                 MyWebView myWebView = MyWebView.this;
@@ -2023,6 +1981,11 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
 
         @Override
         public void loadUrl(String str) {
+            BottomSheet bottomSheet = this.currentSheet;
+            if (bottomSheet != null) {
+                bottomSheet.dismiss();
+                this.currentSheet = null;
+            }
             checkCachedMetaProperties(str);
             this.openedByUrl = str;
             String str2 = BotWebViewContainer.tonsite2magic(str);
@@ -2040,6 +2003,11 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
 
         @Override
         public void loadUrl(String str, Map map) {
+            BottomSheet bottomSheet = this.currentSheet;
+            if (bottomSheet != null) {
+                bottomSheet.dismiss();
+                this.currentSheet = null;
+            }
             checkCachedMetaProperties(str);
             this.openedByUrl = str;
             String str2 = BotWebViewContainer.tonsite2magic(str);
@@ -2056,6 +2024,11 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         }
 
         public void loadUrl(String str, WebMetadataCache.WebMetadata webMetadata) {
+            BottomSheet bottomSheet = this.currentSheet;
+            if (bottomSheet != null) {
+                bottomSheet.dismiss();
+                this.currentSheet = null;
+            }
             applyCachedMeta(webMetadata);
             this.openedByUrl = str;
             String str2 = BotWebViewContainer.tonsite2magic(str);
@@ -3079,10 +3052,10 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
     }
 
     public void onOpenUri(Uri uri) {
-        onOpenUri(uri, null, !this.bot, false);
+        onOpenUri(uri, null, !this.bot, false, false);
     }
 
-    private void onOpenUri(Uri uri, String str, boolean z, boolean z2) {
+    private void onOpenUri(Uri uri, String str, boolean z, boolean z2, boolean z3) {
         if (this.isRequestingPageOpen) {
             return;
         }
@@ -3092,7 +3065,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
             if (Browser.isInternalUri(uri, zArr) && !zArr[0] && this.delegate != null) {
                 setKeyboardFocusable(false);
             }
-            Browser.openUrl(getContext(), uri, true, z, false, null, str, false, true);
+            Browser.openUrl(getContext(), uri, true, z, false, null, str, false, true, z3);
         }
     }
 

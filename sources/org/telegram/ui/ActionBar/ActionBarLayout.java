@@ -209,7 +209,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 baseFragment = ActionBarLayout.this.sheetFragment;
             }
             BaseFragment.AttachedSheet lastSheet = baseFragment != null ? baseFragment.getLastSheet() : null;
-            if (lastSheet != null && lastSheet.isFullyVisible() && lastSheet.mo989getWindowView() != view) {
+            if (lastSheet != null && lastSheet.isFullyVisible() && lastSheet.mo997getWindowView() != view) {
                 return true;
             }
             if (view instanceof ActionBar) {
@@ -914,7 +914,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             if (z) {
                 List list = this.fragmentsStack;
                 if (list.get(list.size() - 1) == baseFragment) {
-                    baseFragment.lambda$onBackPressed$300();
+                    baseFragment.lambda$onBackPressed$319();
                     return;
                 }
             }
@@ -1575,6 +1575,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         }
     }
 
+    @Override
     public BaseFragment getBackgroundFragment() {
         return INavigationLayout.CC.$default$getBackgroundFragment(this);
     }

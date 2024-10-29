@@ -13,6 +13,7 @@ import com.android.billingclient.api.ProductDetailsResponseListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -1140,67 +1141,69 @@ public class StarsController {
     public void lambda$buyStarGift$110(TLObject tLObject, TLRPC.TL_error tL_error, final Utilities.Callback2 callback2, Context context, Theme.ResourcesProvider resourcesProvider, final TL_stars.StarGift starGift, TLRPC.User user, final Activity activity, final boolean z, final long j, final TLRPC.TL_textWithEntities tL_textWithEntities) {
         BaseFragment lastFragment = LaunchActivity.getLastFragment();
         BulletinFactory global = (lastFragment == null || lastFragment.visibleDialog != null) ? BulletinFactory.global() : BulletinFactory.of(lastFragment);
-        if (tLObject instanceof TLRPC.TL_payments_paymentResult) {
-            MessagesController.getInstance(this.currentAccount).processUpdates(((TLRPC.TL_payments_paymentResult) tLObject).updates, false);
-            if (callback2 != null) {
-                callback2.run(Boolean.TRUE, null);
-            }
-            if ((lastFragment instanceof ChatActivity) && ((ChatActivity) lastFragment).getDialogId() == j) {
-                BulletinFactory.of(lastFragment).createEmojiBulletin(starGift.sticker, LocaleController.getString(R.string.StarsGiftCompleted), AndroidUtilities.replaceTags(LocaleController.formatPluralString("StarsGiftCompletedText", (int) starGift.stars, new Object[0]))).show(true);
-            } else {
-                final ChatActivity of = ChatActivity.of(j);
-                of.whenFullyVisible(new Runnable() {
-                    @Override
-                    public final void run() {
-                        StarsController.lambda$buyStarGift$109(ChatActivity.this, starGift);
+        if (!(tLObject instanceof TLRPC.TL_payments_paymentResult)) {
+            if (tL_error == null || !"BALANCE_TOO_LOW".equals(tL_error.text)) {
+                if (tL_error == null || !"STARGIFT_USAGE_LIMITED".equals(tL_error.text)) {
+                    if (callback2 != null) {
+                        callback2.run(Boolean.FALSE, null);
                     }
-                });
-                lastFragment.presentFragment(of);
+                    global.createSimpleBulletin(R.raw.error, LocaleController.formatString(R.string.UnknownErrorCode, tL_error != null ? tL_error.text : "FAILED_SEND_STARS")).show();
+                    return;
+                } else {
+                    if (callback2 != null) {
+                        callback2.run(Boolean.FALSE, "STARGIFT_USAGE_LIMITED");
+                        return;
+                    }
+                    return;
+                }
             }
-            LaunchActivity launchActivity = LaunchActivity.instance;
-            if (launchActivity != null && launchActivity.getFireworksOverlay() != null) {
-                LaunchActivity.instance.getFireworksOverlay().start(true);
-            }
-            invalidateStarGifts();
-            invalidateTransactions(true);
-            return;
-        }
-        if (tL_error == null || !"BALANCE_TOO_LOW".equals(tL_error.text)) {
-            if (tL_error == null || !"STARGIFT_USAGE_LIMITED".equals(tL_error.text)) {
+            if (!MessagesController.getInstance(this.currentAccount).starsPurchaseAvailable()) {
                 if (callback2 != null) {
                     callback2.run(Boolean.FALSE, null);
                 }
-                global.createSimpleBulletin(R.raw.error, LocaleController.formatString(R.string.UnknownErrorCode, tL_error != null ? tL_error.text : "FAILED_SEND_STARS")).show();
+                showNoSupportDialog(context, resourcesProvider);
                 return;
             } else {
-                if (callback2 != null) {
-                    callback2.run(Boolean.FALSE, "STARGIFT_USAGE_LIMITED");
-                    return;
-                }
+                final boolean[] zArr = {false};
+                StarsIntroActivity.StarsNeededSheet starsNeededSheet = new StarsIntroActivity.StarsNeededSheet(context, resourcesProvider, starGift.stars, 6, UserObject.getForcedFirstName(user), new Runnable() {
+                    @Override
+                    public final void run() {
+                        StarsController.this.lambda$buyStarGift$107(zArr, activity, starGift, z, j, tL_textWithEntities, callback2);
+                    }
+                });
+                starsNeededSheet.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public final void onDismiss(DialogInterface dialogInterface) {
+                        StarsController.lambda$buyStarGift$108(Utilities.Callback2.this, zArr, dialogInterface);
+                    }
+                });
+                starsNeededSheet.show();
                 return;
             }
         }
-        if (!MessagesController.getInstance(this.currentAccount).starsPurchaseAvailable()) {
-            if (callback2 != null) {
-                callback2.run(Boolean.FALSE, null);
-            }
-            showNoSupportDialog(context, resourcesProvider);
+        MessagesController.getInstance(this.currentAccount).processUpdates(((TLRPC.TL_payments_paymentResult) tLObject).updates, false);
+        if (callback2 != null) {
+            callback2.run(Boolean.TRUE, null);
+        }
+        if ((lastFragment instanceof ChatActivity) && ((ChatActivity) lastFragment).getDialogId() == j) {
+            BulletinFactory.of(lastFragment).createEmojiBulletin(starGift.sticker, LocaleController.getString(R.string.StarsGiftCompleted), AndroidUtilities.replaceTags(LocaleController.formatPluralString("StarsGiftCompletedText", (int) starGift.stars, new Object[0]))).show(true);
         } else {
-            final boolean[] zArr = {false};
-            StarsIntroActivity.StarsNeededSheet starsNeededSheet = new StarsIntroActivity.StarsNeededSheet(context, resourcesProvider, starGift.stars, 6, UserObject.getForcedFirstName(user), new Runnable() {
+            final ChatActivity of = ChatActivity.of(j);
+            of.whenFullyVisible(new Runnable() {
                 @Override
                 public final void run() {
-                    StarsController.this.lambda$buyStarGift$107(zArr, activity, starGift, z, j, tL_textWithEntities, callback2);
+                    StarsController.lambda$buyStarGift$109(ChatActivity.this, starGift);
                 }
             });
-            starsNeededSheet.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public final void onDismiss(DialogInterface dialogInterface) {
-                    StarsController.lambda$buyStarGift$108(Utilities.Callback2.this, zArr, dialogInterface);
-                }
-            });
-            starsNeededSheet.show();
+            lastFragment.presentFragment(of);
         }
+        MessagesController.getInstance(this.currentAccount).getMainSettings().edit().putBoolean("show_gift_for_" + j, true).putBoolean(Calendar.getInstance().get(1) + "show_gift_for_" + j, true).apply();
+        LaunchActivity launchActivity = LaunchActivity.instance;
+        if (launchActivity != null && launchActivity.getFireworksOverlay() != null) {
+            LaunchActivity.instance.getFireworksOverlay().start(true);
+        }
+        invalidateStarGifts();
+        invalidateTransactions(true);
     }
 
     public void lambda$buyStarGift$111(final Utilities.Callback2 callback2, final Context context, final Theme.ResourcesProvider resourcesProvider, final TL_stars.StarGift starGift, final TLRPC.User user, final Activity activity, final boolean z, final long j, final TLRPC.TL_textWithEntities tL_textWithEntities, final TLObject tLObject, final TLRPC.TL_error tL_error) {
@@ -3082,7 +3085,6 @@ public class StarsController {
         }
         if (!this.giftsLoaded || System.currentTimeMillis() - this.giftsRemoteTime >= 300000) {
             this.giftsLoading = true;
-            MessagesController.getInstance(this.currentAccount).getMainSettings();
             if (this.giftsCacheLoaded) {
                 getStarGiftsRemote(this.giftsHash, new Utilities.Callback() {
                     @Override
@@ -3160,6 +3162,7 @@ public class StarsController {
         if (tL_payments_paymentFormStars == null || tL_payments_paymentFormStars.invoice == null || this.paymentFormOpened) {
             return;
         }
+        MessagesController.getInstance(this.currentAccount).putUsers(tL_payments_paymentFormStars.users, false);
         Context context = LaunchActivity.instance;
         if (context == null) {
             context = ApplicationLoader.applicationContext;
@@ -3272,7 +3275,7 @@ public class StarsController {
                 if (chat != null) {
                     str2 = chat.title;
                 }
-                new StarsIntroActivity.StarsNeededSheet(chatActivity.getContext(), chatActivity.getResourceProvider(), j, 5, str3, new Runnable() {
+                new StarsIntroActivity.StarsNeededSheet(context2, chatActivity.getResourceProvider(), j, 5, str3, new Runnable() {
                     @Override
                     public final void run() {
                         StarsController.this.lambda$sendPaidReaction$95(messageObject, chatActivity, j, bool);
@@ -3282,7 +3285,7 @@ public class StarsController {
             }
             str2 = UserObject.getForcedFirstName(chatActivity.getMessagesController().getUser(Long.valueOf(dialogId)));
             str3 = str2;
-            new StarsIntroActivity.StarsNeededSheet(chatActivity.getContext(), chatActivity.getResourceProvider(), j, 5, str3, new Runnable() {
+            new StarsIntroActivity.StarsNeededSheet(context2, chatActivity.getResourceProvider(), j, 5, str3, new Runnable() {
                 @Override
                 public final void run() {
                     StarsController.this.lambda$sendPaidReaction$95(messageObject, chatActivity, j, bool);

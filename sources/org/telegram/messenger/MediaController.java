@@ -916,7 +916,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
     }
 
-    private class ExternalObserver extends ContentObserver {
+    public class ExternalObserver extends ContentObserver {
         public ExternalObserver() {
             super(null);
         }
@@ -986,7 +986,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
     }
 
-    private class InternalObserver extends ContentObserver {
+    public class InternalObserver extends ContentObserver {
         public InternalObserver() {
             super(null);
         }
@@ -1734,7 +1734,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         }
     }
 
-    private final class StopMediaObserverRunnable implements Runnable {
+    public final class StopMediaObserverRunnable implements Runnable {
         public int currentObserverToken;
 
         private StopMediaObserverRunnable() {
@@ -3713,7 +3713,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             return;
         }
         if (this.videoPlayer.isPlaying() && i == 4) {
-            if (!this.playingMessageObject.isVideo() || z || (iArr != null && iArr[0] >= 4)) {
+            MessageObject messageObject4 = this.playingMessageObject;
+            if (messageObject4 == null || !messageObject4.isVideo() || z || (iArr != null && iArr[0] >= 4)) {
                 cleanupPlayer(true, hasNoNextVoiceOrRoundVideoMessage(), true, false);
                 return;
             }

@@ -2,10 +2,10 @@ package org.telegram.ui;
 
 import org.telegram.ui.Components.ScrimOptions;
 
-public final class ChatActivity$$ExternalSyntheticLambda32 implements Runnable {
+public final class ChatActivity$$ExternalSyntheticLambda33 implements Runnable {
     public final ScrimOptions f$0;
 
-    public ChatActivity$$ExternalSyntheticLambda32(ScrimOptions scrimOptions) {
+    public ChatActivity$$ExternalSyntheticLambda33(ScrimOptions scrimOptions) {
         this.f$0 = scrimOptions;
     }
 

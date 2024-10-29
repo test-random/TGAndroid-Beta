@@ -49,8 +49,10 @@ public class AnimatedTextView extends View {
         private long animateDelay;
         private long animateDuration;
         private TimeInterpolator animateInterpolator;
+        private float animateWave;
         private ValueAnimator animator;
         private final android.graphics.Rect bounds;
+        public boolean centerY;
         private ValueAnimator colorAnimator;
         private float currentHeight;
         private Part[] currentParts;
@@ -63,6 +65,7 @@ public class AnimatedTextView extends View {
         private int emojiCacheType;
         private int emojiColor;
         private ColorFilter emojiColorFilter;
+        private boolean enforceByLetter;
         private int gravity;
         public boolean ignoreRTL;
         private boolean includeFontPadding;
@@ -260,6 +263,10 @@ public class AnimatedTextView extends View {
         }
 
         public AnimatedTextDrawable(boolean z, boolean z2, boolean z3) {
+            this(z, z2, z3, false);
+        }
+
+        public AnimatedTextDrawable(boolean z, boolean z2, boolean z3, boolean z4) {
             this.textPaint = new TextPaint(1);
             this.gravity = 0;
             this.isRTL = false;
@@ -269,15 +276,18 @@ public class AnimatedTextView extends View {
             this.animateDelay = 0L;
             this.animateDuration = 320L;
             this.animateInterpolator = CubicBezierInterpolator.EASE_OUT_QUINT;
+            this.animateWave = -1.0f;
             this.moveAmplitude = 0.3f;
             this.scaleAmplitude = 0.0f;
             this.alpha = 255;
             this.bounds = new android.graphics.Rect();
             this.includeFontPadding = true;
+            this.centerY = true;
             this.shadowed = false;
             this.splitByWords = z;
             this.preserveIndex = z2;
             this.startFromEnd = z3;
+            this.enforceByLetter = z4;
         }
 
         private void applyAlphaInternal(float f) {
@@ -319,8 +329,8 @@ public class AnimatedTextView extends View {
 
         private void diff(CharSequence charSequence, CharSequence charSequence2, RegionCallback regionCallback, RegionCallback regionCallback2, RegionCallback regionCallback3) {
             if (this.updateAll) {
-                regionCallback3.run(charSequence, 0, charSequence.length());
-                regionCallback2.run(charSequence2, 0, charSequence2.length());
+                part(regionCallback3, charSequence, 0, charSequence.length());
+                part(regionCallback2, charSequence2, 0, charSequence2.length());
                 return;
             }
             if (!this.preserveIndex) {
@@ -344,10 +354,10 @@ public class AnimatedTextView extends View {
                                 regionCallback.run(charSequence2.subSequence(i3, i), i3, i);
                             } else {
                                 if (i5 > 0) {
-                                    regionCallback2.run(charSequence2.subSequence(i3, i), i3, i);
+                                    part(regionCallback2, charSequence2.subSequence(i3, i), i3, i);
                                 }
                                 if (i6 > 0) {
-                                    regionCallback3.run(charSequence.subSequence(i4, i2), i4, i2);
+                                    part(regionCallback3, charSequence.subSequence(i4, i2), i4, i2);
                                 }
                             }
                         }
@@ -372,10 +382,10 @@ public class AnimatedTextView extends View {
                     if (z3 != z4 || i7 == min2) {
                         if (i7 - i8 > 0) {
                             if (z3) {
-                                regionCallback.run(charSequence2.subSequence(i8, i7), i8, i7);
+                                part(regionCallback, charSequence2.subSequence(i8, i7), i8, i7);
                             } else {
-                                regionCallback2.run(charSequence2.subSequence(i8, i7), i8, i7);
-                                regionCallback3.run(charSequence.subSequence(i8, i7), i8, i7);
+                                part(regionCallback2, charSequence2.subSequence(i8, i7), i8, i7);
+                                part(regionCallback3, charSequence.subSequence(i8, i7), i8, i7);
                             }
                         }
                         i8 = i7;
@@ -384,10 +394,10 @@ public class AnimatedTextView extends View {
                     i7++;
                 }
                 if (charSequence2.length() - min2 > 0) {
-                    regionCallback2.run(charSequence2.subSequence(min2, charSequence2.length()), min2, charSequence2.length());
+                    part(regionCallback2, charSequence2.subSequence(min2, charSequence2.length()), min2, charSequence2.length());
                 }
                 if (charSequence.length() - min2 > 0) {
-                    regionCallback3.run(charSequence.subSequence(min2, charSequence.length()), min2, charSequence.length());
+                    part(regionCallback3, charSequence.subSequence(min2, charSequence.length()), min2, charSequence.length());
                     return;
                 }
                 return;
@@ -416,18 +426,18 @@ public class AnimatedTextView extends View {
             int length3 = charSequence2.length() - min2;
             int length4 = charSequence.length() - min2;
             if (length3 > 0) {
-                regionCallback2.run(charSequence2.subSequence(0, length3), 0, length3);
+                part(regionCallback2, charSequence2.subSequence(0, length3), 0, length3);
             }
             if (length4 > 0) {
-                regionCallback3.run(charSequence.subSequence(0, length4), 0, length4);
+                part(regionCallback3, charSequence.subSequence(0, length4), 0, length4);
             }
             for (int size = arrayList.size() - 1; size >= 0; size--) {
                 int intValue = ((Integer) arrayList.get(size)).intValue();
                 if ((size % 2 == 0) != z6) {
                     int i12 = length3 + intValue;
-                    regionCallback2.run(charSequence2.subSequence(length3, i12), length3, i12);
+                    part(regionCallback2, charSequence2.subSequence(length3, i12), length3, i12);
                     int i13 = length4 + intValue;
-                    regionCallback3.run(charSequence.subSequence(length4, i13), length4, i13);
+                    part(regionCallback3, charSequence.subSequence(length4, i13), length4, i13);
                 } else if (charSequence2.length() > charSequence.length()) {
                     int i14 = length3 + intValue;
                     regionCallback.run(charSequence2.subSequence(length3, i14), length3, i14);
@@ -507,6 +517,21 @@ public class AnimatedTextView extends View {
             includePad = ellipsizedWidth.setIncludePad(this.includeFontPadding);
             build = includePad.build();
             return build;
+        }
+
+        private void part(RegionCallback regionCallback, CharSequence charSequence, int i, int i2) {
+            if (!this.enforceByLetter || charSequence.length() <= 1) {
+                regionCallback.run(charSequence, i, i2);
+                return;
+            }
+            int i3 = 0;
+            while (i3 < charSequence.length()) {
+                int i4 = i3 + 1;
+                CharSequence subSequence = charSequence.subSequence(i3, i4);
+                int i5 = i3 + i;
+                regionCallback.run(subSequence, i5, i5 + 1);
+                i3 = i4;
+            }
         }
 
         public static boolean partEquals(CharSequence charSequence, CharSequence charSequence2, int i, int i2) {
@@ -605,11 +630,16 @@ public class AnimatedTextView extends View {
             this.alpha = i;
         }
 
-        public void setAnimationProperties(float f, long j, long j2, TimeInterpolator timeInterpolator) {
+        public void setAnimationProperties(float f, long j, long j2, float f2, TimeInterpolator timeInterpolator) {
             this.moveAmplitude = f;
             this.animateDelay = j;
             this.animateDuration = j2;
+            this.animateWave = f2;
             this.animateInterpolator = timeInterpolator;
+        }
+
+        public void setAnimationProperties(float f, long j, long j2, TimeInterpolator timeInterpolator) {
+            setAnimationProperties(f, j, j2, 1.0f, timeInterpolator);
         }
 
         public void setBounds(float f, float f2, float f3, float f4) {
@@ -667,9 +697,14 @@ public class AnimatedTextView extends View {
         }
 
         public void setHacks(boolean z, boolean z2, boolean z3) {
+            setHacks(z, z2, z3, false);
+        }
+
+        public void setHacks(boolean z, boolean z2, boolean z3, boolean z4) {
             this.splitByWords = z;
             this.preserveIndex = z2;
             this.startFromEnd = z3;
+            this.enforceByLetter = z4;
         }
 
         public void setIncludeFontPadding(boolean z) {

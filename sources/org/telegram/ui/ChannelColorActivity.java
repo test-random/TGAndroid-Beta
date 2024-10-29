@@ -930,7 +930,7 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
                         }
 
                         @Override
-                        public int noThemeStringTextSize() {
+                        protected int noThemeStringTextSize() {
                             if (z) {
                                 return super.noThemeStringTextSize();
                             }
@@ -1456,7 +1456,7 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
             });
         }
         if (iArr[r2] == 0) {
-            lambda$onBackPressed$300();
+            lambda$onBackPressed$319();
             this.button.setLoading(r2);
             return;
         }
@@ -1532,7 +1532,7 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
         int i2 = i + 1;
         iArr[0] = i2;
         if (i2 == iArr2[0]) {
-            lambda$onBackPressed$300();
+            lambda$onBackPressed$319();
             showBulletin();
             this.button.setLoading(false);
         }
@@ -1719,7 +1719,7 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
     }
 
     public void lambda$showUnsavedAlert$14(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$300();
+        lambda$onBackPressed$319();
     }
 
     public void lambda$showUnsavedAlert$15(DialogInterface dialogInterface, int i) {
@@ -1862,7 +1862,7 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
                 } else {
                     ChannelColorActivity channelColorActivity = ChannelColorActivity.this;
                     if (channelColorActivity.currentLevel < channelColorActivity.minLevelRequired() || !ChannelColorActivity.this.hasUnsavedChanged()) {
-                        ChannelColorActivity.this.lambda$onBackPressed$300();
+                        ChannelColorActivity.this.lambda$onBackPressed$319();
                     } else {
                         ChannelColorActivity.this.showUnsavedAlert();
                     }

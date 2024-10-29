@@ -233,7 +233,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
     private ActionBarMenuItem searchItem;
     public ActionBarMenuItem searchItemIcon;
     private int searchItemState;
-    private StoriesController.StoriesList searchStoriesList;
+    public StoriesController.StoriesList searchStoriesList;
     public SearchTagsList searchTagsList;
     private boolean searchWas;
     private boolean searching;
@@ -557,13 +557,13 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         }
     }
 
-    public class AnonymousClass40 implements ViewTreeObserver.OnPreDrawListener {
+    public class AnonymousClass41 implements ViewTreeObserver.OnPreDrawListener {
         final SparseBooleanArray val$addedMesages;
         final RecyclerListView val$finalListView;
         final View val$finalProgressView;
         final int val$oldItemCount;
 
-        AnonymousClass40(RecyclerListView recyclerListView, SparseBooleanArray sparseBooleanArray, View view, int i) {
+        AnonymousClass41(RecyclerListView recyclerListView, SparseBooleanArray sparseBooleanArray, View view, int i) {
             this.val$finalListView = recyclerListView;
             this.val$addedMesages = sparseBooleanArray;
             this.val$finalProgressView = view;
@@ -603,10 +603,10 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                             ofFloat2.addListener(new AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(Animator animator) {
-                                    AnonymousClass40.this.val$finalProgressView.setAlpha(1.0f);
-                                    layoutManager.stopIgnoringView(AnonymousClass40.this.val$finalProgressView);
-                                    AnonymousClass40 anonymousClass40 = AnonymousClass40.this;
-                                    anonymousClass40.val$finalListView.removeView(anonymousClass40.val$finalProgressView);
+                                    AnonymousClass41.this.val$finalProgressView.setAlpha(1.0f);
+                                    layoutManager.stopIgnoringView(AnonymousClass41.this.val$finalProgressView);
+                                    AnonymousClass41 anonymousClass41 = AnonymousClass41.this;
+                                    anonymousClass41.val$finalListView.removeView(anonymousClass41.val$finalProgressView);
                                 }
                             });
                             ofFloat2.start();
@@ -625,14 +625,14 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                         ofFloat3.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                             @Override
                             public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                SharedMediaLayout.AnonymousClass40.this.lambda$onPreDraw$0(messageId, recyclerListView, valueAnimator);
+                                SharedMediaLayout.AnonymousClass41.this.lambda$onPreDraw$0(messageId, recyclerListView, valueAnimator);
                             }
                         });
                         ofFloat3.addListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animator) {
                                 SharedMediaLayout.this.messageAlphaEnter.remove(messageId);
-                                AnonymousClass40.this.val$finalListView.invalidate();
+                                AnonymousClass41.this.val$finalListView.invalidate();
                             }
                         });
                         ofFloat3.setStartDelay((int) ((Math.min(this.val$finalListView.getMeasuredHeight(), Math.max(0, r7.getTop())) / this.val$finalListView.getMeasuredHeight()) * 100.0f));
@@ -646,8 +646,8 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         }
     }
 
-    public class AnonymousClass43 implements SharedLinkCell.SharedLinkCellDelegate {
-        AnonymousClass43() {
+    public class AnonymousClass44 implements SharedLinkCell.SharedLinkCellDelegate {
+        AnonymousClass44() {
         }
 
         public void lambda$onLinkPress$0(String str, DialogInterface dialogInterface, int i) {
@@ -687,7 +687,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             builder.setItems(new CharSequence[]{LocaleController.getString("Open", R.string.Open), LocaleController.getString("Copy", R.string.Copy)}, new DialogInterface.OnClickListener() {
                 @Override
                 public final void onClick(DialogInterface dialogInterface, int i) {
-                    SharedMediaLayout.AnonymousClass43.this.lambda$onLinkPress$0(str, dialogInterface, i);
+                    SharedMediaLayout.AnonymousClass44.this.lambda$onLinkPress$0(str, dialogInterface, i);
                 }
             });
             SharedMediaLayout.this.profileActivity.showDialog(builder.create());
@@ -786,7 +786,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         }
 
         public void lambda$onClick$6(TLRPC.User user, boolean z) {
-            SharedMediaLayout.this.profileActivity.lambda$onBackPressed$300();
+            SharedMediaLayout.this.profileActivity.lambda$onBackPressed$319();
             if (SharedMediaLayout.this.profileActivity instanceof NotificationCenter.NotificationCenterDelegate) {
                 SharedMediaLayout.this.profileActivity.getNotificationCenter().removeObserver((NotificationCenter.NotificationCenterDelegate) SharedMediaLayout.this.profileActivity, NotificationCenter.closeChats);
             }
@@ -3305,25 +3305,29 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             while (true) {
                 SharedMediaData[] sharedMediaDataArr = this.sharedMediaData;
                 if (i >= sharedMediaDataArr.length) {
-                    loadMediaCounts();
-                    NotificationCenter notificationCenter = this.parentFragment.getNotificationCenter();
-                    notificationCenter.addObserver(this, NotificationCenter.mediaCountsDidLoad);
-                    notificationCenter.addObserver(this, NotificationCenter.mediaCountDidLoad);
-                    notificationCenter.addObserver(this, NotificationCenter.didReceiveNewMessages);
-                    notificationCenter.addObserver(this, NotificationCenter.messageReceivedByServer);
-                    notificationCenter.addObserver(this, NotificationCenter.mediaDidLoad);
-                    notificationCenter.addObserver(this, NotificationCenter.messagesDeleted);
-                    notificationCenter.addObserver(this, NotificationCenter.replaceMessagesObjects);
-                    notificationCenter.addObserver(this, NotificationCenter.chatInfoDidLoad);
-                    notificationCenter.addObserver(this, NotificationCenter.fileLoaded);
-                    notificationCenter.addObserver(this, NotificationCenter.storiesListUpdated);
-                    notificationCenter.addObserver(this, NotificationCenter.savedMessagesDialogsUpdate);
-                    return;
+                    break;
                 }
                 sharedMediaDataArr[i] = new SharedMediaData();
                 this.sharedMediaData[i].setMaxId(0, DialogObject.isEncryptedDialog(this.dialogId) ? Integer.MIN_VALUE : Integer.MAX_VALUE);
                 i++;
             }
+            loadMediaCounts();
+            BaseFragment baseFragment2 = this.parentFragment;
+            if (baseFragment2 == null) {
+                return;
+            }
+            NotificationCenter notificationCenter = baseFragment2.getNotificationCenter();
+            notificationCenter.addObserver(this, NotificationCenter.mediaCountsDidLoad);
+            notificationCenter.addObserver(this, NotificationCenter.mediaCountDidLoad);
+            notificationCenter.addObserver(this, NotificationCenter.didReceiveNewMessages);
+            notificationCenter.addObserver(this, NotificationCenter.messageReceivedByServer);
+            notificationCenter.addObserver(this, NotificationCenter.mediaDidLoad);
+            notificationCenter.addObserver(this, NotificationCenter.messagesDeleted);
+            notificationCenter.addObserver(this, NotificationCenter.replaceMessagesObjects);
+            notificationCenter.addObserver(this, NotificationCenter.chatInfoDidLoad);
+            notificationCenter.addObserver(this, NotificationCenter.fileLoaded);
+            notificationCenter.addObserver(this, NotificationCenter.storiesListUpdated);
+            notificationCenter.addObserver(this, NotificationCenter.savedMessagesDialogsUpdate);
         }
 
         public void lambda$new$0(Boolean bool) {
@@ -3351,21 +3355,27 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         }
 
         private void loadMediaCounts() {
-            this.parentFragment.getMediaDataController().getMediaCounts(this.dialogId, this.topicId, this.parentFragment.getClassGuid());
+            BaseFragment baseFragment = this.parentFragment;
+            if (baseFragment == null) {
+                return;
+            }
+            baseFragment.getMediaDataController().getMediaCounts(this.dialogId, this.topicId, this.parentFragment.getClassGuid());
             if (this.mergeDialogId != 0) {
                 this.parentFragment.getMediaDataController().getMediaCounts(this.mergeDialogId, this.topicId, this.parentFragment.getClassGuid());
             }
         }
 
         private void setChatInfo(TLRPC.ChatFull chatFull) {
-            if (chatFull != null) {
-                long j = chatFull.migrated_from_chat_id;
-                if (j == 0 || this.mergeDialogId != 0) {
-                    return;
-                }
-                this.mergeDialogId = -j;
-                this.parentFragment.getMediaDataController().getMediaCounts(this.mergeDialogId, this.topicId, this.parentFragment.getClassGuid());
+            BaseFragment baseFragment = this.parentFragment;
+            if (baseFragment == null || chatFull == null) {
+                return;
             }
+            long j = chatFull.migrated_from_chat_id;
+            if (j == 0 || this.mergeDialogId != 0) {
+                return;
+            }
+            this.mergeDialogId = -j;
+            baseFragment.getMediaDataController().getMediaCounts(this.mergeDialogId, this.topicId, this.parentFragment.getClassGuid());
         }
 
         public void addDelegate(SharedMediaPreloaderDelegate sharedMediaPreloaderDelegate) {
@@ -3411,7 +3421,11 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                 return;
             }
             this.delegates.clear();
-            NotificationCenter notificationCenter = this.parentFragment.getNotificationCenter();
+            BaseFragment baseFragment2 = this.parentFragment;
+            if (baseFragment2 == null) {
+                return;
+            }
+            NotificationCenter notificationCenter = baseFragment2.getNotificationCenter();
             notificationCenter.removeObserver(this, NotificationCenter.mediaCountsDidLoad);
             notificationCenter.removeObserver(this, NotificationCenter.mediaCountDidLoad);
             notificationCenter.removeObserver(this, NotificationCenter.didReceiveNewMessages);
@@ -3660,88 +3674,12 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         private final boolean isArchive;
         public ArrayList lastPinnedIds;
         private ViewsForPeerStoriesRequester poller;
-        public final StoriesController.StoriesList storiesList;
+        public StoriesController.StoriesList storiesList;
         private StoriesAdapter supportingAdapter;
         private final ArrayList uploadingStories;
 
-        public StoriesAdapter(Context context, boolean z) {
-            super(context);
-            StoriesController.StoriesList storiesList;
-            TLRPC.User user;
-            StoriesController.SearchStoriesList searchStoriesList;
-            this.uploadingStories = new ArrayList();
-            this.lastPinnedIds = new ArrayList();
-            this.isArchive = z;
-            int currentAccount = SharedMediaLayout.this.profileActivity.getCurrentAccount();
-            if (!TextUtils.isEmpty(SharedMediaLayout.this.getStoriesHashtag())) {
-                if (SharedMediaLayout.this.searchStoriesList == null) {
-                    searchStoriesList = new StoriesController.SearchStoriesList(currentAccount, SharedMediaLayout.this.getStoriesHashtag());
-                    SharedMediaLayout.this.searchStoriesList = searchStoriesList;
-                }
-                storiesList = SharedMediaLayout.this.searchStoriesList;
-            } else if (SharedMediaLayout.this.getStoriesArea() != null) {
-                if (SharedMediaLayout.this.searchStoriesList == null) {
-                    searchStoriesList = new StoriesController.SearchStoriesList(currentAccount, SharedMediaLayout.this.getStoriesArea());
-                    SharedMediaLayout.this.searchStoriesList = searchStoriesList;
-                }
-                storiesList = SharedMediaLayout.this.searchStoriesList;
-            } else if ((!z || SharedMediaLayout.this.isStoriesView()) && (z || !SharedMediaLayout.this.isArchivedOnlyStoriesView())) {
-                int i = 1;
-                boolean z2 = SharedMediaLayout.this.dialog_id > 0 && (user = MessagesController.getInstance(currentAccount).getUser(Long.valueOf(SharedMediaLayout.this.dialog_id))) != null && user.bot;
-                StoriesController storiesController = SharedMediaLayout.this.profileActivity.getMessagesController().getStoriesController();
-                long j = SharedMediaLayout.this.dialog_id;
-                if (z2) {
-                    i = 4;
-                } else if (!z) {
-                    i = 0;
-                }
-                storiesList = storiesController.getStoriesList(j, i);
-            } else {
-                storiesList = null;
-            }
-            this.storiesList = storiesList;
-            StoriesController.StoriesList storiesList2 = this.storiesList;
-            if (storiesList2 != null) {
-                this.id = storiesList2.link();
-                this.poller = new ViewsForPeerStoriesRequester(SharedMediaLayout.this.profileActivity.getMessagesController().getStoriesController(), SharedMediaLayout.this.dialog_id, this.storiesList.currentAccount) {
-                    @Override
-                    protected void getStoryIds(ArrayList arrayList) {
-                        InternalListView internalListView;
-                        MessageObject messageObject;
-                        int i2 = 0;
-                        while (true) {
-                            if (i2 >= SharedMediaLayout.this.mediaPages.length) {
-                                internalListView = null;
-                                break;
-                            }
-                            if (SharedMediaLayout.this.mediaPages[i2].listView != null) {
-                                RecyclerView.Adapter adapter = SharedMediaLayout.this.mediaPages[i2].listView.getAdapter();
-                                StoriesAdapter storiesAdapter = StoriesAdapter.this;
-                                if (adapter == storiesAdapter) {
-                                    internalListView = SharedMediaLayout.this.mediaPages[i2].listView;
-                                    break;
-                                }
-                            }
-                            i2++;
-                        }
-                        if (internalListView != null) {
-                            for (int i3 = 0; i3 < internalListView.getChildCount(); i3++) {
-                                View childAt = internalListView.getChildAt(i3);
-                                if ((childAt instanceof SharedPhotoVideoCell2) && (messageObject = ((SharedPhotoVideoCell2) childAt).getMessageObject()) != null && messageObject.isStory()) {
-                                    arrayList.add(Integer.valueOf(messageObject.storyItem.id));
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    protected boolean updateStories(ArrayList arrayList, TL_stories.TL_stories_storyViews tL_stories_storyViews) {
-                        StoriesAdapter.this.storiesList.updateStoryViews(arrayList, tL_stories_storyViews.views);
-                        return true;
-                    }
-                };
-            }
-            checkColumns();
+        public StoriesAdapter(android.content.Context r9, boolean r10) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.SharedMediaLayout.StoriesAdapter.<init>(org.telegram.ui.Components.SharedMediaLayout, android.content.Context, boolean):void");
         }
 
         private void checkColumns() {
@@ -4016,7 +3954,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         }
     }
 
-    public SharedMediaLayout(android.content.Context r33, long r34, org.telegram.ui.Components.SharedMediaLayout.SharedMediaPreloader r36, int r37, java.util.ArrayList r38, org.telegram.tgnet.TLRPC.ChatFull r39, org.telegram.tgnet.TLRPC.UserFull r40, int r41, org.telegram.ui.ActionBar.BaseFragment r42, org.telegram.ui.Components.SharedMediaLayout.Delegate r43, int r44, org.telegram.ui.ActionBar.Theme.ResourcesProvider r45) {
+    public SharedMediaLayout(android.content.Context r34, long r35, org.telegram.ui.Components.SharedMediaLayout.SharedMediaPreloader r37, int r38, java.util.ArrayList r39, org.telegram.tgnet.TLRPC.ChatFull r40, org.telegram.tgnet.TLRPC.UserFull r41, int r42, org.telegram.ui.ActionBar.BaseFragment r43, org.telegram.ui.Components.SharedMediaLayout.Delegate r44, int r45, org.telegram.ui.ActionBar.Theme.ResourcesProvider r46) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.SharedMediaLayout.<init>(android.content.Context, long, org.telegram.ui.Components.SharedMediaLayout$SharedMediaPreloader, int, java.util.ArrayList, org.telegram.tgnet.TLRPC$ChatFull, org.telegram.tgnet.TLRPC$UserFull, int, org.telegram.ui.ActionBar.BaseFragment, org.telegram.ui.Components.SharedMediaLayout$Delegate, int, org.telegram.ui.ActionBar.Theme$ResourcesProvider):void");
     }
 
@@ -4063,7 +4001,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         if (view != null) {
             recyclerListView.removeView(view);
         }
-        getViewTreeObserver().addOnPreDrawListener(new AnonymousClass40(recyclerListView, sparseBooleanArray, view, i));
+        getViewTreeObserver().addOnPreDrawListener(new AnonymousClass41(recyclerListView, sparseBooleanArray, view, i));
     }
 
     private void animateToMediaColumnsCount(final int i) {
@@ -4531,7 +4469,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                     sharedMediaLayout2.optionsAlpha = sharedMediaLayout2.getPhotoVideoOptionsAlpha(f);
                     SharedMediaLayout sharedMediaLayout3 = SharedMediaLayout.this;
                     sharedMediaLayout3.photoVideoOptionsItem.setVisibility((sharedMediaLayout3.optionsAlpha == 0.0f || !SharedMediaLayout.this.canShowSearchItem() || SharedMediaLayout.this.isArchivedOnlyStoriesView()) ? 4 : 0);
-                    if (SharedMediaLayout.this.canShowSearchItem()) {
+                    if (SharedMediaLayout.this.searchItem == null || SharedMediaLayout.this.canShowSearchItem()) {
                         SharedMediaLayout sharedMediaLayout4 = SharedMediaLayout.this;
                         sharedMediaLayout4.searchAlpha = sharedMediaLayout4.getSearchAlpha(f);
                         SharedMediaLayout.this.updateSearchItemIconAnimated();
@@ -4545,7 +4483,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                         SharedMediaLayout.this.mediaPages[0] = SharedMediaLayout.this.mediaPages[1];
                         SharedMediaLayout.this.mediaPages[1] = mediaPage2;
                         SharedMediaLayout.this.mediaPages[1].setVisibility(8);
-                        if (SharedMediaLayout.this.searchItemState == 2) {
+                        if (SharedMediaLayout.this.searchItem != null && SharedMediaLayout.this.searchItemState == 2) {
                             SharedMediaLayout.this.searchItem.setVisibility(SharedMediaLayout.this.isStoriesView() ? 8 : 4);
                         }
                         SharedMediaLayout.this.searchItemState = 0;
@@ -5083,7 +5021,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                                     public void onTransitionAnimationStart(boolean z, boolean z2) {
                                         if (this.firstCreateView) {
                                             if (this.searchItem != null) {
-                                                lambda$openSearchWithText$303("");
+                                                lambda$openSearchWithText$322("");
                                                 this.searchItem.setSearchFieldText(SharedMediaLayout.this.savedMessagesSearchAdapter.lastQuery, false);
                                             }
                                             SearchTagsList searchTagsList = this.actionBarSearchTags;
@@ -5269,7 +5207,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                 }
                 this.profileActivity.getSendMessagesHelper().sendMessage(arrayList2, j, false, false, true, 0);
             }
-            dialogsActivity.lambda$onBackPressed$300();
+            dialogsActivity.lambda$onBackPressed$319();
             BaseFragment baseFragment = this.profileActivity;
             UndoView undoView = baseFragment instanceof ProfileActivity ? ((ProfileActivity) baseFragment).getUndoView() : null;
             if (undoView != null) {
@@ -5484,7 +5422,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         if (nextPageId < 0) {
             return false;
         }
-        if (canShowSearchItem()) {
+        if (this.searchItem == null || canShowSearchItem()) {
             this.searchAlpha = getSearchAlpha(0.0f);
             updateSearchItemIcon(0.0f);
         } else {
@@ -5899,7 +5837,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                     SharedMediaLayout.this.tabsAnimation = null;
                     if (SharedMediaLayout.this.backAnimation) {
                         SharedMediaLayout.this.mediaPages[1].setVisibility(8);
-                        if (SharedMediaLayout.this.canShowSearchItem()) {
+                        if (SharedMediaLayout.this.searchItem == null || SharedMediaLayout.this.canShowSearchItem()) {
                             SharedMediaLayout sharedMediaLayout = SharedMediaLayout.this;
                             sharedMediaLayout.searchAlpha = sharedMediaLayout.getSearchAlpha(0.0f);
                             SharedMediaLayout.this.updateSearchItemIcon(0.0f);
@@ -5914,7 +5852,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                         SharedMediaLayout.this.mediaPages[0] = SharedMediaLayout.this.mediaPages[1];
                         SharedMediaLayout.this.mediaPages[1] = mediaPage5;
                         SharedMediaLayout.this.mediaPages[1].setVisibility(8);
-                        if (SharedMediaLayout.this.searchItemState == 2) {
+                        if (SharedMediaLayout.this.searchItem != null && SharedMediaLayout.this.searchItemState == 2) {
                             SharedMediaLayout.this.searchItem.setVisibility(SharedMediaLayout.this.isStoriesView() ? 8 : 4);
                         }
                         SharedMediaLayout.this.searchItemState = 0;
@@ -6070,6 +6008,10 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
 
     public void updateTabs(boolean r20) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.SharedMediaLayout.updateTabs(boolean):void");
+    }
+
+    public boolean addActionButtons() {
+        return true;
     }
 
     public void animateSearchToOptions(boolean z, boolean z2) {
@@ -6497,6 +6439,10 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
     }
 
     public String getStoriesHashtag() {
+        return null;
+    }
+
+    public String getStoriesHashtagUsername() {
         return null;
     }
 
@@ -7608,6 +7554,16 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                 SharedMediaLayout.this.lambda$updateSearchItemIconAnimated$0(z);
             }
         }).setDuration(420L).setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT).start();
+    }
+
+    public void updateStoriesList(StoriesController.StoriesList storiesList) {
+        this.searchStoriesList = storiesList;
+        StoriesAdapter storiesAdapter = this.storiesAdapter;
+        storiesAdapter.storiesList = storiesList;
+        storiesAdapter.notifyDataSetChanged();
+        StoriesAdapter storiesAdapter2 = this.animationSupportingStoriesAdapter;
+        storiesAdapter2.storiesList = storiesList;
+        storiesAdapter2.notifyDataSetChanged();
     }
 
     public Boolean zoomIn() {

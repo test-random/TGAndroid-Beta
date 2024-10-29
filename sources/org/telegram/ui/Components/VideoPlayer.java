@@ -40,6 +40,7 @@ import com.google.android.exoplayer2.audio.DefaultAudioSink;
 import com.google.android.exoplayer2.audio.TeeAudioProcessor;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.decoder.DecoderReuseEvaluation;
+import com.google.android.exoplayer2.mediacodec.MediaCodecDecoderException;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.metadata.Metadata;
@@ -58,7 +59,6 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
-import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.video.ColorInfo;
 import com.google.android.exoplayer2.video.SurfaceNotValidException;
@@ -70,11 +70,14 @@ import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
@@ -92,7 +95,8 @@ import org.telegram.ui.Components.VideoPlayer;
 import org.telegram.ui.Stories.recorder.StoryEntry;
 
 public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsListener, NotificationCenter.NotificationCenterDelegate {
-    static int playerCounter;
+    private static HashMap cachedSupportedCodec;
+    private static int lastPlayerId;
     public boolean allowMultipleInstances;
     boolean audioDisabled;
     private ExoPlayer audioPlayer;
@@ -122,8 +126,10 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     private boolean mixedPlayWhenReady;
     private Runnable onQualityChangeListener;
     public ExoPlayer player;
+    private int playerId;
     ProgressiveMediaSource.Factory progressiveMediaSourceFactory;
     private int repeatCount;
+    private final ArrayList seekFinishedListeners;
     private int selectedQualityIndex;
     private boolean shouldPauseOther;
     SsMediaSource.Factory ssMediaSourceFactory;
@@ -138,6 +144,8 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     private String videoType;
     private Uri videoUri;
     private DispatchQueue workerQueue;
+    public static final HashSet activePlayers = new HashSet();
+    static int playerCounter = 0;
 
     public class AnonymousClass1 implements Player.Listener {
         AnonymousClass1() {
@@ -321,8 +329,6 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     }
 
     public static class Quality {
-        private static final List preferableCodecs_1 = Arrays.asList("h264", "avc");
-        private static final ArrayList preferableCodecs_2 = new ArrayList(Arrays.asList("h265", "hevc"));
         public int height;
         public boolean original;
         public final ArrayList uris;
@@ -337,7 +343,32 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
             arrayList.add(videoUri);
         }
 
-        public static ArrayList groupBy(ArrayList arrayList) {
+        public static ArrayList filterByCodec(ArrayList arrayList) {
+            if (arrayList == null) {
+                return null;
+            }
+            int i = 0;
+            while (i < arrayList.size()) {
+                Quality quality = (Quality) arrayList.get(i);
+                int i2 = 0;
+                while (i2 < quality.uris.size()) {
+                    VideoUri videoUri = (VideoUri) quality.uris.get(i2);
+                    if (!TextUtils.isEmpty(videoUri.codec) && !VideoPlayer.supportsHardwareDecoder(videoUri.codec)) {
+                        quality.uris.remove(i2);
+                        i2--;
+                    }
+                    i2++;
+                }
+                if (quality.uris.isEmpty()) {
+                    arrayList.remove(i);
+                    i--;
+                }
+                i++;
+            }
+            return arrayList;
+        }
+
+        public static ArrayList group(ArrayList arrayList) {
             Quality quality;
             Quality quality2;
             ArrayList arrayList2 = new ArrayList();
@@ -366,37 +397,132 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 }
                 arrayList2.add(quality);
             }
+            if (BuildVars.LOGS_ENABLED) {
+                Iterator it3 = arrayList2.iterator();
+                while (it3.hasNext()) {
+                    Quality quality3 = (Quality) it3.next();
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("debug_loading_player: Quality ");
+                    sb.append(quality3.p());
+                    sb.append("p (");
+                    sb.append(quality3.width);
+                    sb.append("x");
+                    sb.append(quality3.height);
+                    sb.append(")");
+                    sb.append(quality3.original ? " (source)" : "");
+                    sb.append(":");
+                    FileLog.d(sb.toString());
+                    Iterator it4 = quality3.uris.iterator();
+                    while (it4.hasNext()) {
+                        VideoUri videoUri2 = (VideoUri) it4.next();
+                        StringBuilder sb2 = new StringBuilder();
+                        sb2.append("debug_loading_player: - video ");
+                        sb2.append(videoUri2.width);
+                        sb2.append("x");
+                        sb2.append(videoUri2.height);
+                        sb2.append(", codec=");
+                        sb2.append(videoUri2.codec);
+                        sb2.append(", bitrate=");
+                        sb2.append((int) (videoUri2.bitrate * 8.0d));
+                        sb2.append(", doc#");
+                        sb2.append(videoUri2.docId);
+                        String str = " (cached)";
+                        sb2.append(videoUri2.isCached() ? " (cached)" : "");
+                        sb2.append(", manifest#");
+                        sb2.append(videoUri2.manifestDocId);
+                        if (!videoUri2.isManifestCached()) {
+                            str = "";
+                        }
+                        sb2.append(str);
+                        FileLog.d(sb2.toString());
+                    }
+                }
+                FileLog.d("debug_loading_player: ");
+            }
             return arrayList2;
         }
 
         public TLRPC.Document getDownloadDocument() {
+            VideoUri videoUri = null;
             if (this.uris.isEmpty()) {
                 return null;
             }
             Iterator it = this.uris.iterator();
             while (it.hasNext()) {
-                VideoUri videoUri = (VideoUri) it.next();
-                String str = videoUri.codec;
-                if (str != null && preferableCodecs_1.contains(str)) {
-                    return videoUri.document;
-                }
-            }
-            Iterator it2 = this.uris.iterator();
-            while (it2.hasNext()) {
-                VideoUri videoUri2 = (VideoUri) it2.next();
-                String str2 = videoUri2.codec;
-                if (str2 != null && preferableCodecs_2.contains(str2)) {
+                VideoUri videoUri2 = (VideoUri) it.next();
+                if (videoUri2.isCached()) {
                     return videoUri2.document;
                 }
             }
-            return ((VideoUri) this.uris.get(0)).document;
+            long j = Long.MAX_VALUE;
+            for (int i = 0; i < this.uris.size(); i++) {
+                VideoUri videoUri3 = (VideoUri) this.uris.get(i);
+                if (videoUri3.size < j && VideoPlayer.supportsHardwareDecoder(videoUri3.codec)) {
+                    j = videoUri3.size;
+                    videoUri = videoUri3;
+                }
+            }
+            return videoUri != null ? videoUri.document : ((VideoUri) this.uris.get(0)).document;
+        }
+
+        public VideoUri getDownloadUri() {
+            VideoUri videoUri = null;
+            if (this.uris.isEmpty()) {
+                return null;
+            }
+            Iterator it = this.uris.iterator();
+            while (it.hasNext()) {
+                VideoUri videoUri2 = (VideoUri) it.next();
+                if (videoUri2.isCached()) {
+                    return videoUri2;
+                }
+            }
+            long j = Long.MAX_VALUE;
+            for (int i = 0; i < this.uris.size(); i++) {
+                VideoUri videoUri3 = (VideoUri) this.uris.get(i);
+                if (videoUri3.size < j && VideoPlayer.supportsHardwareDecoder(videoUri3.codec)) {
+                    j = videoUri3.size;
+                    videoUri = videoUri3;
+                }
+            }
+            return videoUri != null ? videoUri : (VideoUri) this.uris.get(0);
+        }
+
+        public int p() {
+            int min = Math.min(this.width, this.height);
+            if (Math.abs(min - 2160) < 55) {
+                return 2160;
+            }
+            if (Math.abs(min - 1440) < 55) {
+                return 1440;
+            }
+            if (Math.abs(min - 1080) < 55) {
+                return 1080;
+            }
+            if (Math.abs(min - 720) < 55) {
+                return 720;
+            }
+            if (Math.abs(min - 480) < 55) {
+                return 480;
+            }
+            if (Math.abs(min - 360) < 55) {
+                return 360;
+            }
+            if (Math.abs(min - 240) < 55) {
+                return 240;
+            }
+            if (Math.abs(min - 144) < 55) {
+                return 144;
+            }
+            return min;
         }
 
         public String toString() {
+            StringBuilder sb;
             String str;
             String str2 = "";
             if (SharedConfig.debugVideoQualities) {
-                StringBuilder sb = new StringBuilder();
+                sb = new StringBuilder();
                 sb.append(this.width);
                 sb.append("x");
                 sb.append(this.height);
@@ -412,29 +538,16 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 if (((VideoUri) this.uris.get(0)).codec != null) {
                     str2 = ", " + ((VideoUri) this.uris.get(0)).codec;
                 }
-                sb.append(str2);
-                return sb.toString();
+            } else {
+                sb = new StringBuilder();
+                sb.append(p());
+                sb.append("p");
+                if (this.original) {
+                    str2 = " (" + LocaleController.getString(R.string.QualitySource) + ")";
+                }
             }
-            int min = Math.min(this.width, this.height);
-            if (Math.abs(min - 1080) < 30) {
-                min = 1080;
-            } else if (Math.abs(min - 720) < 30) {
-                min = 720;
-            } else if (Math.abs(min - 360) < 30) {
-                min = 360;
-            } else if (Math.abs(min - 240) < 30) {
-                min = 240;
-            } else if (Math.abs(min - 144) < 30) {
-                min = 144;
-            }
-            StringBuilder sb2 = new StringBuilder();
-            sb2.append(min);
-            sb2.append("p");
-            if (this.original) {
-                str2 = " (" + LocaleController.getString(R.string.QualitySource) + ")";
-            }
-            sb2.append(str2);
-            return sb2.toString();
+            sb.append(str2);
+            return sb.toString();
         }
     }
 
@@ -473,12 +586,14 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     public static class VideoUri {
         public double bitrate;
         public String codec;
+        public int currentAccount;
         public long docId;
         public TLRPC.Document document;
         public double duration;
         public int height;
         public Uri m3u8uri;
         public long manifestDocId;
+        public TLRPC.Document manifestDocument;
         public boolean original;
         public long size;
         public Uri uri;
@@ -528,13 +643,18 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 i3++;
             }
             String str = tL_documentAttributeVideo == null ? null : tL_documentAttributeVideo.video_codec;
+            videoUri.currentAccount = i;
             videoUri.document = document;
             videoUri.docId = document.id;
             videoUri.uri = getUri(i, document, i2);
             if (document2 != null) {
+                videoUri.manifestDocument = document2;
                 videoUri.manifestDocId = document2.id;
                 videoUri.m3u8uri = getUri(i, document2, i2);
                 File pathToAttach = FileLoader.getInstance(i).getPathToAttach(document2, null, false, true);
+                if (pathToAttach == null || !pathToAttach.exists()) {
+                    pathToAttach = FileLoader.getInstance(i).getPathToAttach(document2, null, true, true);
+                }
                 if (pathToAttach != null && pathToAttach.exists()) {
                     videoUri.m3u8uri = Uri.fromFile(pathToAttach);
                 }
@@ -552,10 +672,46 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 videoUri.bitrate = d2 / d;
             }
             File pathToAttach2 = FileLoader.getInstance(i).getPathToAttach(document, null, false, true);
+            if (pathToAttach2 == null || !pathToAttach2.exists()) {
+                pathToAttach2 = FileLoader.getInstance(i).getPathToAttach(document, null, true, true);
+            }
             if (pathToAttach2 != null && pathToAttach2.exists()) {
                 videoUri.uri = Uri.fromFile(pathToAttach2);
             }
             return videoUri;
+        }
+
+        public boolean isCached() {
+            Uri uri = this.uri;
+            return uri != null && "file".equalsIgnoreCase(uri.getScheme());
+        }
+
+        public boolean isManifestCached() {
+            Uri uri = this.m3u8uri;
+            return uri != null && "file".equalsIgnoreCase(uri.getScheme());
+        }
+
+        public void updateCached(boolean z) {
+            if (!isCached() && this.document != null) {
+                File pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(this.document, null, false, z);
+                if (pathToAttach == null || !pathToAttach.exists()) {
+                    pathToAttach = FileLoader.getInstance(this.currentAccount).getPathToAttach(this.document, null, true, z);
+                }
+                if (pathToAttach != null && pathToAttach.exists()) {
+                    this.uri = Uri.fromFile(pathToAttach);
+                }
+            }
+            if (isManifestCached() || this.manifestDocument == null) {
+                return;
+            }
+            File pathToAttach2 = FileLoader.getInstance(this.currentAccount).getPathToAttach(this.manifestDocument, null, false, z);
+            if (pathToAttach2 == null || !pathToAttach2.exists()) {
+                pathToAttach2 = FileLoader.getInstance(this.currentAccount).getPathToAttach(this.manifestDocument, null, true, z);
+            }
+            if (pathToAttach2 == null || !pathToAttach2.exists()) {
+                return;
+            }
+            this.m3u8uri = Uri.fromFile(pathToAttach2);
         }
     }
 
@@ -679,10 +835,14 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     }
 
     public VideoPlayer(boolean z, boolean z2) {
+        int i = lastPlayerId;
+        lastPlayerId = i + 1;
+        this.playerId = i;
         this.audioUpdateHandler = new Handler(Looper.getMainLooper());
         this.selectedQualityIndex = -1;
         this.fallbackDuration = -9223372036854775807L;
         this.fallbackPosition = -9223372036854775807L;
+        this.seekFinishedListeners = new ArrayList();
         this.handleAudioFocus = false;
         this.audioDisabled = z2;
         this.mediaDataSourceFactory = new ExtendedDefaultDataSourceFactory(ApplicationLoader.applicationContext, "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20150101 Firefox/47.0 (Chrome)");
@@ -903,39 +1063,23 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     }
 
     public static TLRPC.Document getDocumentForThumb(int i, TLRPC.MessageMedia messageMedia) {
-        if (!(messageMedia instanceof TLRPC.TL_messageMediaDocument)) {
+        VideoUri qualityForThumb;
+        if ((messageMedia instanceof TLRPC.TL_messageMediaDocument) && (qualityForThumb = getQualityForThumb(getQualities(i, messageMedia.document, messageMedia.alt_documents, 0, true))) != null) {
+            return qualityForThumb.document;
+        }
+        return null;
+    }
+
+    public static Boolean getLooping(MessageObject messageObject) {
+        if (messageObject == null) {
             return null;
         }
-        ArrayList qualities = getQualities(i, messageMedia.document, messageMedia.alt_documents, 0, true);
-        Iterator it = qualities.iterator();
-        VideoUri videoUri = null;
-        while (it.hasNext()) {
-            Iterator it2 = ((Quality) it.next()).uris.iterator();
-            while (it2.hasNext()) {
-                VideoUri videoUri2 = (VideoUri) it2.next();
-                if (videoUri == null || videoUri.width * videoUri.height < videoUri2.width * videoUri2.height) {
-                    if (videoUri2.width <= 860 && videoUri2.height <= 860) {
-                        videoUri = videoUri2;
-                    }
-                }
-            }
+        SharedPreferences sharedPreferences = ApplicationLoader.applicationContext.getSharedPreferences("media_saved_pos", 0);
+        String str = messageObject.getDialogId() + "_" + messageObject.getId() + "loop";
+        if (sharedPreferences.contains(str)) {
+            return Boolean.valueOf(sharedPreferences.getBoolean(str, false));
         }
-        if (videoUri == null) {
-            Iterator it3 = qualities.iterator();
-            while (it3.hasNext()) {
-                Iterator it4 = ((Quality) it3.next()).uris.iterator();
-                while (it4.hasNext()) {
-                    VideoUri videoUri3 = (VideoUri) it4.next();
-                    if (videoUri == null || videoUri.width * videoUri.height > videoUri3.width * videoUri3.height) {
-                        videoUri = videoUri3;
-                    }
-                }
-            }
-        }
-        if (videoUri == null) {
-            return null;
-        }
-        return videoUri.document;
+        return null;
     }
 
     public static ArrayList getQualities(int i, TLRPC.Document document, ArrayList arrayList, int i2, boolean z) {
@@ -985,9 +1129,21 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
             String str2 = videoUri.codec;
             if (str2 != null) {
                 if (z) {
-                    if (!"avc".equals(str2) && !"h264".equals(videoUri.codec) && !"h265".equals(videoUri.codec) && !"hevc".equals(videoUri.codec) && !"vp9".equals(videoUri.codec) && !"vp8".equals(videoUri.codec)) {
+                    if (!"avc".equals(str2)) {
+                        if (!"h264".equals(videoUri.codec)) {
+                            if (!"vp9".equals(videoUri.codec)) {
+                                if (!"vp8".equals(videoUri.codec)) {
+                                    if (!"av1".equals(videoUri.codec)) {
+                                        if (!"av01".equals(videoUri.codec)) {
+                                        }
+                                    }
+                                    if (!supportsHardwareDecoder(videoUri.codec)) {
+                                    }
+                                }
+                            }
+                        }
                     }
-                } else if (("av1".equals(str2) || "hevc".equals(videoUri.codec) || "vp9".equals(videoUri.codec)) && !supportsHardwareDecoder(videoUri.codec)) {
+                } else if (("av1".equals(str2) || "av01".equals(videoUri.codec) || "hevc".equals(videoUri.codec) || "h265".equals(videoUri.codec) || "vp9".equals(videoUri.codec)) && !supportsHardwareDecoder(videoUri.codec)) {
                 }
             }
             arrayList4.add(videoUri);
@@ -998,7 +1154,89 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         } else {
             arrayList5.addAll(arrayList4);
         }
-        return Quality.groupBy(arrayList5);
+        return Quality.group(arrayList5);
+    }
+
+    public static ArrayList getQualities(int i, TLRPC.MessageMedia messageMedia) {
+        return !(messageMedia instanceof TLRPC.TL_messageMediaDocument) ? new ArrayList() : getQualities(i, messageMedia.document, messageMedia.alt_documents, 0, false);
+    }
+
+    public static VideoUri getQualityForPlayer(ArrayList arrayList) {
+        int i;
+        int i2;
+        Iterator it = arrayList.iterator();
+        while (it.hasNext()) {
+            Iterator it2 = ((Quality) it.next()).uris.iterator();
+            while (it2.hasNext()) {
+                VideoUri videoUri = (VideoUri) it2.next();
+                if (videoUri.original && videoUri.isCached()) {
+                    return videoUri;
+                }
+            }
+        }
+        Iterator it3 = arrayList.iterator();
+        VideoUri videoUri2 = null;
+        while (it3.hasNext()) {
+            Iterator it4 = ((Quality) it3.next()).uris.iterator();
+            while (it4.hasNext()) {
+                VideoUri videoUri3 = (VideoUri) it4.next();
+                if (!videoUri3.original && supportsHardwareDecoder(videoUri3.codec) && (videoUri2 == null || (i = videoUri3.width * videoUri3.height) > (i2 = videoUri2.width * videoUri2.height) || (i == i2 && videoUri3.bitrate < videoUri2.bitrate))) {
+                    videoUri2 = videoUri3;
+                }
+            }
+        }
+        if (videoUri2 == null) {
+            Iterator it5 = arrayList.iterator();
+            while (it5.hasNext()) {
+                Iterator it6 = ((Quality) it5.next()).uris.iterator();
+                while (it6.hasNext()) {
+                    VideoUri videoUri4 = (VideoUri) it6.next();
+                    if (videoUri2 == null || videoUri2.width * videoUri2.height > videoUri4.width * videoUri4.height) {
+                        videoUri2 = videoUri4;
+                    }
+                }
+            }
+        }
+        return videoUri2;
+    }
+
+    public static VideoUri getQualityForThumb(ArrayList arrayList) {
+        Iterator it = arrayList.iterator();
+        while (it.hasNext()) {
+            Iterator it2 = ((Quality) it.next()).uris.iterator();
+            while (it2.hasNext()) {
+                VideoUri videoUri = (VideoUri) it2.next();
+                if (videoUri.isCached()) {
+                    return videoUri;
+                }
+            }
+        }
+        Iterator it3 = arrayList.iterator();
+        VideoUri videoUri2 = null;
+        while (it3.hasNext()) {
+            Iterator it4 = ((Quality) it3.next()).uris.iterator();
+            while (it4.hasNext()) {
+                VideoUri videoUri3 = (VideoUri) it4.next();
+                if (videoUri2 == null || videoUri2.width * videoUri2.height < videoUri3.width * videoUri3.height) {
+                    if (videoUri3.width <= 860 && videoUri3.height <= 860) {
+                        videoUri2 = videoUri3;
+                    }
+                }
+            }
+        }
+        if (videoUri2 == null) {
+            Iterator it5 = arrayList.iterator();
+            while (it5.hasNext()) {
+                Iterator it6 = ((Quality) it5.next()).uris.iterator();
+                while (it6.hasNext()) {
+                    VideoUri videoUri4 = (VideoUri) it6.next();
+                    if (videoUri2 == null || videoUri2.width * videoUri2.height > videoUri4.width * videoUri4.height) {
+                        videoUri2 = videoUri4;
+                    }
+                }
+            }
+        }
+        return videoUri2;
     }
 
     private TrackSelectionOverride getQualityTrackSelection(VideoUri videoUri) {
@@ -1060,11 +1298,6 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         return getSavedQuality(arrayList, messageObject.getDialogId(), messageObject.getId());
     }
 
-    public static boolean hasQualities(int i, TLRPC.MessageMedia messageMedia) {
-        ArrayList qualities;
-        return (messageMedia instanceof TLRPC.TL_messageMediaDocument) && (qualities = getQualities(i, messageMedia.document, messageMedia.alt_documents, 0, false)) != null && qualities.size() > 1;
-    }
-
     public void lambda$onPlayerError$0() {
         ExoPlayer exoPlayer = this.player;
         if (exoPlayer != null) {
@@ -1084,6 +1317,20 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
 
     public void lambda$onPlayerError$1(PlaybackException playbackException) {
         Throwable cause = playbackException.getCause();
+        if ((cause instanceof MediaCodecDecoderException) && (cause.toString().contains("av1") || cause.toString().contains("av01"))) {
+            MessagesController.getGlobalMainSettings().edit().putBoolean("unsupport_video/av01", true).commit();
+            HashMap hashMap = cachedSupportedCodec;
+            if (hashMap != null) {
+                hashMap.clear();
+            }
+            ArrayList filterByCodec = Quality.filterByCodec(this.videoQualities);
+            this.videoQualities = filterByCodec;
+            if (filterByCodec != null) {
+                preparePlayer(filterByCodec, this.videoQualityToSelect);
+                return;
+            }
+            return;
+        }
         TextureView textureView = this.textureView;
         if (textureView == null || ((this.triedReinit || !(cause instanceof MediaCodecRenderer.DecoderInitializationException)) && !(cause instanceof SurfaceNotValidException))) {
             this.delegate.onError(this, playbackException);
@@ -1184,6 +1431,13 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         }
     }
 
+    public static void saveLooping(boolean z, MessageObject messageObject) {
+        if (messageObject == null) {
+            return;
+        }
+        ApplicationLoader.applicationContext.getSharedPreferences("media_saved_pos", 0).edit().putBoolean(messageObject.getDialogId() + "_" + messageObject.getId() + "loop", z).apply();
+    }
+
     public static void saveQuality(Quality quality, long j, int i) {
         SharedPreferences.Editor edit = ApplicationLoader.applicationContext.getSharedPreferences("media_saved_pos", 0).edit();
         if (quality == null) {
@@ -1207,183 +1461,117 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         saveQuality(quality, messageObject.getDialogId(), messageObject.getId());
     }
 
-    private void setSelectedQuality(boolean z, Quality quality) {
-        ExoPlayer exoPlayer = this.player;
-        if (exoPlayer == null) {
-            return;
-        }
-        boolean isPlaying = exoPlayer.isPlaying();
-        long currentPosition = this.player.getCurrentPosition();
-        if (!z) {
-            this.fallbackPosition = currentPosition;
-            this.fallbackDuration = this.player.getDuration();
-        }
-        this.videoQualityToSelect = quality;
-        boolean z2 = true;
-        if (quality == null) {
-            Uri makeManifest = makeManifest(this.videoQualities);
-            if (makeManifest != null) {
-                MappingTrackSelector mappingTrackSelector = this.trackSelector;
-                mappingTrackSelector.setParameters(mappingTrackSelector.getParameters().buildUpon().clearOverrides().build());
-                if (this.currentStreamIsHls) {
-                    z2 = false;
-                } else {
-                    this.currentStreamIsHls = true;
-                    this.player.setMediaSource(mediaSourceFromUri(makeManifest, "hls"), false);
-                }
-            } else {
-                quality = getHighestQuality(Boolean.TRUE);
-                if (quality == null) {
-                    quality = getHighestQuality(Boolean.FALSE);
-                }
-                if (quality == null || quality.uris.isEmpty()) {
-                    return;
-                }
-                this.currentStreamIsHls = false;
-                this.videoQualityToSelect = quality;
-                this.player.setMediaSource(mediaSourceFromUri(((VideoUri) quality.uris.get(0)).uri, "other"), false);
-            }
-        } else {
-            if (quality.uris.isEmpty()) {
-                return;
-            }
-            Uri makeManifest2 = quality.uris.size() > 1 ? makeManifest(this.videoQualities) : null;
-            if (makeManifest2 == null || quality.uris.size() == 1) {
-                this.currentStreamIsHls = false;
-                this.player.setMediaSource(mediaSourceFromUri(((VideoUri) quality.uris.get(0)).uri, "other"), false);
-            } else {
-                if (this.currentStreamIsHls) {
-                    z2 = false;
-                } else {
-                    this.currentStreamIsHls = true;
-                    this.player.setMediaSource(mediaSourceFromUri(makeManifest2, "hls"), false);
-                }
-                TrackSelectionParameters.Builder clearOverrides = this.trackSelector.getParameters().buildUpon().clearOverrides();
-                Iterator it = quality.uris.iterator();
-                while (it.hasNext()) {
-                    TrackSelectionOverride qualityTrackSelection = getQualityTrackSelection((VideoUri) it.next());
-                    if (qualityTrackSelection != null) {
-                        clearOverrides.addOverride(qualityTrackSelection);
-                    }
-                }
-                this.trackSelector.setParameters(clearOverrides.build());
-            }
-        }
-        if (z2) {
-            this.player.prepare();
-            if (z) {
-                return;
-            }
-            this.player.seekTo(currentPosition);
-            if (isPlaying) {
-                this.player.play();
-            }
-        }
+    private void setSelectedQuality(boolean r10, org.telegram.ui.Components.VideoPlayer.Quality r11) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.VideoPlayer.setSelectedQuality(boolean, org.telegram.ui.Components.VideoPlayer$Quality):void");
     }
 
     public static boolean supportsHardwareDecoder(String str) {
-        char c;
-        String str2;
         try {
-            switch (str.hashCode()) {
-                case 96924:
-                    if (str.equals("av1")) {
-                        c = 6;
-                        break;
-                    }
-                    c = 65535;
-                    break;
-                case 96974:
-                    if (str.equals("avc")) {
-                        c = 1;
-                        break;
-                    }
-                    c = 65535;
-                    break;
-                case 116926:
-                    if (str.equals("vp8")) {
-                        c = 2;
-                        break;
-                    }
-                    c = 65535;
-                    break;
-                case 116927:
-                    if (str.equals("vp9")) {
-                        c = 3;
-                        break;
-                    }
-                    c = 65535;
-                    break;
-                case 3004662:
-                    if (str.equals("av01")) {
-                        c = 7;
-                        break;
-                    }
-                    c = 65535;
-                    break;
-                case 3148040:
-                    if (str.equals("h264")) {
-                        c = 0;
-                        break;
-                    }
-                    c = 65535;
-                    break;
-                case 3148041:
-                    if (str.equals("h265")) {
-                        c = 4;
-                        break;
-                    }
-                    c = 65535;
-                    break;
-                case 3199082:
-                    if (str.equals("hevc")) {
-                        c = 5;
-                        break;
-                    }
-                    c = 65535;
-                    break;
-                default:
-                    c = 65535;
-                    break;
+            String mime = toMime(str);
+            if (mime == null) {
+                return false;
             }
-            switch (c) {
-                case 0:
-                case 1:
-                    str2 = "video/avc";
-                    break;
-                case 2:
-                    str2 = "video/x-vnd.on2.vp8";
-                    break;
-                case 3:
-                    str2 = "video/x-vnd.on2.vp9";
-                    break;
-                case 4:
-                case 5:
-                    str2 = "video/hevc";
-                    break;
-                case 6:
-                case 7:
-                    str2 = "video/av01";
-                    break;
-                default:
-                    str2 = "video/" + str;
-                    break;
+            if (cachedSupportedCodec == null) {
+                cachedSupportedCodec = new HashMap();
+            }
+            Boolean bool = (Boolean) cachedSupportedCodec.get(mime);
+            if (bool != null) {
+                return bool.booleanValue();
+            }
+            if (MessagesController.getGlobalMainSettings().getBoolean("unsupport_" + mime, false)) {
+                return false;
             }
             int codecCount = MediaCodecList.getCodecCount();
             for (int i = 0; i < codecCount; i++) {
                 MediaCodecInfo codecInfoAt = MediaCodecList.getCodecInfoAt(i);
-                if (!codecInfoAt.isEncoder() && MediaCodecUtil.isHardwareAccelerated(codecInfoAt, str2)) {
-                    for (String str3 : codecInfoAt.getSupportedTypes()) {
-                        if (str3.equalsIgnoreCase(str2)) {
+                if (!codecInfoAt.isEncoder() && MediaCodecUtil.isHardwareAccelerated(codecInfoAt, mime)) {
+                    for (String str2 : codecInfoAt.getSupportedTypes()) {
+                        if (str2.equalsIgnoreCase(mime)) {
+                            cachedSupportedCodec.put(mime, Boolean.TRUE);
                             return true;
                         }
                     }
                 }
             }
+            cachedSupportedCodec.put(mime, Boolean.FALSE);
             return false;
         } catch (Exception e) {
             FileLog.e(e);
             return false;
+        }
+    }
+
+    public static String toMime(String str) {
+        if (str == null) {
+            return null;
+        }
+        char c = 65535;
+        switch (str.hashCode()) {
+            case 96924:
+                if (str.equals("av1")) {
+                    c = 0;
+                    break;
+                }
+                break;
+            case 96974:
+                if (str.equals("avc")) {
+                    c = 1;
+                    break;
+                }
+                break;
+            case 116926:
+                if (str.equals("vp8")) {
+                    c = 2;
+                    break;
+                }
+                break;
+            case 116927:
+                if (str.equals("vp9")) {
+                    c = 3;
+                    break;
+                }
+                break;
+            case 3004662:
+                if (str.equals("av01")) {
+                    c = 4;
+                    break;
+                }
+                break;
+            case 3148040:
+                if (str.equals("h264")) {
+                    c = 5;
+                    break;
+                }
+                break;
+            case 3148041:
+                if (str.equals("h265")) {
+                    c = 6;
+                    break;
+                }
+                break;
+            case 3199082:
+                if (str.equals("hevc")) {
+                    c = 7;
+                    break;
+                }
+                break;
+        }
+        switch (c) {
+            case 0:
+            case 4:
+                return "video/av01";
+            case 1:
+            case 5:
+                return "video/avc";
+            case 2:
+                return "video/x-vnd.on2.vp8";
+            case 3:
+                return "video/x-vnd.on2.vp9";
+            case 6:
+            case 7:
+                return "video/hevc";
+            default:
+                return "video/" + str;
         }
     }
 
@@ -1428,45 +1616,21 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     }
 
     public int getCurrentQualityIndex() {
-        int i;
+        Format videoFormat;
         if (this.selectedQualityIndex == -1) {
             try {
-                MappingTrackSelector.MappedTrackInfo currentMappedTrackInfo = this.trackSelector.getCurrentMappedTrackInfo();
-                for (int i2 = 0; i2 < currentMappedTrackInfo.getRendererCount(); i2++) {
-                    TrackGroupArray trackGroups = currentMappedTrackInfo.getTrackGroups(i2);
-                    for (int i3 = 0; i3 < trackGroups.length; i3++) {
-                        TrackGroup trackGroup = trackGroups.get(i3);
-                        for (int i4 = 0; i4 < trackGroup.length; i4++) {
-                            Format format = trackGroup.getFormat(i4);
-                            try {
-                                i = Integer.parseInt(format.id);
-                            } catch (Exception unused) {
-                                i = -1;
-                            }
-                            if (i >= 0) {
-                                int i5 = 0;
-                                for (int i6 = 0; i6 < getQualitiesCount(); i6++) {
-                                    Quality quality = getQuality(i6);
-                                    for (int i7 = 0; i7 < quality.uris.size(); i7++) {
-                                        if (((VideoUri) quality.uris.get(i7)).m3u8uri != null) {
-                                            if (i5 == i) {
-                                                return i6;
-                                            }
-                                            i5++;
-                                        }
-                                    }
-                                }
-                            }
-                            for (int i8 = 0; i8 < getQualitiesCount(); i8++) {
-                                Quality quality2 = getQuality(i8);
-                                if (format.width == quality2.width && format.height == quality2.height) {
-                                    return i8;
-                                }
-                            }
-                        }
+                ExoPlayer exoPlayer = this.player;
+                if (exoPlayer == null || (videoFormat = exoPlayer.getVideoFormat()) == null) {
+                    return -1;
+                }
+                for (int i = 0; i < getQualitiesCount(); i++) {
+                    Quality quality = getQuality(i);
+                    if (!quality.original && videoFormat.width == quality.width && videoFormat.height == quality.height && videoFormat.bitrate == ((int) Math.floor(((VideoUri) quality.uris.get(0)).bitrate * 8.0d))) {
+                        return i;
                     }
                 }
-            } catch (Exception unused2) {
+            } catch (Exception e) {
+                FileLog.e(e);
                 return -1;
             }
         }
@@ -1601,6 +1765,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         sb.append("#EXT-X-VERSION:6\n");
         sb.append("#EXT-X-INDEPENDENT-SEGMENTS\n\n");
         this.manifestUris = new ArrayList();
+        ArrayList arrayList2 = new ArrayList();
         Iterator it = arrayList.iterator();
         boolean z = false;
         while (it.hasNext()) {
@@ -1611,16 +1776,37 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 this.mediaDataSourceFactory.putDocumentUri(videoUri.manifestDocId, videoUri.m3u8uri);
                 if (videoUri.m3u8uri != null) {
                     this.manifestUris.add(videoUri);
-                    sb.append("#EXT-X-STREAM-INF:BANDWIDTH=");
-                    sb.append((int) Math.floor(videoUri.bitrate * 8.0d));
-                    sb.append(",RESOLUTION=");
-                    sb.append(videoUri.width);
-                    sb.append("x");
-                    sb.append(videoUri.height);
-                    sb.append("\n");
-                    sb.append("mtproto:");
-                    sb.append(videoUri.manifestDocId);
-                    sb.append("\n\n");
+                    StringBuilder sb2 = new StringBuilder();
+                    sb2.append("#EXT-X-STREAM-INF:BANDWIDTH=");
+                    sb2.append((int) Math.floor(videoUri.bitrate * 8.0d));
+                    sb2.append(",RESOLUTION=");
+                    sb2.append(videoUri.width);
+                    sb2.append("x");
+                    sb2.append(videoUri.height);
+                    String mime = toMime(videoUri.codec);
+                    if (mime != null) {
+                        sb2.append(",MIME=\"");
+                        sb2.append(mime);
+                        sb2.append("\"");
+                    }
+                    if (videoUri.isCached() && videoUri.isManifestCached()) {
+                        sb2.append(",CACHED=\"true\"");
+                    }
+                    sb2.append(",DOCID=\"");
+                    sb2.append(videoUri.docId);
+                    sb2.append("\"");
+                    sb2.append(",ACCOUNT=\"");
+                    sb2.append(videoUri.currentAccount);
+                    sb2.append("\"");
+                    sb2.append("\n");
+                    if (videoUri.isManifestCached()) {
+                        sb2.append(videoUri.m3u8uri);
+                    } else {
+                        sb2.append("mtproto:");
+                        sb2.append(videoUri.manifestDocId);
+                    }
+                    sb2.append("\n\n");
+                    arrayList2.add(sb2.toString());
                     z = true;
                 }
             }
@@ -1628,6 +1814,8 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         if (!z) {
             return null;
         }
+        Collections.reverse(arrayList2);
+        sb.append(TextUtils.join("", arrayList2));
         return Uri.parse("data:application/x-mpegurl;base64," + Base64.encodeToString(sb.toString().getBytes(), 2));
     }
 
@@ -2056,6 +2244,11 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         if (videoPlayerDelegate != null) {
             videoPlayerDelegate.onSeekFinished(eventTime);
         }
+        Iterator it = this.seekFinishedListeners.iterator();
+        while (it.hasNext()) {
+            ((Runnable) it.next()).run();
+        }
+        this.seekFinishedListeners.clear();
     }
 
     @Override
@@ -2108,6 +2301,10 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     @Override
     public void onTracksChanged(Tracks tracks) {
         Player.Listener.CC.$default$onTracksChanged(this, tracks);
+        Runnable runnable = this.onQualityChangeListener;
+        if (runnable != null) {
+            AndroidUtilities.runOnUIThread(runnable);
+        }
     }
 
     @Override
@@ -2259,8 +2456,10 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
     }
 
     public void preparePlayer(ArrayList arrayList, Quality quality) {
+        ArrayList arrayList2;
         this.videoQualities = arrayList;
         this.videoQualityToSelect = quality;
+        Quality quality2 = null;
         this.videoUri = null;
         this.videoType = "hls";
         this.audioUri = null;
@@ -2272,6 +2471,23 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         this.isStreaming = true;
         ensurePlayerCreated();
         this.currentStreamIsHls = false;
+        if (quality == null) {
+            int i = 0;
+            while (true) {
+                if (i >= arrayList.size()) {
+                    break;
+                }
+                if (((Quality) arrayList.get(i)).original) {
+                    quality2 = (Quality) arrayList.get(i);
+                    break;
+                }
+                i++;
+            }
+            if (quality2 != null && quality2.uris.size() == 1 && ((VideoUri) quality2.uris.get(0)).isCached()) {
+                quality = quality2;
+            }
+        }
+        this.selectedQualityIndex = (quality == null || (arrayList2 = this.videoQualities) == null) ? -1 : arrayList2.indexOf(quality);
         setSelectedQuality(true, quality);
     }
 
@@ -2311,9 +2527,11 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         this.player.prepare();
         this.audioPlayer.setMediaSource(loopingMediaSource2, true);
         this.audioPlayer.prepare();
+        activePlayers.add(Integer.valueOf(this.playerId));
     }
 
     public void releasePlayer(boolean z) {
+        activePlayers.remove(Integer.valueOf(this.playerId));
         ExoPlayer exoPlayer = this.player;
         if (exoPlayer != null) {
             exoPlayer.release();

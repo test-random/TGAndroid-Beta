@@ -239,12 +239,12 @@ public class ArchiveSettingsActivity extends BaseFragment implements Notificatio
     public View createView(Context context) {
         this.actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         this.actionBar.setAllowOverlayTitle(true);
-        this.actionBar.setTitle(LocaleController.getString("ArchiveSettings"));
+        this.actionBar.setTitle(LocaleController.getString(R.string.ArchiveSettings));
         this.actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    ArchiveSettingsActivity.this.lambda$onBackPressed$300();
+                    ArchiveSettingsActivity.this.lambda$onBackPressed$319();
                 }
             }
         });

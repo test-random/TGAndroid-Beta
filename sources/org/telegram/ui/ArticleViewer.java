@@ -6783,6 +6783,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         private Runnable onDismissListener;
         private ValueAnimator openAnimator;
         private float openProgress;
+        private boolean released;
         public Theme.ResourcesProvider resourcesProvider;
         private boolean wasFullyVisible;
         public final WindowView windowView;
@@ -7207,6 +7208,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         }
 
         public void attachInternal(BaseFragment baseFragment) {
+            this.released = false;
             this.fragment = baseFragment;
             this.resourcesProvider = baseFragment.getResourceProvider();
             if (baseFragment instanceof ChatActivity) {
@@ -7275,7 +7277,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 bottomSheetTabDialog2.updateNavigationBarColor();
             } else {
                 LaunchActivity.instance.checkSystemBarColors(true, true, true, false);
-                AndroidUtilities.setLightNavigationBar(mo989getWindowView(), AndroidUtilities.computePerceivedBrightness(getNavigationBarColor(ArticleViewer.this.getThemedColor(Theme.key_windowBackgroundGray))) >= 0.721f);
+                AndroidUtilities.setLightNavigationBar(mo997getWindowView(), AndroidUtilities.computePerceivedBrightness(getNavigationBarColor(ArticleViewer.this.getThemedColor(Theme.key_windowBackgroundGray))) >= 0.721f);
             }
         }
 
@@ -7353,7 +7355,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         }
 
         @Override
-        public WindowView mo989getWindowView() {
+        public WindowView mo997getWindowView() {
             return this.windowView;
         }
 
@@ -7379,7 +7381,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         @Override
         public boolean isShown() {
             WindowView windowView;
-            return !this.dismissing && this.openProgress > 0.5f && (windowView = this.windowView) != null && windowView.isAttachedToWindow() && this.windowView.isVisible() && this.backProgress < 1.0f;
+            return !this.dismissing && !this.released && this.openProgress > 0.5f && (windowView = this.windowView) != null && windowView.isAttachedToWindow() && this.windowView.isVisible() && this.backProgress < 1.0f;
         }
 
         @Override
@@ -7410,6 +7412,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
 
         @Override
         public void release() {
+            this.released = true;
             PageLayout pageLayout = ArticleViewer.this.pages[0];
             if (pageLayout != null && pageLayout.swipeBack) {
                 ChatAttachAlertBotWebViewLayout.WebViewSwipeContainer webViewSwipeContainer = ArticleViewer.this.pages[0].swipeContainer;
@@ -10771,7 +10774,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 sheet.dismiss(true);
             }
         }
-        Browser.openUrl(this.parentActivity, Uri.parse(str), true, true, false, progress, null, true, true);
+        Browser.openUrl(this.parentActivity, Uri.parse(str), true, true, false, progress, null, true, true, false);
         return Boolean.TRUE;
     }
 
@@ -11087,15 +11090,17 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             i = Math.max(spannableStringBuilder.getSpanEnd(uRLSpanArr[i2]), i);
         }
         Uri uriParseSafe = Utilities.uriParseSafe(str);
-        if ((uRLSpanArr.length <= 0 || length != 0 || i <= 0) && (uriParseSafe == null || uriParseSafe.getScheme() == null)) {
-            AddressBarList.pushRecentSearch(activity, str);
-            pageLayout.getWebView().loadUrl(SearchEngine.getCurrent().getSearchURL(str));
-            return;
+        if (uriParseSafe == null || !TextUtils.equals(uriParseSafe.getScheme(), "javascript")) {
+            if ((uRLSpanArr.length <= 0 || length != 0 || i <= 0) && (uriParseSafe == null || uriParseSafe.getScheme() == null)) {
+                AddressBarList.pushRecentSearch(activity, str);
+                pageLayout.getWebView().loadUrl(SearchEngine.getCurrent().getSearchURL(str));
+                return;
+            }
+            if (uriParseSafe != null && uriParseSafe.getScheme() == null && uriParseSafe.getHost() == null && uriParseSafe.getPath() != null) {
+                str = Browser.replace(uriParseSafe, "https", null, uriParseSafe.getPath(), "/");
+            }
+            pageLayout.getWebView().loadUrl(str);
         }
-        if (uriParseSafe.getScheme() == null && uriParseSafe.getHost() == null && uriParseSafe.getPath() != null) {
-            str = Browser.replace(uriParseSafe, "https", null, uriParseSafe.getPath(), "/");
-        }
-        pageLayout.getWebView().loadUrl(str);
     }
 
     public void lambda$setParentActivity$21(final Activity activity, View view) {

@@ -17,13 +17,13 @@ public class MessageCustomParamsHelper {
             this.message = message;
             int i = message.voiceTranscription != null ? 1 : 0;
             this.flags = i;
-            int i2 = i + (message.voiceTranscriptionForce ? 2 : 0);
+            int i2 = i | (message.voiceTranscriptionForce ? 2 : 0);
             this.flags = i2;
-            int i3 = i2 + (message.originalLanguage != null ? 4 : 0);
+            int i3 = i2 | (message.originalLanguage != null ? 4 : 0);
             this.flags = i3;
-            int i4 = i3 + (message.translatedToLanguage != null ? 8 : 0);
+            int i4 = i3 | (message.translatedToLanguage != null ? 8 : 0);
             this.flags = i4;
-            this.flags = i4 + (message.translatedText != null ? 16 : 0);
+            this.flags = i4 | (message.translatedText != null ? 16 : 0);
         }
 
         @Override

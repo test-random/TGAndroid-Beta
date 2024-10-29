@@ -90,6 +90,7 @@ public abstract class CaptionContainerView extends FrameLayout {
     public final AnimatedFloat collapsedT;
     private final FrameLayout containerView;
     protected int currentAccount;
+    private long dialogId;
     public final EditTextEmoji editText;
     private final LinearGradient fadeGradient;
     private final Paint fadePaint;
@@ -203,6 +204,7 @@ public abstract class CaptionContainerView extends FrameLayout {
                 captionContainerView.createMentionsContainer();
             }
             if (CaptionContainerView.this.mentionContainer.getAdapter() != null) {
+                CaptionContainerView.this.mentionContainer.getAdapter().setUserOrChat(MessagesController.getInstance(CaptionContainerView.this.currentAccount).getUser(Long.valueOf(CaptionContainerView.this.dialogId)), MessagesController.getInstance(CaptionContainerView.this.currentAccount).getChat(Long.valueOf(-CaptionContainerView.this.dialogId)));
                 CaptionContainerView.this.mentionContainer.getAdapter().lambda$searchUsernameOrHashtag$7(charSequence, CaptionContainerView.this.editText.getEditText().getSelectionStart(), null, false, false);
             }
         }
@@ -679,6 +681,11 @@ public abstract class CaptionContainerView extends FrameLayout {
                 }
                 paint.setAlpha(i);
                 canvas.drawRoundRect(CaptionContainerView.this.rectF, f, f, CaptionContainerView.this.backgroundPaint);
+            }
+
+            @Override
+            protected boolean isStories() {
+                return true;
             }
         };
         this.mentionContainer = mentionsContainerView;
@@ -1314,6 +1321,10 @@ public abstract class CaptionContainerView extends FrameLayout {
         this.collapsed = z;
         this.collapsedFromX = i;
         invalidate();
+    }
+
+    public void setDialogId(long j) {
+        this.dialogId = j;
     }
 
     public void setOnHeightUpdate(Utilities.Callback<Integer> callback) {

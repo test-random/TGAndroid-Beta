@@ -361,6 +361,13 @@ public class UItem extends AdapterWithDiffUtils.Item {
         return uItem;
     }
 
+    public static UItem asSearchMessage(int i, MessageObject messageObject) {
+        UItem uItem = new UItem(33, false);
+        uItem.id = i;
+        uItem.object = messageObject;
+        return uItem;
+    }
+
     public static UItem asSearchMessage(MessageObject messageObject) {
         UItem uItem = new UItem(33, false);
         uItem.object = messageObject;

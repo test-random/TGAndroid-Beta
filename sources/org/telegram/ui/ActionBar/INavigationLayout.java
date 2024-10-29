@@ -387,6 +387,8 @@ public interface INavigationLayout {
 
     void finishPreviewFragment();
 
+    BaseFragment getBackgroundFragment();
+
     BottomSheet getBottomSheet();
 
     int getBottomTabsHeight(boolean z);

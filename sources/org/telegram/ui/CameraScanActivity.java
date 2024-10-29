@@ -148,7 +148,7 @@ public class CameraScanActivity extends BaseFragment {
             }
 
             @Override
-            public void lambda$onBackPressed$300() {
+            public void lambda$onBackPressed$319() {
                 setFinishing(true);
                 AnonymousClass1.this.dismiss();
             }
@@ -172,7 +172,7 @@ public class CameraScanActivity extends BaseFragment {
                 }
 
                 @Override
-                public void lambda$onBackPressed$300() {
+                public void lambda$onBackPressed$319() {
                     setFinishing(true);
                     AnonymousClass1.this.dismiss();
                 }
@@ -239,7 +239,7 @@ public class CameraScanActivity extends BaseFragment {
         @Override
         public void onItemClick(int i) {
             if (i == -1) {
-                CameraScanActivity.this.lambda$onBackPressed$300();
+                CameraScanActivity.this.lambda$onBackPressed$319();
             }
         }
     }
@@ -919,7 +919,7 @@ public class CameraScanActivity extends BaseFragment {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                CameraScanActivity.this.lambda$onBackPressed$300();
+                CameraScanActivity.this.lambda$onBackPressed$319();
             }
         }, 1200L);
     }
@@ -929,7 +929,7 @@ public class CameraScanActivity extends BaseFragment {
         if (cameraScanActivityDelegate != null) {
             cameraScanActivityDelegate.didFindQr(this.recognizedText);
         }
-        lambda$onBackPressed$300();
+        lambda$onBackPressed$319();
     }
 
     public void lambda$processShot$13() {
@@ -955,7 +955,7 @@ public class CameraScanActivity extends BaseFragment {
             cameraScanActivityDelegate.didFindQr(str);
         }
         if (this.currentType != 3) {
-            lambda$onBackPressed$300();
+            lambda$onBackPressed$319();
         }
     }
 
@@ -1330,7 +1330,7 @@ public class CameraScanActivity extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    CameraScanActivity.this.lambda$onBackPressed$300();
+                    CameraScanActivity.this.lambda$onBackPressed$319();
                 }
             }
         });
@@ -1777,7 +1777,7 @@ public class CameraScanActivity extends BaseFragment {
                 if (cameraScanActivityDelegate != null) {
                     cameraScanActivityDelegate.didFindQr(tryReadQr.text);
                 }
-                lambda$onBackPressed$300();
+                lambda$onBackPressed$319();
             }
         } catch (Throwable th) {
             FileLog.e(th);

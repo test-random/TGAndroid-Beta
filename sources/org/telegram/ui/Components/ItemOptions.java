@@ -46,6 +46,7 @@ public class ItemOptions {
     private View dimView;
     private Runnable dismissListener;
     private boolean dontDismiss;
+    private boolean drawScrim;
     private boolean forceTop;
     private int foregroundIndex;
     private BaseFragment fragment;
@@ -83,7 +84,7 @@ public class ItemOptions {
             super(context);
             this.clipTop = (ItemOptions.this.scrimView == null || !(ItemOptions.this.scrimView.getParent() instanceof View)) ? 0.0f : ((View) ItemOptions.this.scrimView.getParent()).getY() + ItemOptions.this.scrimView.getY();
             this.dim = ColorUtils.setAlphaComponent(0, ItemOptions.this.dimAlpha);
-            if (!(ItemOptions.this.scrimView instanceof UserCell) || !(ItemOptions.this.fragment instanceof ProfileActivity)) {
+            if (!ItemOptions.this.drawScrim || !(ItemOptions.this.scrimView instanceof UserCell) || !(ItemOptions.this.fragment instanceof ProfileActivity)) {
                 this.cachedBitmapPaint = null;
                 this.cachedBitmap = null;
                 return;
@@ -112,69 +113,72 @@ public class ItemOptions {
             int i6;
             super.onDraw(canvas);
             canvas.drawColor(this.dim);
-            if (this.cachedBitmap != null && (ItemOptions.this.scrimView.getParent() instanceof View)) {
-                canvas.save();
-                if (this.clipTop < 1.0f) {
-                    canvas.clipRect(-ItemOptions.this.viewAdditionalOffsets.left, (((-ItemOptions.this.viewAdditionalOffsets.top) + ItemOptions.this.point[1]) - this.clipTop) + 1.0f, getMeasuredWidth() + ItemOptions.this.viewAdditionalOffsets.right, getMeasuredHeight() + ItemOptions.this.viewAdditionalOffsets.bottom);
-                }
-                canvas.translate(ItemOptions.this.point[0], ItemOptions.this.point[1]);
-                if (ItemOptions.this.scrimViewBackground != null) {
-                    if (ItemOptions.this.scrimViewBackground.getIntrinsicWidth() <= 0 || ItemOptions.this.scrimViewBackground.getIntrinsicHeight() <= 0) {
-                        drawable2 = ItemOptions.this.scrimViewBackground;
-                        i4 = -ItemOptions.this.viewAdditionalOffsets.left;
-                        i5 = -ItemOptions.this.viewAdditionalOffsets.top;
-                        width2 = ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right;
-                        height2 = ItemOptions.this.scrimView.getHeight();
-                        i6 = ItemOptions.this.viewAdditionalOffsets.bottom;
-                    } else {
-                        drawable2 = ItemOptions.this.scrimViewBackground;
-                        i4 = (-ItemOptions.this.viewAdditionalOffsets.left) + (((ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right) - ItemOptions.this.scrimViewBackground.getIntrinsicWidth()) / 2);
-                        i5 = (-ItemOptions.this.viewAdditionalOffsets.top) + (((ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.bottom) - ItemOptions.this.scrimViewBackground.getIntrinsicHeight()) / 2);
-                        width2 = (-ItemOptions.this.viewAdditionalOffsets.left) + (((ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right) + ItemOptions.this.scrimViewBackground.getIntrinsicWidth()) / 2);
-                        height2 = -ItemOptions.this.viewAdditionalOffsets.top;
-                        i6 = ((ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.bottom) + ItemOptions.this.scrimViewBackground.getIntrinsicHeight()) / 2;
+            if (ItemOptions.this.drawScrim) {
+                if (this.cachedBitmap != null && (ItemOptions.this.scrimView.getParent() instanceof View)) {
+                    canvas.save();
+                    if (this.clipTop < 1.0f) {
+                        canvas.clipRect(-ItemOptions.this.viewAdditionalOffsets.left, (((-ItemOptions.this.viewAdditionalOffsets.top) + ItemOptions.this.point[1]) - this.clipTop) + 1.0f, getMeasuredWidth() + ItemOptions.this.viewAdditionalOffsets.right, getMeasuredHeight() + ItemOptions.this.viewAdditionalOffsets.bottom);
                     }
-                    drawable2.setBounds(i4, i5, width2, height2 + i6);
-                    ItemOptions.this.scrimViewBackground.draw(canvas);
-                }
-                canvas.drawBitmap(this.cachedBitmap, -ItemOptions.this.viewAdditionalOffsets.left, -ItemOptions.this.viewAdditionalOffsets.top, this.cachedBitmapPaint);
-            } else {
-                if (ItemOptions.this.scrimView == null || !(ItemOptions.this.scrimView.getParent() instanceof View)) {
-                    return;
-                }
-                canvas.save();
-                if (this.clipTop < 1.0f) {
-                    canvas.clipRect(-ItemOptions.this.viewAdditionalOffsets.left, (((-ItemOptions.this.viewAdditionalOffsets.top) + ItemOptions.this.point[1]) - this.clipTop) + 1.0f, getMeasuredWidth() + ItemOptions.this.viewAdditionalOffsets.right, getMeasuredHeight() + ItemOptions.this.viewAdditionalOffsets.bottom);
-                }
-                canvas.translate(ItemOptions.this.point[0], ItemOptions.this.point[1]);
-                if (ItemOptions.this.scrimViewBackground != null) {
-                    if (ItemOptions.this.scrimViewBackground.getIntrinsicWidth() <= 0 || ItemOptions.this.scrimViewBackground.getIntrinsicHeight() <= 0) {
-                        drawable = ItemOptions.this.scrimViewBackground;
-                        i = -ItemOptions.this.viewAdditionalOffsets.left;
-                        i2 = -ItemOptions.this.viewAdditionalOffsets.top;
-                        width = ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right;
-                        height = ItemOptions.this.scrimView.getHeight();
-                        i3 = ItemOptions.this.viewAdditionalOffsets.bottom;
-                    } else {
-                        drawable = ItemOptions.this.scrimViewBackground;
-                        i = (-ItemOptions.this.viewAdditionalOffsets.left) + (((ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right) - ItemOptions.this.scrimViewBackground.getIntrinsicWidth()) / 2);
-                        i2 = (-ItemOptions.this.viewAdditionalOffsets.top) + (((ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.bottom) - ItemOptions.this.scrimViewBackground.getIntrinsicHeight()) / 2);
-                        width = (-ItemOptions.this.viewAdditionalOffsets.left) + (((ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right) + ItemOptions.this.scrimViewBackground.getIntrinsicWidth()) / 2);
-                        height = -ItemOptions.this.viewAdditionalOffsets.top;
-                        i3 = ((ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.bottom) + ItemOptions.this.scrimViewBackground.getIntrinsicHeight()) / 2;
+                    canvas.translate(ItemOptions.this.point[0], ItemOptions.this.point[1]);
+                    if (ItemOptions.this.scrimViewBackground != null) {
+                        if (ItemOptions.this.scrimViewBackground.getIntrinsicWidth() <= 0 || ItemOptions.this.scrimViewBackground.getIntrinsicHeight() <= 0) {
+                            drawable2 = ItemOptions.this.scrimViewBackground;
+                            i4 = -ItemOptions.this.viewAdditionalOffsets.left;
+                            i5 = -ItemOptions.this.viewAdditionalOffsets.top;
+                            width2 = ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right;
+                            height2 = ItemOptions.this.scrimView.getHeight();
+                            i6 = ItemOptions.this.viewAdditionalOffsets.bottom;
+                        } else {
+                            drawable2 = ItemOptions.this.scrimViewBackground;
+                            i4 = (-ItemOptions.this.viewAdditionalOffsets.left) + (((ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right) - ItemOptions.this.scrimViewBackground.getIntrinsicWidth()) / 2);
+                            i5 = (-ItemOptions.this.viewAdditionalOffsets.top) + (((ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.bottom) - ItemOptions.this.scrimViewBackground.getIntrinsicHeight()) / 2);
+                            width2 = (-ItemOptions.this.viewAdditionalOffsets.left) + (((ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right) + ItemOptions.this.scrimViewBackground.getIntrinsicWidth()) / 2);
+                            height2 = -ItemOptions.this.viewAdditionalOffsets.top;
+                            i6 = ((ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.bottom) + ItemOptions.this.scrimViewBackground.getIntrinsicHeight()) / 2;
+                        }
+                        drawable2.setBounds(i4, i5, width2, height2 + i6);
+                        ItemOptions.this.scrimViewBackground.draw(canvas);
                     }
-                    drawable.setBounds(i, i2, width, height + i3);
-                    ItemOptions.this.scrimViewBackground.draw(canvas);
+                    canvas.drawBitmap(this.cachedBitmap, -ItemOptions.this.viewAdditionalOffsets.left, -ItemOptions.this.viewAdditionalOffsets.top, this.cachedBitmapPaint);
+                } else {
+                    if (ItemOptions.this.scrimView == null || !(ItemOptions.this.scrimView.getParent() instanceof View)) {
+                        return;
+                    }
+                    canvas.save();
+                    if (this.clipTop < 1.0f) {
+                        canvas.clipRect(-ItemOptions.this.viewAdditionalOffsets.left, (((-ItemOptions.this.viewAdditionalOffsets.top) + ItemOptions.this.point[1]) - this.clipTop) + 1.0f, getMeasuredWidth() + ItemOptions.this.viewAdditionalOffsets.right, getMeasuredHeight() + ItemOptions.this.viewAdditionalOffsets.bottom);
+                    }
+                    canvas.translate(ItemOptions.this.point[0], ItemOptions.this.point[1]);
+                    if (ItemOptions.this.scrimViewBackground != null) {
+                        if (ItemOptions.this.scrimViewBackground.getIntrinsicWidth() <= 0 || ItemOptions.this.scrimViewBackground.getIntrinsicHeight() <= 0) {
+                            drawable = ItemOptions.this.scrimViewBackground;
+                            i = -ItemOptions.this.viewAdditionalOffsets.left;
+                            i2 = -ItemOptions.this.viewAdditionalOffsets.top;
+                            width = ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right;
+                            height = ItemOptions.this.scrimView.getHeight();
+                            i3 = ItemOptions.this.viewAdditionalOffsets.bottom;
+                        } else {
+                            drawable = ItemOptions.this.scrimViewBackground;
+                            i = (-ItemOptions.this.viewAdditionalOffsets.left) + (((ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right) - ItemOptions.this.scrimViewBackground.getIntrinsicWidth()) / 2);
+                            i2 = (-ItemOptions.this.viewAdditionalOffsets.top) + (((ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.bottom) - ItemOptions.this.scrimViewBackground.getIntrinsicHeight()) / 2);
+                            width = (-ItemOptions.this.viewAdditionalOffsets.left) + (((ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.right) + ItemOptions.this.scrimViewBackground.getIntrinsicWidth()) / 2);
+                            height = -ItemOptions.this.viewAdditionalOffsets.top;
+                            i3 = ((ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.bottom) + ItemOptions.this.scrimViewBackground.getIntrinsicHeight()) / 2;
+                        }
+                        drawable.setBounds(i, i2, width, height + i3);
+                        ItemOptions.this.scrimViewBackground.draw(canvas);
+                    }
+                    ItemOptions.this.scrimView.draw(canvas);
                 }
-                ItemOptions.this.scrimView.draw(canvas);
+                canvas.restore();
             }
-            canvas.restore();
         }
     }
 
     private ItemOptions(ViewGroup viewGroup, Theme.ResourcesProvider resourcesProvider, View view, boolean z) {
         this.gravity = 5;
         this.point = new float[2];
+        this.drawScrim = true;
         this.viewAdditionalOffsets = new android.graphics.Rect();
         this.shiftDp = -4;
         if (viewGroup == null || viewGroup.getContext() == null) {
@@ -192,6 +196,7 @@ public class ItemOptions {
     private ItemOptions(ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout, Theme.ResourcesProvider resourcesProvider) {
         this.gravity = 5;
         this.point = new float[2];
+        this.drawScrim = true;
         this.viewAdditionalOffsets = new android.graphics.Rect();
         this.shiftDp = -4;
         this.context = actionBarPopupWindowLayout.getContext();
@@ -204,6 +209,7 @@ public class ItemOptions {
     private ItemOptions(BaseFragment baseFragment, View view, boolean z) {
         this.gravity = 5;
         this.point = new float[2];
+        this.drawScrim = true;
         this.viewAdditionalOffsets = new android.graphics.Rect();
         this.shiftDp = -4;
         if (baseFragment.getContext() == null) {
@@ -735,6 +741,11 @@ public class ItemOptions {
 
     public ItemOptions setDimAlpha(int i) {
         this.dimAlpha = i;
+        return this;
+    }
+
+    public ItemOptions setDrawScrim(boolean z) {
+        this.drawScrim = z;
         return this;
     }
 

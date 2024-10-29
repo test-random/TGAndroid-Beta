@@ -1431,7 +1431,7 @@ public class ManageLinksActivity extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    ManageLinksActivity.this.lambda$onBackPressed$300();
+                    ManageLinksActivity.this.lambda$onBackPressed$319();
                 }
             }
         });

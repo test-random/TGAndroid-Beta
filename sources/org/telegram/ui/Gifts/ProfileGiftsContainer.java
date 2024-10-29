@@ -38,7 +38,7 @@ import org.telegram.ui.Stars.StarsController;
 import org.telegram.ui.Stars.StarsIntroActivity;
 import org.telegram.ui.Stories.recorder.ButtonWithCounterView;
 
-public class ProfileGiftsContainer extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
+public abstract class ProfileGiftsContainer extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
     private final ButtonWithCounterView button;
     private final FrameLayout buttonContainer;
     private final int currentAccount;
@@ -339,8 +339,16 @@ public class ProfileGiftsContainer extends FrameLayout implements NotificationCe
         return false;
     }
 
+    protected abstract int processColor(int i);
+
     public void setVisibleHeight(int i) {
         this.visibleHeight = i;
-        this.buttonContainer.setTranslationY(((-r0.getTop()) + i) - AndroidUtilities.dp((1.0f / AndroidUtilities.density) + 68.0f));
+    }
+
+    public void updateColors() {
+        ButtonWithCounterView buttonWithCounterView = this.button;
+        if (buttonWithCounterView != null) {
+            buttonWithCounterView.setBackground(Theme.createRoundRectDrawable(AndroidUtilities.dp(8.0f), processColor(Theme.getColor(Theme.key_featuredStickers_addButton, this.resourcesProvider))));
+        }
     }
 }

@@ -122,7 +122,6 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
-import org.telegram.tgnet.tl.TL_stats;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -169,12 +168,10 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
     private TLRPC.TL_auth_sentCode cancelDeletionCode;
     private Bundle cancelDeletionParams;
     private String cancelDeletionPhone;
-    private TLRPC.InputChannel channel;
     private boolean checkPermissions;
     private boolean checkShowPermissions;
     private int currentConnectionState;
     private int currentDoneType;
-    private TLRPC.TL_account_password currentPassword;
     private TLRPC.TL_help_termsOfService currentTermsOfService;
     private int currentViewNum;
     private boolean customKeyboardWasVisible;
@@ -197,7 +194,6 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
     private CustomPhoneKeyboardView keyboardView;
     private boolean needRequestPermissions;
     private boolean newAccount;
-    private Utilities.Callback2 passwordFinishCallback;
     private boolean pendingSwitchingAccount;
     private Dialog permissionsDialog;
     private ArrayList permissionsItems;
@@ -644,7 +640,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
         public void lambda$onNextPressed$18(TLObject tLObject, Bundle bundle) {
             if ((tLObject instanceof TLRPC.TL_account_emailVerified) && LoginActivity.this.activityMode == 3) {
-                LoginActivity.this.lambda$onBackPressed$300();
+                LoginActivity.this.lambda$onBackPressed$319();
                 LoginActivity.this.emailChangeFinishCallback.run();
             } else if (tLObject instanceof TLRPC.TL_account_emailVerifiedLogin) {
                 LoginActivity.this.lambda$resendCodeFromSafetyNet$19(bundle, ((TLRPC.TL_account_emailVerifiedLogin) tLObject).sent_code);
@@ -1510,7 +1506,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         private String requestPhone;
         private TextView titleView;
 
-        public LoginActivityPasswordView(final android.content.Context r22) {
+        public LoginActivityPasswordView(final android.content.Context r20) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.LoginActivity.LoginActivityPasswordView.<init>(org.telegram.ui.LoginActivity, android.content.Context):void");
         }
 
@@ -1627,11 +1623,6 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 }, 8);
                 return;
             }
-            if (tLObject instanceof TL_stats.TL_broadcastRevenueWithdrawalUrl) {
-                LoginActivity.this.passwordFinishCallback.run((TL_stats.TL_broadcastRevenueWithdrawalUrl) tLObject, null);
-                LoginActivity.this.lambda$onBackPressed$300();
-                return;
-            }
             if (tLObject instanceof TLRPC.TL_auth_authorization) {
                 LoginActivity.this.showDoneButton(false, true);
                 postDelayed(new Runnable() {
@@ -1663,8 +1654,6 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         }
 
         public void lambda$onNextPressed$12(String str) {
-            int i;
-            TLRPC.TL_auth_checkPassword tL_auth_checkPassword;
             TLRPC.PasswordKdfAlgo passwordKdfAlgo = this.currentPassword.current_algo;
             boolean z = passwordKdfAlgo instanceof TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow;
             byte[] x = z ? SRPHelper.getX(AndroidUtilities.getStringBytes(str), (TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow) passwordKdfAlgo) : null;
@@ -1681,21 +1670,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                     TLRPC.TL_error tL_error = new TLRPC.TL_error();
                     tL_error.text = "PASSWORD_HASH_INVALID";
                     requestDelegate.run(null, tL_error);
-                    return;
-                }
-                if (LoginActivity.this.activityMode == 4) {
-                    TL_stats.TL_getBroadcastRevenueWithdrawalUrl tL_getBroadcastRevenueWithdrawalUrl = new TL_stats.TL_getBroadcastRevenueWithdrawalUrl();
-                    tL_getBroadcastRevenueWithdrawalUrl.channel = LoginActivity.this.channel;
-                    tL_getBroadcastRevenueWithdrawalUrl.password = startCheck;
-                    i = ((BaseFragment) LoginActivity.this).currentAccount;
-                    tL_auth_checkPassword = tL_getBroadcastRevenueWithdrawalUrl;
                 } else {
-                    TLRPC.TL_auth_checkPassword tL_auth_checkPassword2 = new TLRPC.TL_auth_checkPassword();
-                    tL_auth_checkPassword2.password = startCheck;
-                    i = ((BaseFragment) LoginActivity.this).currentAccount;
-                    tL_auth_checkPassword = tL_auth_checkPassword2;
+                    TLRPC.TL_auth_checkPassword tL_auth_checkPassword = new TLRPC.TL_auth_checkPassword();
+                    tL_auth_checkPassword.password = startCheck;
+                    ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(tL_auth_checkPassword, requestDelegate, 10);
                 }
-                ConnectionsManager.getInstance(i).sendRequest(tL_auth_checkPassword, requestDelegate, 10);
             }
         }
 
@@ -1952,7 +1931,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 double d = LoginActivityPhraseView.this.lastCurrentTime;
                 Double.isNaN(currentTimeMillis);
                 LoginActivityPhraseView.this.lastCurrentTime = currentTimeMillis;
-                LoginActivityPhraseView.access$18226(LoginActivityPhraseView.this, currentTimeMillis - d);
+                LoginActivityPhraseView.access$17826(LoginActivityPhraseView.this, currentTimeMillis - d);
                 if (LoginActivityPhraseView.this.time >= 1000) {
                     int i2 = (LoginActivityPhraseView.this.time / 1000) / 60;
                     int i3 = (LoginActivityPhraseView.this.time / 1000) - (i2 * 60);
@@ -2019,7 +1998,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.LoginActivity.LoginActivityPhraseView.<init>(org.telegram.ui.LoginActivity, android.content.Context, int):void");
         }
 
-        static int access$18226(LoginActivityPhraseView loginActivityPhraseView, double d) {
+        static int access$17826(LoginActivityPhraseView loginActivityPhraseView, double d) {
             double d2 = loginActivityPhraseView.time;
             Double.isNaN(d2);
             int i = (int) (d2 - d);
@@ -4154,7 +4133,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             String string;
             int i;
             if ((tLObject instanceof TLRPC.TL_account_emailVerified) && LoginActivity.this.activityMode == 3) {
-                LoginActivity.this.lambda$onBackPressed$300();
+                LoginActivity.this.lambda$onBackPressed$319();
                 LoginActivity.this.emailChangeFinishCallback.run();
                 return;
             }
@@ -4969,7 +4948,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         }
 
         public void lambda$onNextPressed$22(DialogInterface dialogInterface) {
-            LoginActivity.this.lambda$onBackPressed$300();
+            LoginActivity.this.lambda$onBackPressed$319();
         }
 
         public void lambda$onNextPressed$23() {
@@ -4999,7 +4978,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         }
 
         public void lambda$onNextPressed$26(DialogInterface dialogInterface) {
-            LoginActivity.this.lambda$onBackPressed$300();
+            LoginActivity.this.lambda$onBackPressed$319();
         }
 
         public void lambda$onNextPressed$27(Activity activity) {
@@ -5424,7 +5403,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             NotificationCenter globalInstance;
             int i;
             if (LoginActivity.this.activityMode != 0) {
-                LoginActivity.this.lambda$onBackPressed$300();
+                LoginActivity.this.lambda$onBackPressed$319();
                 return false;
             }
             int i2 = this.prevType;
@@ -6904,7 +6883,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             if (UserConfig.selectedAccount != i) {
                 ((LaunchActivity) LoginActivity.this.getParentActivity()).switchToAccount(i, false);
             }
-            LoginActivity.this.lambda$onBackPressed$300();
+            LoginActivity.this.lambda$onBackPressed$319();
         }
 
         public void lambda$onNextPressed$17(TLRPC.TL_error tL_error, TLObject tLObject, String str) {
@@ -7504,7 +7483,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
     public void lambda$createView$3(View view) {
         if (onBackPressed()) {
-            lambda$onBackPressed$300();
+            lambda$onBackPressed$319();
         }
     }
 
@@ -7959,7 +7938,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 }
             });
             this.pendingSwitchingAccount = false;
-            lambda$onBackPressed$300();
+            lambda$onBackPressed$319();
             return;
         }
         if (z && z2) {

@@ -85,6 +85,7 @@ public class ReactionsLayoutInBubble {
     public int positionOffsetY;
     boolean pressed;
     Theme.ResourcesProvider resourcesProvider;
+    private boolean scrimDirection;
     private float scrimProgress;
     private Integer scrimViewReaction;
     public boolean tags;
@@ -186,6 +187,7 @@ public class ReactionsLayoutInBubble {
         public int lastDrawnTagDotColor;
         public int lastDrawnTextColor;
         public boolean lastImageDrawn;
+        private boolean lastScrimProgressDirection;
         public String name;
         public boolean paid;
         private final View parentView;
@@ -196,6 +198,7 @@ public class ReactionsLayoutInBubble {
         private final TLRPC.ReactionCount reactionCount;
         public int realCount;
         private final Theme.ResourcesProvider resourcesProvider;
+        public AnimatedTextView.AnimatedTextDrawable scrimPreviewCounterDrawable;
         int serviceBackgroundColor;
         int serviceTextColor;
         int textColor;
@@ -237,6 +240,15 @@ public class ReactionsLayoutInBubble {
                 this.textDrawable.setCallback(view);
                 this.textDrawable.setTypeface(AndroidUtilities.bold());
                 this.textDrawable.setOverrideFullWidth(AndroidUtilities.displaySize.x);
+            }
+            if (this.scrimPreviewCounterDrawable == null) {
+                AnimatedTextView.AnimatedTextDrawable animatedTextDrawable2 = new AnimatedTextView.AnimatedTextDrawable(false, false, false, true);
+                this.scrimPreviewCounterDrawable = animatedTextDrawable2;
+                animatedTextDrawable2.setTextSize(AndroidUtilities.dp(12.0f));
+                this.scrimPreviewCounterDrawable.setCallback(view);
+                this.scrimPreviewCounterDrawable.setTypeface(AndroidUtilities.bold());
+                this.scrimPreviewCounterDrawable.setOverrideFullWidth(AndroidUtilities.displaySize.x);
+                this.scrimPreviewCounterDrawable.setScaleProperty(0.35f);
             }
             this.reactionCount = reactionCount;
             TLRPC.Reaction reaction = reactionCount.reaction;
@@ -294,8 +306,8 @@ public class ReactionsLayoutInBubble {
                 this.hasName = !TextUtils.isEmpty(r1);
             }
             if (this.hasName) {
-                AnimatedTextView.AnimatedTextDrawable animatedTextDrawable2 = this.textDrawable;
-                animatedTextDrawable2.setText(Emoji.replaceEmoji(this.name, animatedTextDrawable2.getPaint().getFontMetricsInt(), false), !LocaleController.isRTL);
+                AnimatedTextView.AnimatedTextDrawable animatedTextDrawable3 = this.textDrawable;
+                animatedTextDrawable3.setText(Emoji.replaceEmoji(this.name, animatedTextDrawable3.getPaint().getFontMetricsInt(), false), !LocaleController.isRTL);
                 if (!drawTextWithCounter()) {
                     this.countText = "";
                     this.counterDrawable.setCount(0, false);
@@ -303,9 +315,9 @@ public class ReactionsLayoutInBubble {
                     this.counterDrawable.gravity = 3;
                 }
             } else {
-                AnimatedTextView.AnimatedTextDrawable animatedTextDrawable3 = this.textDrawable;
-                if (animatedTextDrawable3 != null) {
-                    animatedTextDrawable3.setText("", false);
+                AnimatedTextView.AnimatedTextDrawable animatedTextDrawable4 = this.textDrawable;
+                if (animatedTextDrawable4 != null) {
+                    animatedTextDrawable4.setText("", false);
                 }
             }
             this.countText = Integer.toString(reactionCount.count);
@@ -462,8 +474,8 @@ public class ReactionsLayoutInBubble {
             }
         }
 
-        public void draw(android.graphics.Canvas r18, float r19, float r20, float r21, float r22, boolean r23) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.ReactionButton.draw(android.graphics.Canvas, float, float, float, float, boolean):void");
+        public void draw(android.graphics.Canvas r24, float r25, float r26, float r27, float r28, boolean r29, boolean r30, float r31) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.ReactionButton.draw(android.graphics.Canvas, float, float, float, float, boolean, boolean, float):void");
         }
 
         protected boolean drawCounter() {
@@ -1127,7 +1139,7 @@ public class ReactionsLayoutInBubble {
                     canvas.scale(f11, f11, f6 + f8 + (reactionButton.width / 2.0f), f7 + f9 + (reactionButton.height / 2.0f));
                     f2 = f;
                 }
-                reactionButton.draw(canvas, f6 + f8, f7 + f9, reactionButton.animationType == 3 ? f : 1.0f, f2, num != null);
+                reactionButton.draw(canvas, f6 + f8, f7 + f9, reactionButton.animationType == 3 ? f : 1.0f, f2, num != null, this.scrimDirection, this.scrimProgress);
                 canvas.restore();
             }
         }
@@ -1137,7 +1149,7 @@ public class ReactionsLayoutInBubble {
             float f13 = (f12 * 0.5f) + 0.5f;
             canvas.save();
             canvas.scale(f13, f13, reactionButton2.x + f6 + (reactionButton2.width / 2.0f), reactionButton2.y + f7 + (reactionButton2.height / 2.0f));
-            ((ReactionButton) this.outButtons.get(i2)).draw(canvas, reactionButton2.x + f6, f7 + reactionButton2.y, 1.0f, f12, false);
+            ((ReactionButton) this.outButtons.get(i2)).draw(canvas, reactionButton2.x + f6, f7 + reactionButton2.y, 1.0f, f12, false, this.scrimDirection, this.scrimProgress);
             canvas.restore();
         }
     }
@@ -1316,6 +1328,11 @@ public class ReactionsLayoutInBubble {
 
     public void setScrimProgress(float f) {
         this.scrimProgress = f;
+    }
+
+    public void setScrimProgress(float f, boolean z) {
+        this.scrimProgress = f;
+        this.scrimDirection = z;
     }
 
     public void setScrimReaction(Integer num) {

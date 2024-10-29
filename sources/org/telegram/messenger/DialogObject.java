@@ -8,6 +8,32 @@ import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Components.BackupImageView;
 
 public class DialogObject {
+    public static int editDistance(String str, String str2) {
+        String lowerCase = str.toLowerCase();
+        String lowerCase2 = str2.toLowerCase();
+        int[] iArr = new int[lowerCase2.length() + 1];
+        for (int i = 0; i <= lowerCase.length(); i++) {
+            int i2 = i;
+            for (int i3 = 0; i3 <= lowerCase2.length(); i3++) {
+                if (i == 0) {
+                    iArr[i3] = i3;
+                } else if (i3 > 0) {
+                    int i4 = i3 - 1;
+                    int i5 = iArr[i4];
+                    if (lowerCase.charAt(i - 1) != lowerCase2.charAt(i4)) {
+                        i5 = Math.min(Math.min(i5, i2), iArr[i3]) + 1;
+                    }
+                    iArr[i4] = i2;
+                    i2 = i5;
+                }
+            }
+            if (i > 0) {
+                iArr[lowerCase2.length()] = i2;
+            }
+        }
+        return iArr[lowerCase2.length()];
+    }
+
     public static boolean emojiStatusesEqual(TLRPC.EmojiStatus emojiStatus, TLRPC.EmojiStatus emojiStatus2) {
         return getEmojiStatusDocumentId(emojiStatus) == getEmojiStatusDocumentId(emojiStatus2) && getEmojiStatusUntil(emojiStatus) == getEmojiStatusUntil(emojiStatus2);
     }
@@ -108,14 +134,78 @@ public class DialogObject {
         return j2 != 0 ? -j2 : -peer.channel_id;
     }
 
-    public static String getPublicUsername(TLObject tLObject) {
-        if (tLObject instanceof TLRPC.Chat) {
-            return ChatObject.getPublicUsername((TLRPC.Chat) tLObject);
+    public static String getPublicUsername(String str, ArrayList<TLRPC.TL_username> arrayList, boolean z) {
+        if (!TextUtils.isEmpty(str) && !z) {
+            return str;
         }
-        if (tLObject instanceof TLRPC.User) {
-            return UserObject.getPublicUsername((TLRPC.User) tLObject);
+        if (arrayList != null) {
+            for (int i = 0; i < arrayList.size(); i++) {
+                TLRPC.TL_username tL_username = arrayList.get(i);
+                if (tL_username != null && (((tL_username.active && !z) || tL_username.editable) && !TextUtils.isEmpty(tL_username.username))) {
+                    return tL_username.username;
+                }
+            }
+        }
+        if (TextUtils.isEmpty(str) || !z) {
+            return null;
+        }
+        if (arrayList == null || arrayList.size() <= 0) {
+            return str;
         }
         return null;
+    }
+
+    public static String getPublicUsername(TLObject tLObject) {
+        String str;
+        ArrayList<TLRPC.TL_username> arrayList;
+        if (tLObject instanceof TLRPC.Chat) {
+            TLRPC.Chat chat = (TLRPC.Chat) tLObject;
+            str = chat.username;
+            arrayList = chat.usernames;
+        } else {
+            if (!(tLObject instanceof TLRPC.User)) {
+                return null;
+            }
+            TLRPC.User user = (TLRPC.User) tLObject;
+            str = user.username;
+            arrayList = user.usernames;
+        }
+        return getPublicUsername(str, arrayList, false);
+    }
+
+    public static String getPublicUsername(TLObject tLObject, String str) {
+        if (tLObject instanceof TLRPC.Chat) {
+            TLRPC.Chat chat = (TLRPC.Chat) tLObject;
+            return str == null ? getPublicUsername(chat.username, chat.usernames, false) : getSimilarPublicUsername(chat.username, chat.usernames, str);
+        }
+        if (!(tLObject instanceof TLRPC.User)) {
+            return null;
+        }
+        TLRPC.User user = (TLRPC.User) tLObject;
+        return str == null ? getPublicUsername(user.username, user.usernames, false) : getSimilarPublicUsername(user.username, user.usernames, str);
+    }
+
+    public static String getSimilarPublicUsername(String str, ArrayList<TLRPC.TL_username> arrayList, String str2) {
+        double d = -1.0d;
+        String str3 = null;
+        if (arrayList != null) {
+            for (int i = 0; i < arrayList.size(); i++) {
+                TLRPC.TL_username tL_username = arrayList.get(i);
+                if (tL_username != null && tL_username.active && !TextUtils.isEmpty(tL_username.username)) {
+                    double similarity = d < 0.0d ? 0.0d : similarity(tL_username.username, str2);
+                    if (similarity > d) {
+                        str3 = tL_username.username;
+                        d = similarity;
+                    }
+                }
+            }
+        }
+        if (!TextUtils.isEmpty(str)) {
+            if ((d >= 0.0d ? similarity(str, str2) : 0.0d) > d) {
+                return str;
+            }
+        }
+        return str3;
     }
 
     public static void initDialog(TLRPC.Dialog dialog) {
@@ -178,5 +268,21 @@ public class DialogObject {
 
     public static String setDialogPhotoTitle(BackupImageView backupImageView, TLObject tLObject) {
         return backupImageView != null ? setDialogPhotoTitle(backupImageView.getImageReceiver(), backupImageView.getAvatarDrawable(), tLObject) : setDialogPhotoTitle(null, null, tLObject);
+    }
+
+    public static double similarity(String str, String str2) {
+        if (str.length() < str2.length()) {
+            str2 = str;
+            str = str2;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return 1.0d;
+        }
+        double editDistance = length - editDistance(str, str2);
+        double d = length;
+        Double.isNaN(editDistance);
+        Double.isNaN(d);
+        return editDistance / d;
     }
 }

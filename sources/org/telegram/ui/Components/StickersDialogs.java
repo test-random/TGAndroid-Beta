@@ -210,6 +210,9 @@ public abstract class StickersDialogs {
     }
 
     public static void showAddStickerDialog(final TLRPC.TL_messages_stickerSet tL_messages_stickerSet, View view, final BaseFragment baseFragment, final Theme.ResourcesProvider resourcesProvider) {
+        if (baseFragment == null) {
+            return;
+        }
         Context context = baseFragment.getContext();
         if (!(baseFragment instanceof ChatActivity)) {
             openStickerPickerDialog(tL_messages_stickerSet, baseFragment, resourcesProvider);

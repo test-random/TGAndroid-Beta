@@ -365,6 +365,11 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             }
 
             @Override
+            public boolean canPerformReply() {
+                return canPerformActions();
+            }
+
+            @Override
             public void didLongPress(ChatMessageCell chatMessageCell, float f, float f2) {
                 ChannelAdminLogActivity.this.createMenu(chatMessageCell);
             }
@@ -575,7 +580,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             }
 
             @Override
-            public void didPressReplyMessage(ChatMessageCell chatMessageCell, int i) {
+            public void didPressReplyMessage(ChatMessageCell chatMessageCell, int i, float f, float f2, boolean z) {
                 MessageObject messageObject = chatMessageCell.getMessageObject().replyMessageObject;
                 if (messageObject.getDialogId() == (-ChannelAdminLogActivity.this.currentChat.id)) {
                     for (int i2 = 0; i2 < ChannelAdminLogActivity.this.filteredMessages.size(); i2++) {
@@ -2863,7 +2868,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             @Override
             public void onItemClick(int i2) {
                 if (i2 == -1) {
-                    ChannelAdminLogActivity.this.lambda$onBackPressed$300();
+                    ChannelAdminLogActivity.this.lambda$onBackPressed$319();
                 }
             }
         });

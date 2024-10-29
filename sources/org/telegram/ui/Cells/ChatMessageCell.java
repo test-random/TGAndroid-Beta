@@ -90,7 +90,7 @@ import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.WebFile;
 import org.telegram.messenger.browser.Browser;
-import org.telegram.messenger.video.VideoPlayerRewinder;
+import org.telegram.messenger.video.OldVideoPlayerRewinder;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -145,6 +145,7 @@ import org.telegram.ui.Components.URLSpanBrowser;
 import org.telegram.ui.Components.URLSpanMono;
 import org.telegram.ui.Components.URLSpanNoUnderline;
 import org.telegram.ui.Components.VideoForwardDrawable;
+import org.telegram.ui.Components.VideoPlayer;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
 import org.telegram.ui.Components.spoilers.SpoilerEffect2;
 import org.telegram.ui.GradientClip;
@@ -813,7 +814,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private int videoButtonY;
     VideoForwardDrawable videoForwardDrawable;
     private StaticLayout videoInfoLayout;
-    VideoPlayerRewinder videoPlayerRewinder;
+    OldVideoPlayerRewinder videoPlayerRewinder;
     private RadialProgress2 videoRadialProgress;
     private float viewTop;
     private StaticLayout viewsLayout;
@@ -1021,7 +1022,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             public static void $default$didPressReaction(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.ReactionCount reactionCount, boolean z, float f, float f2) {
             }
 
-            public static void $default$didPressReplyMessage(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, int i) {
+            public static void $default$didPressReplyMessage(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, int i, float f, float f2, boolean z) {
             }
 
             public static void $default$didPressRevealSensitiveContent(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell) {
@@ -1164,6 +1165,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
         boolean canPerformActions();
 
+        boolean canPerformReply();
+
         void didLongPress(ChatMessageCell chatMessageCell, float f, float f2);
 
         void didLongPressBotButton(ChatMessageCell chatMessageCell, TLRPC.KeyboardButton keyboardButton);
@@ -1220,7 +1223,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
         void didPressReaction(ChatMessageCell chatMessageCell, TLRPC.ReactionCount reactionCount, boolean z, float f, float f2);
 
-        void didPressReplyMessage(ChatMessageCell chatMessageCell, int i);
+        void didPressReplyMessage(ChatMessageCell chatMessageCell, int i, float f, float f2, boolean z);
 
         void didPressRevealSensitiveContent(ChatMessageCell chatMessageCell);
 
@@ -3312,6 +3315,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         return this.reactionsLayoutInBubble.checkTouchEvent(motionEvent);
     }
 
+    private boolean checkReplyTouchEvent(android.view.MotionEvent r15) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.checkReplyTouchEvent(android.view.MotionEvent):boolean");
+    }
+
     private boolean checkRoundSeekbar(android.view.MotionEvent r18) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.checkRoundSeekbar(android.view.MotionEvent):boolean");
     }
@@ -3882,7 +3889,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             this.statusDrawableAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    ChatMessageCell.this.lambda$createStatusDrawableAnimator$12(z, valueAnimator);
+                    ChatMessageCell.this.lambda$createStatusDrawableAnimator$13(z, valueAnimator);
                 }
             });
             this.statusDrawableAnimator.addListener(new AnimatorListenerAdapter() {
@@ -3908,6 +3915,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         ChatMessageCellDelegate chatMessageCellDelegate;
         ChatMessageCellDelegate chatMessageCellDelegate2;
         TLRPC.WebPage webPage;
+        boolean z;
         TLRPC.MessageMedia messageMedia;
         TLRPC.ReplyMarkup replyMarkup;
         if (this.currentMessageObject.hasMediaSpoilers() && !this.currentMessageObject.needDrawBluredPreview()) {
@@ -3968,13 +3976,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             } else {
                 int i4 = this.documentAttachType;
                 if (i4 == 4) {
-                    if (this.buttonState != -1 && (!this.drawVideoImageButton || (!this.autoPlayingMedia && ((!SharedConfig.streamMedia || !this.canStreamVideo) && !messageObject3.hasVideoQualities())))) {
-                        if (this.drawVideoImageButton) {
+                    int i5 = this.buttonState;
+                    if (i5 != -1 && (!(z = this.drawVideoImageButton) || (!this.autoPlayingMedia && (!SharedConfig.streamMedia || !this.canStreamVideo)))) {
+                        if (z) {
                             didPressButton(true, true);
                             return;
-                        }
-                        int i5 = this.buttonState;
-                        if (i5 != 0 && i5 != 3) {
+                        } else if (i5 != 0 && i5 != 3) {
                             return;
                         }
                     }
@@ -4370,7 +4377,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.drawStatusDrawable(android.graphics.Canvas, boolean, boolean, boolean, boolean, float, boolean, float, float, float, boolean, boolean):void");
     }
 
-    private void drawTimeInternal(android.graphics.Canvas r42, float r43, boolean r44, float r45, android.text.StaticLayout r46, float r47, boolean r48) {
+    private void drawTimeInternal(android.graphics.Canvas r43, float r44, boolean r45, float r46, android.text.StaticLayout r47, float r48, boolean r49) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.drawTimeInternal(android.graphics.Canvas, float, boolean, float, android.text.StaticLayout, float, boolean):void");
     }
 
@@ -4391,23 +4398,33 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         int canDownloadMediaType = DownloadController.getInstance(this.currentAccount).canDownloadMediaType(messageObject);
         TLRPC.Document document = messageObject.getDocument();
-        if (MessageObject.isStickerDocument(document) || MessageObject.isAnimatedStickerDocument(document, true) || MessageObject.isGifDocument(document) || MessageObject.isRoundVideoDocument(document) || messageObject.hasVideoQualities() || this.isSmallImage) {
-            return;
-        }
-        TLRPC.PhotoSize closestPhotoSizeWithSize = document == null ? FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, AndroidUtilities.getPhotoSize()) : null;
-        if (canDownloadMediaType == 2 || (canDownloadMediaType == 1 && messageObject.isVideo())) {
-            if (canDownloadMediaType != 2 && document != null && !messageObject.shouldEncryptPhotoOrVideo() && messageObject.canStreamVideo()) {
-                FileLoader.getInstance(this.currentAccount).loadFile(document, messageObject, 1, 0);
+        if (!MessageObject.isStickerDocument(document) && !MessageObject.isAnimatedStickerDocument(document, true) && !MessageObject.isGifDocument(document) && !MessageObject.isRoundVideoDocument(document) && !messageObject.hasVideoQualities() && !this.isSmallImage) {
+            TLRPC.PhotoSize closestPhotoSizeWithSize = document == null ? FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, AndroidUtilities.getPhotoSize()) : null;
+            if (canDownloadMediaType == 2 || (canDownloadMediaType == 1 && messageObject.isVideo())) {
+                if (canDownloadMediaType != 2 && document != null && !messageObject.shouldEncryptPhotoOrVideo() && messageObject.canStreamVideo()) {
+                    FileLoader.getInstance(this.currentAccount).loadFile(document, messageObject, 1, 0);
+                }
+            } else if (canDownloadMediaType != 0) {
+                if (document != null) {
+                    FileLoader.getInstance(this.currentAccount).loadFile(document, messageObject, 1, ((MessageObject.isVideoDocument(document) || messageObject.isVoiceOnce() || messageObject.isRoundOnce()) && messageObject.shouldEncryptPhotoOrVideo()) ? 2 : 0);
+                } else if (closestPhotoSizeWithSize != null) {
+                    FileLoader.getInstance(this.currentAccount).loadFile(ImageLocation.getForObject(closestPhotoSizeWithSize, messageObject.photoThumbsObject), messageObject, null, 1, messageObject.shouldEncryptPhotoOrVideo() ? 2 : 0);
+                }
             }
-        } else if (canDownloadMediaType != 0) {
-            if (document != null) {
-                FileLoader.getInstance(this.currentAccount).loadFile(document, messageObject, 1, ((MessageObject.isVideoDocument(document) || messageObject.isVoiceOnce() || messageObject.isRoundOnce()) && messageObject.shouldEncryptPhotoOrVideo()) ? 2 : 0);
-            } else if (closestPhotoSizeWithSize != null) {
-                FileLoader.getInstance(this.currentAccount).loadFile(ImageLocation.getForObject(closestPhotoSizeWithSize, messageObject.photoThumbsObject), messageObject, null, 1, messageObject.shouldEncryptPhotoOrVideo() ? 2 : 0);
+            if (z) {
+                updateButtonState(false, false, false);
             }
         }
-        if (z) {
-            updateButtonState(false, false, false);
+        if (messageObject.hasVideoQualities()) {
+            VideoPlayer.VideoUri videoUri = messageObject.highestQuality;
+            if (videoUri != null && !videoUri.isManifestCached()) {
+                FileLoader.getInstance(this.currentAccount).loadFile(messageObject.highestQuality.manifestDocument, messageObject, 1, 0);
+            }
+            VideoPlayer.VideoUri videoUri2 = messageObject.thumbQuality;
+            if (videoUri2 == null || videoUri2.isManifestCached()) {
+                return;
+            }
+            FileLoader.getInstance(this.currentAccount).loadFile(messageObject.thumbQuality.manifestDocument, messageObject, 1, 0);
         }
     }
 
@@ -4836,6 +4853,18 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
     }
 
+    public void lambda$checkReplyTouchEvent$5() {
+        if (this.replyPressed && !this.replySelectorPressed && this.replySelectorCanBePressed) {
+            this.replySelectorPressed = true;
+            this.replySelector.setState(new int[]{16842919, 16842910});
+        }
+    }
+
+    public void lambda$checkReplyTouchEvent$6() {
+        this.replySelector.setState(new int[0]);
+        invalidate();
+    }
+
     public void lambda$checkSpoilersMotionEvent$0() {
         this.isSpoilerRevealing = false;
         getMessageObject().isSpoilersRevealed = true;
@@ -4881,7 +4910,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         });
     }
 
-    public void lambda$createStatusDrawableAnimator$12(boolean z, ValueAnimator valueAnimator) {
+    public void lambda$createStatusDrawableAnimator$13(boolean z, ValueAnimator valueAnimator) {
         this.statusDrawableProgress = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         invalidate();
         if (!z || getParent() == null) {
@@ -4890,18 +4919,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         ((View) getParent()).invalidate();
     }
 
-    public void lambda$drawContent$10(Canvas canvas) {
+    public void lambda$drawContent$11(Canvas canvas) {
         this.radialProgress.draw(canvas);
     }
 
-    public void lambda$onTouchEvent$5() {
-        if (this.replyPressed && !this.replySelectorPressed && this.replySelectorCanBePressed) {
-            this.replySelectorPressed = true;
-            this.replySelector.setState(new int[]{16842919, 16842910});
-        }
-    }
-
-    public void lambda$onTouchEvent$6() {
+    public void lambda$onLongPress$10() {
         this.replySelector.setState(new int[0]);
         invalidate();
     }
@@ -4937,7 +4959,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         return pollButton.percent < pollButton2.percent ? -1 : 0;
     }
 
-    public void lambda$startRevealMedia$11(ValueAnimator valueAnimator) {
+    public void lambda$startRevealMedia$12(ValueAnimator valueAnimator) {
         this.mediaSpoilerRevealProgress = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         invalidate();
     }
@@ -5119,7 +5141,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         duration.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                ChatMessageCell.this.lambda$startRevealMedia$11(valueAnimator);
+                ChatMessageCell.this.lambda$startRevealMedia$12(valueAnimator);
             }
         });
         duration.addListener(new AnimatorListenerAdapter() {
@@ -6403,14 +6425,17 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         ReactionsLayoutInBubble reactionsLayoutInBubble2 = this.reactionsLayoutInBubble;
         if (reactionsLayoutInBubble2.drawServiceShaderBackground > 0.0f || !this.transitionParams.animateBackgroundBoundsInner || this.currentPosition != null || this.isRoundVideo) {
+            reactionsLayoutInBubble2.setScrimProgress(0.0f, false);
+            ReactionsLayoutInBubble reactionsLayoutInBubble3 = this.reactionsLayoutInBubble;
             TransitionParams transitionParams = this.transitionParams;
-            reactionsLayoutInBubble2.draw(canvas, transitionParams.animateChange ? transitionParams.animateChangeProgress : 1.0f, num);
+            reactionsLayoutInBubble3.draw(canvas, transitionParams.animateChange ? transitionParams.animateChangeProgress : 1.0f, num);
         } else {
             canvas.save();
             canvas.clipRect(0.0f, 0.0f, getMeasuredWidth(), getBackgroundDrawableBottom() + this.transitionParams.deltaBottom);
-            ReactionsLayoutInBubble reactionsLayoutInBubble3 = this.reactionsLayoutInBubble;
+            this.reactionsLayoutInBubble.setScrimProgress(0.0f, false);
+            ReactionsLayoutInBubble reactionsLayoutInBubble4 = this.reactionsLayoutInBubble;
             TransitionParams transitionParams2 = this.transitionParams;
-            reactionsLayoutInBubble3.draw(canvas, transitionParams2.animateChange ? transitionParams2.animateChangeProgress : 1.0f, num);
+            reactionsLayoutInBubble4.draw(canvas, transitionParams2.animateChange ? transitionParams2.animateChangeProgress : 1.0f, num);
             canvas.restore();
         }
         if (z) {
@@ -6469,7 +6494,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.drawRoundProgress(android.graphics.Canvas):void");
     }
 
-    public void drawScrimReaction(Canvas canvas, Integer num, float f) {
+    public void drawScrimReaction(Canvas canvas, Integer num, float f, boolean z) {
         MessageObject.GroupedMessagePosition groupedMessagePosition = this.currentPosition;
         if (groupedMessagePosition != null) {
             int i = groupedMessagePosition.flags;
@@ -6481,7 +6506,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (reactionsLayoutInBubble.isSmall) {
             return;
         }
-        reactionsLayoutInBubble.setScrimProgress(f);
+        reactionsLayoutInBubble.setScrimProgress(f, z);
         this.reactionsLayoutInBubble.draw(canvas, this.transitionParams.animateChangeProgress, num);
     }
 
@@ -8005,7 +8030,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     @Override
-    public boolean onTouchEvent(android.view.MotionEvent r21) {
+    public boolean onTouchEvent(android.view.MotionEvent r20) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.onTouchEvent(android.view.MotionEvent):boolean");
     }
 
@@ -9051,9 +9076,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (messageObject == null) {
             return;
         }
-        VideoPlayerRewinder videoPlayerRewinder = this.videoPlayerRewinder;
-        if (videoPlayerRewinder != null && videoPlayerRewinder.rewindCount != 0 && videoPlayerRewinder.rewindByBackSeek) {
-            messageObject.audioProgress = videoPlayerRewinder.getVideoProgress();
+        OldVideoPlayerRewinder oldVideoPlayerRewinder = this.videoPlayerRewinder;
+        if (oldVideoPlayerRewinder != null && oldVideoPlayerRewinder.rewindCount != 0 && oldVideoPlayerRewinder.rewindByBackSeek) {
+            messageObject.audioProgress = oldVideoPlayerRewinder.getVideoProgress();
         }
         double d3 = 0.0d;
         if (this.documentAttachType == 4) {

@@ -119,6 +119,7 @@ public class StoriesController {
     HashSet loadingAllStories = new HashSet();
     LongSparseArray resolvedStories = new LongSparseArray();
     private final HashMap[] storiesLists = new HashMap[5];
+    public final ArrayList attachedSearchLists = new ArrayList();
     private final Comparator peerStoriesComparator = new Comparator() {
         @Override
         public final int compare(Object obj, Object obj2) {
@@ -569,12 +570,14 @@ public class StoriesController {
         public final String query;
         public final TL_stories.MediaArea queryArea;
         private int reqId;
+        public final String username;
 
-        public SearchStoriesList(int i, String str) {
+        public SearchStoriesList(int i, String str, String str2) {
             super(i, 0L, 3, null, null);
             this.fakeDays = new ArrayList();
             this.last_offset = "";
-            this.query = str;
+            this.query = str2;
+            this.username = str;
             this.queryArea = null;
         }
 
@@ -583,10 +586,24 @@ public class StoriesController {
             this.fakeDays = new ArrayList();
             this.last_offset = "";
             this.query = null;
+            this.username = null;
             this.queryArea = mediaArea;
         }
 
-        public void lambda$load$0(TLObject tLObject) {
+        public void lambda$load$0(boolean z, int i, List list, Long l) {
+            TLObject userOrChat = MessagesController.getInstance(this.currentAccount).getUserOrChat(this.username);
+            this.loading = false;
+            if (userOrChat != null) {
+                load(z, i, list);
+                return;
+            }
+            this.count = 0;
+            this.last_offset = "";
+            AndroidUtilities.cancelRunOnUIThread(((StoriesList) this).notify);
+            AndroidUtilities.runOnUIThread(((StoriesList) this).notify);
+        }
+
+        public void lambda$load$1(TLObject tLObject) {
             this.reqId = 0;
             if (tLObject instanceof TL_stories.TL_foundStories) {
                 TL_stories.TL_foundStories tL_foundStories = (TL_stories.TL_foundStories) tLObject;
@@ -615,11 +632,11 @@ public class StoriesController {
             }
         }
 
-        public void lambda$load$1(final TLObject tLObject, TLRPC.TL_error tL_error) {
+        public void lambda$load$2(final TLObject tLObject, TLRPC.TL_error tL_error) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    StoriesController.SearchStoriesList.this.lambda$load$0(tLObject);
+                    StoriesController.SearchStoriesList.this.lambda$load$1(tLObject);
                 }
             });
         }
@@ -669,7 +686,8 @@ public class StoriesController {
         }
 
         @Override
-        public boolean load(boolean z, int i, List list) {
+        public boolean load(final boolean z, final int i, final List list) {
+            TLObject tLObject;
             if (this.loading || this.last_offset == null) {
                 return false;
             }
@@ -687,10 +705,28 @@ public class StoriesController {
                 tL_stories_searchPosts.area = mediaArea;
             }
             this.loading = true;
+            if (TextUtils.isEmpty(this.username)) {
+                tLObject = null;
+            } else {
+                tLObject = MessagesController.getInstance(this.currentAccount).getUserOrChat(this.username);
+                if (tLObject == null) {
+                    MessagesController.getInstance(this.currentAccount).getUserNameResolver().resolve(this.username, new Consumer() {
+                        @Override
+                        public final void accept(Object obj) {
+                            StoriesController.SearchStoriesList.this.lambda$load$0(z, i, list, (Long) obj);
+                        }
+                    });
+                    return true;
+                }
+            }
+            if (tLObject != null) {
+                tL_stories_searchPosts.flags |= 4;
+                tL_stories_searchPosts.peer = MessagesController.getInputPeer(tLObject);
+            }
             this.reqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_stories_searchPosts, new RequestDelegate() {
                 @Override
-                public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    StoriesController.SearchStoriesList.this.lambda$load$1(tLObject, tL_error);
+                public final void run(TLObject tLObject2, TLRPC.TL_error tL_error) {
+                    StoriesController.SearchStoriesList.this.lambda$load$2(tLObject2, tL_error);
                 }
             });
             return true;
@@ -4272,6 +4308,10 @@ public class StoriesController {
         }
         if (storiesList2 != null) {
             storiesList2.updateStories(list);
+        }
+        Iterator it = this.attachedSearchLists.iterator();
+        while (it.hasNext()) {
+            ((SearchStoriesList) it.next()).updateStories(list);
         }
     }
 

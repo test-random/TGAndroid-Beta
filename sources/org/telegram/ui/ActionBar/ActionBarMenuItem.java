@@ -362,7 +362,7 @@ public class ActionBarMenuItem extends FrameLayout {
         protected void onDraw(Canvas canvas) {
             ReactionsLayoutInBubble.ReactionButton reactionButton = this.reactionButton;
             if (reactionButton != null) {
-                reactionButton.draw(canvas, ((getWidth() - AndroidUtilities.dp(4.0f)) - this.reactionButton.width) / 2.0f, (getHeight() - this.reactionButton.height) / 2.0f, 1.0f, 1.0f, false);
+                reactionButton.draw(canvas, ((getWidth() - AndroidUtilities.dp(4.0f)) - this.reactionButton.width) / 2.0f, (getHeight() - this.reactionButton.height) / 2.0f, 1.0f, 1.0f, false, false, 0.0f);
             }
         }
 

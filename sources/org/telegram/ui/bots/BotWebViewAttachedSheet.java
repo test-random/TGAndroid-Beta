@@ -941,7 +941,7 @@ public class BotWebViewAttachedSheet implements NotificationCenter.NotificationC
             MessagesController.getInstance(i).loadFullUser(user, 0, true, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    BotWebViewAttachedSheet.lambda$hasPrivacy$35(Utilities.Callback.this, (TLRPC.UserFull) obj);
+                    BotWebViewAttachedSheet.lambda$hasPrivacy$36(Utilities.Callback.this, (TLRPC.UserFull) obj);
                 }
             });
         }
@@ -1013,6 +1013,15 @@ public class BotWebViewAttachedSheet implements NotificationCenter.NotificationC
 
     public static void lambda$hasPrivacy$35(Utilities.Callback callback, TLRPC.UserFull userFull) {
         callback.run(Boolean.valueOf(hasPrivacy(userFull)));
+    }
+
+    public static void lambda$hasPrivacy$36(final Utilities.Callback callback, final TLRPC.UserFull userFull) {
+        AndroidUtilities.runOnUIThread(new Runnable() {
+            @Override
+            public final void run() {
+                BotWebViewAttachedSheet.lambda$hasPrivacy$35(Utilities.Callback.this, userFull);
+            }
+        });
     }
 
     public void lambda$new$10(Float f) {
@@ -1145,7 +1154,7 @@ public class BotWebViewAttachedSheet implements NotificationCenter.NotificationC
         dismiss();
     }
 
-    public static void lambda$openPrivacy$36(int i, long j) {
+    public static void lambda$openPrivacy$37(int i, long j) {
         SendMessagesHelper.getInstance(i).sendMessage(SendMessagesHelper.SendMessageParams.of("/privacy", j, null, null, null, false, null, null, null, true, 0, null, false));
     }
 
@@ -1362,7 +1371,7 @@ public class BotWebViewAttachedSheet implements NotificationCenter.NotificationC
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BotWebViewAttachedSheet.lambda$openPrivacy$36(i, j);
+                BotWebViewAttachedSheet.lambda$openPrivacy$37(i, j);
             }
         }, 150L);
         return true;
@@ -1515,6 +1524,10 @@ public class BotWebViewAttachedSheet implements NotificationCenter.NotificationC
         checkNavBarColor();
     }
 
+    public long getBotId() {
+        return this.botId;
+    }
+
     public float getContainerTop() {
         return AndroidUtilities.isTablet() ? AndroidUtilities.lerp(this.swipeContainer.getTranslationY() + AndroidUtilities.dp(12.0f), AndroidUtilities.statusBarHeight / 2.0f, this.actionBarTransitionProgress) : AndroidUtilities.lerp(this.swipeContainer.getTranslationY(), AndroidUtilities.statusBarHeight + (ActionBar.getCurrentActionBarHeight() / 2.0f), AndroidUtilities.isTablet() ? 0.0f : this.actionBarTransitionProgress) + AndroidUtilities.dp(12.0f);
     }
@@ -1529,7 +1542,7 @@ public class BotWebViewAttachedSheet implements NotificationCenter.NotificationC
     }
 
     @Override
-    public WindowView mo989getWindowView() {
+    public WindowView mo997getWindowView() {
         return this.windowView;
     }
 

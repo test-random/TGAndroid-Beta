@@ -290,7 +290,7 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
         }
 
         @Override
-        public boolean canDismissWithSwipe() {
+        protected boolean canDismissWithSwipe() {
             return top() > ((float) ((int) (((float) AndroidUtilities.displaySize.y) * 0.5f)));
         }
     }
@@ -3962,7 +3962,7 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
     }
 
     @Override
-    public boolean canDismissWithSwipe() {
+    protected boolean canDismissWithSwipe() {
         View currentView = this.viewPager.getCurrentView();
         if (currentView instanceof Page) {
             return ((Page) currentView).wasAtTop;

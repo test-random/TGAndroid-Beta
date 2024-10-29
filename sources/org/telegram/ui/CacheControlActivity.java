@@ -2747,7 +2747,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
                     }
                 }
                 if (!((BaseFragment) CacheControlActivity.this).actionBar.isActionModeShowed()) {
-                    CacheControlActivity.this.lambda$onBackPressed$300();
+                    CacheControlActivity.this.lambda$onBackPressed$319();
                     return;
                 }
                 CacheModel cacheModel = CacheControlActivity.this.cacheModel;

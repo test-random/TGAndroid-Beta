@@ -434,7 +434,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
                 }
                 this.loadingTransactions[i] = true;
                 TL_stats.TL_getBroadcastRevenueTransactions tL_getBroadcastRevenueTransactions = new TL_stats.TL_getBroadcastRevenueTransactions();
-                tL_getBroadcastRevenueTransactions.channel = MessagesController.getInstance(this.currentAccount).getInputChannel(-this.dialogId);
+                tL_getBroadcastRevenueTransactions.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
                 tL_getBroadcastRevenueTransactions.offset = this.tonTransactions.size();
                 tL_getBroadcastRevenueTransactions.limit = this.tonTransactions.isEmpty() ? 5 : 20;
                 ConnectionsManager connectionsManager2 = ConnectionsManager.getInstance(this.currentAccount);
@@ -535,13 +535,13 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
     }
 
-    public class FeatureCell extends FrameLayout {
-        public FeatureCell(Context context, int i, CharSequence charSequence, CharSequence charSequence2) {
+    public static class FeatureCell extends FrameLayout {
+        public FeatureCell(Context context, int i, CharSequence charSequence, CharSequence charSequence2, Theme.ResourcesProvider resourcesProvider) {
             super(context);
             ImageView imageView = new ImageView(context);
             imageView.setScaleType(ImageView.ScaleType.CENTER);
             int i2 = Theme.key_windowBackgroundWhiteBlackText;
-            imageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(i2, ChannelMonetizationLayout.this.resourcesProvider), PorterDuff.Mode.SRC_IN));
+            imageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(i2, resourcesProvider), PorterDuff.Mode.SRC_IN));
             imageView.setImageResource(i);
             addView(imageView, LayoutHelper.createFrame(24, 24.0f, 51, 0.0f, 5.0f, 18.0f, 0.0f));
             LinearLayout linearLayout = new LinearLayout(context);
@@ -550,12 +550,12 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
             TextView textView = new TextView(context);
             textView.setTypeface(AndroidUtilities.bold());
             textView.setTextSize(1, 14.0f);
-            textView.setTextColor(Theme.getColor(i2, ChannelMonetizationLayout.this.resourcesProvider));
+            textView.setTextColor(Theme.getColor(i2, resourcesProvider));
             textView.setText(charSequence);
             linearLayout.addView(textView, LayoutHelper.createLinear(-1, -2, 55, 0, 0, 0, 2));
             TextView textView2 = new TextView(context);
             textView2.setTextSize(1, 14.0f);
-            textView2.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, ChannelMonetizationLayout.this.resourcesProvider));
+            textView2.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
             textView2.setText(charSequence2);
             linearLayout.addView(textView2, LayoutHelper.createLinear(-1, -2, 55, 0, 0, 0, 0));
         }
@@ -811,7 +811,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
     }
 
-    public ChannelMonetizationLayout(final Context context, final BaseFragment baseFragment, final int i, final long j, Theme.ResourcesProvider resourcesProvider, boolean z, boolean z2) {
+    public ChannelMonetizationLayout(final Context context, final BaseFragment baseFragment, final int i, final long j, final Theme.ResourcesProvider resourcesProvider, boolean z, boolean z2) {
         super(context);
         this.shakeDp = 4;
         this.starRef = new ColoredImageSpan[1];
@@ -847,7 +847,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         this.titleInfo = AndroidUtilities.replaceArrows(AndroidUtilities.replaceSingleTag(LocaleController.formatString(R.string.MonetizationInfo, 50), -1, 3, new Runnable() {
             @Override
             public final void run() {
-                ChannelMonetizationLayout.this.lambda$new$0();
+                ChannelMonetizationLayout.lambda$new$0(BaseFragment.this, context, resourcesProvider);
             }
         }, resourcesProvider), true);
         this.balanceInfo = AndroidUtilities.replaceArrows(AndroidUtilities.replaceSingleTag(LocaleController.getString(MessagesController.getInstance(i).channelRevenueWithdrawalEnabled ? R.string.MonetizationBalanceInfo : R.string.MonetizationBalanceInfoNotAvailable), -1, 3, new Runnable() {
@@ -1154,7 +1154,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
 
     private void checkLearnSheet() {
         if (isAttachedToWindow() && this.tonRevenueAvailable && this.proceedsAvailable && MessagesController.getGlobalMainSettings().getBoolean("monetizationadshint", true)) {
-            lambda$new$0();
+            this.fragment.showDialog(makeLearnSheet(getContext(), false, this.resourcesProvider));
             MessagesController.getGlobalMainSettings().edit().putBoolean("monetizationadshint", false).apply();
         }
     }
@@ -1224,7 +1224,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
         TL_stats.TL_getBroadcastRevenueStats tL_getBroadcastRevenueStats = new TL_stats.TL_getBroadcastRevenueStats();
         tL_getBroadcastRevenueStats.dark = Theme.isCurrentThemeDark();
-        tL_getBroadcastRevenueStats.channel = MessagesController.getInstance(this.currentAccount).getInputChannel(-this.dialogId);
+        tL_getBroadcastRevenueStats.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
         TLRPC.ChatFull chatFull = MessagesController.getInstance(this.currentAccount).getChatFull(-this.dialogId);
         if (chatFull != null) {
             int i2 = chatFull.stats_dc;
@@ -1268,7 +1268,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
             tL_getBroadcastRevenueWithdrawalUrl = tL_payments_getStarsRevenueWithdrawalUrl;
         } else {
             TL_stats.TL_getBroadcastRevenueWithdrawalUrl tL_getBroadcastRevenueWithdrawalUrl2 = new TL_stats.TL_getBroadcastRevenueWithdrawalUrl();
-            tL_getBroadcastRevenueWithdrawalUrl2.channel = MessagesController.getInstance(this.currentAccount).getInputChannel(-this.dialogId);
+            tL_getBroadcastRevenueWithdrawalUrl2.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
             if (inputCheckPasswordSRP == null) {
                 inputCheckPasswordSRP = new TLRPC.TL_inputCheckPasswordEmpty();
             }
@@ -1374,7 +1374,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         int i2;
         if (tL_error == null) {
             twoStepVerificationActivity.needHideProgress();
-            twoStepVerificationActivity.lambda$onBackPressed$300();
+            twoStepVerificationActivity.lambda$onBackPressed$319();
             if (tLObject instanceof TL_stats.TL_broadcastRevenueWithdrawalUrl) {
                 Browser.openUrl(getContext(), ((TL_stats.TL_broadcastRevenueWithdrawalUrl) tLObject).url);
                 return;
@@ -1399,7 +1399,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
             }
             if (twoStepVerificationActivity != null) {
                 twoStepVerificationActivity.needHideProgress();
-                twoStepVerificationActivity.lambda$onBackPressed$300();
+                twoStepVerificationActivity.lambda$onBackPressed$319();
             }
             BulletinFactory.showError(tL_error);
             return;
@@ -1513,6 +1513,14 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
                 ChannelMonetizationLayout.this.lambda$loadStarsStats$26(tLObject);
             }
         });
+    }
+
+    public static void lambda$makeLearnSheet$39(Context context, boolean z) {
+        Browser.openUrl(context, LocaleController.getString(z ? R.string.BotMonetizationInfoTONLink : R.string.MonetizationInfoTONLink));
+    }
+
+    public static void lambda$new$0(BaseFragment baseFragment, Context context, Theme.ResourcesProvider resourcesProvider) {
+        baseFragment.showDialog(makeLearnSheet(context, false, resourcesProvider));
     }
 
     public void lambda$new$1() {
@@ -1755,22 +1763,18 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         });
     }
 
-    public void lambda$showLearnSheet$39() {
-        Browser.openUrl(getContext(), LocaleController.getString(R.string.MonetizationInfoTONLink));
-    }
-
     public static void lambda$showTransactionSheet$37(Context context, TL_stats.TL_broadcastRevenueTransactionWithdrawal tL_broadcastRevenueTransactionWithdrawal, View view) {
         Browser.openUrl(context, tL_broadcastRevenueTransactionWithdrawal.transaction_url);
     }
 
     private void loadStarsStats() {
         if (this.starsRevenueAvailable) {
-            final TLRPC.TL_payments_starsRevenueStats revenueStats = BotStarsController.getInstance(this.currentAccount).getRevenueStats(this.dialogId);
-            if (revenueStats != null) {
+            final TLRPC.TL_payments_starsRevenueStats starsRevenueStats = BotStarsController.getInstance(this.currentAccount).getStarsRevenueStats(this.dialogId);
+            if (starsRevenueStats != null) {
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public final void run() {
-                        ChannelMonetizationLayout.this.lambda$loadStarsStats$25(revenueStats);
+                        ChannelMonetizationLayout.this.lambda$loadStarsStats$25(starsRevenueStats);
                     }
                 });
                 return;
@@ -1785,6 +1789,71 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
                 }
             });
         }
+    }
+
+    public static BottomSheet makeLearnSheet(final Context context, final boolean z, Theme.ResourcesProvider resourcesProvider) {
+        final BottomSheet bottomSheet = new BottomSheet(context, false, resourcesProvider);
+        bottomSheet.fixNavigationBar();
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setOrientation(1);
+        linearLayout.setPadding(AndroidUtilities.dp(8.0f), 0, AndroidUtilities.dp(8.0f), 0);
+        RLottieImageView rLottieImageView = new RLottieImageView(context);
+        rLottieImageView.setScaleType(ImageView.ScaleType.CENTER);
+        rLottieImageView.setImageResource(R.drawable.large_monetize);
+        rLottieImageView.setColorFilter(new PorterDuffColorFilter(-1, PorterDuff.Mode.SRC_IN));
+        rLottieImageView.setBackground(Theme.createCircleDrawable(AndroidUtilities.dp(80.0f), Theme.getColor(Theme.key_featuredStickers_addButton, resourcesProvider)));
+        linearLayout.addView(rLottieImageView, LayoutHelper.createLinear(80, 80, 1, 0, 16, 0, 16));
+        TextView textView = new TextView(context);
+        textView.setGravity(17);
+        textView.setTextSize(1, 20.0f);
+        textView.setTypeface(AndroidUtilities.bold());
+        int i = Theme.key_windowBackgroundWhiteBlackText;
+        textView.setTextColor(Theme.getColor(i, resourcesProvider));
+        textView.setText(LocaleController.getString(z ? R.string.BotMonetizationInfoTitle : R.string.MonetizationInfoTitle));
+        linearLayout.addView(textView, LayoutHelper.createLinear(-1, -2, 8.0f, 0.0f, 8.0f, 25.0f));
+        linearLayout.addView(new FeatureCell(context, R.drawable.msg_channel, LocaleController.getString(z ? R.string.BotMonetizationInfoFeature1Name : R.string.MonetizationInfoFeature1Name), LocaleController.getString(z ? R.string.BotMonetizationInfoFeature1Text : R.string.MonetizationInfoFeature1Text), resourcesProvider), LayoutHelper.createLinear(-1, -2, 49, 0, 0, 0, 16));
+        linearLayout.addView(new FeatureCell(context, R.drawable.menu_feature_split, LocaleController.getString(z ? R.string.BotMonetizationInfoFeature2Name : R.string.MonetizationInfoFeature2Name), LocaleController.getString(z ? R.string.BotMonetizationInfoFeature2Text : R.string.MonetizationInfoFeature2Text), resourcesProvider), LayoutHelper.createLinear(-1, -2, 49, 0, 0, 0, 16));
+        linearLayout.addView(new FeatureCell(context, R.drawable.menu_feature_withdrawals, LocaleController.getString(z ? R.string.BotMonetizationInfoFeature3Name : R.string.MonetizationInfoFeature3Name), LocaleController.getString(z ? R.string.BotMonetizationInfoFeature3Text : R.string.MonetizationInfoFeature3Text), resourcesProvider), LayoutHelper.createLinear(-1, -2, 49, 0, 0, 0, 16));
+        View view = new View(context);
+        view.setBackgroundColor(Theme.getColor(Theme.key_divider, resourcesProvider));
+        linearLayout.addView(view, LayoutHelper.createLinear(-1, 1.0f / AndroidUtilities.density, 55, 12, 0, 12, 0));
+        AnimatedEmojiSpan.TextViewEmojis textViewEmojis = new AnimatedEmojiSpan.TextViewEmojis(context);
+        textViewEmojis.setGravity(17);
+        textViewEmojis.setTextSize(1, 20.0f);
+        textViewEmojis.setTypeface(AndroidUtilities.bold());
+        textViewEmojis.setTextColor(Theme.getColor(i, resourcesProvider));
+        SpannableString spannableString = new SpannableString("💎");
+        ColoredImageSpan coloredImageSpan = new ColoredImageSpan(R.drawable.ton);
+        coloredImageSpan.setScale(0.9f, 0.9f);
+        coloredImageSpan.setColorKey(Theme.key_windowBackgroundWhiteBlueText2);
+        coloredImageSpan.setRelativeSize(textViewEmojis.getPaint().getFontMetricsInt());
+        coloredImageSpan.spaceScaleX = 0.9f;
+        spannableString.setSpan(coloredImageSpan, 0, spannableString.length(), 33);
+        textViewEmojis.setText(AndroidUtilities.replaceCharSequence("💎", LocaleController.getString(z ? R.string.BotMonetizationInfoTONTitle : R.string.MonetizationInfoTONTitle), spannableString));
+        linearLayout.addView(textViewEmojis, LayoutHelper.createLinear(-1, -2, 8.0f, 20.0f, 8.0f, 0.0f));
+        LinkSpanDrawable.LinksTextView linksTextView = new LinkSpanDrawable.LinksTextView(context, resourcesProvider);
+        linksTextView.setGravity(17);
+        linksTextView.setTextSize(1, 14.0f);
+        linksTextView.setTextColor(Theme.getColor(i, resourcesProvider));
+        linksTextView.setLinkTextColor(Theme.getColor(Theme.key_chat_messageLinkIn, resourcesProvider));
+        linksTextView.setText(AndroidUtilities.withLearnMore(AndroidUtilities.replaceTags(LocaleController.getString(z ? R.string.BotMonetizationInfoTONText : R.string.MonetizationInfoTONText)), new Runnable() {
+            @Override
+            public final void run() {
+                ChannelMonetizationLayout.lambda$makeLearnSheet$39(context, z);
+            }
+        }));
+        linearLayout.addView(linksTextView, LayoutHelper.createLinear(-1, -2, 28.0f, 9.0f, 28.0f, 0.0f));
+        ButtonWithCounterView buttonWithCounterView = new ButtonWithCounterView(context, resourcesProvider);
+        buttonWithCounterView.setText(LocaleController.getString(R.string.GotIt), false);
+        buttonWithCounterView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public final void onClick(View view2) {
+                BottomSheet.this.dismiss();
+            }
+        });
+        linearLayout.addView(buttonWithCounterView, LayoutHelper.createLinear(-1, 48, 55, 10, 25, 10, 14));
+        bottomSheet.setCustomView(linearLayout);
+        return bottomSheet;
     }
 
     public void onClick(UItem uItem, View view, int i, float f, float f2) {
@@ -1924,71 +1993,6 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         this.starsBalanceBlockedUntil = i;
         AndroidUtilities.cancelRunOnUIThread(this.setStarsBalanceButtonText);
         this.setStarsBalanceButtonText.run();
-    }
-
-    public void lambda$new$0() {
-        final BottomSheet bottomSheet = new BottomSheet(getContext(), false, this.resourcesProvider);
-        bottomSheet.fixNavigationBar();
-        LinearLayout linearLayout = new LinearLayout(getContext());
-        linearLayout.setOrientation(1);
-        linearLayout.setPadding(AndroidUtilities.dp(8.0f), 0, AndroidUtilities.dp(8.0f), 0);
-        RLottieImageView rLottieImageView = new RLottieImageView(getContext());
-        rLottieImageView.setScaleType(ImageView.ScaleType.CENTER);
-        rLottieImageView.setImageResource(R.drawable.large_monetize);
-        rLottieImageView.setColorFilter(new PorterDuffColorFilter(-1, PorterDuff.Mode.SRC_IN));
-        rLottieImageView.setBackground(Theme.createCircleDrawable(AndroidUtilities.dp(80.0f), Theme.getColor(Theme.key_featuredStickers_addButton, this.resourcesProvider)));
-        linearLayout.addView(rLottieImageView, LayoutHelper.createLinear(80, 80, 1, 0, 16, 0, 16));
-        TextView textView = new TextView(getContext());
-        textView.setGravity(17);
-        textView.setTextSize(1, 20.0f);
-        textView.setTypeface(AndroidUtilities.bold());
-        int i = Theme.key_windowBackgroundWhiteBlackText;
-        textView.setTextColor(Theme.getColor(i, this.resourcesProvider));
-        textView.setText(LocaleController.getString(R.string.MonetizationInfoTitle));
-        linearLayout.addView(textView, LayoutHelper.createLinear(-1, -2, 8.0f, 0.0f, 8.0f, 25.0f));
-        linearLayout.addView(new FeatureCell(getContext(), R.drawable.msg_channel, LocaleController.getString(R.string.MonetizationInfoFeature1Name), LocaleController.getString(R.string.MonetizationInfoFeature1Text)), LayoutHelper.createLinear(-1, -2, 49, 0, 0, 0, 16));
-        linearLayout.addView(new FeatureCell(getContext(), R.drawable.menu_feature_split, LocaleController.getString(R.string.MonetizationInfoFeature2Name), LocaleController.getString(R.string.MonetizationInfoFeature2Text)), LayoutHelper.createLinear(-1, -2, 49, 0, 0, 0, 16));
-        linearLayout.addView(new FeatureCell(getContext(), R.drawable.menu_feature_withdrawals, LocaleController.getString(R.string.MonetizationInfoFeature3Name), LocaleController.getString(R.string.MonetizationInfoFeature3Text)), LayoutHelper.createLinear(-1, -2, 49, 0, 0, 0, 16));
-        View view = new View(getContext());
-        view.setBackgroundColor(Theme.getColor(Theme.key_divider, this.resourcesProvider));
-        linearLayout.addView(view, LayoutHelper.createLinear(-1, 1.0f / AndroidUtilities.density, 55, 12, 0, 12, 0));
-        AnimatedEmojiSpan.TextViewEmojis textViewEmojis = new AnimatedEmojiSpan.TextViewEmojis(getContext());
-        textViewEmojis.setGravity(17);
-        textViewEmojis.setTextSize(1, 20.0f);
-        textViewEmojis.setTypeface(AndroidUtilities.bold());
-        textViewEmojis.setTextColor(Theme.getColor(i, this.resourcesProvider));
-        SpannableString spannableString = new SpannableString("💎");
-        ColoredImageSpan coloredImageSpan = new ColoredImageSpan(R.drawable.ton);
-        coloredImageSpan.setScale(0.9f, 0.9f);
-        coloredImageSpan.setColorKey(Theme.key_windowBackgroundWhiteBlueText2);
-        coloredImageSpan.setRelativeSize(textViewEmojis.getPaint().getFontMetricsInt());
-        coloredImageSpan.spaceScaleX = 0.9f;
-        spannableString.setSpan(coloredImageSpan, 0, spannableString.length(), 33);
-        textViewEmojis.setText(AndroidUtilities.replaceCharSequence("💎", LocaleController.getString(R.string.MonetizationInfoTONTitle), spannableString));
-        linearLayout.addView(textViewEmojis, LayoutHelper.createLinear(-1, -2, 8.0f, 20.0f, 8.0f, 0.0f));
-        LinkSpanDrawable.LinksTextView linksTextView = new LinkSpanDrawable.LinksTextView(getContext(), this.resourcesProvider);
-        linksTextView.setGravity(17);
-        linksTextView.setTextSize(1, 14.0f);
-        linksTextView.setTextColor(Theme.getColor(i, this.resourcesProvider));
-        linksTextView.setLinkTextColor(Theme.getColor(Theme.key_chat_messageLinkIn, this.resourcesProvider));
-        linksTextView.setText(AndroidUtilities.withLearnMore(AndroidUtilities.replaceTags(LocaleController.getString(R.string.MonetizationInfoTONText)), new Runnable() {
-            @Override
-            public final void run() {
-                ChannelMonetizationLayout.this.lambda$showLearnSheet$39();
-            }
-        }));
-        linearLayout.addView(linksTextView, LayoutHelper.createLinear(-1, -2, 28.0f, 9.0f, 28.0f, 0.0f));
-        ButtonWithCounterView buttonWithCounterView = new ButtonWithCounterView(getContext(), this.resourcesProvider);
-        buttonWithCounterView.setText(LocaleController.getString(R.string.GotIt), false);
-        buttonWithCounterView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public final void onClick(View view2) {
-                BottomSheet.this.dismiss();
-            }
-        });
-        linearLayout.addView(buttonWithCounterView, LayoutHelper.createLinear(-1, 48, 55, 10, 25, 10, 14));
-        bottomSheet.setCustomView(linearLayout);
-        this.fragment.showDialog(bottomSheet);
     }
 
     public static void showTransactionSheet(final Context context, int i, TL_stats.BroadcastRevenueTransaction broadcastRevenueTransaction, long j, Theme.ResourcesProvider resourcesProvider) {

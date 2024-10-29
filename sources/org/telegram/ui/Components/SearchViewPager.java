@@ -87,11 +87,18 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
     public DialogsSearchAdapter dialogsSearchAdapter;
     private SearchDownloadsContainer downloadsContainer;
     public StickerEmptyView emptyView;
+    public boolean expandedPublicPosts;
     private FilteredSearchView.Delegate filteredSearchViewDelegate;
     private final int folderId;
     private ActionBarMenuItem forwardItem;
     SizeNotifierFrameLayout fragmentView;
     private ActionBarMenuItem gotoItem;
+    public StickerEmptyView hashtagEmptyView;
+    private DefaultItemAnimator hashtagItemAnimator;
+    public HashtagsSearchAdapter hashtagSearchAdapter;
+    public FrameLayout hashtagSearchContainer;
+    private LinearLayoutManager hashtagSearchLayoutManager;
+    public RecyclerListView hashtagSearchListView;
     private boolean isActionModeShowed;
     private DefaultItemAnimator itemAnimator;
     private RecyclerItemsEnterAnimator itemsEnterAnimator;
@@ -150,6 +157,9 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
             if (i == 4) {
                 return SearchViewPager.this.botsSearchContainer;
             }
+            if (i == 5) {
+                return SearchViewPager.this.hashtagSearchContainer;
+            }
             if (i != 2) {
                 FilteredSearchView filteredSearchView = new FilteredSearchView(SearchViewPager.this.parent);
                 filteredSearchView.setChatPreviewDelegate(SearchViewPager.this.chatPreviewDelegate);
@@ -184,7 +194,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
 
         @Override
         public String getItemTitle(int i) {
-            return ((Item) this.items.get(i)).type == 0 ? LocaleController.getString(R.string.SearchAllChatsShort) : ((Item) this.items.get(i)).type == 1 ? LocaleController.getString(R.string.ChannelsTab) : ((Item) this.items.get(i)).type == 4 ? LocaleController.getString(R.string.AppsTab) : ((Item) this.items.get(i)).type == 2 ? LocaleController.getString(R.string.DownloadsTabs) : FiltersView.filters[((Item) this.items.get(i)).filterIndex].getTitle();
+            return ((Item) this.items.get(i)).type == 0 ? LocaleController.getString(R.string.SearchAllChatsShort) : ((Item) this.items.get(i)).type == 1 ? LocaleController.getString(R.string.ChannelsTab) : ((Item) this.items.get(i)).type == 4 ? LocaleController.getString(R.string.AppsTab) : ((Item) this.items.get(i)).type == 2 ? LocaleController.getString(R.string.DownloadsTabs) : ((Item) this.items.get(i)).type == 5 ? LocaleController.getString(R.string.PublicPostsTabs) : FiltersView.filters[((Item) this.items.get(i)).filterIndex].getTitle();
         }
 
         @Override
@@ -201,12 +211,18 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
             if (((Item) this.items.get(i)).type == 2) {
                 return 2;
             }
+            if (((Item) this.items.get(i)).type == 5) {
+                return 5;
+            }
             return ((Item) this.items.get(i)).type + i;
         }
 
         public void updateItems() {
             this.items.clear();
             this.items.add(new Item(0));
+            if (SearchViewPager.this.expandedPublicPosts) {
+                this.items.add(new Item(5));
+            }
             this.items.add(new Item(1));
             this.items.add(new Item(4));
             if (SearchViewPager.this.showOnlyDialogsAdapter) {
@@ -237,6 +253,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
 
     public SearchViewPager(Context context, final DialogsActivity dialogsActivity, int i, int i2, int i3, ChatPreviewDelegate chatPreviewDelegate) {
         super(context);
+        this.expandedPublicPosts = false;
         this.selectedFiles = new HashMap();
         this.currentSearchFilters = new ArrayList();
         this.currentAccount = UserConfig.selectedAccount;
@@ -266,6 +283,23 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
                     return;
                 }
                 SearchViewPager.this.emptyView.showProgress(false, false);
+            }
+
+            @Override
+            protected void openPublicPosts() {
+                SearchViewPager searchViewPager = SearchViewPager.this;
+                HashtagsSearchAdapter hashtagsSearchAdapter = searchViewPager.hashtagSearchAdapter;
+                DialogsSearchAdapter dialogsSearchAdapter = searchViewPager.dialogsSearchAdapter;
+                hashtagsSearchAdapter.setInitialData(dialogsSearchAdapter.publicPostsHashtag, dialogsSearchAdapter.publicPosts, dialogsSearchAdapter.publicPostsLastRate, dialogsSearchAdapter.publicPostsTotalCount);
+                SearchViewPager searchViewPager2 = SearchViewPager.this;
+                searchViewPager2.expandedPublicPosts = true;
+                searchViewPager2.hashtagSearchLayoutManager.scrollToPositionWithOffset(0, 0);
+                SearchViewPager.this.updateTabs();
+                if (SearchViewPager.this.tabsView.getCurrentTabId() != 1) {
+                    SearchViewPager.this.tabsView.scrollToTab(1, 1);
+                }
+                SearchViewPager searchViewPager3 = SearchViewPager.this;
+                searchViewPager3.hashtagSearchAdapter.search(searchViewPager3.lastSearchString);
             }
         };
         int i4 = 1;
@@ -547,6 +581,86 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
                 SearchViewPager.this.botsSearchAdapter.checkBottom();
             }
         });
+        this.hashtagSearchContainer = new FrameLayout(context);
+        DefaultItemAnimator defaultItemAnimator5 = new DefaultItemAnimator() {
+            @Override
+            public void onMoveAnimationUpdate(RecyclerView.ViewHolder viewHolder) {
+                super.onMoveAnimationUpdate(viewHolder);
+                SearchViewPager.this.invalidate();
+            }
+        };
+        this.hashtagItemAnimator = defaultItemAnimator5;
+        defaultItemAnimator5.setSupportsChangeAnimations(false);
+        this.hashtagItemAnimator.setDelayAnimations(false);
+        this.hashtagItemAnimator.setInterpolator(cubicBezierInterpolator);
+        this.hashtagItemAnimator.setDurations(350L);
+        BlurredRecyclerView blurredRecyclerView4 = new BlurredRecyclerView(context);
+        this.hashtagSearchListView = blurredRecyclerView4;
+        blurredRecyclerView4.setItemAnimator(this.hashtagItemAnimator);
+        this.hashtagSearchListView.setPivotY(0.0f);
+        int i8 = 1;
+        this.hashtagSearchListView.setVerticalScrollBarEnabled(true);
+        this.hashtagSearchListView.setInstantClick(true);
+        this.hashtagSearchListView.setVerticalScrollbarPosition(LocaleController.isRTL ? 1 : 2);
+        RecyclerListView recyclerListView6 = this.hashtagSearchListView;
+        LinearLayoutManager linearLayoutManager4 = new LinearLayoutManager(context, 1, false);
+        this.hashtagSearchLayoutManager = linearLayoutManager4;
+        recyclerListView6.setLayoutManager(linearLayoutManager4);
+        this.hashtagSearchListView.setAnimateEmptyView(true, 0);
+        FlickerLoadingView flickerLoadingView4 = new FlickerLoadingView(context);
+        flickerLoadingView4.setViewType(1);
+        StickerEmptyView stickerEmptyView4 = new StickerEmptyView(context, flickerLoadingView4, i8) {
+            @Override
+            public void setVisibility(int i9) {
+                if (SearchViewPager.this.noMediaFiltersSearchView.getTag() != null) {
+                    super.setVisibility(8);
+                } else {
+                    super.setVisibility(i9);
+                }
+            }
+        };
+        this.hashtagEmptyView = stickerEmptyView4;
+        stickerEmptyView4.title.setText(LocaleController.getString(i6));
+        this.hashtagEmptyView.subtitle.setVisibility(8);
+        this.hashtagEmptyView.setVisibility(8);
+        this.hashtagEmptyView.addView(flickerLoadingView4, 0);
+        this.hashtagEmptyView.showProgress(true, false);
+        this.hashtagSearchContainer.addView(this.hashtagEmptyView);
+        this.hashtagSearchContainer.addView(this.hashtagSearchListView);
+        this.hashtagSearchListView.setEmptyView(this.hashtagEmptyView);
+        RecyclerListView recyclerListView7 = this.hashtagSearchListView;
+        HashtagsSearchAdapter hashtagsSearchAdapter = new HashtagsSearchAdapter(recyclerListView7, context, this.currentAccount, i3, null) {
+            @Override
+            protected void scrollToTop(boolean z) {
+                if (z && SearchViewPager.this.hashtagSearchListView.canScrollVertically(-1)) {
+                    return;
+                }
+                SearchViewPager.this.hashtagSearchLayoutManager.scrollToPositionWithOffset(0, 0);
+            }
+
+            @Override
+            public void update(boolean z) {
+                super.update(z);
+                SearchViewPager.this.hashtagEmptyView.showProgress(false, z);
+                SearchViewPager.this.hashtagEmptyView.title.setText(LocaleController.getString(R.string.NoResult));
+                SearchViewPager.this.hashtagEmptyView.subtitle.setVisibility(8);
+            }
+        };
+        this.hashtagSearchAdapter = hashtagsSearchAdapter;
+        recyclerListView7.setAdapter(hashtagsSearchAdapter);
+        this.hashtagSearchListView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int i9) {
+                if (i9 == 1) {
+                    AndroidUtilities.hideKeyboard(dialogsActivity.getParentActivity().getCurrentFocus());
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int i9, int i10) {
+                SearchViewPager.this.hashtagSearchAdapter.checkBottom();
+            }
+        });
         this.itemsEnterAnimator = new RecyclerItemsEnterAnimator(this.searchListView, true);
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter();
         this.viewPagerAdapter = viewPagerAdapter;
@@ -594,7 +708,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
                 }
                 AccountInstance.getInstance(this.currentAccount).getSendMessagesHelper().sendMessage(arrayList2, j, false, false, true, 0);
             }
-            dialogsActivity.lambda$onBackPressed$300();
+            dialogsActivity.lambda$onBackPressed$319();
         } else {
             long j2 = ((MessagesStorage.TopicKey) arrayList.get(0)).dialogId;
             Bundle bundle = new Bundle();
@@ -626,6 +740,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
 
     public void search(View view, int i, String str, boolean z) {
         boolean z2;
+        boolean z3;
         if (TextUtils.isEmpty(str)) {
             this.emptyView.subtitle.setVisibility(8);
         } else {
@@ -635,7 +750,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
         DialogsSearchAdapter.DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.dialogsSearchAdapter.delegate;
         long searchForumDialogId = dialogsSearchAdapterDelegate != null ? dialogsSearchAdapterDelegate.getSearchForumDialogId() : 0L;
         long j = i == 0 ? 0L : searchForumDialogId;
-        boolean z3 = false;
+        boolean z4 = false;
         long j2 = 0;
         long j3 = 0;
         for (int i2 = 0; i2 < this.currentSearchFilters.size(); i2++) {
@@ -654,8 +769,11 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
                 j3 = dateData.maxDate;
                 j2 = j4;
             } else if (i3 == 7) {
-                z3 = true;
+                z4 = true;
             }
+        }
+        if (this.hashtagSearchAdapter.getHashtag(str) == null) {
+            collapsePublicPosts();
         }
         if (view == this.channelsSearchContainer) {
             MessagesController.getInstance(this.currentAccount).getChannelRecommendations(0L);
@@ -672,12 +790,26 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
             }
             return;
         }
+        if (view == this.hashtagSearchContainer) {
+            if (this.hashtagSearchAdapter.getHashtag(str) == null) {
+                return;
+            }
+            if (z) {
+                z3 = false;
+                this.hashtagSearchLayoutManager.scrollToPositionWithOffset(0, 0);
+            } else {
+                z3 = false;
+            }
+            this.hashtagSearchAdapter.search(str);
+            this.hashtagEmptyView.setKeyboardHeight(this.keyboardSize, z3);
+            return;
+        }
         if (view != this.searchContainer) {
             if (view instanceof FilteredSearchView) {
                 FilteredSearchView filteredSearchView = (FilteredSearchView) view;
                 filteredSearchView.setUseFromUserAsAvatar(searchForumDialogId != 0);
                 filteredSearchView.setKeyboardHeight(this.keyboardSize, false);
-                filteredSearchView.search(j, j2, j3, FiltersView.filters[((ViewPagerAdapter.Item) this.viewPagerAdapter.items.get(i)).filterIndex], z3, str, z);
+                filteredSearchView.search(j, j2, j3, FiltersView.filters[((ViewPagerAdapter.Item) this.viewPagerAdapter.items.get(i)).filterIndex], z4, str, z);
                 return;
             }
             if (view instanceof SearchDownloadsContainer) {
@@ -706,11 +838,11 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
                 this.noMediaFiltersSearchView.animate().alpha(1.0f).setDuration(150L).start();
                 z2 = r3;
             }
-            this.noMediaFiltersSearchView.search(j, j2, j3, null, z3, str, z2);
+            this.noMediaFiltersSearchView.search(j, j2, j3, null, z4, str, z2);
             this.emptyView.setVisibility(8);
         } else {
             this.lastSearchScrolledToTop = false;
-            this.dialogsSearchAdapter.searchDialogs(str, z3 ? 1 : 0);
+            this.dialogsSearchAdapter.searchDialogs(str, z4 ? 1 : 0, true);
             this.dialogsSearchAdapter.setFiltersDelegate(this.filteredSearchViewDelegate, false);
             this.noMediaFiltersSearchView.animate().setListener(null).cancel();
             this.noMediaFiltersSearchView.setDelegate(null, false);
@@ -828,6 +960,18 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
 
     public void clear() {
         this.currentSearchFilters.clear();
+        collapsePublicPosts();
+    }
+
+    public void collapsePublicPosts() {
+        if (this.expandedPublicPosts) {
+            this.expandedPublicPosts = false;
+            updateTabs();
+            if (this.tabsView.getCurrentTabId() != 0) {
+                this.tabsView.scrollToTab(0, 0);
+            }
+            this.dialogsSearchAdapter.searchDialogs(this.lastSearchString, includeFolder() ? 1 : 0, true);
+        }
     }
 
     @Override
@@ -839,8 +983,18 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
             if (i == NotificationCenter.reloadWebappsHints) {
                 universalAdapter = this.botsSearchAdapter;
                 universalAdapter.update(true);
+            } else {
+                if (i == NotificationCenter.storiesListUpdated) {
+                    Object obj = objArr[0];
+                    HashtagsSearchAdapter hashtagsSearchAdapter = this.hashtagSearchAdapter;
+                    if (obj == hashtagsSearchAdapter.list) {
+                        hashtagsSearchAdapter.update(true);
+                        return;
+                    }
+                    return;
+                }
+                return;
             }
-            return;
         }
         this.channelsSearchAdapter.updateMyChannels();
         universalAdapter = this.channelsSearchAdapter;
@@ -950,6 +1104,15 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
 
     protected abstract boolean includeDownloads();
 
+    public boolean includeFolder() {
+        for (int i = 0; i < this.currentSearchFilters.size(); i++) {
+            if (((FiltersView.MediaFilterData) this.currentSearchFilters.get(i)).filterType == 7) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     protected void invalidateBlur() {
         this.fragmentView.invalidateBlur();
@@ -1028,6 +1191,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.dialogDeleted);
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.dialogsNeedReload);
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.reloadWebappsHints);
+        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.storiesListUpdated);
         this.attached = true;
         DialogsChannelsAdapter dialogsChannelsAdapter = this.channelsSearchAdapter;
         if (dialogsChannelsAdapter != null) {
@@ -1047,6 +1211,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.dialogDeleted);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.dialogsNeedReload);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.reloadWebappsHints);
+        NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.storiesListUpdated);
     }
 
     @Override
@@ -1100,6 +1265,10 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
         LinearLayoutManager linearLayoutManager2 = this.botsSearchLayoutManager;
         if (linearLayoutManager2 != null) {
             linearLayoutManager2.scrollToPositionWithOffset(0, 0);
+        }
+        LinearLayoutManager linearLayoutManager3 = this.hashtagSearchLayoutManager;
+        if (linearLayoutManager3 != null) {
+            linearLayoutManager3.scrollToPositionWithOffset(0, 0);
         }
         this.viewsByType.clear();
     }
@@ -1156,7 +1325,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
     }
 
     public void showDownloads() {
-        setPosition(4);
+        setPosition((this.expandedPublicPosts ? 1 : 0) + 4);
     }
 
     public void showOnlyDialogsAdapter(boolean z) {
@@ -1279,8 +1448,12 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
     }
 
     public void updateTabs() {
+        updateTabs(false);
+    }
+
+    public void updateTabs(boolean z) {
         this.viewPagerAdapter.updateItems();
-        fillTabs(false);
+        fillTabs(z);
         ViewPagerFixed.TabsView tabsView = this.tabsView;
         if (tabsView != null) {
             tabsView.finishAddingTabs();

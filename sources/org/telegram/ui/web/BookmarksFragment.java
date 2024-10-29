@@ -68,7 +68,7 @@ public class BookmarksFragment extends UniversalFragment {
         public void onItemClick(int i) {
             if (i == -1) {
                 if (!((BaseFragment) BookmarksFragment.this).actionBar.isActionModeShowed()) {
-                    BookmarksFragment.this.lambda$onBackPressed$300();
+                    BookmarksFragment.this.lambda$onBackPressed$319();
                     return;
                 }
                 ((BaseFragment) BookmarksFragment.this).actionBar.hideActionMode();
@@ -392,7 +392,7 @@ public class BookmarksFragment extends UniversalFragment {
         }
         final long clientUserId = UserConfig.getInstance(this.currentAccount).getClientUserId();
         final int intValue = ((Integer) this.selected.iterator().next()).intValue();
-        lambda$onBackPressed$300();
+        lambda$onBackPressed$319();
         Runnable runnable = this.closeToTabs;
         if (runnable != null) {
             runnable.run();
@@ -420,7 +420,7 @@ public class BookmarksFragment extends UniversalFragment {
             if (this.actionBar.isActionModeShowed()) {
                 clickSelect(uItem, view);
             } else {
-                lambda$onBackPressed$300();
+                lambda$onBackPressed$319();
                 this.whenClicked.run(AddressBarList.getLink((MessageObject) uItem.object2));
             }
         }

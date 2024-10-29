@@ -315,7 +315,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
                         TLRPC.User user5 = this.user;
                         boolean z = user5.bot;
                         if (z && (i2 = user5.bot_active_users) != 0) {
-                            charSequence = LocaleController.formatPluralStringSpaced("BotUsers", i2);
+                            charSequence = LocaleController.formatPluralStringSpaced("BotUsersShort", i2);
                         } else if (z) {
                             i = R.string.Bot;
                         } else {

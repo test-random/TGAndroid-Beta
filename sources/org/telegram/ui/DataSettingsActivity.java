@@ -472,7 +472,7 @@ public class DataSettingsActivity extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    DataSettingsActivity.this.lambda$onBackPressed$300();
+                    DataSettingsActivity.this.lambda$onBackPressed$319();
                 }
             }
         });

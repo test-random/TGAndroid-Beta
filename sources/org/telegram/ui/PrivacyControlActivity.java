@@ -485,6 +485,11 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
                 }
 
                 @Override
+                public boolean canPerformReply() {
+                    return canPerformActions();
+                }
+
+                @Override
                 public void didLongPress(ChatMessageCell chatMessageCell2, float f, float f2) {
                     ChatMessageCell.ChatMessageCellDelegate.CC.$default$didLongPress(this, chatMessageCell2, f, f2);
                 }
@@ -625,8 +630,8 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
                 }
 
                 @Override
-                public void didPressReplyMessage(ChatMessageCell chatMessageCell2, int i) {
-                    ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressReplyMessage(this, chatMessageCell2, i);
+                public void didPressReplyMessage(ChatMessageCell chatMessageCell2, int i, float f, float f2, boolean z) {
+                    ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressReplyMessage(this, chatMessageCell2, i, f, f2, z);
                 }
 
                 @Override
@@ -1153,7 +1158,7 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
         if (tL_globalPrivacySettings != null) {
             tL_globalPrivacySettings.new_noncontact_peers_require_premium = tL_account_setGlobalPrivacySettings.settings.new_noncontact_peers_require_premium;
         }
-        lambda$onBackPressed$300();
+        lambda$onBackPressed$319();
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.privacyRulesUpdated, new Object[0]);
     }
 
@@ -1197,7 +1202,7 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
         MessagesController.getInstance(this.currentAccount).putUsers(tL_account_privacyRules.users, false);
         MessagesController.getInstance(this.currentAccount).putChats(tL_account_privacyRules.chats, false);
         ContactsController.getInstance(this.currentAccount).setPrivacyRules(tL_account_privacyRules.rules, this.rulesType);
-        lambda$onBackPressed$300();
+        lambda$onBackPressed$319();
     }
 
     public void lambda$applyCurrentPrivacySettings$15(final AlertDialog alertDialog, final TLObject tLObject, final TLRPC.TL_error tL_error) {
@@ -1229,7 +1234,7 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
     }
 
     public void lambda$checkDiscard$20(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$300();
+        lambda$onBackPressed$319();
     }
 
     public void lambda$createView$3() {

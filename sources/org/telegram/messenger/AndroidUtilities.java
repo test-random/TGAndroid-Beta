@@ -4035,7 +4035,11 @@ public class AndroidUtilities {
         return spannableStringBuilder;
     }
 
-    public static SpannableStringBuilder replaceLinks(String str, final Theme.ResourcesProvider resourcesProvider) {
+    public static SpannableStringBuilder replaceLinks(String str, Theme.ResourcesProvider resourcesProvider) {
+        return replaceLinks(str, resourcesProvider, null);
+    }
+
+    public static SpannableStringBuilder replaceLinks(String str, final Theme.ResourcesProvider resourcesProvider, final Runnable runnable) {
         if (linksPattern == null) {
             linksPattern = Pattern.compile("\\[(.+?)\\]\\((.+?)\\)");
         }
@@ -4050,6 +4054,10 @@ public class AndroidUtilities {
             spannableStringBuilder.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(View view) {
+                    Runnable runnable2 = runnable;
+                    if (runnable2 != null) {
+                        runnable2.run();
+                    }
                     Browser.openUrl(ApplicationLoader.applicationContext, group2);
                 }
 
@@ -4165,7 +4173,7 @@ public class AndroidUtilities {
         }
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(replace);
         if (indexOf >= 0) {
-            spannableStringBuilder.setSpan(new ClickableSpan() {
+            spannableStringBuilder.setSpan(runnable != null ? new ClickableSpan() {
                 @Override
                 public void onClick(View view) {
                     Runnable runnable2 = runnable;
@@ -4177,6 +4185,12 @@ public class AndroidUtilities {
                 @Override
                 public void updateDrawState(TextPaint textPaint) {
                     super.updateDrawState(textPaint);
+                    textPaint.setUnderlineText(false);
+                    textPaint.setColor(i);
+                }
+            } : new CharacterStyle() {
+                @Override
+                public void updateDrawState(TextPaint textPaint) {
                     textPaint.setUnderlineText(false);
                     textPaint.setColor(i);
                 }
@@ -4243,6 +4257,34 @@ public class AndroidUtilities {
 
     public static SpannableStringBuilder replaceSingleTag(String str, Runnable runnable) {
         return replaceSingleTag(str, -1, 0, runnable);
+    }
+
+    public static SpannableStringBuilder replaceTags(SpannableStringBuilder spannableStringBuilder) {
+        try {
+            ArrayList arrayList = new ArrayList();
+            while (true) {
+                int charSequenceIndexOf = charSequenceIndexOf(spannableStringBuilder, "**");
+                if (charSequenceIndexOf == -1) {
+                    break;
+                }
+                spannableStringBuilder.replace(charSequenceIndexOf, charSequenceIndexOf + 2, "");
+                int charSequenceIndexOf2 = charSequenceIndexOf(spannableStringBuilder, "**");
+                if (charSequenceIndexOf2 >= 0) {
+                    spannableStringBuilder.replace(charSequenceIndexOf2, charSequenceIndexOf2 + 2, "");
+                    arrayList.add(Integer.valueOf(charSequenceIndexOf));
+                    arrayList.add(Integer.valueOf(charSequenceIndexOf2));
+                }
+            }
+            SpannableStringBuilder spannableStringBuilder2 = new SpannableStringBuilder(spannableStringBuilder);
+            for (int i = 0; i < arrayList.size() / 2; i++) {
+                int i2 = i * 2;
+                spannableStringBuilder2.setSpan(new TypefaceSpan(bold()), ((Integer) arrayList.get(i2)).intValue(), ((Integer) arrayList.get(i2 + 1)).intValue(), 33);
+            }
+            return spannableStringBuilder2;
+        } catch (Exception e) {
+            FileLog.e(e);
+            return spannableStringBuilder;
+        }
     }
 
     public static SpannableStringBuilder replaceTags(String str) {

@@ -32,7 +32,7 @@ public class FileStreamLoadOperation extends BaseDataSource implements FileLoadO
     private Uri uri;
 
     public FileStreamLoadOperation() {
-        super(false);
+        super(true);
     }
 
     @Deprecated
@@ -104,6 +104,7 @@ public class FileStreamLoadOperation extends BaseDataSource implements FileLoadO
 
     @Override
     public void close() {
+        FileLog.e("FileStreamLoadOperation " + this.document.id + " close me=" + this);
         FileLoadOperation fileLoadOperation = this.loadOperation;
         if (fileLoadOperation != null) {
             fileLoadOperation.removeStreamListener(this);

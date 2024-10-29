@@ -215,7 +215,7 @@ public class GiveawayResultsMessageCell {
 
     public void lambda$setMessageContent$0(MessageObject messageObject, TLRPC.TL_messageMediaGiveawayResults tL_messageMediaGiveawayResults) {
         if (messageObject.getDialogId() == (-tL_messageMediaGiveawayResults.channel_id)) {
-            this.parentView.getDelegate().didPressReplyMessage(this.parentView, tL_messageMediaGiveawayResults.launch_msg_id);
+            this.parentView.getDelegate().didPressReplyMessage(this.parentView, tL_messageMediaGiveawayResults.launch_msg_id, 0.0f, 0.0f, false);
             return;
         }
         Bundle bundle = new Bundle();

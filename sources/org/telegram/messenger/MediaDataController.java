@@ -6113,12 +6113,8 @@ public class MediaDataController extends BaseController {
     }
 
     public boolean canCreateAttachedMenuBotShortcut(long j) {
-        for (int i = 0; i < this.attachMenuBots.bots.size(); i++) {
-            if (this.attachMenuBots.bots.get(i).bot_id == j) {
-                return this.attachMenuBots.bots.get(i).show_in_side_menu && !isShortcutAdded(j, SHORTCUT_TYPE_ATTACHED_BOT);
-            }
-        }
-        return false;
+        TLRPC.User user = getMessagesController().getUser(Long.valueOf(j));
+        return user != null && user.bot_has_main_app;
     }
 
     public boolean cancelRemovingStickerSet(long j) {

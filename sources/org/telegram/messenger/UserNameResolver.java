@@ -71,21 +71,21 @@ public class UserNameResolver {
         }, 2L);
     }
 
-    public void resolve(final String str, Consumer consumer) {
+    public int resolve(final String str, Consumer consumer) {
         TLRPC.TL_contacts_resolveUsername tL_contacts_resolveUsername;
         CachedPeer cachedPeer = this.resolvedCache.get(str);
         if (cachedPeer != null) {
             if (System.currentTimeMillis() - cachedPeer.time < 3600000) {
                 consumer.accept(Long.valueOf(cachedPeer.peerId));
                 FileLog.d("resolve username from cache " + str + " " + cachedPeer.peerId);
-                return;
+                return -1;
             }
             this.resolvedCache.remove(str);
         }
         ArrayList<Consumer> arrayList = this.resolvingConsumers.get(str);
         if (arrayList != null) {
             arrayList.add(consumer);
-            return;
+            return -1;
         }
         ArrayList<Consumer> arrayList2 = new ArrayList<>();
         arrayList2.add(consumer);
@@ -99,7 +99,7 @@ public class UserNameResolver {
             tL_contacts_resolveUsername2.username = str;
             tL_contacts_resolveUsername = tL_contacts_resolveUsername2;
         }
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_contacts_resolveUsername, new RequestDelegate() {
+        return ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_contacts_resolveUsername, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 UserNameResolver.this.lambda$resolve$1(str, tLObject, tL_error);

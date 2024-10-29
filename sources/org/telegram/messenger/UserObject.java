@@ -176,6 +176,10 @@ public class UserObject {
         return user != null && user.id == 2666000;
     }
 
+    public static boolean isBot(TLRPC.User user) {
+        return user != null && user.bot;
+    }
+
     public static boolean isContact(TLRPC.User user) {
         return user != null && ((user instanceof TLRPC.TL_userContact_old2) || user.contact || user.mutual_contact);
     }

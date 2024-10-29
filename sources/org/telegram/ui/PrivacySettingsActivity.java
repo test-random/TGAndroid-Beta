@@ -1359,7 +1359,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    PrivacySettingsActivity.this.lambda$onBackPressed$300();
+                    PrivacySettingsActivity.this.lambda$onBackPressed$319();
                 }
             }
         });

@@ -2201,7 +2201,7 @@ public class MessagesController extends BaseController implements NotificationCe
         this.loadingPinnedDialogs = new SparseIntArray();
         this.faqSearchArray = new ArrayList<>();
         this.suggestContacts = true;
-        this.themeCheckRunnable = new MessagesController$$ExternalSyntheticLambda91();
+        this.themeCheckRunnable = new MessagesController$$ExternalSyntheticLambda92();
         this.passwordCheckRunnable = new Runnable() {
             @Override
             public final void run() {
@@ -2843,7 +2843,7 @@ public class MessagesController extends BaseController implements NotificationCe
                 this.proxyDialogAddress = null;
                 this.nextPromoInfoCheckTime = getConnectionsManager().getCurrentTime() + 3600;
                 getGlobalMainSettings().edit().putLong("proxy_dialog", this.promoDialogId).remove("proxyDialogAddress").putInt("nextPromoInfoCheckTime", this.nextPromoInfoCheckTime).commit();
-                AndroidUtilities.runOnUIThread(new MessagesController$$ExternalSyntheticLambda65(this));
+                AndroidUtilities.runOnUIThread(new MessagesController$$ExternalSyntheticLambda66(this));
             }
         }
     }
@@ -8512,15 +8512,15 @@ public class MessagesController extends BaseController implements NotificationCe
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesController.lambda$processUpdateArray$380(int, java.util.ArrayList, java.util.ArrayList, androidx.collection.LongSparseArray, int, org.telegram.messenger.support.LongSparseIntArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, java.util.ArrayList, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, boolean, java.util.ArrayList, java.util.ArrayList, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, java.util.ArrayList):void");
     }
 
-    public void lambda$processUpdateArray$381(org.telegram.messenger.support.LongSparseIntArray r22, org.telegram.messenger.support.LongSparseIntArray r23, android.util.SparseIntArray r24, androidx.collection.LongSparseArray r25, androidx.collection.LongSparseArray r26, androidx.collection.LongSparseArray r27, androidx.collection.LongSparseArray r28, org.telegram.messenger.support.LongSparseIntArray r29) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesController.lambda$processUpdateArray$381(org.telegram.messenger.support.LongSparseIntArray, org.telegram.messenger.support.LongSparseIntArray, android.util.SparseIntArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, org.telegram.messenger.support.LongSparseIntArray):void");
+    public void lambda$processUpdateArray$381(org.telegram.messenger.support.LongSparseIntArray r22, org.telegram.messenger.support.LongSparseIntArray r23, android.util.SparseIntArray r24, androidx.collection.LongSparseArray r25, androidx.collection.LongSparseArray r26, androidx.collection.LongSparseArray r27, androidx.collection.LongSparseArray r28, androidx.collection.LongSparseArray r29, org.telegram.messenger.support.LongSparseIntArray r30) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesController.lambda$processUpdateArray$381(org.telegram.messenger.support.LongSparseIntArray, org.telegram.messenger.support.LongSparseIntArray, android.util.SparseIntArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray, org.telegram.messenger.support.LongSparseIntArray):void");
     }
 
-    public void lambda$processUpdateArray$382(final LongSparseIntArray longSparseIntArray, final LongSparseIntArray longSparseIntArray2, final SparseIntArray sparseIntArray, final LongSparseArray longSparseArray, final LongSparseArray longSparseArray2, final LongSparseArray longSparseArray3, final LongSparseArray longSparseArray4, final LongSparseIntArray longSparseIntArray3) {
+    public void lambda$processUpdateArray$382(final LongSparseIntArray longSparseIntArray, final LongSparseIntArray longSparseIntArray2, final SparseIntArray sparseIntArray, final LongSparseArray longSparseArray, final LongSparseArray longSparseArray2, final LongSparseArray longSparseArray3, final LongSparseArray longSparseArray4, final LongSparseArray longSparseArray5, final LongSparseIntArray longSparseIntArray3) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                MessagesController.this.lambda$processUpdateArray$381(longSparseIntArray, longSparseIntArray2, sparseIntArray, longSparseArray, longSparseArray2, longSparseArray3, longSparseArray4, longSparseIntArray3);
+                MessagesController.this.lambda$processUpdateArray$381(longSparseIntArray, longSparseIntArray2, sparseIntArray, longSparseArray, longSparseArray2, longSparseArray3, longSparseArray4, longSparseArray5, longSparseIntArray3);
             }
         });
     }
@@ -11923,8 +11923,12 @@ public class MessagesController extends BaseController implements NotificationCe
         deleteMessages(arrayList, arrayList2, encryptedChat, j, z, i2, z2, 0L, null, i);
     }
 
-    public void deleteMessages(java.util.ArrayList<java.lang.Integer> r27, java.util.ArrayList<java.lang.Long> r28, org.telegram.tgnet.TLRPC.EncryptedChat r29, long r30, boolean r32, int r33, boolean r34, long r35, org.telegram.tgnet.TLObject r37, int r38) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesController.deleteMessages(java.util.ArrayList, java.util.ArrayList, org.telegram.tgnet.TLRPC$EncryptedChat, long, boolean, int, boolean, long, org.telegram.tgnet.TLObject, int):void");
+    public void deleteMessages(ArrayList<Integer> arrayList, ArrayList<Long> arrayList2, TLRPC.EncryptedChat encryptedChat, long j, boolean z, int i, boolean z2, long j2, TLObject tLObject, int i2) {
+        deleteMessages(arrayList, arrayList2, encryptedChat, j, z, i, z2, j2, tLObject, i2, false, 0);
+    }
+
+    public void deleteMessages(java.util.ArrayList<java.lang.Integer> r28, java.util.ArrayList<java.lang.Long> r29, org.telegram.tgnet.TLRPC.EncryptedChat r30, long r31, boolean r33, int r34, boolean r35, long r36, org.telegram.tgnet.TLObject r38, int r39, boolean r40, int r41) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesController.deleteMessages(java.util.ArrayList, java.util.ArrayList, org.telegram.tgnet.TLRPC$EncryptedChat, long, boolean, int, boolean, long, org.telegram.tgnet.TLObject, int, boolean, int):void");
     }
 
     public void deleteMessagesByPush(final long j, final ArrayList<Integer> arrayList, final long j2) {
@@ -12766,6 +12770,18 @@ public class MessagesController extends BaseController implements NotificationCe
         return tL_messages_stickerSet;
     }
 
+    public void forceNoReload(long j, int i) {
+        LongSparseArray longSparseArray;
+        if (i == 1) {
+            longSparseArray = this.lastScheduledServerQueryTime;
+        } else if (i != 0) {
+            return;
+        } else {
+            longSparseArray = this.lastServerQueryTime;
+        }
+        longSparseArray.put(j, Long.valueOf(SystemClock.elapsedRealtime()));
+    }
+
     public void forceResetDialogs() {
         resetDialogs(true, getMessagesStorage().getLastSeqValue(), getMessagesStorage().getLastPtsValue(), getMessagesStorage().getLastDateValue(), getMessagesStorage().getLastQtsValue());
         getNotificationsController().deleteAllNotificationChannels();
@@ -13594,16 +13610,15 @@ public class MessagesController extends BaseController implements NotificationCe
         if (sponsoredMessagesInfo != null && (sponsoredMessagesInfo.loading || Math.abs(SystemClock.elapsedRealtime() - sponsoredMessagesInfo.loadTime) <= 300000)) {
             return sponsoredMessagesInfo;
         }
-        TLRPC.Chat chat = getChat(Long.valueOf(-j));
-        if (!ChatObject.isChannel(chat)) {
+        if (j >= 0 ? !UserObject.isBot(getUser(Long.valueOf(j))) : !ChatObject.isChannel(getChat(Long.valueOf(-j)))) {
             return null;
         }
         final SponsoredMessagesInfo sponsoredMessagesInfo2 = new SponsoredMessagesInfo();
         sponsoredMessagesInfo2.loading = true;
         this.sponsoredMessages.put(j, sponsoredMessagesInfo2);
-        TLRPC.TL_channels_getSponsoredMessages tL_channels_getSponsoredMessages = new TLRPC.TL_channels_getSponsoredMessages();
-        tL_channels_getSponsoredMessages.channel = getInputChannel(chat);
-        getConnectionsManager().sendRequest(tL_channels_getSponsoredMessages, new RequestDelegate() {
+        TLRPC.TL_messages_getSponsoredMessages tL_messages_getSponsoredMessages = new TLRPC.TL_messages_getSponsoredMessages();
+        tL_messages_getSponsoredMessages.peer = getInputPeer(j);
+        getConnectionsManager().sendRequest(tL_messages_getSponsoredMessages, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 MessagesController.this.lambda$getSponsoredMessages$395(j, sponsoredMessagesInfo2, tLObject, tL_error);
@@ -15409,7 +15424,7 @@ public class MessagesController extends BaseController implements NotificationCe
         }
     }
 
-    public boolean processUpdateArray(java.util.ArrayList<org.telegram.tgnet.TLRPC.Update> r75, java.util.ArrayList<org.telegram.tgnet.TLRPC.User> r76, java.util.ArrayList<org.telegram.tgnet.TLRPC.Chat> r77, boolean r78, int r79) {
+    public boolean processUpdateArray(java.util.ArrayList<org.telegram.tgnet.TLRPC.Update> r76, java.util.ArrayList<org.telegram.tgnet.TLRPC.User> r77, java.util.ArrayList<org.telegram.tgnet.TLRPC.Chat> r78, boolean r79, int r80) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesController.processUpdateArray(java.util.ArrayList, java.util.ArrayList, java.util.ArrayList, boolean, int):boolean");
     }
 

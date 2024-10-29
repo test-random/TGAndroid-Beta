@@ -170,7 +170,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
                 } else {
                     StickersAlert stickersAlert = StickersAlert.this;
                     stickersAlert.stickerSet = tL_messages_stickerSet;
-                    stickersAlert.loadStickerSet();
+                    stickersAlert.loadStickerSet(false);
                     StickersAlert.this.updateFields();
                 }
             }
@@ -1110,11 +1110,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
         init(context);
     }
 
-    public StickersAlert(Context context, BaseFragment baseFragment, TLRPC.InputStickerSet inputStickerSet, TLRPC.TL_messages_stickerSet tL_messages_stickerSet, StickersAlertDelegate stickersAlertDelegate) {
-        this(context, baseFragment, inputStickerSet, tL_messages_stickerSet, stickersAlertDelegate, null);
-    }
-
-    public StickersAlert(Context context, BaseFragment baseFragment, TLRPC.InputStickerSet inputStickerSet, TLRPC.TL_messages_stickerSet tL_messages_stickerSet, StickersAlertDelegate stickersAlertDelegate, Theme.ResourcesProvider resourcesProvider) {
+    public StickersAlert(Context context, BaseFragment baseFragment, TLRPC.InputStickerSet inputStickerSet, TLRPC.TL_messages_stickerSet tL_messages_stickerSet, StickersAlertDelegate stickersAlertDelegate, Theme.ResourcesProvider resourcesProvider, boolean z) {
         super(context, false, resourcesProvider);
         this.shadowAnimation = new AnimatorSet[2];
         this.shadow = new View[2];
@@ -1126,8 +1122,12 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
         this.inputStickerSet = inputStickerSet;
         this.stickerSet = tL_messages_stickerSet;
         this.parentFragment = baseFragment;
-        loadStickerSet();
+        loadStickerSet(z);
         init(context);
+    }
+
+    public StickersAlert(Context context, BaseFragment baseFragment, TLRPC.InputStickerSet inputStickerSet, TLRPC.TL_messages_stickerSet tL_messages_stickerSet, StickersAlertDelegate stickersAlertDelegate, boolean z) {
+        this(context, baseFragment, inputStickerSet, tL_messages_stickerSet, stickersAlertDelegate, null, z);
     }
 
     private void checkOptions() {
@@ -1823,7 +1823,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
                 TLRPC.StickerSet stickerSet2 = stickerSetCovered.set;
                 tL_inputStickerSetID.access_hash = stickerSet2.access_hash;
                 tL_inputStickerSetID.id = stickerSet2.id;
-                StickersAlert stickersAlert = new StickersAlert(this.parentActivity, this.parentFragment, tL_inputStickerSetID, null, null, this.resourcesProvider);
+                StickersAlert stickersAlert = new StickersAlert(this.parentActivity, this.parentFragment, tL_inputStickerSetID, null, null, this.resourcesProvider, false);
                 if (this.masterDismissListener != null) {
                     stickersAlert.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
@@ -1958,7 +1958,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
                     TLRPC.StickerSet stickerSet = stickerSetCovered.set;
                     tL_inputStickerSetID.id = stickerSet.id;
                     tL_inputStickerSetID.access_hash = stickerSet.access_hash;
-                    loadStickerSet();
+                    loadStickerSet(false);
                     return;
                 }
                 this.stickerSetCovereds = new ArrayList();
@@ -2889,7 +2889,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
             }
             if (r4 != null && r4 != this.stickerSet) {
                 this.stickerSet = r4;
-                loadStickerSet();
+                loadStickerSet(false);
             }
         }
         updateFields();
@@ -3028,15 +3028,17 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
         return arrayList;
     }
 
-    public void loadStickerSet() {
+    public void loadStickerSet(boolean z) {
         String str;
         if (this.inputStickerSet != null) {
             final MediaDataController mediaDataController = MediaDataController.getInstance(this.currentAccount);
-            if (this.stickerSet == null && (str = this.inputStickerSet.short_name) != null) {
-                this.stickerSet = mediaDataController.getStickerSetByName(str);
-            }
-            if (this.stickerSet == null) {
-                this.stickerSet = mediaDataController.getStickerSetById(this.inputStickerSet.id);
+            if (!z) {
+                if (this.stickerSet == null && (str = this.inputStickerSet.short_name) != null) {
+                    this.stickerSet = mediaDataController.getStickerSetByName(str);
+                }
+                if (this.stickerSet == null) {
+                    this.stickerSet = mediaDataController.getStickerSetById(this.inputStickerSet.id);
+                }
             }
             if (this.stickerSet == null) {
                 TLRPC.TL_messages_getStickerSet tL_messages_getStickerSet = new TLRPC.TL_messages_getStickerSet();
@@ -3059,7 +3061,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
             }
         }
         if (this.stickerSet != null) {
-            this.showEmoji = !r0.set.masks;
+            this.showEmoji = !r4.set.masks;
         }
         checkPremiumStickers();
     }

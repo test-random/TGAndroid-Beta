@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Base64;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -56,6 +57,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.Components.VideoPlayer;
 import org.telegram.ui.LoginActivity;
 
 public class ConnectionsManager extends BaseController {
@@ -798,14 +800,15 @@ public class ConnectionsManager extends BaseController {
         }
     }
 
-    public void lambda$sendRequestInternal$4(TLObject tLObject, final RequestDelegate requestDelegate, final RequestDelegateTimestamp requestDelegateTimestamp, QuickAckDelegate quickAckDelegate, WriteToSocketDelegate writeToSocketDelegate, int i, int i2, int i3, boolean z, long j, int i4, long j2, int i5, String str, int i6, final long j3, long j4, int i7) {
-        TLRPC.TL_error tL_error;
+    public void lambda$sendRequestInternal$4(TLObject tLObject, int i, long j, final RequestDelegate requestDelegate, final RequestDelegateTimestamp requestDelegateTimestamp, QuickAckDelegate quickAckDelegate, WriteToSocketDelegate writeToSocketDelegate, int i2, int i3, boolean z, int i4, long j2, int i5, String str, int i6, final long j3, long j4, int i7) {
         TLObject tLObject2;
+        TLRPC.TL_error tL_error;
+        int i8;
         try {
             if (j2 != 0) {
                 NativeByteBuffer wrap = NativeByteBuffer.wrap(j2);
                 wrap.reused = true;
-                wrap.limit();
+                i8 = wrap.limit();
                 try {
                     tLObject2 = tLObject.deserializeResponse(wrap, wrap.readInt32(true), true);
                     tL_error = null;
@@ -816,25 +819,33 @@ public class ConnectionsManager extends BaseController {
                     FileLog.fatal(e);
                     return;
                 }
-            } else if (str != null) {
-                TLRPC.TL_error tL_error2 = new TLRPC.TL_error();
-                tL_error2.code = i5;
-                tL_error2.text = str;
-                if (BuildVars.LOGS_ENABLED && i5 != -2000) {
-                    FileLog.e(tLObject + " got error " + tL_error2.code + " " + tL_error2.text);
-                }
-                tL_error = tL_error2;
-                tLObject2 = null;
             } else {
-                tL_error = null;
-                tLObject2 = null;
+                if (str != null) {
+                    TLRPC.TL_error tL_error2 = new TLRPC.TL_error();
+                    tL_error2.code = i5;
+                    tL_error2.text = str;
+                    if (BuildVars.LOGS_ENABLED && i5 != -2000) {
+                        FileLog.e(tLObject + " got error " + tL_error2.code + " " + tL_error2.text);
+                    }
+                    tLObject2 = null;
+                    tL_error = tL_error2;
+                } else {
+                    tLObject2 = null;
+                    tL_error = null;
+                }
+                i8 = 0;
+            }
+            if ((i & 2) != 0 && VideoPlayer.activePlayers.isEmpty()) {
+                long native_getCurrentPingTime = native_getCurrentPingTime(this.currentAccount);
+                FileLog.d("ping_time = " + native_getCurrentPingTime);
+                DefaultBandwidthMeter.getSingletonInstance(ApplicationLoader.applicationContext).onTransfer((long) i8, Math.max(0L, (System.currentTimeMillis() - j) - native_getCurrentPingTime));
             }
             if (BuildVars.DEBUG_PRIVATE_VERSION && !getUserConfig().isClientActivated() && tL_error != null && tL_error.code == 400 && Objects.equals(tL_error.text, "CONNECTION_NOT_INITED")) {
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.d("Cleanup keys for " + this.currentAccount + " because of CONNECTION_NOT_INITED");
                 }
                 cleanup(true);
-                sendRequest(tLObject, requestDelegate, requestDelegateTimestamp, quickAckDelegate, writeToSocketDelegate, i, i2, i3, z);
+                sendRequest(tLObject, requestDelegate, requestDelegateTimestamp, quickAckDelegate, writeToSocketDelegate, i2, i3, i, z);
                 return;
             }
             if (tLObject2 != null) {
@@ -919,6 +930,8 @@ public class ConnectionsManager extends BaseController {
     public static native int native_getConnectionState(int i);
 
     public static native int native_getCurrentDatacenterId(int i);
+
+    public static native int native_getCurrentPingTime(int i);
 
     public static native int native_getCurrentTime(int i);
 
@@ -1265,6 +1278,7 @@ public class ConnectionsManager extends BaseController {
     }
 
     public void lambda$sendRequest$2(final TLObject tLObject, final RequestDelegate requestDelegate, final RequestDelegateTimestamp requestDelegateTimestamp, final QuickAckDelegate quickAckDelegate, final WriteToSocketDelegate writeToSocketDelegate, final int i, final int i2, final int i3, final boolean z, final int i4) {
+        long j;
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("send request " + tLObject + " with token = " + i4);
         }
@@ -1272,11 +1286,36 @@ public class ConnectionsManager extends BaseController {
             NativeByteBuffer nativeByteBuffer = new NativeByteBuffer(tLObject.getObjectSize());
             tLObject.serializeToStream(nativeByteBuffer);
             tLObject.freeResources();
-            final long currentTimeMillis = (BuildVars.DEBUG_PRIVATE_VERSION && BuildVars.LOGS_ENABLED) ? System.currentTimeMillis() : 0L;
+            if (BuildVars.DEBUG_PRIVATE_VERSION) {
+                if (!BuildVars.LOGS_ENABLED) {
+                }
+                j = System.currentTimeMillis();
+                final long j2 = j;
+                listen(i4, new RequestDelegateInternal() {
+                    @Override
+                    public final void run(long j3, int i5, String str, int i6, long j4, long j5, int i7) {
+                        ConnectionsManager.this.lambda$sendRequestInternal$4(tLObject, i3, j2, requestDelegate, requestDelegateTimestamp, quickAckDelegate, writeToSocketDelegate, i, i2, z, i4, j3, i5, str, i6, j4, j5, i7);
+                    }
+                }, quickAckDelegate, writeToSocketDelegate);
+                native_sendRequest(this.currentAccount, nativeByteBuffer.address, i, i2, i3, z, i4);
+            }
+            if ((i3 & 2) == 0) {
+                j = 0;
+                final long j22 = j;
+                listen(i4, new RequestDelegateInternal() {
+                    @Override
+                    public final void run(long j3, int i5, String str, int i6, long j4, long j5, int i7) {
+                        ConnectionsManager.this.lambda$sendRequestInternal$4(tLObject, i3, j22, requestDelegate, requestDelegateTimestamp, quickAckDelegate, writeToSocketDelegate, i, i2, z, i4, j3, i5, str, i6, j4, j5, i7);
+                    }
+                }, quickAckDelegate, writeToSocketDelegate);
+                native_sendRequest(this.currentAccount, nativeByteBuffer.address, i, i2, i3, z, i4);
+            }
+            j = System.currentTimeMillis();
+            final long j222 = j;
             listen(i4, new RequestDelegateInternal() {
                 @Override
-                public final void run(long j, int i5, String str, int i6, long j2, long j3, int i7) {
-                    ConnectionsManager.this.lambda$sendRequestInternal$4(tLObject, requestDelegate, requestDelegateTimestamp, quickAckDelegate, writeToSocketDelegate, i, i2, i3, z, currentTimeMillis, i4, j, i5, str, i6, j2, j3, i7);
+                public final void run(long j3, int i5, String str, int i6, long j4, long j5, int i7) {
+                    ConnectionsManager.this.lambda$sendRequestInternal$4(tLObject, i3, j222, requestDelegate, requestDelegateTimestamp, quickAckDelegate, writeToSocketDelegate, i, i2, z, i4, j3, i5, str, i6, j4, j5, i7);
                 }
             }, quickAckDelegate, writeToSocketDelegate);
             native_sendRequest(this.currentAccount, nativeByteBuffer.address, i, i2, i3, z, i4);
@@ -1525,31 +1564,8 @@ public class ConnectionsManager extends BaseController {
         return native_getTimeDifference(this.currentAccount);
     }
 
-    public void init(int i, int i2, int i3, String str, String str2, String str3, String str4, String str5, String str6, String str7, String str8, String str9, int i4, long j, boolean z, boolean z2) {
-        String str10;
-        String str11;
-        SharedPreferences sharedPreferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0);
-        String string = sharedPreferences.getString("proxy_ip", "");
-        String string2 = sharedPreferences.getString("proxy_user", "");
-        String string3 = sharedPreferences.getString("proxy_pass", "");
-        String string4 = sharedPreferences.getString("proxy_secret", "");
-        int i5 = sharedPreferences.getInt("proxy_port", 1080);
-        if (sharedPreferences.getBoolean("proxy_enabled", false) && !TextUtils.isEmpty(string)) {
-            native_setProxySettings(this.currentAccount, string, i5, string2, string3, string4);
-        }
-        try {
-            str10 = ApplicationLoader.applicationContext.getPackageManager().getInstallerPackageName(ApplicationLoader.applicationContext.getPackageName());
-        } catch (Throwable unused) {
-            str10 = "";
-        }
-        String str12 = str10 == null ? "" : str10;
-        try {
-            str11 = ApplicationLoader.applicationContext.getPackageName();
-        } catch (Throwable unused2) {
-            str11 = "";
-        }
-        native_init(this.currentAccount, i, i2, i3, str, str2, str3, str4, str5, str6, str7, str8, str9, str12, str11 == null ? "" : str11, i4, j, z, z2, ApplicationLoader.isNetworkOnline(), ApplicationLoader.getCurrentNetworkType(), SharedConfig.measureDevicePerformanceClass());
-        checkConnection();
+    public void init(int r29, int r30, int r31, java.lang.String r32, java.lang.String r33, java.lang.String r34, java.lang.String r35, java.lang.String r36, java.lang.String r37, java.lang.String r38, java.lang.String r39, java.lang.String r40, int r41, long r42, boolean r44, boolean r45) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.tgnet.ConnectionsManager.init(int, int, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, int, long, boolean, boolean):void");
     }
 
     public boolean isPushConnectionEnabled() {

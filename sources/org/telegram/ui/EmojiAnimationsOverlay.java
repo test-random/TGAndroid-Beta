@@ -227,7 +227,7 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
         ChatActivity chatActivity = this.chatActivity;
         TLRPC.InputStickerSet inputStickerSet = messageObject.getInputStickerSet();
         ChatActivity chatActivity2 = this.chatActivity;
-        StickersAlert stickersAlert = new StickersAlert(parentActivity, chatActivity, inputStickerSet, null, chatActivity2.chatActivityEnterView, chatActivity2.getResourceProvider());
+        StickersAlert stickersAlert = new StickersAlert(parentActivity, chatActivity, inputStickerSet, null, chatActivity2.chatActivityEnterView, chatActivity2.getResourceProvider(), false);
         stickersAlert.setCalcMandatoryInsets(this.chatActivity.isKeyboardVisible());
         this.chatActivity.showDialog(stickersAlert);
     }

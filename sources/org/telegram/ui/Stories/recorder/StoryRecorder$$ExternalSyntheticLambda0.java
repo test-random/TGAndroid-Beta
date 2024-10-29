@@ -9,6 +9,6 @@ public final class StoryRecorder$$ExternalSyntheticLambda0 implements Runnable {
 
     @Override
     public final void run() {
-        StoryRecorder.m3464$r8$lambda$pn_nN4vNitDazwxNqSU4oEeY4M(this.f$0);
+        StoryRecorder.m3501$r8$lambda$pn_nN4vNitDazwxNqSU4oEeY4M(this.f$0);
     }
 }

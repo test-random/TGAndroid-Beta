@@ -295,7 +295,7 @@ public class TableView extends android.widget.TableLayout {
         return addRow(charSequence, LocaleController.formatString(R.string.formatDateAtTime, LocaleController.getInstance().getFormatterGiveawayCard().format(new Date(j)), LocaleController.getInstance().getFormatterDay().format(new Date(j))));
     }
 
-    public void addRowLink(CharSequence charSequence, CharSequence charSequence2, final Runnable runnable) {
+    public TableRow addRowLink(CharSequence charSequence, CharSequence charSequence2, final Runnable runnable) {
         LinkSpanDrawable.LinksTextView linksTextView = new LinkSpanDrawable.LinksTextView(getContext(), this.resourcesProvider);
         linksTextView.setPadding(AndroidUtilities.dp(12.66f), AndroidUtilities.dp(9.33f), AndroidUtilities.dp(12.66f), AndroidUtilities.dp(9.33f));
         linksTextView.setEllipsize(TextUtils.TruncateAt.END);
@@ -321,7 +321,7 @@ public class TableView extends android.widget.TableLayout {
             }
         }, 0, spannableStringBuilder.length(), 33);
         linksTextView.setText(spannableStringBuilder);
-        addRowUnpadded(charSequence, linksTextView);
+        return addRowUnpadded(charSequence, linksTextView);
     }
 
     public TableRow addRowUnpadded(CharSequence charSequence, View view) {
