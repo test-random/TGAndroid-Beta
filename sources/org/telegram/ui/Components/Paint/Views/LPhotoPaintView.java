@@ -641,9 +641,7 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
 
             @Override
             public ColorFilter getAnimatedEmojiColorFilter() {
-                ColorFilter colorFilter;
-                colorFilter = Theme.chat_animatedEmojiTextColorFilter;
-                return colorFilter;
+                return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
             }
 
             @Override
@@ -655,16 +653,12 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
 
             @Override
             public int getColorOrDefault(int i4) {
-                int color;
-                color = getColor(i4);
-                return color;
+                return getColor(i4);
             }
 
             @Override
             public int getCurrentColor(int i4) {
-                int color;
-                color = getColor(i4);
-                return color;
+                return getColor(i4);
             }
 
             @Override
@@ -674,9 +668,7 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
 
             @Override
             public Paint getPaint(String str) {
-                Paint themePaint;
-                themePaint = Theme.getThemePaint(str);
-                return themePaint;
+                return Theme.ResourcesProvider.CC.$default$getPaint(this, str);
             }
 
             @Override

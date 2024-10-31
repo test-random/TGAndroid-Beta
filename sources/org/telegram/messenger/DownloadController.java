@@ -201,6 +201,10 @@ public class DownloadController extends BaseController implements NotificationCe
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.DownloadController.<init>(int):void");
     }
 
+    private int canDownloadMediaInternal(org.telegram.messenger.MessageObject r16) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.DownloadController.canDownloadMediaInternal(org.telegram.messenger.MessageObject):int");
+    }
+
     private void checkDownloadFinished(String str, int i) {
         DownloadObject downloadObject = this.downloadQueueKeys.get(str);
         if (downloadObject != null) {
@@ -672,7 +676,7 @@ public class DownloadController extends BaseController implements NotificationCe
         if (messageObject.sponsoredMedia != null) {
             return true;
         }
-        return !messageObject.isHiddenSensitive() && canDownloadMedia(messageObject.messageOwner) == 1;
+        return !messageObject.isHiddenSensitive() && canDownloadMediaInternal(messageObject) == 1;
     }
 
     public int canDownloadMediaType(MessageObject messageObject) {
@@ -687,7 +691,7 @@ public class DownloadController extends BaseController implements NotificationCe
         if (messageObject.isHiddenSensitive()) {
             return 0;
         }
-        return canDownloadMedia(messageObject.messageOwner);
+        return canDownloadMediaInternal(messageObject);
     }
 
     public boolean canDownloadNextTrack() {

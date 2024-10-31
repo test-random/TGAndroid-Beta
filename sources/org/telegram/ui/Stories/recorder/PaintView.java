@@ -899,16 +899,12 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
 
             @Override
             public int getColorOrDefault(int i6) {
-                int color;
-                color = getColor(i6);
-                return color;
+                return getColor(i6);
             }
 
             @Override
             public int getCurrentColor(int i6) {
-                int color;
-                color = getColor(i6);
-                return color;
+                return getColor(i6);
             }
 
             @Override

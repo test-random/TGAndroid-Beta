@@ -1510,9 +1510,7 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
 
                     @Override
                     public ColorFilter getAnimatedEmojiColorFilter() {
-                        ColorFilter colorFilter;
-                        colorFilter = Theme.chat_animatedEmojiTextColorFilter;
-                        return colorFilter;
+                        return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
                     }
 
                     @Override
@@ -2302,9 +2300,7 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
 
         @Override
         public ColorFilter getAnimatedEmojiColorFilter() {
-            ColorFilter colorFilter;
-            colorFilter = Theme.chat_animatedEmojiTextColorFilter;
-            return colorFilter;
+            return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
         }
 
         @Override
@@ -2315,20 +2311,13 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
 
         @Override
         public int getColorOrDefault(int i) {
-            int color;
-            color = getColor(i);
-            return color;
+            return getColor(i);
         }
 
         @Override
         public int getCurrentColor(int i) {
-            int color;
             Theme.ResourcesProvider resourcesProvider = this.parentProvider;
-            if (resourcesProvider != null) {
-                return resourcesProvider.getCurrentColor(i);
-            }
-            color = getColor(i);
-            return color;
+            return resourcesProvider != null ? resourcesProvider.getCurrentColor(i) : getColor(i);
         }
 
         @Override
@@ -2339,7 +2328,6 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
 
         @Override
         public Paint getPaint(String str) {
-            Paint themePaint;
             str.hashCode();
             char c = 65535;
             switch (str.hashCode()) {
@@ -2395,11 +2383,7 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
                     return this.chat_actionTextPaint;
                 default:
                     Theme.ResourcesProvider resourcesProvider = this.parentProvider;
-                    if (resourcesProvider != null) {
-                        return resourcesProvider.getPaint(str);
-                    }
-                    themePaint = Theme.getThemePaint(str);
-                    return themePaint;
+                    return resourcesProvider != null ? resourcesProvider.getPaint(str) : Theme.ResourcesProvider.CC.$default$getPaint(this, str);
             }
         }
 

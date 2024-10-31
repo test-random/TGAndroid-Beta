@@ -158,11 +158,6 @@ public class MediaActionDrawable extends Drawable {
         this.messageDrawable = messageDrawable;
     }
 
-    public void setBackgroundGradientDrawable(LinearGradient linearGradient) {
-        this.gradientDrawable = linearGradient;
-        this.gradientMatrix = new Matrix();
-    }
-
     @Override
     public void setBounds(int i, int i2, int i3, int i4) {
         super.setBounds(i, i2, i3, i4);

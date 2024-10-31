@@ -124,15 +124,7 @@ public class BotAdView extends FrameLayout {
         Browser.openUrl(getContext(), Uri.parse(str), true, false, false, null, null, false, MessagesController.getInstance(UserConfig.selectedAccount).sponsoredLinksInappAllow, false);
     }
 
-    public static boolean lambda$set$3(Runnable runnable, View view) {
-        if (runnable == null) {
-            return false;
-        }
-        runnable.run();
-        return true;
-    }
-
-    public static void lambda$set$4(Runnable runnable, View view) {
+    public static void lambda$set$3(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
@@ -226,18 +218,10 @@ public class BotAdView extends FrameLayout {
                 BotAdView.this.lambda$set$2(str2, view);
             }
         });
-        setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public final boolean onLongClick(View view) {
-                boolean lambda$set$3;
-                lambda$set$3 = BotAdView.lambda$set$3(runnable, view);
-                return lambda$set$3;
-            }
-        });
         this.closeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                BotAdView.lambda$set$4(runnable2, view);
+                BotAdView.lambda$set$3(runnable2, view);
             }
         });
     }

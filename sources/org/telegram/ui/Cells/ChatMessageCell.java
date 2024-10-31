@@ -3915,7 +3915,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         ChatMessageCellDelegate chatMessageCellDelegate;
         ChatMessageCellDelegate chatMessageCellDelegate2;
         TLRPC.WebPage webPage;
-        boolean z;
         TLRPC.MessageMedia messageMedia;
         TLRPC.ReplyMarkup replyMarkup;
         if (this.currentMessageObject.hasMediaSpoilers() && !this.currentMessageObject.needDrawBluredPreview()) {
@@ -3976,12 +3975,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             } else {
                 int i4 = this.documentAttachType;
                 if (i4 == 4) {
-                    int i5 = this.buttonState;
-                    if (i5 != -1 && (!(z = this.drawVideoImageButton) || (!this.autoPlayingMedia && (!SharedConfig.streamMedia || !this.canStreamVideo)))) {
-                        if (z) {
+                    if (this.buttonState != -1 && (!this.drawVideoImageButton || (!this.autoPlayingMedia && !messageObject3.hasVideoQualities() && (!SharedConfig.streamMedia || !this.canStreamVideo)))) {
+                        if (this.drawVideoImageButton) {
                             didPressButton(true, true);
                             return;
-                        } else if (i5 != 0 && i5 != 3) {
+                        }
+                        int i5 = this.buttonState;
+                        if (i5 != 0 && i5 != 3) {
                             return;
                         }
                     }

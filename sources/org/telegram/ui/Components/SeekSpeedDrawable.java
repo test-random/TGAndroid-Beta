@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import java.util.Locale;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
@@ -266,7 +267,7 @@ public class SeekSpeedDrawable extends Drawable {
     public void setSpeed(float f, boolean z) {
         if (Math.floor(this.lastSpeed * 10.0f) != Math.floor(10.0f * f)) {
             this.speedText.cancelAnimation();
-            this.speedText.setText(String.format("%.1fx", Float.valueOf(Math.abs(f))), z);
+            this.speedText.setText(String.format(Locale.US, "%.1fx", Float.valueOf(Math.abs(f))), z);
             this.lastSpeed = f;
         }
         int i = f > 0.0f ? 1 : -1;

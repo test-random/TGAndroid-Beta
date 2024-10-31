@@ -1,22 +1,21 @@
 package org.telegram.ui;
 
 import android.content.Context;
-import android.text.TextUtils;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import androidx.core.graphics.ColorUtils;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
-import org.telegram.messenger.SharedConfig;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
-import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.ColoredImageSpan;
 import org.telegram.ui.Components.PopupSwipeBackLayout;
 import org.telegram.ui.Components.VideoPlayer;
 
@@ -71,6 +70,7 @@ public class ChooseDownloadQualityLayout {
 
     public boolean update(final MessageObject messageObject) {
         TLRPC.Message message;
+        CharSequence formatFileSize;
         if (messageObject == null || (message = messageObject.messageOwner) == null || message.media == null || !messageObject.hasVideoQualities()) {
             return false;
         }
@@ -85,18 +85,24 @@ public class ChooseDownloadQualityLayout {
             sb.append(LocaleController.formatString(R.string.QualitySaveIn, Integer.valueOf(quality.p())));
             sb.append(quality.original ? " (" + LocaleController.getString(R.string.QualitySource) + ")" : "");
             String sb2 = sb.toString();
-            String formatFileSize = AndroidUtilities.formatFileSize(downloadUri.document.size);
-            ActionBarMenuSubItem addItem = ActionBarMenuItem.addItem(this.buttonsLayout, 0, sb2, false, null);
-            if (!TextUtils.isEmpty(formatFileSize)) {
-                addItem.setSubtext(formatFileSize);
-                addItem.subtextView.setPadding(0, 0, 0, 0);
-            }
-            if (downloadUri.isCached() && SharedConfig.debugVideoQualities) {
-                int i3 = Theme.key_featuredStickers_addButton;
-                addItem.setColors(ColorUtils.blendARGB(Theme.getColor(i3), -328966, 0.25f), ColorUtils.blendARGB(Theme.getColor(i3), -328966, 0.25f));
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+            if (downloadUri.isCached()) {
+                spannableStringBuilder.append(AndroidUtilities.formatFileSize(downloadUri.document.size));
+                formatFileSize = LocaleController.getString(R.string.QualityCached);
             } else {
-                addItem.setColors(-328966, -328966);
+                SpannableString spannableString = new SpannableString("s ");
+                ColoredImageSpan coloredImageSpan = new ColoredImageSpan(R.drawable.msg_mini_arrow_mediabold);
+                coloredImageSpan.rotate(90.0f);
+                coloredImageSpan.translate(0.0f, AndroidUtilities.dp(1.0f));
+                coloredImageSpan.spaceScaleX = 0.85f;
+                spannableString.setSpan(coloredImageSpan, 0, 1, 33);
+                spannableStringBuilder.append((CharSequence) spannableString);
+                formatFileSize = AndroidUtilities.formatFileSize(downloadUri.document.size);
             }
+            spannableStringBuilder.append(formatFileSize);
+            ActionBarMenuSubItem addItem = ActionBarMenuItem.addItem(this.buttonsLayout, 0, sb2, false, null);
+            addItem.setSubtext(spannableStringBuilder);
+            addItem.subtextView.setPadding(0, 0, 0, 0);
             addItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {

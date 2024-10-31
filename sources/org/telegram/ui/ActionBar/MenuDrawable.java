@@ -113,30 +113,4 @@ public class MenuDrawable extends Drawable {
         this.paint.setStrokeCap(Paint.Cap.ROUND);
         this.roundCap = true;
     }
-
-    public void setType(int i, boolean z) {
-        int i2 = this.type;
-        if (i2 == i) {
-            return;
-        }
-        this.previousType = i2;
-        this.type = i;
-        this.typeAnimationProgress = z ? 0.0f : 1.0f;
-        invalidateSelf();
-    }
-
-    public void setUpdateDownloadProgress(float f, boolean z) {
-        if (z) {
-            if (this.animatedDownloadProgress > f) {
-                this.animatedDownloadProgress = f;
-            }
-            this.downloadProgressAnimationStart = this.animatedDownloadProgress;
-        } else {
-            this.animatedDownloadProgress = f;
-            this.downloadProgressAnimationStart = f;
-        }
-        this.downloadProgress = f;
-        this.downloadProgressTime = 0.0f;
-        invalidateSelf();
-    }
 }

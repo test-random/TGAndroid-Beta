@@ -10466,7 +10466,8 @@ public class MessagesController extends BaseController implements NotificationCe
         this.canEditFactcheck = false;
         this.starsLocked = true;
         this.factcheckLengthLimit = 1024;
-        this.mainPreferences.edit().remove("starsLocked").remove("getfileExperimentalParams").remove("smsjobsStickyNotificationEnabled").remove("channelRevenueWithdrawalEnabled").remove("showAnnualPerMonth").remove("canEditFactcheck").remove("factcheckLengthLimit").apply();
+        this.videoIgnoreAltDocuments = false;
+        this.mainPreferences.edit().remove("starsLocked").remove("getfileExperimentalParams").remove("smsjobsStickyNotificationEnabled").remove("channelRevenueWithdrawalEnabled").remove("showAnnualPerMonth").remove("canEditFactcheck").remove("factcheckLengthLimit").remove("videoIgnoreAltDocuments").apply();
     }
 
     private void resetDialogs(boolean r27, final int r28, final int r29, final int r30, final int r31) {
@@ -14031,7 +14032,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void loadAppConfig() {
-        loadAppConfig(false);
+        loadAppConfig(true);
     }
 
     public void loadAppConfig(boolean z) {

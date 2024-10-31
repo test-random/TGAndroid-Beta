@@ -2,7 +2,6 @@ package org.telegram.ui.Components;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.View;
@@ -174,18 +173,9 @@ public class RadialProgress2 {
         this.overlayImageView.onDetachedFromWindow();
     }
 
-    public void setAsMini() {
-        this.mediaActionDrawable.setMini(true);
-    }
-
     public void setBackgroundDrawable(Theme.MessageDrawable messageDrawable) {
         this.mediaActionDrawable.setBackgroundDrawable(messageDrawable);
         this.miniMediaActionDrawable.setBackgroundDrawable(messageDrawable);
-    }
-
-    public void setBackgroundGradientDrawable(LinearGradient linearGradient) {
-        this.mediaActionDrawable.setBackgroundGradientDrawable(linearGradient);
-        this.miniMediaActionDrawable.setBackgroundGradientDrawable(linearGradient);
     }
 
     public void setCircleCrossfadeColor(int i, float f, float f2) {

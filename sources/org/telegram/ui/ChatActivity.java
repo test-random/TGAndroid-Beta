@@ -1065,9 +1065,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public ColorFilter getAnimatedEmojiColorFilter() {
-            ColorFilter colorFilter;
-            colorFilter = Theme.chat_animatedEmojiTextColorFilter;
-            return colorFilter;
+            return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
         }
 
         @Override
@@ -1077,16 +1075,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public int getColorOrDefault(int i) {
-            int color;
-            color = getColor(i);
-            return color;
+            return getColor(i);
         }
 
         @Override
         public int getCurrentColor(int i) {
-            int color;
-            color = getColor(i);
-            return color;
+            return getColor(i);
         }
 
         @Override
@@ -1096,9 +1090,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public Paint getPaint(String str) {
-            Paint themePaint;
-            themePaint = Theme.getThemePaint(str);
-            return themePaint;
+            return Theme.ResourcesProvider.CC.$default$getPaint(this, str);
         }
 
         @Override
@@ -14729,9 +14721,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public ColorFilter getAnimatedEmojiColorFilter() {
-            ColorFilter colorFilter;
-            colorFilter = Theme.chat_animatedEmojiTextColorFilter;
-            return colorFilter;
+            return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
         }
 
         public List getCachedThemes() {
@@ -14761,9 +14751,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public int getColorOrDefault(int i) {
-            int color;
-            color = getColor(i);
-            return color;
+            return getColor(i);
         }
 
         @Override
@@ -15075,9 +15063,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
             @Override
             public ColorFilter getAnimatedEmojiColorFilter() {
-                ColorFilter colorFilter;
-                colorFilter = Theme.chat_animatedEmojiTextColorFilter;
-                return colorFilter;
+                return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
             }
 
             @Override
@@ -15087,16 +15073,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
             @Override
             public int getColorOrDefault(int i) {
-                int color;
-                color = getColor(i);
-                return color;
+                return getColor(i);
             }
 
             @Override
             public int getCurrentColor(int i) {
-                int color;
-                color = getColor(i);
-                return color;
+                return getColor(i);
             }
 
             @Override
@@ -15106,9 +15088,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
             @Override
             public Paint getPaint(String str) {
-                Paint themePaint;
-                themePaint = Theme.getThemePaint(str);
-                return themePaint;
+                return Theme.ResourcesProvider.CC.$default$getPaint(this, str);
             }
 
             @Override
@@ -23501,11 +23481,21 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public void lambda$updateTopPanel$216() {
+    public void lambda$updateTopPanel$216(ItemOptions itemOptions, RevenueSharingAdsInfoBottomSheet[] revenueSharingAdsInfoBottomSheetArr) {
+        itemOptions.dismiss();
+        RevenueSharingAdsInfoBottomSheet revenueSharingAdsInfoBottomSheet = revenueSharingAdsInfoBottomSheetArr[0];
+        if (revenueSharingAdsInfoBottomSheet != null) {
+            revenueSharingAdsInfoBottomSheet.dismiss();
+        }
         ReportBottomSheet.openSponsored(this, this.botSponsoredMessage, this.themeDelegate);
     }
 
-    public void lambda$updateTopPanel$217() {
+    public void lambda$updateTopPanel$217(ItemOptions itemOptions, RevenueSharingAdsInfoBottomSheet[] revenueSharingAdsInfoBottomSheetArr) {
+        itemOptions.dismiss();
+        RevenueSharingAdsInfoBottomSheet revenueSharingAdsInfoBottomSheet = revenueSharingAdsInfoBottomSheetArr[0];
+        if (revenueSharingAdsInfoBottomSheet != null) {
+            revenueSharingAdsInfoBottomSheet.dismiss();
+        }
         if (!getUserConfig().isPremium()) {
             showDialog(new PremiumFeatureBottomSheet(this, 3, true));
             return;
@@ -23516,20 +23506,20 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         getMessagesController().disableAds(true);
     }
 
-    public void lambda$updateTopPanel$218(final org.telegram.ui.Components.ItemOptions r17) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.lambda$updateTopPanel$218(org.telegram.ui.Components.ItemOptions):void");
+    public void lambda$updateTopPanel$218(final org.telegram.ui.RevenueSharingAdsInfoBottomSheet[] r17, final org.telegram.ui.Components.ItemOptions r18) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.lambda$updateTopPanel$218(org.telegram.ui.RevenueSharingAdsInfoBottomSheet[], org.telegram.ui.Components.ItemOptions):void");
     }
 
     public void lambda$updateTopPanel$219() {
         if (this.botSponsoredMessage == null) {
             return;
         }
-        RevenueSharingAdsInfoBottomSheet.showAlert(getContext(), this, true, this.resourceProvider, new Utilities.Callback() {
+        final RevenueSharingAdsInfoBottomSheet[] revenueSharingAdsInfoBottomSheetArr = {RevenueSharingAdsInfoBottomSheet.showAlert(getContext(), this, true, this.resourceProvider, new Utilities.Callback() {
             @Override
             public final void run(Object obj) {
-                ChatActivity.this.lambda$updateTopPanel$218((ItemOptions) obj);
+                ChatActivity.this.lambda$updateTopPanel$218(revenueSharingAdsInfoBottomSheetArr, (ItemOptions) obj);
             }
-        });
+        })};
     }
 
     public void lambda$updateTopPanel$220() {

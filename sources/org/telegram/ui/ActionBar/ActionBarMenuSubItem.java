@@ -236,7 +236,7 @@ public class ActionBarMenuSubItem extends FrameLayout {
         }
     }
 
-    public void setSubtext(String str) {
+    public void setSubtext(CharSequence charSequence) {
         if (this.subtextView == null) {
             TextView textView = new TextView(getContext());
             this.subtextView = textView;
@@ -250,14 +250,14 @@ public class ActionBarMenuSubItem extends FrameLayout {
             this.subtextView.setPadding(LocaleController.isRTL ? 0 : AndroidUtilities.dp(43.0f), 0, LocaleController.isRTL ? AndroidUtilities.dp(43.0f) : 0, 0);
             addView(this.subtextView, LayoutHelper.createFrame(-2, -2.0f, (LocaleController.isRTL ? 5 : 3) | 16, 0.0f, 10.0f, 0.0f, 0.0f));
         }
-        boolean z = !TextUtils.isEmpty(str);
+        boolean z = !TextUtils.isEmpty(charSequence);
         if (z != (this.subtextView.getVisibility() == 0)) {
             this.subtextView.setVisibility(z ? 0 : 8);
             FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) this.textView.getLayoutParams();
             layoutParams.bottomMargin = z ? AndroidUtilities.dp(10.0f) : 0;
             this.textView.setLayoutParams(layoutParams);
         }
-        this.subtextView.setText(str);
+        this.subtextView.setText(charSequence);
     }
 
     public void setSubtextColor(int i) {

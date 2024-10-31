@@ -55,12 +55,12 @@ public class BottomSheetTabDialog extends Dialog {
     }
 
     public BottomSheetTabDialog(BottomSheetTabsOverlay.Sheet sheet) {
-        super(sheet.mo997getWindowView().getContext(), R.style.TransparentDialog);
+        super(sheet.mo998getWindowView().getContext(), R.style.TransparentDialog);
         Paint paint = new Paint(1);
         this.navigationBarPaint = paint;
         this.sheet = sheet;
-        BottomSheetTabsOverlay.SheetView mo997getWindowView = sheet.mo997getWindowView();
-        this.sheetView = mo997getWindowView;
+        BottomSheetTabsOverlay.SheetView mo998getWindowView = sheet.mo998getWindowView();
+        this.sheetView = mo998getWindowView;
         View view = new View(getContext()) {
             @Override
             protected void dispatchDraw(Canvas canvas) {
@@ -75,7 +75,7 @@ public class BottomSheetTabDialog extends Dialog {
         };
         this.navigationBar = view;
         paint.setColor(Theme.getColor(Theme.key_windowBackgroundGray));
-        WindowView windowView = new WindowView(mo997getWindowView);
+        WindowView windowView = new WindowView(mo998getWindowView);
         this.windowView = windowView;
         setContentView(windowView, new ViewGroup.LayoutParams(-1, -1));
         windowView.addView(view, LayoutHelper.createFrame(-1, -2, 80));
@@ -150,5 +150,6 @@ public class BottomSheetTabDialog extends Dialog {
         this.navigationBar.invalidate();
         AndroidUtilities.setNavigationBarColor(getWindow(), navigationBarColor);
         AndroidUtilities.setLightNavigationBar(getWindow(), AndroidUtilities.computePerceivedBrightness(navigationBarColor) >= 0.721f);
+        LaunchActivity.instance.checkSystemBarColors(true, true, true, false);
     }
 }

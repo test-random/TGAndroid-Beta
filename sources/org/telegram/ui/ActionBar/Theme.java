@@ -2360,12 +2360,24 @@ public abstract class Theme {
     public interface ResourcesProvider {
 
         public abstract class CC {
+            public static ColorFilter $default$getAnimatedEmojiColorFilter(ResourcesProvider resourcesProvider) {
+                return Theme.chat_animatedEmojiTextColorFilter;
+            }
+
             public static Drawable $default$getDrawable(ResourcesProvider resourcesProvider, String str) {
                 return null;
             }
 
+            public static Paint $default$getPaint(ResourcesProvider resourcesProvider, String str) {
+                return Theme.getThemePaint(str);
+            }
+
             public static boolean $default$hasGradientService(ResourcesProvider resourcesProvider) {
                 return false;
+            }
+
+            public static boolean $default$isDark(ResourcesProvider resourcesProvider) {
+                return Theme.isCurrentThemeDark();
             }
 
             public static void $default$setAnimatedColor(ResourcesProvider resourcesProvider, int i, int i2) {

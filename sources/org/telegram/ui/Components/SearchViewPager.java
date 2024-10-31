@@ -295,7 +295,8 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
                 searchViewPager2.expandedPublicPosts = true;
                 searchViewPager2.hashtagSearchLayoutManager.scrollToPositionWithOffset(0, 0);
                 SearchViewPager.this.updateTabs();
-                if (SearchViewPager.this.tabsView.getCurrentTabId() != 1) {
+                ViewPagerFixed.TabsView tabsView = SearchViewPager.this.tabsView;
+                if (tabsView != null && tabsView.getCurrentTabId() != 1) {
                     SearchViewPager.this.tabsView.scrollToTab(1, 1);
                 }
                 SearchViewPager searchViewPager3 = SearchViewPager.this;

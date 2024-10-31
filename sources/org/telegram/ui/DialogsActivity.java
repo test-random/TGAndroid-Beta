@@ -76,7 +76,6 @@ import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.LiteMode;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaDataController;
@@ -171,7 +170,6 @@ import org.telegram.ui.Components.ProxyDrawable;
 import org.telegram.ui.Components.PullForegroundDrawable;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
-import org.telegram.ui.Components.RadialProgress2;
 import org.telegram.ui.Components.RadialProgressView;
 import org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble;
 import org.telegram.ui.Components.RecyclerAnimationScrollHelper;
@@ -446,11 +444,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private int topPadding;
     private UndoView[] undoView;
     private int undoViewIndex;
-    private FrameLayout updateLayout;
-    private AnimatorSet updateLayoutAnimator;
-    private RadialProgress2 updateLayoutIcon;
     private boolean updatePullAfterScroll;
-    private TextView updateTextView;
     private ViewPage[] viewPages;
     private boolean waitingForScrollFinished;
     private boolean wasDrawn;
@@ -822,10 +816,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    public class AnonymousClass33 implements GroupCreateFinalActivity.GroupCreateFinalActivityDelegate {
+    public class AnonymousClass32 implements GroupCreateFinalActivity.GroupCreateFinalActivityDelegate {
         final AlertDialog val$progress;
 
-        AnonymousClass33(AlertDialog alertDialog) {
+        AnonymousClass32(AlertDialog alertDialog) {
             this.val$progress = alertDialog;
         }
 
@@ -886,7 +880,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             DialogsActivity.this.showSendToBotAlert(DialogsActivity.this.getMessagesController().getChat(Long.valueOf(j)), runnable, new Runnable() {
                 @Override
                 public final void run() {
-                    DialogsActivity.AnonymousClass33.this.lambda$didFinishChatCreation$2(baseFragmentArr);
+                    DialogsActivity.AnonymousClass32.this.lambda$didFinishChatCreation$2(baseFragmentArr);
                 }
             });
         }
@@ -905,7 +899,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     @Override
                     public final boolean run(TLRPC.TL_error tL_error) {
                         boolean lambda$didFinishChatCreation$4;
-                        lambda$didFinishChatCreation$4 = DialogsActivity.AnonymousClass33.lambda$didFinishChatCreation$4(runnable, tL_error);
+                        lambda$didFinishChatCreation$4 = DialogsActivity.AnonymousClass32.lambda$didFinishChatCreation$4(runnable, tL_error);
                         return lambda$didFinishChatCreation$4;
                     }
                 });
@@ -930,7 +924,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 @Override
                 public final boolean run(TLRPC.TL_error tL_error) {
                     boolean lambda$didFinishChatCreation$6;
-                    lambda$didFinishChatCreation$6 = DialogsActivity.AnonymousClass33.lambda$didFinishChatCreation$6(runnable, tL_error);
+                    lambda$didFinishChatCreation$6 = DialogsActivity.AnonymousClass32.lambda$didFinishChatCreation$6(runnable, tL_error);
                     return lambda$didFinishChatCreation$6;
                 }
             });
@@ -949,7 +943,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     @Override
                     public final boolean run(TLRPC.TL_error tL_error) {
                         boolean lambda$didFinishChatCreation$8;
-                        lambda$didFinishChatCreation$8 = DialogsActivity.AnonymousClass33.lambda$didFinishChatCreation$8(runnable, tL_error);
+                        lambda$didFinishChatCreation$8 = DialogsActivity.AnonymousClass32.lambda$didFinishChatCreation$8(runnable, tL_error);
                         return lambda$didFinishChatCreation$8;
                     }
                 });
@@ -966,39 +960,39 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             Utilities.Callback callback = new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    DialogsActivity.AnonymousClass33.this.lambda$didFinishChatCreation$1(j, baseFragmentArr, (Runnable) obj);
+                    DialogsActivity.AnonymousClass32.this.lambda$didFinishChatCreation$1(j, baseFragmentArr, (Runnable) obj);
                 }
             };
             Utilities.Callback callback2 = new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    DialogsActivity.AnonymousClass33.this.lambda$didFinishChatCreation$3(j, baseFragmentArr, (Runnable) obj);
+                    DialogsActivity.AnonymousClass32.this.lambda$didFinishChatCreation$3(j, baseFragmentArr, (Runnable) obj);
                 }
             };
             final AlertDialog alertDialog = this.val$progress;
             Utilities.Callback callback3 = new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    DialogsActivity.AnonymousClass33.this.lambda$didFinishChatCreation$5(alertDialog, j, (Runnable) obj);
+                    DialogsActivity.AnonymousClass32.this.lambda$didFinishChatCreation$5(alertDialog, j, (Runnable) obj);
                 }
             };
             Utilities.Callback callback4 = new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    DialogsActivity.AnonymousClass33.this.lambda$didFinishChatCreation$7(j, (Runnable) obj);
+                    DialogsActivity.AnonymousClass32.this.lambda$didFinishChatCreation$7(j, (Runnable) obj);
                 }
             };
             Utilities.Callback callback5 = new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    DialogsActivity.AnonymousClass33.this.lambda$didFinishChatCreation$9(j, (Runnable) obj);
+                    DialogsActivity.AnonymousClass32.this.lambda$didFinishChatCreation$9(j, (Runnable) obj);
                 }
             };
             final AlertDialog alertDialog2 = this.val$progress;
             Utilities.doCallbacks(callback, callback2, callback3, callback4, callback5, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    DialogsActivity.AnonymousClass33.this.lambda$didFinishChatCreation$10(alertDialog2, j, baseFragmentArr, (Runnable) obj);
+                    DialogsActivity.AnonymousClass32.this.lambda$didFinishChatCreation$10(alertDialog2, j, baseFragmentArr, (Runnable) obj);
                 }
             });
         }
@@ -1008,8 +1002,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    public class AnonymousClass45 extends UndoView {
-        AnonymousClass45(Context context) {
+    public class AnonymousClass42 extends UndoView {
+        AnonymousClass42(Context context) {
             super(context);
         }
 
@@ -1055,7 +1049,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         AndroidUtilities.runOnUIThread(new Runnable() {
                             @Override
                             public final void run() {
-                                DialogsActivity.AnonymousClass45.this.lambda$onRemoveDialogAction$0(i2, dialog);
+                                DialogsActivity.AnonymousClass42.this.lambda$onRemoveDialogAction$0(i2, dialog);
                             }
                         });
                     } else {
@@ -1264,57 +1258,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    public class AnonymousClass6 extends FilterTabsView {
-        AnonymousClass6(Context context) {
-            super(context);
-        }
-
-        public void lambda$onDefaultTabMoved$0() {
-            DialogsActivity.this.showDialog(new PremiumFeatureBottomSheet(DialogsActivity.this, 9, true));
-            DialogsActivity.this.filterTabsView.setIsEditing(false);
-            DialogsActivity.this.showDoneItem(false);
-        }
-
-        @Override
-        protected void onDefaultTabMoved() {
-            if (DialogsActivity.this.getMessagesController().premiumFeaturesBlocked()) {
-                return;
-            }
-            try {
-                performHapticFeedback(3, 1);
-            } catch (Exception unused) {
-            }
-            DialogsActivity dialogsActivity = DialogsActivity.this;
-            dialogsActivity.topBulletin = BulletinFactory.of(dialogsActivity).createSimpleBulletin(R.raw.filter_reorder, AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LimitReachedReorderFolder, LocaleController.getString(R.string.FilterAllChats))), LocaleController.getString(R.string.PremiumMore), 5000, new Runnable() {
-                @Override
-                public final void run() {
-                    DialogsActivity.AnonymousClass6.this.lambda$onDefaultTabMoved$0();
-                }
-            }).show(true);
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(MotionEvent motionEvent) {
-            getParent().requestDisallowInterceptTouchEvent(true);
-            DialogsActivity.this.maybeStartTracking = false;
-            return super.onInterceptTouchEvent(motionEvent);
-        }
-
-        @Override
-        public void setTranslationY(float f) {
-            if (getTranslationY() != f) {
-                super.setTranslationY(f);
-                DialogsActivity.this.updateContextViewPosition();
-                View view = DialogsActivity.this.fragmentView;
-                if (view != null) {
-                    view.invalidate();
-                }
-            }
-        }
-    }
-
-    public class AnonymousClass60 implements DialogsSearchAdapter.DialogsSearchAdapterDelegate {
-        AnonymousClass60() {
+    public class AnonymousClass57 implements DialogsSearchAdapter.DialogsSearchAdapterDelegate {
+        AnonymousClass57() {
         }
 
         public void lambda$needClearList$1(DialogInterface dialogInterface, int i) {
@@ -1413,7 +1358,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 onClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public final void onClick(DialogInterface dialogInterface, int i) {
-                        DialogsActivity.AnonymousClass60.this.lambda$needClearList$1(dialogInterface, i);
+                        DialogsActivity.AnonymousClass57.this.lambda$needClearList$1(dialogInterface, i);
                     }
                 };
             } else {
@@ -1423,7 +1368,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 onClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public final void onClick(DialogInterface dialogInterface, int i) {
-                        DialogsActivity.AnonymousClass60.this.lambda$needClearList$2(dialogInterface, i);
+                        DialogsActivity.AnonymousClass57.this.lambda$needClearList$2(dialogInterface, i);
                     }
                 };
             }
@@ -1449,7 +1394,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             builder.setPositiveButton(LocaleController.getString(R.string.StickersRemove), new DialogInterface.OnClickListener() {
                 @Override
                 public final void onClick(DialogInterface dialogInterface, int i) {
-                    DialogsActivity.AnonymousClass60.this.lambda$needRemoveHint$0(j, dialogInterface, i);
+                    DialogsActivity.AnonymousClass57.this.lambda$needRemoveHint$0(j, dialogInterface, i);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1486,6 +1431,55 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             if (z && DialogsActivity.this.searchViewPager.dialogsSearchAdapter.getItemCount() == 0) {
                 DialogsActivity.this.searchViewPager.cancelEnterAnimation();
+            }
+        }
+    }
+
+    public class AnonymousClass6 extends FilterTabsView {
+        AnonymousClass6(Context context) {
+            super(context);
+        }
+
+        public void lambda$onDefaultTabMoved$0() {
+            DialogsActivity.this.showDialog(new PremiumFeatureBottomSheet(DialogsActivity.this, 9, true));
+            DialogsActivity.this.filterTabsView.setIsEditing(false);
+            DialogsActivity.this.showDoneItem(false);
+        }
+
+        @Override
+        protected void onDefaultTabMoved() {
+            if (DialogsActivity.this.getMessagesController().premiumFeaturesBlocked()) {
+                return;
+            }
+            try {
+                performHapticFeedback(3, 1);
+            } catch (Exception unused) {
+            }
+            DialogsActivity dialogsActivity = DialogsActivity.this;
+            dialogsActivity.topBulletin = BulletinFactory.of(dialogsActivity).createSimpleBulletin(R.raw.filter_reorder, AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LimitReachedReorderFolder, LocaleController.getString(R.string.FilterAllChats))), LocaleController.getString(R.string.PremiumMore), 5000, new Runnable() {
+                @Override
+                public final void run() {
+                    DialogsActivity.AnonymousClass6.this.lambda$onDefaultTabMoved$0();
+                }
+            }).show(true);
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(MotionEvent motionEvent) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+            DialogsActivity.this.maybeStartTracking = false;
+            return super.onInterceptTouchEvent(motionEvent);
+        }
+
+        @Override
+        public void setTranslationY(float f) {
+            if (getTranslationY() != f) {
+                super.setTranslationY(f);
+                DialogsActivity.this.updateContextViewPosition();
+                View view = DialogsActivity.this.fragmentView;
+                if (view != null) {
+                    view.invalidate();
+                }
             }
         }
     }
@@ -3230,7 +3224,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             bundle2.putInt("chatType", (bool3 == null || !bool3.booleanValue()) ? 4 : 5);
             bundle2.putBoolean("canToggleTopics", false);
             GroupCreateFinalActivity groupCreateFinalActivity2 = new GroupCreateFinalActivity(bundle2);
-            groupCreateFinalActivity2.setDelegate(new AnonymousClass33(alertDialog));
+            groupCreateFinalActivity2.setDelegate(new AnonymousClass32(alertDialog));
             groupCreateFinalActivity = groupCreateFinalActivity2;
         }
         presentFragment(groupCreateFinalActivity);
@@ -3933,12 +3927,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         onSendLongClick(frameLayout);
         return true;
-    }
-
-    public void lambda$createView$17(View view) {
-        if (SharedConfig.isAppUpdateAvailable()) {
-            AndroidUtilities.openForView(SharedConfig.pendingAppUpdate.document, true, getParentActivity());
-        }
     }
 
     public void lambda$createView$18(View view) {
@@ -6404,75 +6392,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }, 200L);
     }
 
-    private void updateAppUpdateViews(boolean z) {
-        boolean z2;
-        AnimatorSet animatorSet;
-        AnimatorListenerAdapter animatorListenerAdapter;
-        if (this.updateLayout == null) {
-            return;
-        }
-        if (SharedConfig.isAppUpdateAvailable()) {
-            FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
-            z2 = getFileLoader().getPathToAttach(SharedConfig.pendingAppUpdate.document, true).exists();
-        } else {
-            z2 = false;
-        }
-        if (z2) {
-            if (this.updateLayout.getTag() != null) {
-                return;
-            }
-            AnimatorSet animatorSet2 = this.updateLayoutAnimator;
-            if (animatorSet2 != null) {
-                animatorSet2.cancel();
-            }
-            this.updateLayout.setVisibility(0);
-            this.updateLayout.setTag(1);
-            if (!z) {
-                this.updateLayout.setTranslationY(0.0f);
-                return;
-            }
-            AnimatorSet animatorSet3 = new AnimatorSet();
-            this.updateLayoutAnimator = animatorSet3;
-            animatorSet3.setDuration(180L);
-            this.updateLayoutAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT);
-            this.updateLayoutAnimator.playTogether(ObjectAnimator.ofFloat(this.updateLayout, (Property<FrameLayout, Float>) View.TRANSLATION_Y, 0.0f));
-            animatorSet = this.updateLayoutAnimator;
-            animatorListenerAdapter = new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    DialogsActivity.this.updateLayoutAnimator = null;
-                }
-            };
-        } else {
-            if (this.updateLayout.getTag() == null) {
-                return;
-            }
-            this.updateLayout.setTag(null);
-            if (!z) {
-                this.updateLayout.setTranslationY(AndroidUtilities.dp(48.0f));
-                this.updateLayout.setVisibility(4);
-                return;
-            }
-            AnimatorSet animatorSet4 = new AnimatorSet();
-            this.updateLayoutAnimator = animatorSet4;
-            animatorSet4.setDuration(180L);
-            this.updateLayoutAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT);
-            this.updateLayoutAnimator.playTogether(ObjectAnimator.ofFloat(this.updateLayout, (Property<FrameLayout, Float>) View.TRANSLATION_Y, AndroidUtilities.dp(48.0f)));
-            animatorSet = this.updateLayoutAnimator;
-            animatorListenerAdapter = new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    if (DialogsActivity.this.updateLayout.getTag() == null) {
-                        DialogsActivity.this.updateLayout.setVisibility(4);
-                    }
-                    DialogsActivity.this.updateLayoutAnimator = null;
-                }
-            };
-        }
-        animatorSet.addListener(animatorListenerAdapter);
-        this.updateLayoutAnimator.start();
-    }
-
     private void updateAuthHintCellVisibility(final boolean z) {
         final int i;
         if (this.authHintCellVisible != z) {
@@ -6881,28 +6800,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void updateMenuButton(boolean z) {
-        int i;
-        if (this.menuDrawable == null || this.updateLayout == null) {
-            return;
-        }
-        float f = 0.0f;
-        if (SharedConfig.isAppUpdateAvailable()) {
-            String attachFileName = FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
-            if (getFileLoader().isLoadingFile(attachFileName)) {
-                i = MenuDrawable.TYPE_UDPATE_DOWNLOADING;
-                Float fileProgress = ImageLoader.getInstance().getFileProgress(attachFileName);
-                if (fileProgress != null) {
-                    f = fileProgress.floatValue();
-                }
-            } else {
-                i = MenuDrawable.TYPE_UDPATE_AVAILABLE;
-            }
-        } else {
-            i = MenuDrawable.TYPE_DEFAULT;
-        }
-        updateAppUpdateViews(z);
-        this.menuDrawable.setType(i, z);
-        this.menuDrawable.setUpdateDownloadProgress(f, z);
     }
 
     public void updatePasscodeButton() {
@@ -7366,7 +7263,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         };
         this.searchViewPager = searchViewPager2;
         ((ContentView) this.fragmentView).addView(searchViewPager2, this.searchViewPagerIndex);
-        this.searchViewPager.dialogsSearchAdapter.setDelegate(new AnonymousClass60());
+        this.searchViewPager.dialogsSearchAdapter.setDelegate(new AnonymousClass57());
         this.searchViewPager.channelsSearchListView.setOnItemClickListener(new RecyclerListView.OnItemClickListenerExtended() {
             @Override
             public boolean hasDoubleTap(View view, int i) {
@@ -7472,7 +7369,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         Context context;
         if (this.undoView[0] == null && (context = getContext()) != null) {
             for (int i = 0; i < 2; i++) {
-                this.undoView[i] = new AnonymousClass45(context);
+                this.undoView[i] = new AnonymousClass42(context);
                 ContentView contentView = (ContentView) this.fragmentView;
                 UndoView undoView = this.undoView[i];
                 int i2 = this.undoViewIndex + 1;
@@ -7483,7 +7380,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     @Override
-    public android.view.View createView(final android.content.Context r48) {
+    public android.view.View createView(final android.content.Context r46) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.DialogsActivity.createView(android.content.Context):android.view.View");
     }
 

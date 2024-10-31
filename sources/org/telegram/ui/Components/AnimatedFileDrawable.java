@@ -196,7 +196,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         return i;
     }
 
-    static int access$3608(AnimatedFileDrawable animatedFileDrawable) {
+    static int access$3508(AnimatedFileDrawable animatedFileDrawable) {
         int i = animatedFileDrawable.decoderTryCount;
         animatedFileDrawable.decoderTryCount = i + 1;
         return i;
@@ -253,11 +253,11 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         canvas.drawBitmap(this.renderingBitmap, 0.0f, 0.0f, paint);
     }
 
-    private static native int getFrameAtTime(long j, long j2, Bitmap bitmap, int[] iArr, int i);
+    public static native int getFrameAtTime(long j, long j2, Bitmap bitmap, int[] iArr, int i);
 
     public static native int getVideoFrame(long j, Bitmap bitmap, int[] iArr, int i, boolean z, float f, float f2, boolean z2);
 
-    private static native void getVideoInfo(int i, String str, int[] iArr);
+    public static native void getVideoInfo(int i, String str, int[] iArr);
 
     public static void getVideoInfo(String str, int[] iArr) {
         getVideoInfo(Build.VERSION.SDK_INT, str, iArr);
@@ -303,7 +303,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         }
     }
 
-    private static native void prepareToSeek(long j);
+    public static native void prepareToSeek(long j);
 
     public void scheduleNextGetFrame() {
         if (this.loadFrameTask == null) {
@@ -349,9 +349,9 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         }
     }
 
-    public static native void seekToMs(long j, long j2, boolean z);
+    public static native void seekToMs(long j, long j2, int[] iArr, boolean z);
 
-    private static native void stopDecoder(long j);
+    public static native void stopDecoder(long j);
 
     public void updateScaleFactor() {
         int i;
@@ -554,11 +554,12 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
             this.stream.reset();
         }
         if (!z) {
-            seekToMs(this.nativePtr, j, z);
+            seekToMs(this.nativePtr, j, this.metaData, z);
         }
         int[] iArr = this.metaData;
         Bitmap createBitmap = Bitmap.createBitmap(iArr[0], iArr[1], Bitmap.Config.ARGB_8888);
-        if ((z ? getFrameAtTime(this.nativePtr, j, createBitmap, this.metaData, createBitmap.getRowBytes()) : getVideoFrame(this.nativePtr, createBitmap, this.metaData, createBitmap.getRowBytes(), true, 0.0f, 0.0f, true)) != 0) {
+        long j2 = this.nativePtr;
+        if ((z ? getFrameAtTime(j2, j, createBitmap, this.metaData, createBitmap.getRowBytes()) : getVideoFrame(j2, createBitmap, this.metaData, createBitmap.getRowBytes(), true, 0.0f, 0.0f, true)) != 0) {
             return createBitmap;
         }
         return null;
