@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.LocaleController;
@@ -46,7 +47,7 @@ public class BotAdView extends FrameLayout {
         LinearLayout linearLayout = new LinearLayout(context);
         this.layout = linearLayout;
         linearLayout.setOrientation(0);
-        linearLayout.setPadding(AndroidUtilities.dp(16.0f), AndroidUtilities.dp(5.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(10.0f));
+        linearLayout.setPadding(AndroidUtilities.dp(16.0f), AndroidUtilities.dp(5.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(5.0f));
         ScaleStateListAnimator.apply(linearLayout, 0.025f, 1.4f);
         addView(linearLayout, LayoutHelper.createFrame(-1, -1, 119));
         int i = Theme.key_featuredStickers_addButton;
@@ -152,9 +153,9 @@ public class BotAdView extends FrameLayout {
         }
         boolean z = true;
         this.invalidatedMeasure = true;
-        String str = messageObject.sponsoredTitle;
-        CharSequence charSequence = messageObject.messageText;
-        final String str2 = messageObject.sponsoredUrl;
+        CharSequence replaceEmoji = Emoji.replaceEmoji(messageObject.sponsoredTitle, this.titleView.getPaint().getFontMetricsInt(), false);
+        CharSequence replaceEmoji2 = Emoji.replaceEmoji(messageObject.messageText, this.textView.getPaint().getFontMetricsInt(), false);
+        final String str = messageObject.sponsoredUrl;
         if (messageObject.sponsoredMedia != null) {
             this.imageView.setVisibility(0);
             this.closeView.setVisibility(8);
@@ -194,17 +195,17 @@ public class BotAdView extends FrameLayout {
         int i2 = Theme.key_featuredStickers_addButton;
         spannableStringBuilder.setSpan(new ForegroundColorSpan(Theme.getColor(i2, this.resourcesProvider)), 0, spannableStringBuilder.length(), 33);
         spannableStringBuilder.append((CharSequence) " \u2009");
-        spannableStringBuilder.append((CharSequence) str);
-        if (this.titleView.getPaint().measureText(spannableStringBuilder.toString()) > ((AndroidUtilities.displaySize.x - AndroidUtilities.dp(44.660004f)) - this.removeView.getPaint().measureText(this.removeView.getText().toString())) - AndroidUtilities.dp(z ? 58.0f : 0.0f)) {
+        spannableStringBuilder.append(replaceEmoji);
+        if (this.titleView.getPaint().measureText(spannableStringBuilder.toString()) > (((AndroidUtilities.displaySize.x - AndroidUtilities.dp(44.660004f)) - this.removeView.getPaint().measureText(this.removeView.getText().toString())) - AndroidUtilities.dp(32.0f)) - AndroidUtilities.dp(z ? 58.0f : 0.0f)) {
             spannableStringBuilder = new SpannableStringBuilder(LocaleController.getString(i));
             spannableStringBuilder.setSpan(new ForegroundColorSpan(Theme.getColor(i2, this.resourcesProvider)), 0, spannableStringBuilder.length(), 33);
             this.channelTitleView.setVisibility(0);
-            this.channelTitleView.setText(str);
+            this.channelTitleView.setText(replaceEmoji);
         } else {
             this.channelTitleView.setVisibility(8);
         }
         this.titleView.setText(spannableStringBuilder);
-        this.textView.setText(charSequence);
+        this.textView.setText(replaceEmoji2);
         setLayoutParams(LayoutHelper.createFrame(-1, -2, 83));
         this.removeView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -215,7 +216,7 @@ public class BotAdView extends FrameLayout {
         setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                BotAdView.this.lambda$set$2(str2, view);
+                BotAdView.this.lambda$set$2(str, view);
             }
         });
         this.closeView.setOnClickListener(new View.OnClickListener() {

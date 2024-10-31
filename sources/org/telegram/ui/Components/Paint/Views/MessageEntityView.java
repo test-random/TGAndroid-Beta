@@ -201,7 +201,9 @@ public abstract class MessageEntityView extends EntityView {
 
             @Override
             public ColorFilter getAnimatedEmojiColorFilter() {
-                return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
+                ColorFilter colorFilter;
+                colorFilter = Theme.chat_animatedEmojiTextColorFilter;
+                return colorFilter;
             }
 
             @Override
@@ -211,12 +213,16 @@ public abstract class MessageEntityView extends EntityView {
 
             @Override
             public int getColorOrDefault(int i) {
-                return getColor(i);
+                int color;
+                color = getColor(i);
+                return color;
             }
 
             @Override
             public int getCurrentColor(int i) {
-                return getColor(i);
+                int color;
+                color = getColor(i);
+                return color;
             }
 
             @Override
@@ -275,6 +281,7 @@ public abstract class MessageEntityView extends EntityView {
 
             @Override
             public Paint getPaint(String str) {
+                Paint themePaint;
                 str.hashCode();
                 char c = 65535;
                 switch (str.hashCode()) {
@@ -321,7 +328,8 @@ public abstract class MessageEntityView extends EntityView {
                     case 4:
                         return this.chat_actionTextPaint;
                     default:
-                        return Theme.ResourcesProvider.CC.$default$getPaint(this, str);
+                        themePaint = Theme.getThemePaint(str);
+                        return themePaint;
                 }
             }
 

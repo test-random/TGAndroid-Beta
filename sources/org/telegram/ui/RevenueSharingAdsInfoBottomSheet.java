@@ -117,8 +117,8 @@ public class RevenueSharingAdsInfoBottomSheet extends BottomSheetWithRecyclerLis
         textView2.setTextSize(1, 14.0f);
         textView2.setGravity(1);
         linearLayout.addView(textView2, LayoutHelper.createLinear(-2, -2, 1, 22, 8, 22, 0));
-        linearLayout.addView(new FeatureCell(context, R.drawable.menu_privacy, LocaleController.getString(R.string.RevenueSharingAdsInfo1Title), LocaleController.getString(R.string.RevenueSharingAdsInfo1Subtitle)), LayoutHelper.createLinear(-1, -2, 0.0f, 0, 0, 20, 0, 0));
-        linearLayout.addView(new FeatureCell(context, R.drawable.menu_feature_split, LocaleController.getString(R.string.RevenueSharingAdsInfo2Title), LocaleController.getString(R.string.RevenueSharingAdsInfo2Subtitle)), LayoutHelper.createLinear(-1, -2, 0.0f, 0, 0, 16, 0, 0));
+        linearLayout.addView(new FeatureCell(context, R.drawable.menu_privacy, LocaleController.getString(z ? R.string.RevenueSharingAdsInfo1TitleBot : R.string.RevenueSharingAdsInfo1Title), LocaleController.getString(z ? R.string.RevenueSharingAdsInfo1SubtitleBot : R.string.RevenueSharingAdsInfo1Subtitle)), LayoutHelper.createLinear(-1, -2, 0.0f, 0, 0, 20, 0, 0));
+        linearLayout.addView(new FeatureCell(context, R.drawable.menu_feature_split, LocaleController.getString(z ? R.string.RevenueSharingAdsInfo2TitleBot : R.string.RevenueSharingAdsInfo2Title), LocaleController.getString(z ? R.string.RevenueSharingAdsInfo2SubtitleBot : R.string.RevenueSharingAdsInfo2Subtitle)), LayoutHelper.createLinear(-1, -2, 0.0f, 0, 0, 16, 0, 0));
         String formatString = LocaleController.formatString(z ? R.string.RevenueSharingAdsInfo3SubtitleBot : R.string.RevenueSharingAdsInfo3Subtitle, Integer.valueOf(MessagesController.getInstance(UserConfig.selectedAccount).channelRestrictSponsoredLevelMin));
         int i3 = Theme.key_chat_messageLinkIn;
         linearLayout.addView(new FeatureCell(context, R.drawable.menu_feature_noads, LocaleController.getString(R.string.RevenueSharingAdsInfo3Title), AndroidUtilities.replaceSingleTag(formatString, i3, 0, new Runnable() {
@@ -133,13 +133,14 @@ public class RevenueSharingAdsInfoBottomSheet extends BottomSheetWithRecyclerLis
         layoutParams.setMargins(AndroidUtilities.dp(24.0f), AndroidUtilities.dp(20.0f), AndroidUtilities.dp(24.0f), AndroidUtilities.dp(20.0f));
         linearLayout.addView(view, layoutParams);
         TextView textView3 = new TextView(context);
-        textView3.setText(LocaleController.getString(R.string.RevenueSharingAdsInfo4Title));
+        textView3.setText(LocaleController.getString(z ? R.string.RevenueSharingAdsInfo4TitleBot : R.string.RevenueSharingAdsInfo4Title));
         textView3.setTypeface(AndroidUtilities.bold());
         textView3.setTextColor(Theme.getColor(i2, resourcesProvider));
         textView3.setTextSize(1, 20.0f);
         textView3.setTextAlignment(4);
+        textView3.setGravity(17);
         linearLayout.addView(textView3, LayoutHelper.createLinear(-2, -2, 1, 22, 0, 22, 0));
-        SpannableStringBuilder replaceTags = AndroidUtilities.replaceTags(LocaleController.getString(R.string.RevenueSharingAdsInfo4Subtitle2));
+        SpannableStringBuilder replaceTags = AndroidUtilities.replaceTags(LocaleController.getString(z ? R.string.RevenueSharingAdsInfo4Subtitle2Bot : R.string.RevenueSharingAdsInfo4Subtitle2));
         SpannableStringBuilder replaceSingleTag = AndroidUtilities.replaceSingleTag(LocaleController.getString(R.string.RevenueSharingAdsInfo4SubtitleLearnMore), i3, 0, new Runnable() {
             @Override
             public final void run() {

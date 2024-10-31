@@ -117,30 +117,36 @@ public class VideoFramesRewinder {
     }
 
     public void lambda$new$2() {
-        long j;
         int i;
+        int i2;
+        int i3;
         final ArrayList arrayList = new ArrayList();
         final long currentTimeMillis = System.currentTimeMillis();
         int[] iArr = this.meta;
-        int i2 = iArr[4];
-        int i3 = 0;
+        int i4 = iArr[4];
         int min = Math.min(this.w / 4, iArr[0]);
         int min2 = Math.min(this.h / 4, this.meta[1]);
-        int i4 = this.maxFrameSide;
-        if (min > i4 || min2 > i4) {
-            float max = i4 / Math.max(min, min2);
+        int i5 = this.maxFrameSide;
+        if (min > i5 || min2 > i5) {
+            float max = i5 / Math.max(min, min2);
             min = (int) (min * max);
             min2 = (int) (min2 * max);
         }
-        long j2 = this.prepareToMs;
-        AnimatedFileDrawable.seekToMs(this.ptr, j2, this.meta, false);
+        long j = this.prepareToMs;
+        AnimatedFileDrawable.seekToMs(this.ptr, j - (this.prepareWithSpeed * 350.0f), this.meta, false);
         char c = 3;
-        long j3 = this.meta[3];
-        while (this.meta[c] <= j2 && !this.stop.get()) {
-            float f = 1000.0f / i2;
-            int i5 = i2;
-            long j4 = ((float) j3) + (this.prepareWithSpeed * f);
-            Frame remove = !this.freeFrames.isEmpty() ? this.freeFrames.remove(i3) : new Frame();
+        long j2 = this.meta[3];
+        int i6 = 0;
+        while (true) {
+            int i7 = i4;
+            if (this.meta[c] > j || this.stop.get()) {
+                break;
+            }
+            int i8 = i7;
+            float f = 1000.0f / i8;
+            long j3 = j;
+            long j4 = ((float) j2) + (this.prepareWithSpeed * f);
+            Frame remove = !this.freeFrames.isEmpty() ? this.freeFrames.remove(0) : new Frame();
             Bitmap bitmap = remove.bitmap;
             if (bitmap == null || bitmap.getWidth() != min || remove.bitmap.getHeight() != min2) {
                 AndroidUtilities.recycleBitmap(remove.bitmap);
@@ -151,24 +157,38 @@ public class VideoFramesRewinder {
                 }
             }
             while (true) {
-                j = j3;
-                i = min2;
-                if (this.meta[c] + ((long) Math.ceil(f)) < j4) {
-                    AnimatedFileDrawable.getVideoFrame(this.ptr, null, this.meta, 0, true, 0.0f, r10[4], false);
-                    min2 = i;
-                    j3 = j;
-                    c = 3;
+                i = i6;
+                i2 = i8;
+                i3 = min2;
+                if (this.meta[3] + ((long) Math.ceil(f)) >= j4) {
+                    break;
                 }
+                AnimatedFileDrawable.getVideoFrame(this.ptr, null, this.meta, 0, true, 0.0f, r10[4], false);
+                min2 = i3;
+                i6 = i;
+                i8 = i2;
+                min = min;
             }
+            int i9 = min;
             long j5 = this.ptr;
             Bitmap bitmap2 = remove.bitmap;
-            AnimatedFileDrawable.getVideoFrame(j5, bitmap2, this.meta, bitmap2.getRowBytes(), true, 0.0f, this.meta[4], false);
-            remove.position = this.meta[3];
-            arrayList.add(remove);
-            min2 = i;
-            i2 = i5;
-            j3 = j;
-            i3 = 0;
+            if (AnimatedFileDrawable.getVideoFrame(j5, bitmap2, this.meta, bitmap2.getRowBytes(), true, 0.0f, this.meta[4], false) == 0) {
+                i6 = i + 1;
+                if (i6 > 6) {
+                    break;
+                }
+                min2 = i3;
+                j = j3;
+            } else {
+                j2 = this.meta[3];
+                remove.position = j2;
+                arrayList.add(remove);
+                min2 = i3;
+                j = j3;
+                i6 = i;
+            }
+            i4 = i2;
+            min = i9;
             c = 3;
         }
         AndroidUtilities.runOnUIThread(new Runnable() {
@@ -180,10 +200,6 @@ public class VideoFramesRewinder {
     }
 
     private void prepare(long j) {
-        if (j <= 0) {
-            FileLog.d("[VideoFramesRewinder] WTF asked to prepare " + j + "ms");
-            return;
-        }
         if (this.isPreparing) {
             return;
         }
@@ -267,10 +283,10 @@ public class VideoFramesRewinder {
                         FileLog.d("[VideoFramesRewinder] also deleted " + i + " frames after this frame");
                     }
                 }
-                j = Math.max(0L, this.frames.first().position - 20);
+                j = this.frames.first().position - 20;
             }
         }
-        prepare(j);
+        prepare(Math.max(0L, j));
     }
 
     public void setParentView(View view) {

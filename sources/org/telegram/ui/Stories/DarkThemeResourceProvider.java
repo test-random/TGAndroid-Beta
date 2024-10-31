@@ -188,12 +188,16 @@ public class DarkThemeResourceProvider implements Theme.ResourcesProvider {
 
     @Override
     public int getColorOrDefault(int i) {
-        return getColor(i);
+        int color;
+        color = getColor(i);
+        return color;
     }
 
     @Override
     public int getCurrentColor(int i) {
-        return getColor(i);
+        int color;
+        color = getColor(i);
+        return color;
     }
 
     @Override

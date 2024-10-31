@@ -1065,7 +1065,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public ColorFilter getAnimatedEmojiColorFilter() {
-            return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
+            ColorFilter colorFilter;
+            colorFilter = Theme.chat_animatedEmojiTextColorFilter;
+            return colorFilter;
         }
 
         @Override
@@ -1075,12 +1077,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public int getColorOrDefault(int i) {
-            return getColor(i);
+            int color;
+            color = getColor(i);
+            return color;
         }
 
         @Override
         public int getCurrentColor(int i) {
-            return getColor(i);
+            int color;
+            color = getColor(i);
+            return color;
         }
 
         @Override
@@ -1090,7 +1096,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public Paint getPaint(String str) {
-            return Theme.ResourcesProvider.CC.$default$getPaint(this, str);
+            Paint themePaint;
+            themePaint = Theme.getThemePaint(str);
+            return themePaint;
         }
 
         @Override
@@ -5343,7 +5351,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 return;
             }
             int max = Math.max(0, ChatActivity.this.selectedObject.messageOwner.ttl_period - (ChatActivity.this.getConnectionsManager().getCurrentTime() - ChatActivity.this.selectedObject.messageOwner.date));
-            ChatActivity.this.menuDeleteItem.setSubtext(LocaleController.formatString("AutoDeleteIn", R.string.AutoDeleteIn, max < 86400 ? AndroidUtilities.formatDuration(max, false) : LocaleController.formatPluralString("Days", Math.round(max / 86400.0f), new Object[0])));
+            ChatActivity.this.menuDeleteItem.setSubtext(LocaleController.formatString(R.string.AutoDeleteIn, max < 86400 ? AndroidUtilities.formatDuration(max, false) : LocaleController.formatPluralString("Days", Math.round(max / 86400.0f), new Object[0])));
             AndroidUtilities.runOnUIThread(ChatActivity.this.updateDeleteItemRunnable, 1000L);
         }
     }
@@ -14721,7 +14729,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public ColorFilter getAnimatedEmojiColorFilter() {
-            return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
+            ColorFilter colorFilter;
+            colorFilter = Theme.chat_animatedEmojiTextColorFilter;
+            return colorFilter;
         }
 
         public List getCachedThemes() {
@@ -14751,7 +14761,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public int getColorOrDefault(int i) {
-            return getColor(i);
+            int color;
+            color = getColor(i);
+            return color;
         }
 
         @Override
@@ -15063,7 +15075,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
             @Override
             public ColorFilter getAnimatedEmojiColorFilter() {
-                return Theme.ResourcesProvider.CC.$default$getAnimatedEmojiColorFilter(this);
+                ColorFilter colorFilter;
+                colorFilter = Theme.chat_animatedEmojiTextColorFilter;
+                return colorFilter;
             }
 
             @Override
@@ -15073,12 +15087,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
             @Override
             public int getColorOrDefault(int i) {
-                return getColor(i);
+                int color;
+                color = getColor(i);
+                return color;
             }
 
             @Override
             public int getCurrentColor(int i) {
-                return getColor(i);
+                int color;
+                color = getColor(i);
+                return color;
             }
 
             @Override
@@ -15088,7 +15106,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
             @Override
             public Paint getPaint(String str) {
-                return Theme.ResourcesProvider.CC.$default$getPaint(this, str);
+                Paint themePaint;
+                themePaint = Theme.getThemePaint(str);
+                return themePaint;
             }
 
             @Override
@@ -15142,7 +15162,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     return;
                 }
                 int max = Math.max(0, ChatActivity.this.selectedObject.messageOwner.ttl_period - (ChatActivity.this.getConnectionsManager().getCurrentTime() - ChatActivity.this.selectedObject.messageOwner.date));
-                ChatActivity.this.menuDeleteItem.setSubtext(LocaleController.formatString("AutoDeleteIn", R.string.AutoDeleteIn, max < 86400 ? AndroidUtilities.formatDuration(max, false) : LocaleController.formatPluralString("Days", Math.round(max / 86400.0f), new Object[0])));
+                ChatActivity.this.menuDeleteItem.setSubtext(LocaleController.formatString(R.string.AutoDeleteIn, max < 86400 ? AndroidUtilities.formatDuration(max, false) : LocaleController.formatPluralString("Days", Math.round(max / 86400.0f), new Object[0])));
                 AndroidUtilities.runOnUIThread(ChatActivity.this.updateDeleteItemRunnable, 1000L);
             }
         };
@@ -18541,12 +18561,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         } else {
             i = (this.topChatPanelView.getLayoutParams() == null ? AndroidUtilities.dp(50.0f) : this.topChatPanelView.getLayoutParams().height) - AndroidUtilities.dp(2.0f);
         }
-        float max = this.contentPanTranslation + this.contentPaddingTop + Math.max(0, i + ((int) Math.max(-i, this.topChatPanelViewOffset)));
+        int max = i + ((int) Math.max(-i, this.topChatPanelViewOffset));
+        float max2 = this.contentPanTranslation + this.contentPaddingTop + Math.max(0, max);
         BlurredFrameLayout blurredFrameLayout2 = this.pinnedMessageView;
         if (blurredFrameLayout2 != null) {
-            float f = max + this.pinnedMessageEnterOffset;
+            float f = max2 + this.pinnedMessageEnterOffset;
             blurredFrameLayout2.setTranslationY(f);
-            max = f + AndroidUtilities.dp(48.0f);
+            max2 = f + AndroidUtilities.dp(48.0f);
         }
         BlurredFrameLayout blurredFrameLayout3 = this.topChatPanelView2;
         if (blurredFrameLayout3 == null || blurredFrameLayout3.getVisibility() != 0) {
@@ -18554,13 +18575,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         } else {
             i2 = (this.topChatPanelView2.getLayoutParams() == null ? AndroidUtilities.dp(50.0f) : this.topChatPanelView2.getLayoutParams().height) - AndroidUtilities.dp(2.0f);
         }
-        float max2 = max + Math.max(0, i2 + ((int) Math.max(-i2, this.topChatPanelView2Offset)));
+        float max3 = max2 + Math.max(0, i2 + ((int) Math.max(-i2, this.topChatPanelView2Offset)));
         ChatActivityMemberRequestsDelegate chatActivityMemberRequestsDelegate = this.pendingRequestsDelegate;
         View view = chatActivityMemberRequestsDelegate != null ? chatActivityMemberRequestsDelegate.getView() : null;
         if (view != null) {
-            view.setTranslationY(max2 + this.pendingRequestsDelegate.getViewEnterOffset());
+            view.setTranslationY(max3 + this.pendingRequestsDelegate.getViewEnterOffset());
         }
-        float currentHeight = (this.actionBarSearchTags != null ? r0.getCurrentHeight() : 0.0f) + 0.0f + (this.hashtagSearchTabs != null ? r4.getCurrentHeight() : 0.0f);
+        float currentHeight = (this.actionBarSearchTags != null ? r1.getCurrentHeight() : 0.0f) + 0.0f + (this.hashtagSearchTabs != null ? r5.getCurrentHeight() : 0.0f);
         if (this.fragmentContextView != null) {
             FragmentContextView fragmentContextView = this.fragmentLocationContextView;
             float dp = (fragmentContextView == null || fragmentContextView.getVisibility() != 0) ? 0.0f : AndroidUtilities.dp(36.0f) + 0.0f;
@@ -18579,7 +18600,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         BlurredFrameLayout blurredFrameLayout5 = this.topChatPanelView2;
         if (blurredFrameLayout5 != null) {
-            blurredFrameLayout5.setTranslationY(this.contentPanTranslation + currentHeight + this.contentPaddingTop + this.topChatPanelView2Offset + Math.max(0.0f, this.pinnedMessageView != null ? AndroidUtilities.dp(48.0f) + this.pinnedMessageEnterOffset : 0.0f));
+            blurredFrameLayout5.setTranslationY(this.contentPanTranslation + currentHeight + this.contentPaddingTop + this.topChatPanelView2Offset + max + this.topChatPanelViewOffset + Math.max(0.0f, this.pinnedMessageView != null ? AndroidUtilities.dp(48.0f) + this.pinnedMessageEnterOffset : 0.0f));
         }
         FrameLayout frameLayout = this.alertView;
         if (frameLayout != null && frameLayout.getVisibility() == 0) {
@@ -24521,7 +24542,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.processLoadedDiscussionMessage(boolean, org.telegram.tgnet.TLRPC$TL_messages_discussionMessage, boolean, org.telegram.tgnet.TLRPC$messages_Messages, int, org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$TL_messages_getDiscussionMessage, org.telegram.tgnet.TLRPC$Chat, int, org.telegram.messenger.MessageObject):void");
     }
 
-    private void processNewMessages(java.util.ArrayList r32) {
+    private void processNewMessages(java.util.ArrayList r33) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.processNewMessages(java.util.ArrayList):void");
     }
 

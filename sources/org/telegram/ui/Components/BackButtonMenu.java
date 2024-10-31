@@ -172,7 +172,7 @@ public abstract class BackButtonMenu {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.BackButtonMenu.lambda$show$0(java.util.concurrent.atomic.AtomicReference, org.telegram.ui.Components.BackButtonMenu$PulledDialog, org.telegram.ui.ActionBar.INavigationLayout, org.telegram.tgnet.TLRPC$TL_forumTopic, org.telegram.ui.ActionBar.BaseFragment, android.view.View):void");
     }
 
-    public static org.telegram.ui.ActionBar.ActionBarPopupWindow show(final org.telegram.ui.ActionBar.BaseFragment r27, android.view.View r28, long r29, long r31, org.telegram.ui.ActionBar.Theme.ResourcesProvider r33) {
+    public static org.telegram.ui.ActionBar.ActionBarPopupWindow show(final org.telegram.ui.ActionBar.BaseFragment r28, android.view.View r29, long r30, long r32, org.telegram.ui.ActionBar.Theme.ResourcesProvider r34) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.BackButtonMenu.show(org.telegram.ui.ActionBar.BaseFragment, android.view.View, long, long, org.telegram.ui.ActionBar.Theme$ResourcesProvider):org.telegram.ui.ActionBar.ActionBarPopupWindow");
     }
 }
