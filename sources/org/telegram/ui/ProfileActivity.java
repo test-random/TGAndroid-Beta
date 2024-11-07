@@ -2859,7 +2859,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         }
                     }
                 }
-                ProfileActivity.this.lambda$onBackPressed$319();
+                ProfileActivity.this.lambda$onBackPressed$321();
                 Context context = ProfileActivity.this.getContext();
                 if (context != null) {
                     BulletinFactory.of(Bulletin.BulletinWindow.make(context), ProfileActivity.this.resourcesProvider).createSimpleBulletin(R.raw.ic_delete, LocaleController.getPluralString("TopicsDeleted", 1)).show();
@@ -2915,7 +2915,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             notificationCenter.removeObserver(profileActivity, i2);
             ProfileActivity.this.getNotificationCenter().lambda$postNotificationNameOnUIThread$1(i2, new Object[0]);
             ProfileActivity.this.playProfileAnimation = 0;
-            ProfileActivity.this.lambda$onBackPressed$319();
+            ProfileActivity.this.lambda$onBackPressed$321();
         }
 
         public void lambda$onItemClick$1(DialogInterface dialogInterface, int i) {
@@ -3036,7 +3036,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     ProfileActivity.this.getParentLayout().removeFragmentFromStack(fragmentStack.size() - 2);
                 }
             }
-            ProfileActivity.this.lambda$onBackPressed$319();
+            ProfileActivity.this.lambda$onBackPressed$321();
             ProfileActivity.this.getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.needDeleteDialog, Long.valueOf(ProfileActivity.this.dialogId), user, ProfileActivity.this.currentChat, Boolean.valueOf(z));
         }
 
@@ -8431,7 +8431,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         getMessagesController().deleteParticipantFromChat(this.chatId, getMessagesController().getUser(Long.valueOf(getUserConfig().getClientUserId())));
         this.playProfileAnimation = 0;
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$checkCanSendStoryForPosting$27(Boolean bool) {
@@ -9876,7 +9876,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         int i = NotificationCenter.closeChats;
         notificationCenter.removeObserver(this, i);
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(i, new Object[0]);
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.needDeleteDialog, Long.valueOf(-this.currentChat.id), null, this.currentChat, Boolean.valueOf(z));
     }
 
@@ -10587,11 +10587,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     public void lambda$updateProfileData$71() {
-        getMessagesController().reloadUser(this.dialogId);
+        getMessagesController().reloadUser(getDialogId());
     }
 
     public void lambda$updateProfileData$72(View view) {
-        MessagePrivateSeenView.showSheet(getContext(), this.currentAccount, this.dialogId, true, null, new Runnable() {
+        MessagePrivateSeenView.showSheet(getContext(), this.currentAccount, getDialogId(), true, null, new Runnable() {
             @Override
             public final void run() {
                 ProfileActivity.this.lambda$updateProfileData$71();
@@ -11320,7 +11320,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 return;
             }
         }
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void openAddMember() {
@@ -11446,7 +11446,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         anonymousClass55.setResourceProvider(this.resourcesProvider);
         TLRPC.TL_message tL_message = new TLRPC.TL_message();
         tL_message.local_id = -1;
-        tL_message.peer_id = getMessagesController().getPeer(this.dialogId);
+        tL_message.peer_id = getMessagesController().getPeer(getDialogId());
         TLRPC.TL_messageMediaGeo tL_messageMediaGeo = new TLRPC.TL_messageMediaGeo();
         TLRPC.TL_businessLocation tL_businessLocation2 = this.userInfo.business_location;
         tL_messageMediaGeo.geo = tL_businessLocation2.geo_point;
@@ -11592,7 +11592,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             }
             BaseFragment baseFragment = (BaseFragment) this.parentLayout.getFragmentStack().get(this.parentLayout.getFragmentStack().size() - 2);
             if (baseFragment instanceof ChatActivity) {
-                lambda$onBackPressed$319();
+                lambda$onBackPressed$321();
                 ((ChatActivity) baseFragment).chatActivityEnterView.setCommand(null, str, false, false);
             }
         }

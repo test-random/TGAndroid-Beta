@@ -118,7 +118,7 @@ public class ChangeNameActivity extends BaseFragment {
                         ChangeNameActivity.this.saveName();
                     }
                 }
-                ChangeNameActivity.this.lambda$onBackPressed$319();
+                ChangeNameActivity.this.lambda$onBackPressed$321();
             }
         });
         this.doneButton = this.actionBar.createMenu().addItemWithWidth(1, R.drawable.ic_ab_done, AndroidUtilities.dp(56.0f), LocaleController.getString(R.string.Done));

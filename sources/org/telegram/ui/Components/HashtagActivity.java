@@ -220,7 +220,7 @@ public class HashtagActivity extends BaseFragment implements NotificationCenter.
             @Override
             public void onItemClick(int i3) {
                 if (i3 == -1) {
-                    HashtagActivity.this.lambda$onBackPressed$319();
+                    HashtagActivity.this.lambda$onBackPressed$321();
                 }
             }
         });

@@ -162,7 +162,7 @@ public class PhotoPickerSearchActivity extends BaseFragment {
             @Override
             public void onItemClick(int i3) {
                 if (i3 == -1) {
-                    PhotoPickerSearchActivity.this.lambda$onBackPressed$319();
+                    PhotoPickerSearchActivity.this.lambda$onBackPressed$321();
                 }
             }
         });
@@ -170,7 +170,7 @@ public class PhotoPickerSearchActivity extends BaseFragment {
         ActionBarMenuItem actionBarMenuItemSearchListener = this.actionBar.createMenu().addItem(0, R.drawable.ic_ab_search).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
             @Override
             public boolean canCollapseSearch() {
-                PhotoPickerSearchActivity.this.lambda$onBackPressed$319();
+                PhotoPickerSearchActivity.this.lambda$onBackPressed$321();
                 return false;
             }
 

@@ -2321,7 +2321,7 @@ public class PremiumPreviewFragment extends BaseFragment implements Notification
             @Override
             public void onItemClick(int i3) {
                 if (i3 == -1) {
-                    PremiumPreviewFragment.this.lambda$onBackPressed$319();
+                    PremiumPreviewFragment.this.lambda$onBackPressed$321();
                 }
             }
         });

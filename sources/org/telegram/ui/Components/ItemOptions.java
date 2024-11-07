@@ -47,6 +47,7 @@ public class ItemOptions {
     private Runnable dismissListener;
     private boolean dontDismiss;
     private boolean drawScrim;
+    private boolean forceBottom;
     private boolean forceTop;
     private int foregroundIndex;
     private BaseFragment fragment;
@@ -575,6 +576,11 @@ public class ItemOptions {
         this.dontDismiss = true;
     }
 
+    public ItemOptions forceBottom(boolean z) {
+        this.forceBottom = z;
+        return this;
+    }
+
     public ItemOptions forceTop(boolean z) {
         this.forceTop = z;
         return this;
@@ -948,7 +954,9 @@ public class ItemOptions {
                 viewGroup.getPaddingLeft();
             }
             int measuredWidth = this.scrimView != null ? this.gravity == 5 ? (int) (((this.point[0] + r1.getMeasuredWidth()) - this.layout.getMeasuredWidth()) + viewGroup.getX()) : (int) (viewGroup.getX() + this.point[0]) : (viewGroup.getWidth() - this.layout.getMeasuredWidth()) / 2;
-            if (this.scrimView != null) {
+            if (this.forceBottom) {
+                height = (int) ((Math.min(f2 + this.scrimView.getMeasuredHeight(), AndroidUtilities.displaySize.y) - this.layout.getMeasuredHeight()) + viewGroup.getY());
+            } else if (this.scrimView != null) {
                 if (this.forceTop || this.layout.getMeasuredHeight() + f2 + AndroidUtilities.dp(16.0f) > AndroidUtilities.displaySize.y - AndroidUtilities.navigationBarHeight) {
                     f2 = (f2 - this.scrimView.getMeasuredHeight()) - this.layout.getMeasuredHeight();
                 }

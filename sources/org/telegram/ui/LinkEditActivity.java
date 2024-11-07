@@ -317,7 +317,7 @@ public class LinkEditActivity extends BaseFragment {
 
     public void lambda$createView$9(DialogInterface dialogInterface, int i) {
         this.callback.revokeLink(this.inviteToEdit);
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$getThemeDescriptions$16() {
@@ -364,7 +364,7 @@ public class LinkEditActivity extends BaseFragment {
         if (callback != null) {
             callback.onLinkCreated(tLObject);
         }
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$onCreateClicked$13(final TLObject tLObject, final TLRPC.TL_error tL_error) {
@@ -393,7 +393,7 @@ public class LinkEditActivity extends BaseFragment {
         if (callback != null) {
             callback.onLinkEdited(this.inviteToEdit, tLObject);
         }
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$onCreateClicked$15(final TLObject tLObject, final TLRPC.TL_error tL_error) {
@@ -453,10 +453,10 @@ public class LinkEditActivity extends BaseFragment {
     }
 
     @Override
-    public void lambda$onBackPressed$319() {
+    public void lambda$onBackPressed$321() {
         this.scrollView.getLayoutParams().height = this.scrollView.getHeight();
         this.finished = true;
-        super.lambda$onBackPressed$319();
+        super.lambda$onBackPressed$321();
     }
 
     @Override

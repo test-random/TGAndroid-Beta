@@ -207,7 +207,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
         public void lambda$addInfoView$0(VenueLocation venueLocation, boolean z, int i) {
             LocationActivity.this.delegate.didSelectLocation(venueLocation.venue, LocationActivity.this.locationType, z, i);
-            LocationActivity.this.lambda$onBackPressed$319();
+            LocationActivity.this.lambda$onBackPressed$321();
         }
 
         public void lambda$addInfoView$1(final VenueLocation venueLocation, View view) {
@@ -220,7 +220,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 });
             } else {
                 LocationActivity.this.delegate.didSelectLocation(venueLocation.venue, LocationActivity.this.locationType, true, 0);
-                LocationActivity.this.lambda$onBackPressed$319();
+                LocationActivity.this.lambda$onBackPressed$321();
             }
         }
 
@@ -1027,7 +1027,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         }
         alertDialogArr[0] = null;
         this.delegate.didSelectLocation(tL_messageMediaVenue, 4, true, 0);
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$createView$13(final AlertDialog[] alertDialogArr, final TLRPC.TL_messageMediaVenue tL_messageMediaVenue, TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -1045,12 +1045,12 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
     public void lambda$createView$15(TLRPC.TL_messageMediaGeo tL_messageMediaGeo, boolean z, int i) {
         this.delegate.didSelectLocation(tL_messageMediaGeo, this.locationType, z, i);
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$createView$16(Object obj, boolean z, int i) {
         this.delegate.didSelectLocation((TLRPC.TL_messageMediaVenue) obj, this.locationType, z, i);
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$createView$17(View view, int i) {
@@ -1186,7 +1186,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             return;
         }
         this.delegate.didSelectLocation(tL_messageMediaVenue2, 4, true, 0);
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public boolean lambda$createView$18(MotionEvent motionEvent, IMapsProvider.ICallableMethod iCallableMethod) {
@@ -1326,7 +1326,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
     public void lambda$createView$26(TLRPC.TL_messageMediaVenue tL_messageMediaVenue, boolean z, int i) {
         this.delegate.didSelectLocation(tL_messageMediaVenue, this.locationType, z, i);
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$createView$27(ActionBarMenu actionBarMenu, View view, int i) {
@@ -1348,7 +1348,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 return;
             } else {
                 this.delegate.didSelectLocation(item, this.locationType, true, 0);
-                lambda$onBackPressed$319();
+                lambda$onBackPressed$321();
                 return;
             }
         }
@@ -1595,7 +1595,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             FileLog.e(e);
         }
         this.hasScreenshot = true;
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
     }
 
     public void lambda$onCheckGlScreenshot$45(Bitmap bitmap, final GLSurfaceView gLSurfaceView) {
@@ -2080,7 +2080,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         tL_messageMediaGeoLive.flags = i3 | 9;
         this.delegate.didSelectLocation(tL_messageMediaGeoLive, this.locationType, true, 0);
         if (i2 <= 0) {
-            lambda$onBackPressed$319();
+            lambda$onBackPressed$321();
             return;
         }
         this.proximitySheet.setRadiusSet();

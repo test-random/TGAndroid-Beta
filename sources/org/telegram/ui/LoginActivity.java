@@ -640,7 +640,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
         public void lambda$onNextPressed$18(TLObject tLObject, Bundle bundle) {
             if ((tLObject instanceof TLRPC.TL_account_emailVerified) && LoginActivity.this.activityMode == 3) {
-                LoginActivity.this.lambda$onBackPressed$319();
+                LoginActivity.this.lambda$onBackPressed$321();
                 LoginActivity.this.emailChangeFinishCallback.run();
             } else if (tLObject instanceof TLRPC.TL_account_emailVerifiedLogin) {
                 LoginActivity.this.lambda$resendCodeFromSafetyNet$19(bundle, ((TLRPC.TL_account_emailVerifiedLogin) tLObject).sent_code);
@@ -4133,7 +4133,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             String string;
             int i;
             if ((tLObject instanceof TLRPC.TL_account_emailVerified) && LoginActivity.this.activityMode == 3) {
-                LoginActivity.this.lambda$onBackPressed$319();
+                LoginActivity.this.lambda$onBackPressed$321();
                 LoginActivity.this.emailChangeFinishCallback.run();
                 return;
             }
@@ -4948,7 +4948,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         }
 
         public void lambda$onNextPressed$22(DialogInterface dialogInterface) {
-            LoginActivity.this.lambda$onBackPressed$319();
+            LoginActivity.this.lambda$onBackPressed$321();
         }
 
         public void lambda$onNextPressed$23() {
@@ -4978,7 +4978,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         }
 
         public void lambda$onNextPressed$26(DialogInterface dialogInterface) {
-            LoginActivity.this.lambda$onBackPressed$319();
+            LoginActivity.this.lambda$onBackPressed$321();
         }
 
         public void lambda$onNextPressed$27(Activity activity) {
@@ -5403,7 +5403,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             NotificationCenter globalInstance;
             int i;
             if (LoginActivity.this.activityMode != 0) {
-                LoginActivity.this.lambda$onBackPressed$319();
+                LoginActivity.this.lambda$onBackPressed$321();
                 return false;
             }
             int i2 = this.prevType;
@@ -6883,7 +6883,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             if (UserConfig.selectedAccount != i) {
                 ((LaunchActivity) LoginActivity.this.getParentActivity()).switchToAccount(i, false);
             }
-            LoginActivity.this.lambda$onBackPressed$319();
+            LoginActivity.this.lambda$onBackPressed$321();
         }
 
         public void lambda$onNextPressed$17(TLRPC.TL_error tL_error, TLObject tLObject, String str) {
@@ -7483,7 +7483,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
     public void lambda$createView$3(View view) {
         if (onBackPressed()) {
-            lambda$onBackPressed$319();
+            lambda$onBackPressed$321();
         }
     }
 
@@ -7938,7 +7938,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 }
             });
             this.pendingSwitchingAccount = false;
-            lambda$onBackPressed$319();
+            lambda$onBackPressed$321();
             return;
         }
         if (z && z2) {

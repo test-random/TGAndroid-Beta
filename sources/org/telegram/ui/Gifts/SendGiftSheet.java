@@ -333,7 +333,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
                     }
                 } else if (baseFragment instanceof ProfileActivity) {
                     if (z && parentLayout.getLastFragment() == baseFragment) {
-                        baseFragment.lambda$onBackPressed$319();
+                        baseFragment.lambda$onBackPressed$321();
                     }
                     baseFragment.removeSelfFromStack();
                 }

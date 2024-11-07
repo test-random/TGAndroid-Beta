@@ -1160,7 +1160,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    FiltersSetupActivity.this.lambda$onBackPressed$319();
+                    FiltersSetupActivity.this.lambda$onBackPressed$321();
                 }
             }
         });

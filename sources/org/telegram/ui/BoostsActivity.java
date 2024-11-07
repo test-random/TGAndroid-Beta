@@ -932,7 +932,7 @@ public class BoostsActivity extends GradientHeaderActivity implements Notificati
         List fragmentStack2 = getParentLayout().getFragmentStack();
         BaseFragment baseFragment2 = fragmentStack2.size() >= 2 ? (BaseFragment) fragmentStack2.get(fragmentStack2.size() - 2) : null;
         if (!booleanValue) {
-            lambda$onBackPressed$319();
+            lambda$onBackPressed$321();
             if ((baseFragment2 instanceof ProfileActivity) || (baseFragment2 instanceof ChatActivity)) {
                 BoostDialogs.showBulletin(baseFragment2, chat, false);
                 return;
@@ -943,7 +943,7 @@ public class BoostsActivity extends GradientHeaderActivity implements Notificati
         if (baseFragment2 instanceof ProfileActivity) {
             getParentLayout().removeFragmentFromStack(baseFragment2);
         }
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
         if (baseFragment3 instanceof ChatActivity) {
             BoostDialogs.showBulletin(baseFragment3, chat, true);
         }

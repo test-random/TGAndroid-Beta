@@ -4392,7 +4392,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (z && messageObject != null && (this.isRoundVideo || messageObject.isVideo())) {
             checkVideoPlayback(true, null);
         }
-        if (messageObject == null || messageObject.mediaExists()) {
+        if (messageObject == null || messageObject.mediaExists) {
             return;
         }
         int canDownloadMediaType = DownloadController.getInstance(this.currentAccount).canDownloadMediaType(messageObject);

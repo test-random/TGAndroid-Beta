@@ -179,6 +179,7 @@ public class ReactionsLayoutInBubble {
         public boolean hasName;
         public int height;
         public ImageReceiver imageReceiver;
+        public boolean inGroup;
         boolean isSelected;
         private final boolean isSmall;
         public boolean isTag;
@@ -201,6 +202,7 @@ public class ReactionsLayoutInBubble {
         public AnimatedTextView.AnimatedTextDrawable scrimPreviewCounterDrawable;
         int serviceBackgroundColor;
         int serviceTextColor;
+        private final Drawable.Callback supercallback;
         int textColor;
         public AnimatedTextView.AnimatedTextDrawable textDrawable;
         ArrayList users;
@@ -214,10 +216,63 @@ public class ReactionsLayoutInBubble {
         private RectF bounds = new RectF();
         private RectF rect2 = new RectF();
         private final Path tagPath = new Path();
+        private final Drawable.Callback callback = new Drawable.Callback() {
+            @Override
+            public void invalidateDrawable(Drawable drawable) {
+                if (ReactionButton.this.parentView != null) {
+                    ReactionButton.this.parentView.invalidate();
+                    ReactionButton reactionButton = ReactionButton.this;
+                    if (reactionButton.inGroup && (reactionButton.parentView.getParent() instanceof View)) {
+                        ((View) ReactionButton.this.parentView.getParent()).invalidate();
+                    }
+                }
+            }
+
+            @Override
+            public void scheduleDrawable(Drawable drawable, Runnable runnable, long j) {
+                if (ReactionButton.this.parentView != null) {
+                    ReactionButton.this.parentView.scheduleDrawable(drawable, runnable, j);
+                }
+            }
+
+            @Override
+            public void unscheduleDrawable(Drawable drawable, Runnable runnable) {
+                if (ReactionButton.this.parentView != null) {
+                    ReactionButton.this.parentView.unscheduleDrawable(drawable, runnable);
+                }
+            }
+        };
 
         public ReactionButton(ReactionButton reactionButton, int i, View view, TLRPC.ReactionCount reactionCount, boolean z, boolean z2, Theme.ResourcesProvider resourcesProvider) {
             String l;
             StarsReactionsSheet.Particles particles;
+            Drawable.Callback callback = new Drawable.Callback() {
+                @Override
+                public void invalidateDrawable(Drawable drawable) {
+                    if (ReactionButton.this.parentView != null) {
+                        ReactionButton.this.parentView.invalidate();
+                        ReactionButton reactionButton2 = ReactionButton.this;
+                        if (reactionButton2.inGroup && reactionButton2.parentView.getParent() != null && (ReactionButton.this.parentView.getParent().getParent() instanceof View)) {
+                            ((View) ReactionButton.this.parentView.getParent().getParent()).invalidate();
+                        }
+                    }
+                }
+
+                @Override
+                public void scheduleDrawable(Drawable drawable, Runnable runnable, long j) {
+                    if (ReactionButton.this.parentView != null) {
+                        ReactionButton.this.parentView.scheduleDrawable(drawable, runnable, j);
+                    }
+                }
+
+                @Override
+                public void unscheduleDrawable(Drawable drawable, Runnable runnable) {
+                    if (ReactionButton.this.parentView != null) {
+                        ReactionButton.this.parentView.unscheduleDrawable(drawable, runnable);
+                    }
+                }
+            };
+            this.supercallback = callback;
             this.currentAccount = i;
             this.parentView = view;
             this.bounce = new ButtonBounce(view);
@@ -237,7 +292,7 @@ public class ReactionsLayoutInBubble {
                 this.textDrawable = animatedTextDrawable;
                 animatedTextDrawable.setAnimationProperties(0.4f, 0L, 320L, CubicBezierInterpolator.EASE_OUT_QUINT);
                 this.textDrawable.setTextSize(AndroidUtilities.dp(13.0f));
-                this.textDrawable.setCallback(view);
+                this.textDrawable.setCallback(callback);
                 this.textDrawable.setTypeface(AndroidUtilities.bold());
                 this.textDrawable.setOverrideFullWidth(AndroidUtilities.displaySize.x);
             }
@@ -245,7 +300,7 @@ public class ReactionsLayoutInBubble {
                 AnimatedTextView.AnimatedTextDrawable animatedTextDrawable2 = new AnimatedTextView.AnimatedTextDrawable(false, false, false, true);
                 this.scrimPreviewCounterDrawable = animatedTextDrawable2;
                 animatedTextDrawable2.setTextSize(AndroidUtilities.dp(12.0f));
-                this.scrimPreviewCounterDrawable.setCallback(view);
+                this.scrimPreviewCounterDrawable.setCallback(callback);
                 this.scrimPreviewCounterDrawable.setTypeface(AndroidUtilities.bold());
                 this.scrimPreviewCounterDrawable.setOverrideFullWidth(AndroidUtilities.displaySize.x);
                 this.scrimPreviewCounterDrawable.setScaleProperty(0.35f);
@@ -474,7 +529,7 @@ public class ReactionsLayoutInBubble {
             }
         }
 
-        public void draw(android.graphics.Canvas r24, float r25, float r26, float r27, float r28, boolean r29, boolean r30, float r31) {
+        public void draw(android.graphics.Canvas r26, float r27, float r28, float r29, float r30, boolean r31, boolean r32, float r33) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.ReactionButton.draw(android.graphics.Canvas, float, float, float, float, boolean, boolean, float):void");
         }
 

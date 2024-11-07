@@ -491,7 +491,7 @@ public class CountrySelectActivity extends BaseFragment {
         if (i < 0) {
             return;
         }
-        lambda$onBackPressed$319();
+        lambda$onBackPressed$321();
         if (item == null || (countrySelectActivityDelegate = this.delegate) == null) {
             return;
         }
@@ -513,7 +513,7 @@ public class CountrySelectActivity extends BaseFragment {
             @Override
             public void onItemClick(int i2) {
                 if (i2 == -1) {
-                    CountrySelectActivity.this.lambda$onBackPressed$319();
+                    CountrySelectActivity.this.lambda$onBackPressed$321();
                 }
             }
         });
