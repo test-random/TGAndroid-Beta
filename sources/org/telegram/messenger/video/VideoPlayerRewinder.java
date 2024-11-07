@@ -192,12 +192,13 @@ public class VideoPlayerRewinder {
     public void cancelRewind() {
         long currentPosition;
         boolean z;
-        VideoFramesRewinder videoFramesRewinder;
         if (this.rewinding) {
             this.rewinding = false;
             this.fastSeeking = false;
             VideoPlayer videoPlayer = this.videoPlayer;
-            if (videoPlayer != null || this.webView != null) {
+            if (videoPlayer == null && this.webView == null) {
+                z = false;
+            } else {
                 if (!this.rewindByBackSeek) {
                     currentPosition = getCurrentPosition();
                 } else if (videoPlayer == null || this.framesRewinder == null) {
@@ -210,23 +211,19 @@ public class VideoPlayerRewinder {
                         }
                     });
                     z = true;
-                    videoFramesRewinder = this.framesRewinder;
-                    if (videoFramesRewinder != null && !z) {
-                        videoFramesRewinder.release();
-                    }
                     setPlaybackSpeed(this.playSpeed);
                 }
                 seekTo(currentPosition, false);
                 z = false;
-                videoFramesRewinder = this.framesRewinder;
-                if (videoFramesRewinder != null) {
-                    videoFramesRewinder.release();
-                }
                 setPlaybackSpeed(this.playSpeed);
             }
             setMuted(this.wasMuted);
             setPaused(this.wasPaused);
             AndroidUtilities.cancelRunOnUIThread(this.backSeek);
+            VideoFramesRewinder videoFramesRewinder = this.framesRewinder;
+            if (videoFramesRewinder != null && !z) {
+                videoFramesRewinder.release();
+            }
             Runnable runnable = this.updateRewindRunnable;
             if (runnable != null) {
                 AndroidUtilities.cancelRunOnUIThread(runnable);

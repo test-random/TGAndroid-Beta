@@ -1228,8 +1228,8 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
             Iterator it4 = ((Quality) it3.next()).uris.iterator();
             while (it4.hasNext()) {
                 VideoUri videoUri3 = (VideoUri) it4.next();
-                if (!videoUri3.original && (videoUri2 == null || videoUri2.width * videoUri2.height < videoUri3.width * videoUri3.height || videoUri3.bitrate < videoUri2.bitrate)) {
-                    if (videoUri3.width <= 860 && videoUri3.height <= 860) {
+                if (!videoUri3.original && (videoUri2 == null || videoUri2.width * videoUri2.height > videoUri3.width * videoUri3.height || videoUri3.bitrate < videoUri2.bitrate)) {
+                    if (videoUri3.width <= 900 && videoUri3.height <= 900) {
                         videoUri2 = videoUri3;
                     }
                 }

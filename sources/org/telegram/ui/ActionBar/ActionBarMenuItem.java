@@ -123,6 +123,7 @@ public class ActionBarMenuItem extends FrameLayout {
     private float transitionOffset;
     private boolean wrapSearchInScrollView;
     private FrameLayout wrappedSearchFrameLayout;
+    private int xOffset;
     private int yOffset;
 
     public interface ActionBarMenuItemDelegate {
@@ -1527,13 +1528,13 @@ public class ActionBarMenuItem extends FrameLayout {
             view = actionBarMenu2.parentActionBar;
             if (this.subMenuOpenSide == 0) {
                 if (z) {
-                    this.popupWindow.showAsDropDown(view, (((view2.getLeft() + this.parentMenu.getLeft()) + view2.getMeasuredWidth()) - this.popupWindow.getContentView().getMeasuredWidth()) + ((int) getTranslationX()), i6);
+                    this.popupWindow.showAsDropDown(view, (((view2.getLeft() + this.parentMenu.getLeft()) + view2.getMeasuredWidth()) - this.popupWindow.getContentView().getMeasuredWidth()) + ((int) getTranslationX()) + this.xOffset, i6);
                 }
                 if (z2) {
                     actionBarPopupWindow = this.popupWindow;
                     left = ((view2.getLeft() + this.parentMenu.getLeft()) + view2.getMeasuredWidth()) - this.popupWindow.getContentView().getMeasuredWidth();
                     i5 = (int) getTranslationX();
-                    measuredWidth = left + i5;
+                    measuredWidth = left + i5 + this.xOffset;
                     i3 = -1;
                     i4 = -1;
                     actionBarPopupWindow.update(view, measuredWidth, i6, i3, i4);
@@ -1542,14 +1543,14 @@ public class ActionBarMenuItem extends FrameLayout {
             }
             if (z) {
                 if (this.forceSmoothKeyboard) {
-                    this.popupWindow.showAtLocation(view, 51, (getLeft() - AndroidUtilities.dp(8.0f)) + ((int) getTranslationX()), i6);
+                    this.popupWindow.showAtLocation(view, 51, (getLeft() - AndroidUtilities.dp(8.0f)) + ((int) getTranslationX()) + this.xOffset, i6);
                 } else {
-                    this.popupWindow.showAsDropDown(view, (getLeft() - AndroidUtilities.dp(8.0f)) + ((int) getTranslationX()), i6);
+                    this.popupWindow.showAsDropDown(view, (getLeft() - AndroidUtilities.dp(8.0f)) + ((int) getTranslationX()) + this.xOffset, i6);
                 }
             }
             if (z2) {
                 ActionBarPopupWindow actionBarPopupWindow2 = this.popupWindow;
-                measuredWidth = (getLeft() - AndroidUtilities.dp(8.0f)) + ((int) getTranslationX());
+                measuredWidth = (getLeft() - AndroidUtilities.dp(8.0f)) + ((int) getTranslationX()) + this.xOffset;
                 i3 = -1;
                 i4 = -1;
                 actionBarPopupWindow = actionBarPopupWindow2;
@@ -1562,13 +1563,13 @@ public class ActionBarMenuItem extends FrameLayout {
             if (getParent() != null) {
                 view = (View) getParent();
                 if (z) {
-                    this.popupWindow.showAsDropDown(view, ((getLeft() + getMeasuredWidth()) - this.popupWindow.getContentView().getMeasuredWidth()) + this.additionalXOffset, i6);
+                    this.popupWindow.showAsDropDown(view, ((getLeft() + getMeasuredWidth()) - this.popupWindow.getContentView().getMeasuredWidth()) + this.additionalXOffset + this.xOffset, i6);
                 }
                 if (z2) {
                     actionBarPopupWindow = this.popupWindow;
                     left = (getLeft() + getMeasuredWidth()) - this.popupWindow.getContentView().getMeasuredWidth();
                     i5 = this.additionalXOffset;
-                    measuredWidth = left + i5;
+                    measuredWidth = left + i5 + this.xOffset;
                     i3 = -1;
                     i4 = -1;
                     actionBarPopupWindow.update(view, measuredWidth, i6, i3, i4);
@@ -1579,25 +1580,25 @@ public class ActionBarMenuItem extends FrameLayout {
         }
         if (i7 == 1) {
             if (z) {
-                this.popupWindow.showAsDropDown(this, (-AndroidUtilities.dp(8.0f)) + this.additionalXOffset, i6);
+                this.popupWindow.showAsDropDown(this, (-AndroidUtilities.dp(8.0f)) + this.additionalXOffset + this.xOffset, i6);
             }
             if (!z2) {
                 return;
             }
             ActionBarPopupWindow actionBarPopupWindow3 = this.popupWindow;
-            measuredWidth = (-AndroidUtilities.dp(8.0f)) + this.additionalXOffset;
+            measuredWidth = (-AndroidUtilities.dp(8.0f)) + this.additionalXOffset + this.xOffset;
             i3 = -1;
             i4 = -1;
             actionBarPopupWindow = actionBarPopupWindow3;
         } else {
             if (z) {
-                this.popupWindow.showAsDropDown(this, (getMeasuredWidth() - this.popupWindow.getContentView().getMeasuredWidth()) + this.additionalXOffset, i6);
+                this.popupWindow.showAsDropDown(this, (getMeasuredWidth() - this.popupWindow.getContentView().getMeasuredWidth()) + this.additionalXOffset + this.xOffset, i6);
             }
             if (!z2) {
                 return;
             }
             actionBarPopupWindow = this.popupWindow;
-            measuredWidth = (getMeasuredWidth() - this.popupWindow.getContentView().getMeasuredWidth()) + this.additionalXOffset;
+            measuredWidth = (getMeasuredWidth() - this.popupWindow.getContentView().getMeasuredWidth()) + this.additionalXOffset + this.xOffset;
             i3 = -1;
             i4 = -1;
         }
@@ -2274,6 +2275,10 @@ public class ActionBarMenuItem extends FrameLayout {
 
     public void setLongClickEnabled(boolean z) {
         this.longClickEnabled = z;
+    }
+
+    public void setMenuXOffset(int i) {
+        this.xOffset = i;
     }
 
     public void setMenuYOffset(int i) {

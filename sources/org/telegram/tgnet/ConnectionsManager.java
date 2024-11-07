@@ -836,9 +836,7 @@ public class ConnectionsManager extends BaseController {
                 i8 = 0;
             }
             if ((i & 2) != 0 && VideoPlayer.activePlayers.isEmpty()) {
-                long native_getCurrentPingTime = native_getCurrentPingTime(this.currentAccount);
-                FileLog.d("ping_time = " + native_getCurrentPingTime);
-                DefaultBandwidthMeter.getSingletonInstance(ApplicationLoader.applicationContext).onTransfer((long) i8, Math.max(0L, (System.currentTimeMillis() - j) - native_getCurrentPingTime));
+                DefaultBandwidthMeter.getSingletonInstance(ApplicationLoader.applicationContext).onTransfer(i8, Math.max(0L, (System.currentTimeMillis() - j) - native_getCurrentPingTime(this.currentAccount)));
             }
             if (BuildVars.DEBUG_PRIVATE_VERSION && !getUserConfig().isClientActivated() && tL_error != null && tL_error.code == 400 && Objects.equals(tL_error.text, "CONNECTION_NOT_INITED")) {
                 if (BuildVars.LOGS_ENABLED) {

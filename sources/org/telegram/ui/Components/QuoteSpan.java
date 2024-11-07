@@ -584,10 +584,10 @@ public class QuoteSpan implements LeadingMarginSpan {
         quoteStyleSpan.span = quoteSpan;
         quoteSpan.start = clamp;
         quoteSpan.end = clamp2;
-        editable.setSpan(quoteSpan, clamp, clamp2, 33);
-        editable.setSpan(quoteStyleSpan, clamp, clamp2, 33);
-        editable.insert(clamp2, "\ufeff");
-        editable.delete(clamp2, i3);
+        editable.setSpan(quoteSpan, Utilities.clamp(clamp, editable.length(), 0), Utilities.clamp(clamp2, editable.length(), 0), 33);
+        editable.setSpan(quoteStyleSpan, Utilities.clamp(clamp, editable.length(), 0), Utilities.clamp(clamp2, editable.length(), 0), 33);
+        editable.insert(Utilities.clamp(clamp2, editable.length(), 0), "\ufeff");
+        editable.delete(Utilities.clamp(clamp2, editable.length(), 0), Utilities.clamp(i3, editable.length(), 0));
         return i3;
     }
 

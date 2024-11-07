@@ -1129,6 +1129,30 @@ public class MessagesStorage extends BaseController {
         return sb.toString().toLowerCase();
     }
 
+    private int getDialogFolderIdInternal(long j) {
+        SQLiteCursor sQLiteCursor = null;
+        try {
+            try {
+                if (this.unknownDialogsIds.get(j) == null) {
+                    sQLiteCursor = this.database.queryFinalized("SELECT folder_id FROM dialogs WHERE did = ?", Long.valueOf(j));
+                    r3 = sQLiteCursor.next() ? sQLiteCursor.intValue(0) : -1;
+                    sQLiteCursor.dispose();
+                }
+                return r3;
+            } catch (Exception e) {
+                checkSQLException(e);
+                if (sQLiteCursor != null) {
+                    sQLiteCursor.dispose();
+                }
+                return 0;
+            }
+        } finally {
+            if (sQLiteCursor != null) {
+                sQLiteCursor.dispose();
+            }
+        }
+    }
+
     public static MessagesStorage getInstance(int i) {
         MessagesStorage messagesStorage = Instance[i];
         if (messagesStorage == null) {

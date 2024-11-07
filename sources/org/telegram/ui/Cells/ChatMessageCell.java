@@ -1061,10 +1061,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             public static void $default$didPressVoteButtons(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, ArrayList arrayList, int i, int i2, int i3) {
             }
 
-            public static void $default$didPressWebPage(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.WebPage webPage, String str, boolean z) {
-                Browser.openUrl(chatMessageCell.getContext(), str);
-            }
-
             public static void $default$didStartVideoStream(ChatMessageCellDelegate chatMessageCellDelegate, MessageObject messageObject) {
             }
 
@@ -3913,14 +3909,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     private void didClickedImage() {
         ChatMessageCellDelegate chatMessageCellDelegate;
+        MessageObject messageObject;
         ChatMessageCellDelegate chatMessageCellDelegate2;
         TLRPC.WebPage webPage;
         TLRPC.MessageMedia messageMedia;
         TLRPC.ReplyMarkup replyMarkup;
         if (this.currentMessageObject.hasMediaSpoilers() && !this.currentMessageObject.needDrawBluredPreview()) {
-            MessageObject messageObject = this.currentMessageObject;
-            if (!messageObject.isMediaSpoilersRevealed) {
-                if (this.delegate == null || !messageObject.isSensitive()) {
+            MessageObject messageObject2 = this.currentMessageObject;
+            if (!messageObject2.isMediaSpoilersRevealed) {
+                if (this.delegate == null || !messageObject2.isSensitive()) {
                     startRevealMedia(this.lastTouchX, this.lastTouchY);
                     return;
                 } else {
@@ -3929,10 +3926,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 }
             }
         }
-        MessageObject messageObject2 = this.currentMessageObject;
-        int i = messageObject2.type;
+        MessageObject messageObject3 = this.currentMessageObject;
+        int i = messageObject3.type;
         if (i == 20) {
-            TLRPC.Message message = messageObject2.messageOwner;
+            TLRPC.Message message = messageObject3.messageOwner;
             if (message == null || (messageMedia = message.media) == null || messageMedia.extended_media.isEmpty() || (replyMarkup = this.currentMessageObject.messageOwner.reply_markup) == null) {
                 return;
             }
@@ -3946,11 +3943,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
             return;
         }
-        if (i != 1 && !messageObject2.isAnyKindOfSticker()) {
-            MessageObject messageObject3 = this.currentMessageObject;
-            int i2 = messageObject3.type;
+        if (i != 1 && !messageObject3.isAnyKindOfSticker()) {
+            MessageObject messageObject4 = this.currentMessageObject;
+            int i2 = messageObject4.type;
             if (i2 == 12) {
-                long j = MessageObject.getMedia(messageObject3.messageOwner).user_id;
+                long j = MessageObject.getMedia(messageObject4.messageOwner).user_id;
                 this.delegate.didPressUserAvatar(this, j != 0 ? MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(j)) : null, this.lastTouchX, this.lastTouchY, false);
                 return;
             }
@@ -3973,57 +3970,59 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 }
                 chatMessageCellDelegate = this.delegate;
             } else {
-                int i4 = this.documentAttachType;
-                if (i4 == 4) {
-                    if (this.buttonState != -1 && (!this.drawVideoImageButton || (!this.autoPlayingMedia && !messageObject3.hasVideoQualities() && (!SharedConfig.streamMedia || !this.canStreamVideo)))) {
-                        if (this.drawVideoImageButton) {
-                            didPressButton(true, true);
-                            return;
-                        }
-                        int i5 = this.buttonState;
-                        if (i5 != 0 && i5 != 3) {
-                            return;
+                if (this.documentAttachType != 4 && !messageObject4.hasVideoQualities()) {
+                    MessageObject messageObject5 = this.currentMessageObject;
+                    int i4 = messageObject5.type;
+                    if (i4 != 4 && i4 != 23 && i4 != 24) {
+                        int i5 = this.documentAttachType;
+                        if (i5 == 1) {
+                            if (this.buttonState != -1) {
+                                return;
+                            }
+                        } else if (messageObject5.sponsoredMedia != null) {
+                            chatMessageCellDelegate = this.delegate;
+                            if (chatMessageCellDelegate == null) {
+                                return;
+                            }
+                        } else {
+                            if (i5 == 2) {
+                                if (this.buttonState != -1 || (webPage = MessageObject.getMedia(messageObject5.messageOwner).webpage) == null) {
+                                    return;
+                                }
+                                String str = webPage.embed_url;
+                                if (str == null || str.length() == 0) {
+                                    Browser.openUrl(getContext(), webPage.url);
+                                    return;
+                                } else {
+                                    this.delegate.needOpenWebView(this.currentMessageObject, webPage.embed_url, webPage.site_name, webPage.description, webPage.url, webPage.embed_width, webPage.embed_height);
+                                    return;
+                                }
+                            }
+                            if (!this.hasInvoicePreview) {
+                                if (Build.VERSION.SDK_INT < 26 || (chatMessageCellDelegate2 = this.delegate) == null) {
+                                    return;
+                                }
+                                if (i4 == 16) {
+                                    chatMessageCellDelegate2.didLongPress(this, 0.0f, 0.0f);
+                                    return;
+                                } else {
+                                    chatMessageCellDelegate2.didPressOther(this, this.otherX, this.otherY);
+                                    return;
+                                }
+                            }
+                            if (this.buttonState != -1) {
+                                return;
+                            }
                         }
                     }
-                } else if (i2 != 4 && i2 != 23 && i2 != 24) {
-                    if (i4 == 1) {
-                        if (this.buttonState != -1) {
-                            return;
-                        }
-                    } else if (messageObject3.sponsoredMedia != null) {
-                        chatMessageCellDelegate = this.delegate;
-                        if (chatMessageCellDelegate == null) {
-                            return;
-                        }
-                    } else {
-                        if (i4 == 2) {
-                            if (this.buttonState != -1 || (webPage = MessageObject.getMedia(messageObject3.messageOwner).webpage) == null) {
-                                return;
-                            }
-                            String str = webPage.embed_url;
-                            if (str == null || str.length() == 0) {
-                                Browser.openUrl(getContext(), webPage.url);
-                                return;
-                            } else {
-                                this.delegate.needOpenWebView(this.currentMessageObject, webPage.embed_url, webPage.site_name, webPage.description, webPage.url, webPage.embed_width, webPage.embed_height);
-                                return;
-                            }
-                        }
-                        if (!this.hasInvoicePreview) {
-                            if (Build.VERSION.SDK_INT < 26 || (chatMessageCellDelegate2 = this.delegate) == null) {
-                                return;
-                            }
-                            if (i2 == 16) {
-                                chatMessageCellDelegate2.didLongPress(this, 0.0f, 0.0f);
-                                return;
-                            } else {
-                                chatMessageCellDelegate2.didPressOther(this, this.otherX, this.otherY);
-                                return;
-                            }
-                        }
-                        if (this.buttonState != -1) {
-                            return;
-                        }
+                } else if (this.buttonState != -1 && (!this.drawVideoImageButton || (!this.autoPlayingMedia && (((messageObject = this.currentMessageObject) == null || !messageObject.hasVideoQualities()) && (!SharedConfig.streamMedia || !this.canStreamVideo))))) {
+                    if (this.drawVideoImageButton) {
+                        didPressButton(true, true);
+                        return;
+                    }
+                    int i6 = this.buttonState;
+                    if (i6 != 0 && i6 != 3) {
+                        return;
                     }
                 }
                 chatMessageCellDelegate = this.delegate;
@@ -4031,9 +4030,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             didPressButton(true, false);
             return;
         }
-        int i6 = this.buttonState;
-        if (i6 != -1) {
-            if (i6 != 0) {
+        int i7 = this.buttonState;
+        if (i7 != -1) {
+            if (i7 != 0) {
                 return;
             }
             didPressButton(true, false);
@@ -4393,7 +4392,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (z && messageObject != null && (this.isRoundVideo || messageObject.isVideo())) {
             checkVideoPlayback(true, null);
         }
-        if (messageObject == null || messageObject.mediaExists) {
+        if (messageObject == null || messageObject.mediaExists()) {
             return;
         }
         int canDownloadMediaType = DownloadController.getInstance(this.currentAccount).canDownloadMediaType(messageObject);
