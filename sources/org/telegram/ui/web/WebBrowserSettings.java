@@ -472,7 +472,7 @@ public class WebBrowserSettings extends UniversalFragment implements Notificatio
     }
 
     @Override
-    public void fillItems(java.util.ArrayList r9, org.telegram.ui.Components.UniversalAdapter r10) {
+    protected void fillItems(java.util.ArrayList r9, org.telegram.ui.Components.UniversalAdapter r10) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.web.WebBrowserSettings.fillItems(java.util.ArrayList, org.telegram.ui.Components.UniversalAdapter):void");
     }
 
@@ -487,7 +487,7 @@ public class WebBrowserSettings extends UniversalFragment implements Notificatio
     }
 
     @Override
-    public void onClick(UItem uItem, final View view, int i, float f, float f2) {
+    protected void onClick(UItem uItem, final View view, int i, float f, float f2) {
         AlertDialog.Builder message;
         String string;
         DialogInterface.OnClickListener onClickListener;
@@ -723,7 +723,7 @@ public class WebBrowserSettings extends UniversalFragment implements Notificatio
     }
 
     @Override
-    public boolean onLongClick(UItem uItem, View view, int i, float f, float f2) {
+    protected boolean onLongClick(UItem uItem, View view, int i, float f, float f2) {
         return false;
     }
 }

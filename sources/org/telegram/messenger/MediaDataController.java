@@ -180,7 +180,8 @@ public class MediaDataController extends BaseController {
     private boolean[] loadingRecentStickers;
     boolean loadingSavedReactions;
     private boolean loadingSearchLocal;
-    private final HashMap<TLRPC.InputStickerSet, ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>>> loadingStickerSets;
+    private final HashMap<String, ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>>> loadingStickerSets;
+    private final HashSet<String> loadingStickerSetsKeys;
     private boolean[] loadingStickers;
     private int menuBotsUpdateDate;
     private long menuBotsUpdateHash;
@@ -502,6 +503,7 @@ public class MediaDataController extends BaseController {
         this.emojiStatusesFetchDate = new Long[4];
         this.emojiStatusesFromCacheFetched = new boolean[4];
         this.emojiStatusesFetching = new boolean[4];
+        this.loadingStickerSetsKeys = new HashSet<>();
         this.loadingStickerSets = new HashMap<>();
         this.messagesSearchCount = new int[]{0, 0};
         this.messagesSearchEndReached = new boolean[]{false, false};
@@ -936,19 +938,20 @@ public class MediaDataController extends BaseController {
         return false;
     }
 
-    private void fetchStickerSetInternal(final TLRPC.InputStickerSet inputStickerSet, Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet> callback2) {
+    private void fetchStickerSetInternal(TLRPC.InputStickerSet inputStickerSet, Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet> callback2) {
         if (callback2 == null) {
             return;
         }
-        ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>> arrayList = this.loadingStickerSets.get(inputStickerSet);
+        final String inputSetKey = inputSetKey(inputStickerSet);
+        ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>> arrayList = this.loadingStickerSets.get(inputSetKey);
         if (arrayList != null && arrayList.size() > 0) {
             arrayList.add(callback2);
             return;
         }
         if (arrayList == null) {
-            HashMap<TLRPC.InputStickerSet, ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>>> hashMap = this.loadingStickerSets;
+            HashMap<String, ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>>> hashMap = this.loadingStickerSets;
             ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>> arrayList2 = new ArrayList<>();
-            hashMap.put(inputStickerSet, arrayList2);
+            hashMap.put(inputSetKey, arrayList2);
             arrayList = arrayList2;
         }
         arrayList.add(callback2);
@@ -957,7 +960,7 @@ public class MediaDataController extends BaseController {
         getConnectionsManager().sendRequest(tL_messages_getStickerSet, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                MediaDataController.this.lambda$fetchStickerSetInternal$42(inputStickerSet, tLObject, tL_error);
+                MediaDataController.this.lambda$fetchStickerSetInternal$42(inputSetKey, tLObject, tL_error);
             }
         });
     }
@@ -1165,6 +1168,45 @@ public class MediaDataController extends BaseController {
 
     public static java.util.ArrayList<org.telegram.ui.Components.TextStyleSpan.TextStyleRun> getTextStyleRuns(java.util.ArrayList<org.telegram.tgnet.TLRPC.MessageEntity> r12, java.lang.CharSequence r13, int r14) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaDataController.getTextStyleRuns(java.util.ArrayList, java.lang.CharSequence, int):java.util.ArrayList");
+    }
+
+    public static String inputSetKey(TLRPC.InputStickerSet inputStickerSet) {
+        StringBuilder sb;
+        String str;
+        if (inputStickerSet instanceof TLRPC.TL_inputStickerSetID) {
+            sb = new StringBuilder();
+            sb.append("id");
+            sb.append(inputStickerSet.id);
+            sb.append("access_hash");
+            sb.append(inputStickerSet.access_hash);
+        } else {
+            if (inputStickerSet instanceof TLRPC.TL_inputStickerSetShortName) {
+                sb = new StringBuilder();
+                sb.append("short");
+                str = inputStickerSet.short_name;
+            } else {
+                if (inputStickerSet instanceof TLRPC.TL_inputStickerSetEmpty) {
+                    return "empty";
+                }
+                if (inputStickerSet instanceof TLRPC.TL_inputStickerSetAnimatedEmoji) {
+                    return "animatedEmoji";
+                }
+                if (inputStickerSet instanceof TLRPC.TL_inputStickerSetEmojiGenericAnimations) {
+                    return "emojiGenericAnimations";
+                }
+                if (inputStickerSet instanceof TLRPC.TL_inputStickerSetEmojiChannelDefaultStatuses) {
+                    return "emojiChannelDefaultStatuses";
+                }
+                if (!(inputStickerSet instanceof TLRPC.TL_inputStickerSetDice)) {
+                    return inputStickerSet instanceof TLRPC.TL_inputStickerSetPremiumGifts ? "premiumGifts" : inputStickerSet instanceof TLRPC.TL_inputStickerSetEmojiDefaultTopicIcons ? "defaultTopicIcons" : "null";
+                }
+                sb = new StringBuilder();
+                sb.append("dice");
+                str = ((TLRPC.TL_inputStickerSetDice) inputStickerSet).emoticon;
+            }
+            sb.append(str);
+        }
+        return sb.toString();
     }
 
     public void lambda$addRecentGif$26(TLRPC.Document document) {
@@ -1573,10 +1615,10 @@ public class MediaDataController extends BaseController {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaDataController.lambda$fetchNewEmojiKeywords$213(java.lang.String):void");
     }
 
-    public void lambda$fetchStickerSetInternal$41(TLRPC.InputStickerSet inputStickerSet, TLObject tLObject) {
+    public void lambda$fetchStickerSetInternal$41(String str, TLObject tLObject) {
         Boolean bool;
         TLRPC.TL_messages_stickerSet tL_messages_stickerSet;
-        ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>> arrayList = this.loadingStickerSets.get(inputStickerSet);
+        ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>> arrayList = this.loadingStickerSets.get(str);
         if (arrayList != null) {
             for (int i = 0; i < arrayList.size(); i++) {
                 Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet> callback2 = arrayList.get(i);
@@ -1590,14 +1632,14 @@ public class MediaDataController extends BaseController {
                 callback2.run(bool, tL_messages_stickerSet);
             }
         }
-        this.loadingStickerSets.remove(inputStickerSet);
+        this.loadingStickerSets.remove(str);
     }
 
-    public void lambda$fetchStickerSetInternal$42(final TLRPC.InputStickerSet inputStickerSet, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$fetchStickerSetInternal$42(final String str, final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                MediaDataController.this.lambda$fetchStickerSetInternal$41(inputStickerSet, tLObject);
+                MediaDataController.this.lambda$fetchStickerSetInternal$41(str, tLObject);
             }
         });
     }
@@ -1898,8 +1940,9 @@ public class MediaDataController extends BaseController {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaDataController.lambda$getMediaCounts$129(long, long, int):void");
     }
 
-    public void lambda$getStickerSet$32(Utilities.Callback callback, Boolean bool, TLRPC.TL_messages_stickerSet tL_messages_stickerSet) {
+    public void lambda$getStickerSet$32(String str, Utilities.Callback callback, Boolean bool, TLRPC.TL_messages_stickerSet tL_messages_stickerSet) {
         TLRPC.StickerSet stickerSet;
+        this.loadingStickerSetsKeys.remove(str);
         if (callback != null) {
             callback.run(tL_messages_stickerSet);
         }
@@ -1912,16 +1955,22 @@ public class MediaDataController extends BaseController {
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.groupStickersDidLoad, Long.valueOf(tL_messages_stickerSet.set.id), tL_messages_stickerSet);
     }
 
-    public void lambda$getStickerSet$33(TLRPC.TL_messages_stickerSet tL_messages_stickerSet, final Utilities.Callback callback, TLRPC.InputStickerSet inputStickerSet) {
+    public void lambda$getStickerSet$33(TLRPC.TL_messages_stickerSet tL_messages_stickerSet, final String str, final Utilities.Callback callback, boolean z, TLRPC.InputStickerSet inputStickerSet) {
         if (tL_messages_stickerSet == null) {
-            fetchStickerSetInternal(inputStickerSet, new Utilities.Callback2() {
-                @Override
-                public final void run(Object obj, Object obj2) {
-                    MediaDataController.this.lambda$getStickerSet$32(callback, (Boolean) obj, (TLRPC.TL_messages_stickerSet) obj2);
-                }
-            });
-            return;
+            if (z) {
+                this.loadingStickerSetsKeys.remove(str);
+                return;
+            } else {
+                fetchStickerSetInternal(inputStickerSet, new Utilities.Callback2() {
+                    @Override
+                    public final void run(Object obj, Object obj2) {
+                        MediaDataController.this.lambda$getStickerSet$32(str, callback, (Boolean) obj, (TLRPC.TL_messages_stickerSet) obj2);
+                    }
+                });
+                return;
+            }
         }
+        this.loadingStickerSetsKeys.remove(str);
         if (callback != null) {
             callback.run(tL_messages_stickerSet);
         }
@@ -1933,18 +1982,19 @@ public class MediaDataController extends BaseController {
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.groupStickersDidLoad, Long.valueOf(tL_messages_stickerSet.set.id), tL_messages_stickerSet);
     }
 
-    public void lambda$getStickerSet$34(final TLRPC.InputStickerSet inputStickerSet, Integer num, final Utilities.Callback callback) {
+    public void lambda$getStickerSet$34(final TLRPC.InputStickerSet inputStickerSet, Integer num, final String str, final Utilities.Callback callback, final boolean z) {
         final TLRPC.TL_messages_stickerSet cachedStickerSetInternal = getCachedStickerSetInternal(inputStickerSet.id, num);
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                MediaDataController.this.lambda$getStickerSet$33(cachedStickerSetInternal, callback, inputStickerSet);
+                MediaDataController.this.lambda$getStickerSet$33(cachedStickerSetInternal, str, callback, z, inputStickerSet);
             }
         });
     }
 
-    public void lambda$getStickerSet$35(Utilities.Callback callback, Boolean bool, TLRPC.TL_messages_stickerSet tL_messages_stickerSet) {
+    public void lambda$getStickerSet$35(String str, Utilities.Callback callback, Boolean bool, TLRPC.TL_messages_stickerSet tL_messages_stickerSet) {
         TLRPC.StickerSet stickerSet;
+        this.loadingStickerSetsKeys.remove(str);
         if (callback != null) {
             callback.run(tL_messages_stickerSet);
         }
@@ -1957,16 +2007,22 @@ public class MediaDataController extends BaseController {
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.groupStickersDidLoad, Long.valueOf(tL_messages_stickerSet.set.id), tL_messages_stickerSet);
     }
 
-    public void lambda$getStickerSet$36(TLRPC.TL_messages_stickerSet tL_messages_stickerSet, final Utilities.Callback callback, TLRPC.InputStickerSet inputStickerSet) {
+    public void lambda$getStickerSet$36(TLRPC.TL_messages_stickerSet tL_messages_stickerSet, final String str, final Utilities.Callback callback, boolean z, TLRPC.InputStickerSet inputStickerSet) {
         if (tL_messages_stickerSet == null) {
-            fetchStickerSetInternal(inputStickerSet, new Utilities.Callback2() {
-                @Override
-                public final void run(Object obj, Object obj2) {
-                    MediaDataController.this.lambda$getStickerSet$35(callback, (Boolean) obj, (TLRPC.TL_messages_stickerSet) obj2);
-                }
-            });
-            return;
+            if (z) {
+                this.loadingStickerSetsKeys.remove(str);
+                return;
+            } else {
+                fetchStickerSetInternal(inputStickerSet, new Utilities.Callback2() {
+                    @Override
+                    public final void run(Object obj, Object obj2) {
+                        MediaDataController.this.lambda$getStickerSet$35(str, callback, (Boolean) obj, (TLRPC.TL_messages_stickerSet) obj2);
+                    }
+                });
+                return;
+            }
         }
+        this.loadingStickerSetsKeys.remove(str);
         if (callback != null) {
             callback.run(tL_messages_stickerSet);
         }
@@ -1978,17 +2034,18 @@ public class MediaDataController extends BaseController {
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.groupStickersDidLoad, Long.valueOf(tL_messages_stickerSet.set.id), tL_messages_stickerSet);
     }
 
-    public void lambda$getStickerSet$37(final TLRPC.InputStickerSet inputStickerSet, Integer num, final Utilities.Callback callback) {
+    public void lambda$getStickerSet$37(final TLRPC.InputStickerSet inputStickerSet, Integer num, final String str, final Utilities.Callback callback, final boolean z) {
         final TLRPC.TL_messages_stickerSet cachedStickerSetInternal = getCachedStickerSetInternal(inputStickerSet.short_name.toLowerCase(), num);
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                MediaDataController.this.lambda$getStickerSet$36(cachedStickerSetInternal, callback, inputStickerSet);
+                MediaDataController.this.lambda$getStickerSet$36(cachedStickerSetInternal, str, callback, z, inputStickerSet);
             }
         });
     }
 
-    public void lambda$getStickerSet$38(Utilities.Callback callback, TLRPC.InputStickerSet inputStickerSet, Boolean bool, TLRPC.TL_messages_stickerSet tL_messages_stickerSet) {
+    public void lambda$getStickerSet$38(String str, Utilities.Callback callback, TLRPC.InputStickerSet inputStickerSet, Boolean bool, TLRPC.TL_messages_stickerSet tL_messages_stickerSet) {
+        this.loadingStickerSetsKeys.remove(str);
         if (callback != null) {
             callback.run(tL_messages_stickerSet);
         }
@@ -7307,7 +7364,7 @@ public class MediaDataController extends BaseController {
         return getStickerSet(inputStickerSet, num, z, false, callback);
     }
 
-    public org.telegram.tgnet.TLRPC.TL_messages_stickerSet getStickerSet(final org.telegram.tgnet.TLRPC.InputStickerSet r6, final java.lang.Integer r7, boolean r8, boolean r9, final org.telegram.messenger.Utilities.Callback<org.telegram.tgnet.TLRPC.TL_messages_stickerSet> r10) {
+    public org.telegram.tgnet.TLRPC.TL_messages_stickerSet getStickerSet(final org.telegram.tgnet.TLRPC.InputStickerSet r11, final java.lang.Integer r12, final boolean r13, boolean r14, final org.telegram.messenger.Utilities.Callback<org.telegram.tgnet.TLRPC.TL_messages_stickerSet> r15) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaDataController.getStickerSet(org.telegram.tgnet.TLRPC$InputStickerSet, java.lang.Integer, boolean, boolean, org.telegram.messenger.Utilities$Callback):org.telegram.tgnet.TLRPC$TL_messages_stickerSet");
     }
 

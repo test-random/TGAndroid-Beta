@@ -23,6 +23,7 @@ import org.telegram.tgnet.TLObject;
 
 public class BackupImageView extends View {
     public AnimatedEmojiDrawable animatedEmojiDrawable;
+    public boolean applyAttach;
     boolean attached;
     private AvatarDrawable avatarDrawable;
     protected boolean blurAllowed;
@@ -41,6 +42,7 @@ public class BackupImageView extends View {
         super(context);
         this.width = -1;
         this.height = -1;
+        this.applyAttach = true;
         ImageReceiver createImageReciever = createImageReciever();
         this.imageReceiver = createImageReciever;
         createImageReciever.setCrossfadeByScale(0.0f);
@@ -173,7 +175,9 @@ public class BackupImageView extends View {
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         this.attached = true;
-        this.imageReceiver.onAttachedToWindow();
+        if (this.applyAttach) {
+            this.imageReceiver.onAttachedToWindow();
+        }
         if (this.blurAllowed) {
             this.blurImageReceiver.onAttachedToWindow();
         }
@@ -187,7 +191,9 @@ public class BackupImageView extends View {
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         this.attached = false;
-        this.imageReceiver.onDetachedFromWindow();
+        if (this.applyAttach) {
+            this.imageReceiver.onDetachedFromWindow();
+        }
         if (this.blurAllowed) {
             this.blurImageReceiver.onDetachedFromWindow();
         }

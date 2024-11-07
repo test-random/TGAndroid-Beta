@@ -245,7 +245,7 @@ public class HashtagActivity extends BaseFragment implements NotificationCenter.
             boolean activityCreated = false;
 
             @Override
-            public void initChatActivity() {
+            protected void initChatActivity() {
                 if (this.activityCreated) {
                     return;
                 }

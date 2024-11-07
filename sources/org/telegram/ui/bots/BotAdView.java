@@ -24,9 +24,9 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.LinkSpanDrawable;
 import org.telegram.ui.Components.ScaleStateListAnimator;
 
 public class BotAdView extends FrameLayout {
@@ -37,7 +37,7 @@ public class BotAdView extends FrameLayout {
     private final LinearLayout layout;
     public final TextView removeView;
     private final Theme.ResourcesProvider resourcesProvider;
-    public final AnimatedEmojiSpan.TextViewEmojis textView;
+    public final LinkSpanDrawable.LinksTextView textView;
     public final TextView titleView;
 
     public BotAdView(Context context, Theme.ResourcesProvider resourcesProvider) {
@@ -83,12 +83,12 @@ public class BotAdView extends FrameLayout {
         textView3.setTypeface(AndroidUtilities.bold());
         linearLayout2.addView(textView3, LayoutHelper.createLinear(-1, -2, 0.0f, 0.0f, 0.0f, 2.0f));
         NotificationCenter.listenEmojiLoading(textView3);
-        AnimatedEmojiSpan.TextViewEmojis textViewEmojis = new AnimatedEmojiSpan.TextViewEmojis(context);
-        this.textView = textViewEmojis;
-        textViewEmojis.setTextSize(1, 13.0f);
-        textViewEmojis.setTextColor(Theme.getColor(i2, resourcesProvider));
-        linearLayout2.addView(textViewEmojis, LayoutHelper.createLinear(-1, -2, 0.0f, 0.0f, 0.0f, 0.0f));
-        NotificationCenter.listenEmojiLoading(textViewEmojis);
+        LinkSpanDrawable.LinksTextView linksTextView = new LinkSpanDrawable.LinksTextView(context);
+        this.textView = linksTextView;
+        linksTextView.setTextSize(1, 13.0f);
+        linksTextView.setTextColor(Theme.getColor(i2, resourcesProvider));
+        linearLayout2.addView(linksTextView, LayoutHelper.createLinear(-1, -2, 0.0f, 0.0f, 0.0f, 0.0f));
+        NotificationCenter.listenEmojiLoading(linksTextView);
         BackupImageView backupImageView = new BackupImageView(context);
         this.imageView = backupImageView;
         backupImageView.setRoundRadius(AndroidUtilities.dp(4.0f));

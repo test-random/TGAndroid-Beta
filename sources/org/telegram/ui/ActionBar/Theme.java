@@ -37,6 +37,7 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
@@ -86,6 +87,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.LiteMode;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
@@ -1201,6 +1203,9 @@ public abstract class Theme {
     private static final Object sync = new Object();
     private static float lastBrightnessValue = 1.0f;
     private static Runnable switchDayBrightnessRunnable = new Runnable() {
+        AnonymousClass1() {
+        }
+
         @Override
         public void run() {
             boolean unused = Theme.switchDayRunnableScheduled = false;
@@ -1208,6 +1213,9 @@ public abstract class Theme {
         }
     };
     private static Runnable switchNightBrightnessRunnable = new Runnable() {
+        AnonymousClass2() {
+        }
+
         @Override
         public void run() {
             boolean unused = Theme.switchNightRunnableScheduled = false;
@@ -1235,6 +1243,299 @@ public abstract class Theme {
     public static Drawable[][] chat_fileStatesDrawable = (Drawable[][]) Array.newInstance((Class<?>) Drawable.class, 5, 2);
     public static Path[] chat_filePath = new Path[2];
     public static Path[] chat_updatePath = new Path[3];
+
+    public class AnonymousClass1 implements Runnable {
+        AnonymousClass1() {
+        }
+
+        @Override
+        public void run() {
+            boolean unused = Theme.switchDayRunnableScheduled = false;
+            Theme.applyDayNightThemeMaybe(false);
+        }
+    }
+
+    public class AnonymousClass10 extends MessageDrawable {
+        final SparseIntArray val$colors;
+
+        AnonymousClass10(int i, boolean z, boolean z2, SparseIntArray sparseIntArray) {
+            super(i, z, z2);
+            r4 = sparseIntArray;
+        }
+
+        @Override
+        protected int getColor(int i) {
+            int indexOfKey = r4.indexOfKey(i);
+            return indexOfKey > 0 ? r4.valueAt(indexOfKey) : Theme.defaultColors[i];
+        }
+
+        @Override
+        protected int getCurrentColor(int i) {
+            return r4.get(i);
+        }
+    }
+
+    public class AnonymousClass11 extends BackgroundGradientDrawable.ListenerAdapter {
+        AnonymousClass11() {
+        }
+
+        @Override
+        public void onSizeReady(int i, int i2) {
+            Point point = AndroidUtilities.displaySize;
+            if ((point.x <= point.y) == (i <= i2)) {
+                NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.didSetNewWallpapper, new Object[0]);
+            }
+        }
+    }
+
+    public class AnonymousClass12 extends BackgroundGradientDrawable.ListenerAdapter {
+        AnonymousClass12() {
+        }
+
+        @Override
+        public void onSizeReady(int i, int i2) {
+            Point point = AndroidUtilities.displaySize;
+            if ((point.x <= point.y) == (i <= i2)) {
+                NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.didSetNewWallpapper, new Object[0]);
+            }
+        }
+    }
+
+    public class AnonymousClass13 extends BackgroundGradientDrawable.ListenerAdapter {
+        final View val$ownerView;
+        final boolean val$thumb;
+
+        AnonymousClass13(boolean z, View view) {
+            r1 = z;
+            r2 = view;
+        }
+
+        @Override
+        public void onSizeReady(int i, int i2) {
+            if (!r1) {
+                Point point = AndroidUtilities.displaySize;
+                if ((point.x <= point.y) != (i <= i2)) {
+                    return;
+                }
+            }
+            r2.invalidate();
+        }
+    }
+
+    class AnonymousClass2 implements Runnable {
+        AnonymousClass2() {
+        }
+
+        @Override
+        public void run() {
+            boolean unused = Theme.switchNightRunnableScheduled = false;
+            Theme.applyDayNightThemeMaybe(true);
+        }
+    }
+
+    public class AnonymousClass3 extends StateListDrawable {
+        AnonymousClass3() {
+        }
+
+        @Override
+        public boolean selectDrawable(int r3) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.Theme.AnonymousClass3.selectDrawable(int):boolean");
+        }
+    }
+
+    public class AnonymousClass4 extends StateListDrawable {
+        AnonymousClass4() {
+        }
+
+        @Override
+        public boolean selectDrawable(int r3) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.Theme.AnonymousClass4.selectDrawable(int):boolean");
+        }
+    }
+
+    public class AnonymousClass6 extends Drawable {
+        private RectF rect = new RectF();
+        final Paint val$backgroundPaint;
+        final View val$containerView;
+        final int val$rad;
+        final ResourcesProvider val$resourcesProvider;
+        final View val$view;
+
+        AnonymousClass6(View view, View view2, int i, Paint paint, ResourcesProvider resourcesProvider) {
+            r1 = view;
+            r2 = view2;
+            r3 = i;
+            r4 = paint;
+            r5 = resourcesProvider;
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            Rect bounds = getBounds();
+            this.rect.set(bounds.left, bounds.top, bounds.right, bounds.bottom);
+            Theme.applyServiceShaderMatrixForView(r1, r2);
+            RectF rectF = this.rect;
+            float f = r3;
+            Paint paint = r4;
+            if (paint == null) {
+                paint = Theme.getThemePaint("paintChatActionBackground", r5);
+            }
+            canvas.drawRoundRect(rectF, f, f, paint);
+            ResourcesProvider resourcesProvider = r5;
+            if (resourcesProvider != null) {
+                if (!resourcesProvider.hasGradientService()) {
+                    return;
+                }
+            } else if (!Theme.hasGradientService()) {
+                return;
+            }
+            RectF rectF2 = this.rect;
+            float f2 = r3;
+            canvas.drawRoundRect(rectF2, f2, f2, Theme.getThemePaint("paintChatActionBackgroundDarken", r5));
+        }
+
+        @Override
+        public int getOpacity() {
+            return -2;
+        }
+
+        @Override
+        public void setAlpha(int i) {
+        }
+
+        @Override
+        public void setColorFilter(ColorFilter colorFilter) {
+        }
+    }
+
+    public class AnonymousClass7 extends Drawable {
+        RectF rect;
+        final int val$maskType;
+        final int val$radius;
+
+        AnonymousClass7(int i, int i2) {
+            r1 = i;
+            r2 = i2;
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            int i;
+            Rect bounds = getBounds();
+            int i2 = r1;
+            if (i2 != 7) {
+                if (i2 == 1 || i2 == 6) {
+                    i = r2;
+                    if (i <= 0) {
+                        i = AndroidUtilities.dp(20.0f);
+                    }
+                } else {
+                    i = i2 == 3 ? Math.max(bounds.width(), bounds.height()) / 2 : (int) Math.ceil(Math.sqrt(((bounds.left - bounds.centerX()) * (bounds.left - bounds.centerX())) + ((bounds.top - bounds.centerY()) * (bounds.top - bounds.centerY()))));
+                }
+                canvas.drawCircle(bounds.centerX(), bounds.centerY(), i, Theme.maskPaint);
+                return;
+            }
+            if (this.rect == null) {
+                this.rect = new RectF();
+            }
+            this.rect.set(bounds);
+            int i3 = r2;
+            if (i3 <= 0) {
+                i3 = AndroidUtilities.dp(6.0f);
+            }
+            float f = i3;
+            canvas.drawRoundRect(this.rect, f, f, Theme.maskPaint);
+        }
+
+        @Override
+        public int getOpacity() {
+            return 0;
+        }
+
+        @Override
+        public void setAlpha(int i) {
+        }
+
+        @Override
+        public void setColorFilter(ColorFilter colorFilter) {
+        }
+    }
+
+    public class AnonymousClass8 extends Drawable {
+        final int val$leftInset;
+        final int val$rightInset;
+
+        AnonymousClass8(int i, int i2) {
+            r1 = i;
+            r2 = i2;
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            Rect bounds = getBounds();
+            canvas.drawCircle((bounds.centerX() - r1) + r2, bounds.centerY(), (Math.max(bounds.width(), bounds.height()) / 2) + r1 + r2, Theme.maskPaint);
+        }
+
+        @Override
+        public int getOpacity() {
+            return 0;
+        }
+
+        @Override
+        public void setAlpha(int i) {
+        }
+
+        @Override
+        public void setColorFilter(ColorFilter colorFilter) {
+        }
+    }
+
+    class AnonymousClass9 implements SensorEventListener {
+        AnonymousClass9() {
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            Runnable runnable;
+            float f = sensorEvent.values[0];
+            if (f <= 0.0f) {
+                f = 0.1f;
+            }
+            if (ApplicationLoader.mainInterfacePaused || !ApplicationLoader.isScreenOn) {
+                return;
+            }
+            float unused = Theme.lastBrightnessValue = f > 500.0f ? 1.0f : ((float) Math.ceil((Math.log(f) * 9.932299613952637d) + 27.05900001525879d)) / 100.0f;
+            if (Theme.lastBrightnessValue > Theme.autoNightBrighnessThreshold) {
+                if (Theme.switchNightRunnableScheduled) {
+                    boolean unused2 = Theme.switchNightRunnableScheduled = false;
+                    AndroidUtilities.cancelRunOnUIThread(Theme.switchNightBrightnessRunnable);
+                }
+                if (Theme.switchDayRunnableScheduled) {
+                    return;
+                }
+                boolean unused3 = Theme.switchDayRunnableScheduled = true;
+                runnable = Theme.switchDayBrightnessRunnable;
+            } else {
+                if (MediaController.getInstance().isRecordingOrListeningByProximity()) {
+                    return;
+                }
+                if (Theme.switchDayRunnableScheduled) {
+                    boolean unused4 = Theme.switchDayRunnableScheduled = false;
+                    AndroidUtilities.cancelRunOnUIThread(Theme.switchDayBrightnessRunnable);
+                }
+                if (Theme.switchNightRunnableScheduled) {
+                    return;
+                }
+                boolean unused5 = Theme.switchNightRunnableScheduled = true;
+                runnable = Theme.switchNightBrightnessRunnable;
+            }
+            AndroidUtilities.runOnUIThread(runnable, Theme.access$3000());
+        }
+    }
 
     public static class AdaptiveRipple {
         private static final int defaultBackgroundColorKey = Theme.key_windowBackgroundWhite;
@@ -2132,6 +2433,10 @@ public abstract class Theme {
             private LoadingPattern() {
                 this.accents = new ArrayList();
             }
+
+            LoadingPattern(AnonymousClass1 anonymousClass1) {
+                this();
+            }
         }
 
         private PatternsLoader(final ArrayList arrayList) {
@@ -2360,12 +2665,36 @@ public abstract class Theme {
     public interface ResourcesProvider {
 
         public abstract class CC {
+            public static void $default$applyServiceShaderMatrix(ResourcesProvider resourcesProvider, int i, int i2, float f, float f2) {
+                Theme.applyServiceShaderMatrix(i, i2, f, f2);
+            }
+
+            public static ColorFilter $default$getAnimatedEmojiColorFilter(ResourcesProvider resourcesProvider) {
+                return Theme.chat_animatedEmojiTextColorFilter;
+            }
+
+            public static int $default$getColorOrDefault(ResourcesProvider resourcesProvider, int i) {
+                return resourcesProvider.getColor(i);
+            }
+
+            public static int $default$getCurrentColor(ResourcesProvider resourcesProvider, int i) {
+                return resourcesProvider.getColor(i);
+            }
+
             public static Drawable $default$getDrawable(ResourcesProvider resourcesProvider, String str) {
                 return null;
             }
 
+            public static Paint $default$getPaint(ResourcesProvider resourcesProvider, String str) {
+                return Theme.getThemePaint(str);
+            }
+
             public static boolean $default$hasGradientService(ResourcesProvider resourcesProvider) {
                 return false;
+            }
+
+            public static boolean $default$isDark(ResourcesProvider resourcesProvider) {
+                return Theme.isCurrentThemeDark();
             }
 
             public static void $default$setAnimatedColor(ResourcesProvider resourcesProvider, int i, int i2) {
@@ -5129,14 +5458,22 @@ public abstract class Theme {
         return combinedDrawable;
     }
 
-    public static Drawable createCircleSelectorDrawable(int i, final int i2, final int i3) {
+    public static Drawable createCircleSelectorDrawable(int i, int i2, int i3) {
         if (Build.VERSION.SDK_INT >= 21) {
             maskPaint.setColor(-1);
             return new BaseCell.RippleDrawableSafe(new ColorStateList(new int[][]{StateSet.WILD_CARD}, new int[]{i}), null, new Drawable() {
+                final int val$leftInset;
+                final int val$rightInset;
+
+                AnonymousClass8(int i22, int i32) {
+                    r1 = i22;
+                    r2 = i32;
+                }
+
                 @Override
                 public void draw(Canvas canvas) {
                     Rect bounds = getBounds();
-                    canvas.drawCircle((bounds.centerX() - i2) + i3, bounds.centerY(), (Math.max(bounds.width(), bounds.height()) / 2) + i2 + i3, Theme.maskPaint);
+                    canvas.drawCircle((bounds.centerX() - r1) + r2, bounds.centerY(), (Math.max(bounds.width(), bounds.height()) / 2) + r1 + r2, Theme.maskPaint);
                 }
 
                 @Override
@@ -5589,16 +5926,19 @@ public abstract class Theme {
         mutate.setColorFilter(new PorterDuffColorFilter(i, mode));
         Drawable mutate2 = resources.getDrawable(R.drawable.search_dark_activated).mutate();
         mutate2.setColorFilter(new PorterDuffColorFilter(i2, mode));
-        StateListDrawable stateListDrawable = new StateListDrawable() {
+        AnonymousClass4 anonymousClass4 = new StateListDrawable() {
+            AnonymousClass4() {
+            }
+
             @Override
             public boolean selectDrawable(int r3) {
                 throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.Theme.AnonymousClass4.selectDrawable(int):boolean");
             }
         };
-        stateListDrawable.addState(new int[]{16842910, 16842908}, mutate2);
-        stateListDrawable.addState(new int[]{16842908}, mutate2);
-        stateListDrawable.addState(StateSet.WILD_CARD, mutate);
-        return stateListDrawable;
+        anonymousClass4.addState(new int[]{16842910, 16842908}, mutate2);
+        anonymousClass4.addState(new int[]{16842908}, mutate2);
+        anonymousClass4.addState(StateSet.WILD_CARD, mutate);
+        return anonymousClass4;
     }
 
     public static Drawable createEditTextDrawable(Context context, boolean z) {
@@ -5615,17 +5955,20 @@ public abstract class Theme {
         if (i3 != 0) {
             mutate2.setColorFilter(new PorterDuffColorFilter(i3, PorterDuff.Mode.MULTIPLY));
         }
-        StateListDrawable stateListDrawable = new StateListDrawable() {
+        AnonymousClass3 anonymousClass3 = new StateListDrawable() {
+            AnonymousClass3() {
+            }
+
             @Override
             public boolean selectDrawable(int r3) {
                 throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.Theme.AnonymousClass3.selectDrawable(int):boolean");
             }
         };
-        stateListDrawable.setEnterFadeDuration(1);
-        stateListDrawable.setExitFadeDuration(200);
-        stateListDrawable.addState(new int[]{16842913}, mutate2);
-        stateListDrawable.addState(new int[0], mutate);
-        return stateListDrawable;
+        anonymousClass3.setEnterFadeDuration(1);
+        anonymousClass3.setExitFadeDuration(200);
+        anonymousClass3.addState(new int[]{16842913}, mutate2);
+        anonymousClass3.addState(new int[0], mutate);
+        return anonymousClass3;
     }
 
     public static ThemeInfo createNewTheme(String str) {
@@ -5714,7 +6057,7 @@ public abstract class Theme {
         return createSelectorDrawable(i, i2, -1);
     }
 
-    public static android.graphics.drawable.Drawable createSelectorDrawable(int r11, final int r12, final int r13) {
+    public static android.graphics.drawable.Drawable createSelectorDrawable(int r11, int r12, int r13) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.Theme.createSelectorDrawable(int, int, int):android.graphics.drawable.Drawable");
     }
 
@@ -5745,23 +6088,36 @@ public abstract class Theme {
         return createServiceDrawable(i, view, view2, paint, null);
     }
 
-    public static Drawable createServiceDrawable(final int i, final View view, final View view2, final Paint paint, final ResourcesProvider resourcesProvider) {
+    public static Drawable createServiceDrawable(int i, View view, View view2, Paint paint, ResourcesProvider resourcesProvider) {
         return new Drawable() {
             private RectF rect = new RectF();
+            final Paint val$backgroundPaint;
+            final View val$containerView;
+            final int val$rad;
+            final ResourcesProvider val$resourcesProvider;
+            final View val$view;
+
+            AnonymousClass6(View view3, View view22, int i2, Paint paint2, ResourcesProvider resourcesProvider2) {
+                r1 = view3;
+                r2 = view22;
+                r3 = i2;
+                r4 = paint2;
+                r5 = resourcesProvider2;
+            }
 
             @Override
             public void draw(Canvas canvas) {
                 Rect bounds = getBounds();
                 this.rect.set(bounds.left, bounds.top, bounds.right, bounds.bottom);
-                Theme.applyServiceShaderMatrixForView(view, view2);
+                Theme.applyServiceShaderMatrixForView(r1, r2);
                 RectF rectF = this.rect;
-                float f = i;
-                Paint paint2 = paint;
+                float f = r3;
+                Paint paint2 = r4;
                 if (paint2 == null) {
-                    paint2 = Theme.getThemePaint("paintChatActionBackground", resourcesProvider);
+                    paint2 = Theme.getThemePaint("paintChatActionBackground", r5);
                 }
                 canvas.drawRoundRect(rectF, f, f, paint2);
-                ResourcesProvider resourcesProvider2 = resourcesProvider;
+                ResourcesProvider resourcesProvider2 = r5;
                 if (resourcesProvider2 != null) {
                     if (!resourcesProvider2.hasGradientService()) {
                         return;
@@ -5770,8 +6126,8 @@ public abstract class Theme {
                     return;
                 }
                 RectF rectF2 = this.rect;
-                float f2 = i;
-                canvas.drawRoundRect(rectF2, f2, f2, Theme.getThemePaint("paintChatActionBackgroundDarken", resourcesProvider));
+                float f2 = r3;
+                canvas.drawRoundRect(rectF2, f2, f2, Theme.getThemePaint("paintChatActionBackgroundDarken", r5));
             }
 
             @Override
@@ -6439,7 +6795,7 @@ public abstract class Theme {
         return getThemedDrawable(context, i, getColor(i2, resourcesProvider));
     }
 
-    public static android.graphics.drawable.Drawable getThemedWallpaper(final boolean r10, final android.view.View r11) {
+    public static android.graphics.drawable.Drawable getThemedWallpaper(boolean r10, android.view.View r11) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ActionBar.Theme.getThemedWallpaper(boolean, android.view.View):android.graphics.drawable.Drawable");
     }
 

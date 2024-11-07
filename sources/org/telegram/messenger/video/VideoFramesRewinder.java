@@ -262,13 +262,16 @@ public class VideoFramesRewinder {
         this.lastSeek = j;
         this.lastSpeed = f;
         Iterator<Frame> it = this.frames.iterator();
+        ArrayList arrayList = new ArrayList();
         while (true) {
             if (!it.hasNext()) {
                 FileLog.d("[VideoFramesRewinder] didn't find a frame, wanting to prepare " + j + "ms");
                 break;
             }
             Frame next = it.next();
-            if (((float) Math.abs(next.position - j)) < 25.0f * f) {
+            arrayList.add(Long.valueOf(next.position));
+            float f2 = 25.0f * f;
+            if (((float) Math.abs(next.position - j)) < f2) {
                 if (this.currentFrame != next) {
                     FileLog.d("[VideoFramesRewinder] found a frame " + next.position + "ms to fit to " + j + "ms from " + this.frames.size() + " frames");
                     this.currentFrame = next;
@@ -281,6 +284,14 @@ public class VideoFramesRewinder {
                     }
                     if (i > 0) {
                         FileLog.d("[VideoFramesRewinder] also deleted " + i + " frames after this frame");
+                    }
+                }
+                for (int size = arrayList.size() - 2; size >= 0; size--) {
+                    long longValue = ((Long) arrayList.get(size + 1)).longValue();
+                    long longValue2 = ((Long) arrayList.get(size)).longValue();
+                    if (((float) Math.abs(longValue - longValue2)) > f2) {
+                        prepare(longValue2);
+                        return;
                     }
                 }
                 j = this.frames.first().position - 20;

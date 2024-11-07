@@ -18600,7 +18600,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         BlurredFrameLayout blurredFrameLayout5 = this.topChatPanelView2;
         if (blurredFrameLayout5 != null) {
-            blurredFrameLayout5.setTranslationY(this.contentPanTranslation + currentHeight + this.contentPaddingTop + this.topChatPanelView2Offset + max + this.topChatPanelViewOffset + Math.max(0.0f, this.pinnedMessageView != null ? AndroidUtilities.dp(48.0f) + this.pinnedMessageEnterOffset : 0.0f));
+            blurredFrameLayout5.setTranslationY(this.contentPanTranslation + currentHeight + this.contentPaddingTop + this.topChatPanelView2Offset + max + Math.max(0.0f, this.topChatPanelViewOffset) + Math.max(0.0f, this.pinnedMessageView != null ? AndroidUtilities.dp(48.0f) + this.pinnedMessageEnterOffset : 0.0f));
         }
         FrameLayout frameLayout = this.alertView;
         if (frameLayout != null && frameLayout.getVisibility() == 0) {
@@ -21133,7 +21133,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public void lambda$didReceivedNotification$159(int i) {
-        BaseFragment backgroundFragment = this.parentLayout.getBackgroundFragment();
+        INavigationLayout iNavigationLayout = this.parentLayout;
+        if (iNavigationLayout == null) {
+            return;
+        }
+        BaseFragment backgroundFragment = iNavigationLayout.getBackgroundFragment();
         if (backgroundFragment instanceof ChatActivity) {
             ChatActivity chatActivity = (ChatActivity) backgroundFragment;
             if (chatActivity.getDialogId() == this.dialog_id) {

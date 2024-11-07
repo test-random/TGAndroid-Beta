@@ -1202,7 +1202,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 Iterator it6 = ((Quality) it5.next()).uris.iterator();
                 while (it6.hasNext()) {
                     VideoUri videoUri4 = (VideoUri) it6.next();
-                    if (videoUri2 == null || videoUri2.width * videoUri2.height > videoUri4.width * videoUri4.height) {
+                    if (videoUri2 == null || videoUri2.width * videoUri2.height > videoUri4.width * videoUri4.height || videoUri4.bitrate < videoUri2.bitrate) {
                         videoUri2 = videoUri4;
                     }
                 }
@@ -1228,7 +1228,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
             Iterator it4 = ((Quality) it3.next()).uris.iterator();
             while (it4.hasNext()) {
                 VideoUri videoUri3 = (VideoUri) it4.next();
-                if (videoUri2 == null || videoUri2.width * videoUri2.height < videoUri3.width * videoUri3.height) {
+                if (!videoUri3.original && (videoUri2 == null || videoUri2.width * videoUri2.height < videoUri3.width * videoUri3.height || videoUri3.bitrate < videoUri2.bitrate)) {
                     if (videoUri3.width <= 860 && videoUri3.height <= 860) {
                         videoUri2 = videoUri3;
                     }
@@ -1241,7 +1241,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 Iterator it6 = ((Quality) it5.next()).uris.iterator();
                 while (it6.hasNext()) {
                     VideoUri videoUri4 = (VideoUri) it6.next();
-                    if (videoUri2 == null || videoUri2.width * videoUri2.height > videoUri4.width * videoUri4.height) {
+                    if (videoUri2 == null || videoUri2.width * videoUri2.height > videoUri4.width * videoUri4.height || videoUri4.bitrate < videoUri2.bitrate) {
                         videoUri2 = videoUri4;
                     }
                 }
