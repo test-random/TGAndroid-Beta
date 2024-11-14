@@ -52,7 +52,6 @@ import org.telegram.ui.ArticleViewer;
 import org.telegram.ui.EmptyBaseFragment;
 import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.Stories.StoryViewer;
-import org.telegram.ui.bots.BotWebViewAttachedSheet;
 
 public abstract class BaseFragment {
     protected ActionBar actionBar;
@@ -210,7 +209,7 @@ public abstract class BaseFragment {
 
         int getNavigationBarColor(int i);
 
-        View mo997getWindowView();
+        View mo999getWindowView();
 
         boolean isAttachedLightStatusBar();
 
@@ -320,8 +319,8 @@ public abstract class BaseFragment {
             for (int i = 0; i < this.sheetsStack.size(); i++) {
                 AttachedSheet attachedSheet = (AttachedSheet) this.sheetsStack.get(i);
                 if (attachedSheet != null && attachedSheet.attachedToParent()) {
-                    AndroidUtilities.removeFromParent(attachedSheet.mo997getWindowView());
-                    layoutContainer.addView(attachedSheet.mo997getWindowView());
+                    AndroidUtilities.removeFromParent(attachedSheet.mo999getWindowView());
+                    layoutContainer.addView(attachedSheet.mo999getWindowView());
                 }
             }
         }
@@ -424,13 +423,6 @@ public abstract class BaseFragment {
         return makeSheet;
     }
 
-    public BotWebViewAttachedSheet createBotViewer() {
-        BotWebViewAttachedSheet botWebViewAttachedSheet = new BotWebViewAttachedSheet(this);
-        addSheet(botWebViewAttachedSheet);
-        BottomSheetTabDialog.checkSheet(botWebViewAttachedSheet);
-        return botWebViewAttachedSheet;
-    }
-
     public StoryViewer createOverlayStoryViewer() {
         if (this.sheetsStack == null) {
             this.sheetsStack = new ArrayList();
@@ -454,7 +446,7 @@ public abstract class BaseFragment {
             for (int i = 0; i < this.sheetsStack.size(); i++) {
                 AttachedSheet attachedSheet = (AttachedSheet) this.sheetsStack.get(i);
                 if (attachedSheet != null && attachedSheet.attachedToParent()) {
-                    AndroidUtilities.removeFromParent(attachedSheet.mo997getWindowView());
+                    AndroidUtilities.removeFromParent(attachedSheet.mo999getWindowView());
                 }
             }
         }

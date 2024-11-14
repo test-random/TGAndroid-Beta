@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.text.TextUtils;
+import android.util.Pair;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.WeakHashMap;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -33,6 +35,7 @@ import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.LaunchActivity;
 
 public class BotBiometry {
+    private static final WeakHashMap instances = new WeakHashMap();
     private static KeyStore keyStore;
     public boolean access_granted;
     public boolean access_requested;
@@ -55,7 +58,7 @@ public class BotBiometry {
         }
     }
 
-    public BotBiometry(Context context, int i, long j) {
+    private BotBiometry(Context context, int i, long j) {
         this.context = context;
         this.currentAccount = i;
         this.botId = j;
@@ -70,6 +73,19 @@ public class BotBiometry {
         for (int i = 0; i < 4; i++) {
             context.getSharedPreferences("2botbiometry_" + i, 0).edit().clear().apply();
         }
+        instances.clear();
+    }
+
+    public static BotBiometry get(Context context, int i, long j) {
+        Pair pair = new Pair(Integer.valueOf(i), Long.valueOf(j));
+        WeakHashMap weakHashMap = instances;
+        BotBiometry botBiometry = (BotBiometry) weakHashMap.get(pair);
+        if (botBiometry != null) {
+            return botBiometry;
+        }
+        BotBiometry botBiometry2 = new BotBiometry(context, i, j);
+        weakHashMap.put(pair, botBiometry2);
+        return botBiometry2;
     }
 
     public static String getAvailableType(Context context) {
@@ -109,7 +125,7 @@ public class BotBiometry {
         Iterator it2 = arrayList.iterator();
         while (it2.hasNext()) {
             Long l = (Long) it2.next();
-            BotBiometry botBiometry = new BotBiometry(context, i, l.longValue());
+            BotBiometry botBiometry = get(context, i, l.longValue());
             if (botBiometry.access_granted && botBiometry.access_requested) {
                 hashMap.put(l, Boolean.valueOf(!botBiometry.disabled));
             }
@@ -346,6 +362,10 @@ public class BotBiometry {
         edit.apply();
     }
 
+    public boolean asked() {
+        return this.access_requested;
+    }
+
     public JSONObject getStatus() {
         JSONObject jSONObject = new JSONObject();
         String availableType = getAvailableType(this.context);
@@ -364,6 +384,10 @@ public class BotBiometry {
         jSONObject.put("token_saved", !TextUtils.isEmpty(this.encrypted_token));
         jSONObject.put("device_id", getDeviceId(this.context, this.currentAccount, this.botId));
         return jSONObject;
+    }
+
+    public boolean granted() {
+        return this.access_granted;
     }
 
     public void load() {
@@ -420,6 +444,12 @@ public class BotBiometry {
             edit.remove(this.botId + "_disabled");
         }
         edit.apply();
+    }
+
+    public void setGranted(boolean z) {
+        this.access_requested = true;
+        this.access_granted = z;
+        save();
     }
 
     public void updateToken(String str, final String str2, final Utilities.Callback callback) {

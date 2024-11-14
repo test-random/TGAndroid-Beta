@@ -80,7 +80,6 @@ import org.telegram.ui.SecretMediaViewer;
 import org.telegram.ui.Stars.StarsController;
 import org.telegram.ui.Stories.StoriesController;
 import org.telegram.ui.ThemeActivity;
-import org.telegram.ui.bots.BotWebViewAttachedSheet;
 import org.telegram.ui.bots.BotWebViewSheet;
 import org.telegram.ui.bots.WebViewRequestProps;
 
@@ -7744,8 +7743,9 @@ public class MessagesController extends BaseController implements NotificationCe
         zArr[0] = true;
     }
 
-    public void lambda$openApp$452(BaseFragment baseFragment, Browser.Progress progress, boolean[] zArr, TLRPC.User user, String str, TL_bots.BotInfo[] botInfoArr) {
-        BotWebViewAttachedSheet createBotViewer;
+    public void lambda$openApp$452(BaseFragment baseFragment, Browser.Progress progress, boolean[] zArr, TLRPC.User user, String str, boolean z, boolean z2, TL_bots.BotInfo[] botInfoArr) {
+        BaseFragment baseFragment2;
+        WebViewRequestProps of;
         BotWebViewSheet botWebViewSheet;
         BaseFragment safeLastFragment = baseFragment != null ? baseFragment : LaunchActivity.getSafeLastFragment();
         if (safeLastFragment == null) {
@@ -7761,63 +7761,46 @@ public class MessagesController extends BaseController implements NotificationCe
             if (safeLastFragment.getParentLayout() instanceof ActionBarLayout) {
                 safeLastFragment = ((ActionBarLayout) safeLastFragment.getParentLayout()).getSheetFragment();
             }
-            BaseFragment baseFragment2 = safeLastFragment;
-            AndroidUtilities.hideKeyboard(baseFragment2.getFragmentView());
+            BaseFragment baseFragment3 = safeLastFragment;
+            AndroidUtilities.hideKeyboard(baseFragment3.getFragmentView());
             int i = this.currentAccount;
             long j = user.id;
-            WebViewRequestProps of = WebViewRequestProps.of(i, j, j, null, null, 4, 0, false, null, false, str, user, 0, false);
+            baseFragment2 = baseFragment3;
+            of = WebViewRequestProps.of(i, j, j, null, null, 4, 0, false, null, false, str, user, 0, z, z2);
             LaunchActivity launchActivity = LaunchActivity.instance;
-            if (launchActivity == null || launchActivity.getBottomSheetTabs() == null || LaunchActivity.instance.getBottomSheetTabs().tryReopenTab(of) == null) {
-                if (AndroidUtilities.isTablet()) {
-                    botWebViewSheet = new BotWebViewSheet(baseFragment2.getContext(), baseFragment2.getResourceProvider());
-                    botWebViewSheet.setDefaultFullsize(true);
-                    botWebViewSheet.setNeedsContext(true);
-                    botWebViewSheet.setParentActivity(baseFragment2.getParentActivity());
-                    botWebViewSheet.requestWebView(baseFragment2, of);
-                    botWebViewSheet.show();
-                    return;
-                }
-                createBotViewer = baseFragment2.createBotViewer();
-                createBotViewer.setDefaultFullsize(true);
-                createBotViewer.setNeedsContext(false);
-                createBotViewer.setParentActivity(baseFragment2.getParentActivity());
-                createBotViewer.requestWebView(baseFragment2, of);
-                createBotViewer.show();
-            }
-            return;
-        }
-        TL_bots.BotInfo botInfo = botInfoArr[0];
-        if (botInfo == null || !(botInfo.menu_button instanceof TL_bots.TL_botMenuButton)) {
-            safeLastFragment.presentFragment(ChatActivity.of(user.id));
-            return;
-        }
-        if (safeLastFragment.getParentLayout() instanceof ActionBarLayout) {
-            safeLastFragment = ((ActionBarLayout) safeLastFragment.getParentLayout()).getSheetFragment();
-        }
-        BaseFragment baseFragment3 = safeLastFragment;
-        TL_bots.TL_botMenuButton tL_botMenuButton = (TL_bots.TL_botMenuButton) botInfoArr[0].menu_button;
-        AndroidUtilities.hideKeyboard(baseFragment3.getFragmentView());
-        int i2 = this.currentAccount;
-        long j2 = user.id;
-        WebViewRequestProps of2 = WebViewRequestProps.of(i2, j2, j2, tL_botMenuButton.text, tL_botMenuButton.url, 2, 0, false, null, false, str, user, 0, false);
-        LaunchActivity launchActivity2 = LaunchActivity.instance;
-        if (launchActivity2 == null || launchActivity2.getBottomSheetTabs() == null || LaunchActivity.instance.getBottomSheetTabs().tryReopenTab(of2) == null) {
-            if (AndroidUtilities.isTablet()) {
-                botWebViewSheet = new BotWebViewSheet(baseFragment3.getContext(), baseFragment3.getResourceProvider());
-                botWebViewSheet.setDefaultFullsize(false);
-                botWebViewSheet.setNeedsContext(true);
-                botWebViewSheet.setParentActivity(baseFragment3.getParentActivity());
-                botWebViewSheet.requestWebView(baseFragment3, of2);
-                botWebViewSheet.show();
+            if (launchActivity != null && launchActivity.getBottomSheetTabs() != null && LaunchActivity.instance.getBottomSheetTabs().tryReopenTab(of) != null) {
                 return;
             }
-            createBotViewer = baseFragment3.createBotViewer();
-            createBotViewer.setDefaultFullsize(false);
-            createBotViewer.setNeedsContext(false);
-            createBotViewer.setParentActivity(baseFragment3.getParentActivity());
-            createBotViewer.requestWebView(baseFragment3, of2);
-            createBotViewer.show();
+            botWebViewSheet = new BotWebViewSheet(baseFragment2.getContext(), baseFragment2.getResourceProvider());
+            botWebViewSheet.setDefaultFullsize(true);
+            botWebViewSheet.setNeedsContext(true);
+        } else {
+            TL_bots.BotInfo botInfo = botInfoArr[0];
+            if (botInfo == null || !(botInfo.menu_button instanceof TL_bots.TL_botMenuButton)) {
+                safeLastFragment.presentFragment(ChatActivity.of(user.id));
+                return;
+            }
+            if (safeLastFragment.getParentLayout() instanceof ActionBarLayout) {
+                safeLastFragment = ((ActionBarLayout) safeLastFragment.getParentLayout()).getSheetFragment();
+            }
+            BaseFragment baseFragment4 = safeLastFragment;
+            TL_bots.TL_botMenuButton tL_botMenuButton = (TL_bots.TL_botMenuButton) botInfoArr[0].menu_button;
+            AndroidUtilities.hideKeyboard(baseFragment4.getFragmentView());
+            int i2 = this.currentAccount;
+            long j2 = user.id;
+            baseFragment2 = baseFragment4;
+            of = WebViewRequestProps.of(i2, j2, j2, tL_botMenuButton.text, tL_botMenuButton.url, 2, 0, false, null, false, str, user, 0, z, z2);
+            LaunchActivity launchActivity2 = LaunchActivity.instance;
+            if (launchActivity2 != null && launchActivity2.getBottomSheetTabs() != null && LaunchActivity.instance.getBottomSheetTabs().tryReopenTab(of) != null) {
+                return;
+            }
+            botWebViewSheet = new BotWebViewSheet(baseFragment2.getContext(), baseFragment2.getResourceProvider());
+            botWebViewSheet.setDefaultFullsize(false);
+            botWebViewSheet.setNeedsContext(true);
         }
+        botWebViewSheet.setParentActivity(baseFragment2.getParentActivity());
+        botWebViewSheet.requestWebView(baseFragment2, of);
+        botWebViewSheet.show();
     }
 
     public static void lambda$openApp$453(boolean[] zArr, TL_bots.BotInfo[] botInfoArr, Runnable runnable, TLRPC.UserFull userFull) {
@@ -15009,7 +14992,11 @@ public class MessagesController extends BaseController implements NotificationCe
         openApp(null, user, null, i, null);
     }
 
-    public void openApp(final BaseFragment baseFragment, final TLRPC.User user, final String str, final int i, final Browser.Progress progress) {
+    public void openApp(BaseFragment baseFragment, TLRPC.User user, String str, int i, Browser.Progress progress) {
+        openApp(baseFragment, user, str, i, progress, false, false);
+    }
+
+    public void openApp(final BaseFragment baseFragment, final TLRPC.User user, final String str, final int i, final Browser.Progress progress, final boolean z, final boolean z2) {
         if (user == null) {
             return;
         }
@@ -15026,7 +15013,7 @@ public class MessagesController extends BaseController implements NotificationCe
         final Runnable runnable = new Runnable() {
             @Override
             public final void run() {
-                MessagesController.this.lambda$openApp$452(baseFragment, progress, zArr, user, str, r7);
+                MessagesController.this.lambda$openApp$452(baseFragment, progress, zArr, user, str, z, z2, r9);
             }
         };
         MediaDataController mediaDataController = getMediaDataController();

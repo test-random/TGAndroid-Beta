@@ -517,7 +517,7 @@ public class Bulletin {
         }
 
         @Override
-        protected void onMeasure(int i, int i2) {
+        public void onMeasure(int i, int i2) {
             this.childrenMeasuredWidth = 0;
             if (this.wrapWidth) {
                 i = View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(i), Integer.MIN_VALUE);

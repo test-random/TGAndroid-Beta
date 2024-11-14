@@ -16,6 +16,7 @@ public class WebViewRequestProps {
     public boolean compact;
     public int currentAccount;
     public int flags;
+    public boolean fullscreen;
     public long peerId;
     public int replyToMsgId;
     public TLObject response;
@@ -24,7 +25,7 @@ public class WebViewRequestProps {
     public String startParam;
     public int type;
 
-    public static WebViewRequestProps of(int i, long j, long j2, String str, String str2, int i2, int i3, boolean z, TLRPC.BotApp botApp, boolean z2, String str3, TLRPC.User user, int i4, boolean z3) {
+    public static WebViewRequestProps of(int i, long j, long j2, String str, String str2, int i2, int i3, boolean z, TLRPC.BotApp botApp, boolean z2, String str3, TLRPC.User user, int i4, boolean z3, boolean z4) {
         WebViewRequestProps webViewRequestProps = new WebViewRequestProps();
         webViewRequestProps.currentAccount = i;
         webViewRequestProps.peerId = j;
@@ -40,9 +41,12 @@ public class WebViewRequestProps {
         webViewRequestProps.botUser = user;
         webViewRequestProps.flags = i4;
         webViewRequestProps.compact = z3;
-        if (!z3 && !TextUtils.isEmpty(str2)) {
+        webViewRequestProps.fullscreen = z4;
+        if (!z3 && !z4 && !TextUtils.isEmpty(str2)) {
             try {
-                webViewRequestProps.compact = TextUtils.equals(Uri.parse(str2).getQueryParameter("mode"), "compact");
+                Uri parse = Uri.parse(str2);
+                webViewRequestProps.compact = TextUtils.equals(parse.getQueryParameter("mode"), "compact");
+                webViewRequestProps.fullscreen = TextUtils.equals(parse.getQueryParameter("mode"), "fullscreen");
             } catch (Exception e) {
                 FileLog.e(e);
             }

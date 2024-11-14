@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.TreeSet;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BillingController;
+import org.telegram.messenger.BirthdayController;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.DocumentObject;
 import org.telegram.messenger.FileLoader;
@@ -73,6 +74,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
     private final int TAB_ALL;
     private final int TAB_LIMITED;
     private UniversalAdapter adapter;
+    private boolean birthday;
     private final Runnable closeParentSheet;
     private final int currentAccount;
     private final long dialogId;
@@ -329,11 +331,11 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
             boolean z = starGift.limited;
             if (z && starGift.availability_remains <= 0) {
                 this.ribbon.setVisibility(0);
-                this.ribbon.setColor(Theme.getColor(Theme.key_text_RedBold, this.resourcesProvider));
+                this.ribbon.setColor(Theme.getColor(Theme.key_gift_ribbon_soldout, this.resourcesProvider));
                 this.ribbon.setText(LocaleController.getString(R.string.Gift2SoldOut), true);
             } else if (z) {
                 this.ribbon.setVisibility(0);
-                this.ribbon.setColor(-12147470);
+                this.ribbon.setColor(Theme.getColor(Theme.key_gift_ribbon, this.resourcesProvider));
                 this.ribbon.setText(LocaleController.getString(R.string.Gift2LimitedRibbon), false);
             } else {
                 this.ribbon.setVisibility(8);
@@ -368,7 +370,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
             }
             if (userStarGift.gift.limited) {
                 this.ribbon.setVisibility(0);
-                this.ribbon.setColor(-12147470);
+                this.ribbon.setColor(Theme.getColor(Theme.key_gift_ribbon, this.resourcesProvider));
                 this.ribbon.setText(LocaleController.formatString(R.string.Gift2Limited1OfRibbon, AndroidUtilities.formatWholeNumber(userStarGift.gift.availability_total, 0)), true);
             } else {
                 this.ribbon.setVisibility(8);
@@ -787,6 +789,9 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
         updatePremiumTiers();
         this.adapter.update(false);
         updateTitle();
+        if (BirthdayController.getInstance(i).isToday(j)) {
+            setBirthday();
+        }
         NotificationCenter.getInstance(i).addObserver(this, NotificationCenter.billingProductDetailsUpdated);
         NotificationCenter.getInstance(i).addObserver(this, NotificationCenter.starGiftsLoaded);
         NotificationCenter.getInstance(i).addObserver(this, NotificationCenter.userInfoDidLoad);
@@ -1031,7 +1036,8 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
                 arrayList.add(GiftCell.Factory.asPremiumGift((GiftPremiumBottomSheet$GiftTier) it.next()));
             }
         }
-        ArrayList arrayList3 = StarsController.getInstance(this.currentAccount).gifts;
+        StarsController starsController = StarsController.getInstance(this.currentAccount);
+        ArrayList arrayList3 = this.birthday ? starsController.birthdaySortedGifts : starsController.gifts;
         if (MessagesController.getInstance(this.currentAccount).stargiftsBlocked || arrayList3.isEmpty()) {
             return;
         }
@@ -1065,7 +1071,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
                 arrayList.add(GiftCell.Factory.asStarGift(i4, starGift));
             }
         }
-        if (StarsController.getInstance(this.currentAccount).giftsLoading) {
+        if (starsController.giftsLoading) {
             arrayList.add(UItem.asFlicker(4, 34).setSpanCount(1));
             arrayList.add(UItem.asFlicker(5, 34).setSpanCount(1));
             arrayList.add(UItem.asFlicker(6, 34).setSpanCount(1));
@@ -1076,5 +1082,15 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
     @Override
     protected CharSequence getTitle() {
         return LocaleController.formatString(R.string.Gift2User, this.name);
+    }
+
+    public GiftSheet setBirthday() {
+        return setBirthday(true);
+    }
+
+    public GiftSheet setBirthday(boolean z) {
+        this.birthday = z;
+        this.adapter.update(false);
+        return this;
     }
 }

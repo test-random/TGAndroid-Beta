@@ -47,6 +47,7 @@ public class GroupCreateUserCell extends FrameLayout {
     private int checkBoxType;
     private float checkProgress;
     private int currentAccount;
+    public boolean currentMiniapps;
     private CharSequence currentName;
     private Object currentObject;
     public boolean currentPremium;
@@ -149,6 +150,14 @@ public class GroupCreateUserCell extends FrameLayout {
         }
         this.checkProgress = floatValue;
         invalidate();
+    }
+
+    public static Drawable makeMiniAppsDrawable(Context context, boolean z) {
+        AvatarDrawable avatarDrawable = new AvatarDrawable();
+        avatarDrawable.setAvatarType(8);
+        avatarDrawable.setScaleSize(z ? 0.8f : 1.1f);
+        avatarDrawable.setColor(Theme.getColor(Theme.key_avatar_backgroundBlue), Theme.getColor(Theme.key_avatar_background2Blue));
+        return avatarDrawable;
     }
 
     public static Drawable makePremiumUsersDrawable(Context context, boolean z) {
@@ -301,7 +310,7 @@ public class GroupCreateUserCell extends FrameLayout {
     protected void onMeasure(int i, int i2) {
         int makeMeasureSpec = View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(i), 1073741824);
         Object obj = this.currentObject;
-        super.onMeasure(makeMeasureSpec, View.MeasureSpec.makeMeasureSpec(AndroidUtilities.dp((!(obj instanceof String) || "premium".equalsIgnoreCase((String) obj)) ? 58.0f : 50.0f), 1073741824));
+        super.onMeasure(makeMeasureSpec, View.MeasureSpec.makeMeasureSpec(AndroidUtilities.dp((!(obj instanceof String) || "premium".equalsIgnoreCase((String) obj) || "miniapps".equalsIgnoreCase((String) this.currentObject)) ? 58.0f : 50.0f), 1073741824));
     }
 
     public void overridePremiumBlocked(boolean z, boolean z2) {
@@ -370,12 +379,29 @@ public class GroupCreateUserCell extends FrameLayout {
         this.checkBox.setForbidden(z);
     }
 
+    public void setMiniapps() {
+        this.currentMiniapps = true;
+        this.currentObject = "miniapps";
+        this.avatarImageView.setImageDrawable(makeMiniAppsDrawable(getContext(), false));
+        this.nameTextView.setText(LocaleController.getString(R.string.PrivacyMiniapps));
+        SimpleTextView simpleTextView = this.statusTextView;
+        int i = Theme.key_windowBackgroundWhiteGrayText;
+        simpleTextView.setTag(Integer.valueOf(i));
+        SimpleTextView simpleTextView2 = this.statusTextView;
+        if (this.forceDarkTheme) {
+            i = Theme.key_voipgroup_lastSeenText;
+        }
+        simpleTextView2.setTextColor(Theme.getColor(i, this.resourcesProvider));
+        this.statusTextView.setText(LocaleController.getString(R.string.PrivacyMiniappsText));
+    }
+
     public void setObject(Object obj, CharSequence charSequence, CharSequence charSequence2) {
         this.currentObject = obj;
         this.currentStatus = charSequence2;
         this.currentName = charSequence;
         this.drawDivider = false;
         this.currentPremium = false;
+        this.currentMiniapps = false;
         update(0);
     }
 
@@ -418,7 +444,7 @@ public class GroupCreateUserCell extends FrameLayout {
         AvatarDrawable avatarDrawable;
         int i4;
         Object obj = this.currentObject;
-        if (obj == null || this.currentPremium) {
+        if (obj == null || this.currentPremium || this.currentMiniapps) {
             return;
         }
         TLRPC.Chat chat = null;

@@ -708,7 +708,10 @@ public abstract class UserSelectorBottomSheet extends BottomSheetWithRecyclerLis
                 }
                 List filterGiftOptionsByBilling = BoostRepository.filterGiftOptionsByBilling(BoostRepository.filterGiftOptions(this.paymentOptions, arrayList.size()));
                 if (arrayList.size() == 1) {
-                    new GiftSheet(getContext(), this.currentAccount, ((TLRPC.User) arrayList.get(0)).id, filterGiftOptionsByBilling, new UserSelectorBottomSheet$$ExternalSyntheticLambda3(this)).show();
+                    long j = ((TLRPC.User) arrayList.get(0)).id;
+                    GiftSheet giftSheet = new GiftSheet(getContext(), this.currentAccount, j, filterGiftOptionsByBilling, new UserSelectorBottomSheet$$ExternalSyntheticLambda3(this));
+                    BirthdayController.BirthdayState birthdayState = this.birthdays;
+                    giftSheet.setBirthday(birthdayState != null && birthdayState.contains(j)).show();
                 }
             }
         }

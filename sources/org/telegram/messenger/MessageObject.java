@@ -994,8 +994,7 @@ public class MessageObject {
                 }
                 this.copySeparator.setColor(ColorUtils.setAlphaComponent(i2, 38));
                 canvas.drawRect(AndroidUtilities.dp(10.0f) + rectF.left, (rectF.bottom - AndroidUtilities.dp(38.0f)) - AndroidUtilities.getShadowHeight(), rectF.right - AndroidUtilities.dp(6.66f), rectF.bottom - AndroidUtilities.dp(38.0f), this.copySeparator);
-                float min = Math.min(rectF.width() - AndroidUtilities.dp(12.0f), (this.copyIcon.getIntrinsicWidth() * 0.8f) + AndroidUtilities.dp(5.0f) + this.copyText.getCurrentWidth());
-                float centerX = rectF.centerX() - (min / 2.0f);
+                float centerX = rectF.centerX() - (Math.min(rectF.width() - AndroidUtilities.dp(12.0f), ((this.copyIcon.getIntrinsicWidth() * 0.8f) + AndroidUtilities.dp(5.0f)) + this.copyText.getCurrentWidth()) / 2.0f);
                 float dp = rectF.bottom - (AndroidUtilities.dp(38.0f) / 2.0f);
                 if (this.copyIconColor != i) {
                     Drawable drawable2 = this.copyIcon;
@@ -1005,7 +1004,7 @@ public class MessageObject {
                 this.copyIcon.setAlpha(i3);
                 this.copyIcon.setBounds((int) centerX, (int) (dp - ((r10.getIntrinsicHeight() * 0.8f) / 2.0f)), (int) ((this.copyIcon.getIntrinsicWidth() * 0.8f) + centerX), (int) (((this.copyIcon.getIntrinsicHeight() * 0.8f) / 2.0f) + dp));
                 this.copyIcon.draw(canvas);
-                this.copyText.ellipsize(((int) (min - ((this.copyIcon.getIntrinsicWidth() * 0.8f) + AndroidUtilities.dp(5.0f)))) + AndroidUtilities.dp(12.0f)).draw(canvas, centerX + (this.copyIcon.getIntrinsicWidth() * 0.8f) + AndroidUtilities.dp(5.0f), dp, i, f);
+                this.copyText.ellipsize(((int) (r1 - ((this.copyIcon.getIntrinsicWidth() * 0.8f) + AndroidUtilities.dp(5.0f)))) + AndroidUtilities.dp(12.0f)).draw(canvas, centerX + (this.copyIcon.getIntrinsicWidth() * 0.8f) + AndroidUtilities.dp(5.0f), dp, i, f);
             }
         }
 
@@ -6744,7 +6743,7 @@ public class MessageObject {
             String lowerCase2 = this.messageOwner.reply_to.quote_text.trim().toLowerCase();
             if (lowerCase2.contains(lowerCase) && !arrayList.contains(lowerCase)) {
                 arrayList.add(lowerCase);
-                handleFoundWords(arrayList, split, true);
+                handleFoundWords(arrayList, split, true, z);
                 return;
             }
             arrayList2.addAll(Arrays.asList(lowerCase2.split("[^\\p{L}#$]+")));
@@ -6753,7 +6752,7 @@ public class MessageObject {
             String lowerCase3 = this.messageOwner.message.trim().toLowerCase();
             if (lowerCase3.contains(lowerCase) && !arrayList.contains(lowerCase)) {
                 arrayList.add(lowerCase);
-                handleFoundWords(arrayList, split, false);
+                handleFoundWords(arrayList, split, false, z);
                 return;
             }
             arrayList2.addAll(Arrays.asList(lowerCase3.split("[^\\p{L}#$]+")));

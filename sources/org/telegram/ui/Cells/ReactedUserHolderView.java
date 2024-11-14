@@ -81,7 +81,7 @@ public class ReactedUserHolderView extends FrameLayout {
         int i3 = i == STYLE_STORY ? 48 : 34;
         BackupImageView backupImageView = new BackupImageView(context) {
             @Override
-            protected void onDraw(Canvas canvas) {
+            public void onDraw(Canvas canvas) {
                 if (i != ReactedUserHolderView.STYLE_STORY) {
                     super.onDraw(canvas);
                 } else {

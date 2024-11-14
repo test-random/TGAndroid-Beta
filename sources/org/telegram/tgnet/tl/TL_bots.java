@@ -1,6 +1,8 @@
 package org.telegram.tgnet.tl;
 
+import android.graphics.Path;
 import java.util.ArrayList;
+import org.telegram.messenger.SvgHelper;
 import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -8,6 +10,7 @@ import org.telegram.tgnet.TLRPC;
 public class TL_bots {
 
     public static abstract class BotInfo extends TLObject {
+        public botAppSettings app_settings;
         public ArrayList<TLRPC.TL_botCommand> commands = new ArrayList<>();
         public String description;
         public TLRPC.Document description_document;
@@ -20,40 +23,43 @@ public class TL_bots {
         public int version;
 
         public static BotInfo TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            BotInfo tL_botInfo;
+            BotInfo tL_botInfo_layer192;
             switch (i) {
                 case -2109505932:
-                    tL_botInfo = new TL_botInfo();
+                    tL_botInfo_layer192 = new TL_botInfo_layer192();
                     break;
                 case -1892676777:
-                    tL_botInfo = new TL_botInfo_layer185();
+                    tL_botInfo_layer192 = new TL_botInfo_layer185();
                     break;
                 case -1729618630:
-                    tL_botInfo = new TL_botInfo_layer131();
+                    tL_botInfo_layer192 = new TL_botInfo_layer131();
                     break;
                 case -1154598962:
-                    tL_botInfo = new TL_botInfoEmpty_layer48();
+                    tL_botInfo_layer192 = new TL_botInfoEmpty_layer48();
                     break;
                 case -468280483:
-                    tL_botInfo = new TL_botInfo_layer140();
+                    tL_botInfo_layer192 = new TL_botInfo_layer140();
                     break;
                 case 164583517:
-                    tL_botInfo = new TL_botInfo_layer48();
+                    tL_botInfo_layer192 = new TL_botInfo_layer48();
                     break;
                 case 460632885:
-                    tL_botInfo = new TL_botInfo_layer139();
+                    tL_botInfo_layer192 = new TL_botInfo_layer139();
+                    break;
+                case 912290611:
+                    tL_botInfo_layer192 = new TL_botInfo();
                     break;
                 default:
-                    tL_botInfo = null;
+                    tL_botInfo_layer192 = null;
                     break;
             }
-            if (tL_botInfo == null && z) {
+            if (tL_botInfo_layer192 == null && z) {
                 throw new RuntimeException(String.format("can't parse magic %x in BotInfo", Integer.valueOf(i)));
             }
-            if (tL_botInfo != null) {
-                tL_botInfo.readParams(abstractSerializedData, z);
+            if (tL_botInfo_layer192 != null) {
+                tL_botInfo_layer192.readParams(abstractSerializedData, z);
             }
-            return tL_botInfo;
+            return tL_botInfo_layer192;
         }
     }
 
@@ -71,7 +77,7 @@ public class TL_bots {
     }
 
     public static class TL_botInfo extends BotInfo {
-        public static final int constructor = -2109505932;
+        public static final int constructor = 912290611;
 
         @Override
         public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
@@ -113,11 +119,14 @@ public class TL_bots {
             if ((this.flags & 128) != 0) {
                 this.privacy_policy_url = abstractSerializedData.readString(z);
             }
+            if ((this.flags & 256) != 0) {
+                this.app_settings = botAppSettings.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            }
         }
 
         @Override
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-2109505932);
+            abstractSerializedData.writeInt32(912290611);
             int i = this.has_preview_medias ? this.flags | 64 : this.flags & (-65);
             this.flags = i;
             abstractSerializedData.writeInt32(i);
@@ -146,6 +155,9 @@ public class TL_bots {
             }
             if ((this.flags & 128) != 0) {
                 abstractSerializedData.writeString(this.privacy_policy_url);
+            }
+            if ((this.flags & 256) != 0) {
+                this.app_settings.serializeToStream(abstractSerializedData);
             }
         }
     }
@@ -349,6 +361,86 @@ public class TL_bots {
         }
     }
 
+    public static class TL_botInfo_layer192 extends TL_botInfo {
+        public static final int constructor = -2109505932;
+
+        @Override
+        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+            int readInt32 = abstractSerializedData.readInt32(z);
+            this.flags = readInt32;
+            this.has_preview_medias = (readInt32 & 64) != 0;
+            if ((readInt32 & 1) != 0) {
+                this.user_id = abstractSerializedData.readInt64(z);
+            }
+            if ((this.flags & 2) != 0) {
+                this.description = abstractSerializedData.readString(z);
+            }
+            if ((this.flags & 16) != 0) {
+                this.description_photo = TLRPC.Photo.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            }
+            if ((this.flags & 32) != 0) {
+                this.description_document = TLRPC.Document.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            }
+            if ((this.flags & 4) != 0) {
+                int readInt322 = abstractSerializedData.readInt32(z);
+                if (readInt322 != 481674261) {
+                    if (z) {
+                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
+                    }
+                    return;
+                }
+                int readInt323 = abstractSerializedData.readInt32(z);
+                for (int i = 0; i < readInt323; i++) {
+                    TLRPC.TL_botCommand TLdeserialize = TLRPC.TL_botCommand.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                    if (TLdeserialize == null) {
+                        return;
+                    }
+                    this.commands.add(TLdeserialize);
+                }
+            }
+            if ((this.flags & 8) != 0) {
+                this.menu_button = BotMenuButton.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            }
+            if ((this.flags & 128) != 0) {
+                this.privacy_policy_url = abstractSerializedData.readString(z);
+            }
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            abstractSerializedData.writeInt32(-2109505932);
+            int i = this.has_preview_medias ? this.flags | 64 : this.flags & (-65);
+            this.flags = i;
+            abstractSerializedData.writeInt32(i);
+            if ((this.flags & 1) != 0) {
+                abstractSerializedData.writeInt64(this.user_id);
+            }
+            if ((this.flags & 2) != 0) {
+                abstractSerializedData.writeString(this.description);
+            }
+            if ((this.flags & 16) != 0) {
+                this.description_photo.serializeToStream(abstractSerializedData);
+            }
+            if ((this.flags & 32) != 0) {
+                this.description_document.serializeToStream(abstractSerializedData);
+            }
+            if ((this.flags & 4) != 0) {
+                abstractSerializedData.writeInt32(481674261);
+                int size = this.commands.size();
+                abstractSerializedData.writeInt32(size);
+                for (int i2 = 0; i2 < size; i2++) {
+                    this.commands.get(i2).serializeToStream(abstractSerializedData);
+                }
+            }
+            if ((this.flags & 8) != 0) {
+                this.menu_button.serializeToStream(abstractSerializedData);
+            }
+            if ((this.flags & 128) != 0) {
+                abstractSerializedData.writeString(this.privacy_policy_url);
+            }
+        }
+    }
+
     public static class TL_botInfo_layer48 extends TL_botInfo {
         public static final int constructor = 164583517;
 
@@ -483,6 +575,73 @@ public class TL_bots {
         }
     }
 
+    public static class botAppSettings extends TLObject {
+        public static final int constructor = -912582320;
+        public int background_color;
+        public int background_dark_color;
+        public int flags;
+        public int header_color;
+        public int header_dark_color;
+        public byte[] placeholder_path;
+        public Path placeholder_svg_path;
+
+        public static botAppSettings TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+            if (-912582320 != i) {
+                if (z) {
+                    throw new RuntimeException(String.format("can't parse magic %x in botAppSettings", Integer.valueOf(i)));
+                }
+                return null;
+            }
+            botAppSettings botappsettings = new botAppSettings();
+            botappsettings.readParams(abstractSerializedData, z);
+            return botappsettings;
+        }
+
+        @Override
+        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+            int readInt32 = abstractSerializedData.readInt32(z);
+            this.flags = readInt32;
+            if ((readInt32 & 1) != 0) {
+                byte[] readByteArray = abstractSerializedData.readByteArray(z);
+                this.placeholder_path = readByteArray;
+                this.placeholder_svg_path = SvgHelper.doPath(SvgHelper.decompress(readByteArray));
+            }
+            if ((this.flags & 2) != 0) {
+                this.background_color = abstractSerializedData.readInt32(z);
+            }
+            if ((this.flags & 4) != 0) {
+                this.background_dark_color = abstractSerializedData.readInt32(z);
+            }
+            if ((this.flags & 8) != 0) {
+                this.header_color = abstractSerializedData.readInt32(z);
+            }
+            if ((this.flags & 16) != 0) {
+                this.header_dark_color = abstractSerializedData.readInt32(z);
+            }
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            abstractSerializedData.writeInt32(-912582320);
+            abstractSerializedData.writeInt32(this.flags);
+            if ((this.flags & 1) != 0) {
+                abstractSerializedData.writeByteArray(this.placeholder_path);
+            }
+            if ((this.flags & 2) != 0) {
+                abstractSerializedData.writeInt32(this.background_color);
+            }
+            if ((this.flags & 4) != 0) {
+                abstractSerializedData.writeInt32(this.background_dark_color);
+            }
+            if ((this.flags & 8) != 0) {
+                abstractSerializedData.writeInt32(this.header_color);
+            }
+            if ((this.flags & 16) != 0) {
+                abstractSerializedData.writeInt32(this.header_dark_color);
+            }
+        }
+    }
+
     public static class botPreviewMedia extends TLObject {
         public static final int constructor = 602479523;
         public int date;
@@ -527,6 +686,26 @@ public class TL_bots {
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
             abstractSerializedData.writeInt32(324662502);
             this.bot.serializeToStream(abstractSerializedData);
+        }
+    }
+
+    public static class checkDownloadFileParams extends TLObject {
+        public static final int constructor = 1342666121;
+        public TLRPC.InputUser bot;
+        public String file_name;
+        public String url;
+
+        @Override
+        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+            return TLRPC.Bool.TLdeserialize(abstractSerializedData, i, z);
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            abstractSerializedData.writeInt32(1342666121);
+            this.bot.serializeToStream(abstractSerializedData);
+            abstractSerializedData.writeString(this.file_name);
+            abstractSerializedData.writeString(this.url);
         }
     }
 
@@ -912,6 +1091,24 @@ public class TL_bots {
             abstractSerializedData.writeInt32(1157944655);
             this.user_id.serializeToStream(abstractSerializedData);
             this.button.serializeToStream(abstractSerializedData);
+        }
+    }
+
+    public static class toggleUserEmojiStatusPermission extends TLObject {
+        public static final int constructor = 115237778;
+        public TLRPC.InputUser bot;
+        public boolean enabled;
+
+        @Override
+        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+            return TLRPC.Bool.TLdeserialize(abstractSerializedData, i, z);
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            abstractSerializedData.writeInt32(115237778);
+            this.bot.serializeToStream(abstractSerializedData);
+            abstractSerializedData.writeBool(this.enabled);
         }
     }
 

@@ -218,6 +218,7 @@ public class MediaDataController extends BaseController {
     public ArrayList<MessageObject> searchResultMessages;
     public ArrayList<MessageObject> searchServerResultMessages;
     private SparseArray<MessageObject>[] searchServerResultMessagesMap;
+    public final HashMap<String, Utilities.Callback<Boolean>> shortcutCallbacks;
     private TLRPC.TL_messages_stickerSet stickerSetDefaultChannelStatuses;
     private TLRPC.TL_messages_stickerSet stickerSetDefaultStatuses;
     private ArrayList<TLRPC.TL_messages_stickerSet>[] stickerSets;
@@ -515,6 +516,7 @@ public class MediaDataController extends BaseController {
         this.hints = new ArrayList<>();
         this.inlineBots = new ArrayList<>();
         this.webapps = new ArrayList<>();
+        this.shortcutCallbacks = new HashMap<>();
         this.loadingPinnedMessages = new LongSparseArray();
         this.draftsFolderIds = new LongSparseArray();
         this.drafts = new LongSparseArray();
@@ -1198,7 +1200,7 @@ public class MediaDataController extends BaseController {
                     return "emojiChannelDefaultStatuses";
                 }
                 if (!(inputStickerSet instanceof TLRPC.TL_inputStickerSetDice)) {
-                    return inputStickerSet instanceof TLRPC.TL_inputStickerSetPremiumGifts ? "premiumGifts" : inputStickerSet instanceof TLRPC.TL_inputStickerSetEmojiDefaultTopicIcons ? "defaultTopicIcons" : "null";
+                    return inputStickerSet instanceof TLRPC.TL_inputStickerSetPremiumGifts ? "premiumGifts" : inputStickerSet instanceof TLRPC.TL_inputStickerSetEmojiDefaultTopicIcons ? "defaultTopicIcons" : inputStickerSet instanceof TLRPC.TL_inputStickerSetEmojiDefaultStatuses ? "emojiDefaultStatuses" : "null";
                 }
                 sb = new StringBuilder();
                 sb.append("dice");
@@ -4976,7 +4978,7 @@ public class MediaDataController extends BaseController {
         }
     }
 
-    public void lambda$searchMessagesInChat$123(final TLRPC.TL_messages_search tL_messages_search, final boolean z, String str, final int i, final boolean z2, final long j, final long j2, final int i2, final long j3, final long j4, final TLRPC.User user, final TLRPC.Chat chat, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$searchMessagesInChat$123(final TLRPC.TL_messages_search tL_messages_search, final boolean z, String str, boolean z2, final int i, final boolean z3, final long j, final long j2, final int i2, final long j3, final long j4, final TLRPC.User user, final TLRPC.Chat chat, final TLObject tLObject, TLRPC.TL_error tL_error) {
         final ArrayList arrayList = new ArrayList();
         if (tL_error == null) {
             TLRPC.messages_Messages messages_messages = (TLRPC.messages_Messages) tLObject;
@@ -4986,14 +4988,14 @@ public class MediaDataController extends BaseController {
                 if (messageObject.hasValidGroupId()) {
                     messageObject.isPrimaryGroupMessage = true;
                 }
-                messageObject.setQuery(str);
+                messageObject.setQuery(str, !z2);
                 arrayList.add(messageObject);
             }
         }
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                MediaDataController.this.lambda$searchMessagesInChat$122(i, z2, tLObject, tL_messages_search, j, j2, i2, arrayList, z, j3, j4, user, chat);
+                MediaDataController.this.lambda$searchMessagesInChat$122(i, z3, tLObject, tL_messages_search, j, j2, i2, arrayList, z, j3, j4, user, chat);
             }
         });
     }
@@ -6170,8 +6172,7 @@ public class MediaDataController extends BaseController {
     }
 
     public boolean canCreateAttachedMenuBotShortcut(long j) {
-        TLRPC.User user = getMessagesController().getUser(Long.valueOf(j));
-        return user != null && user.bot_has_main_app;
+        return true;
     }
 
     public boolean cancelRemovingStickerSet(long j) {
@@ -7534,8 +7535,12 @@ public class MediaDataController extends BaseController {
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.reloadWebappsHints, new Object[0]);
     }
 
-    public void installShortcut(long r18, int r20) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaDataController.installShortcut(long, int):void");
+    public void installShortcut(long j, int i) {
+        installShortcut(j, i, null);
+    }
+
+    public void installShortcut(long r19, int r21, org.telegram.messenger.Utilities.Callback<java.lang.Boolean> r22) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaDataController.installShortcut(long, int, org.telegram.messenger.Utilities$Callback):void");
     }
 
     public boolean isLoadingStickers(int i) {
@@ -9167,7 +9172,7 @@ public class MediaDataController extends BaseController {
         searchMessagesInChat(str, j, j2, i, i2, j3, false, user, chat, true, visibleReaction);
     }
 
-    public void searchMessagesInChat(java.lang.String r38, final long r39, final long r41, final int r43, final int r44, final long r45, boolean r47, final org.telegram.tgnet.TLRPC.User r48, final org.telegram.tgnet.TLRPC.Chat r49, final boolean r50, final org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r51) {
+    public void searchMessagesInChat(java.lang.String r39, final long r40, final long r42, final int r44, final int r45, final long r46, boolean r48, final org.telegram.tgnet.TLRPC.User r49, final org.telegram.tgnet.TLRPC.Chat r50, final boolean r51, final org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r52) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaDataController.searchMessagesInChat(java.lang.String, long, long, int, int, long, boolean, org.telegram.tgnet.TLRPC$User, org.telegram.tgnet.TLRPC$Chat, boolean, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction):void");
     }
 

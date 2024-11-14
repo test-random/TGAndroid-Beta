@@ -52,7 +52,6 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
-import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.AdjustPanLayoutHelper;
@@ -1113,9 +1112,7 @@ public class MessageSendPreview extends Dialog implements NotificationCenter.Not
 
                     @Override
                     public boolean canPerformReply() {
-                        boolean canPerformActions;
-                        canPerformActions = canPerformActions();
-                        return canPerformActions;
+                        return canPerformActions();
                     }
 
                     @Override
@@ -1325,7 +1322,7 @@ public class MessageSendPreview extends Dialog implements NotificationCenter.Not
 
                     @Override
                     public void didPressWebPage(ChatMessageCell chatMessageCell, TLRPC.WebPage webPage, String str, boolean z) {
-                        Browser.openUrl(chatMessageCell.getContext(), str);
+                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressWebPage(this, chatMessageCell, webPage, str, z);
                     }
 
                     @Override

@@ -84,7 +84,7 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
     private Runnable onAnimationEndListener;
     protected WeakReference onFinishCallback;
     private Runnable onFrameReadyRunnable;
-    private ArrayList parentViews;
+    private final ArrayList parentViews;
     private volatile HashMap pendingColorUpdates;
     private int[] pendingReplaceColors;
     protected boolean playInDirectionOfCustomEndFrame;

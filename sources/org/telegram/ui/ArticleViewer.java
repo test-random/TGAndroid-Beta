@@ -184,6 +184,7 @@ import org.telegram.ui.Stories.DarkThemeResourceProvider;
 import org.telegram.ui.Stories.recorder.ButtonWithCounterView;
 import org.telegram.ui.Stories.recorder.HintView2;
 import org.telegram.ui.Stories.recorder.KeyboardNotifier;
+import org.telegram.ui.bots.BotSensors;
 import org.telegram.ui.bots.ChatAttachAlertBotWebViewLayout;
 import org.telegram.ui.web.AddressBarList;
 import org.telegram.ui.web.BookmarksFragment;
@@ -5291,7 +5292,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             BotWebViewContainer.MyWebView myWebView = this.webView;
             if (myWebView != null) {
                 myWebView.onResume();
-                pageLayout.webViewContainer.replaceWebView(this.webView, this.proxy);
+                pageLayout.webViewContainer.replaceWebView(UserConfig.selectedAccount, this.webView, this.proxy);
                 pageLayout.setWebBgColor(true, this.actionBarColor);
                 pageLayout.setWebBgColor(false, this.backgroundColor);
                 return;
@@ -5489,7 +5490,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
     }
 
     public static class ErrorContainer extends FrameLayout {
-        private final ButtonWithCounterView buttonView;
+        public final ButtonWithCounterView buttonView;
         private final TextView codeView;
         private boolean dark;
         private ValueAnimator darkAnimator;
@@ -5549,6 +5550,12 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             this.titleView.setText(LocaleController.getString(R.string.WebErrorTitle));
             String magic2tonsite = BotWebViewContainer.magic2tonsite(str);
             this.descriptionView.setText(Emoji.replaceEmoji(AndroidUtilities.replaceTags((magic2tonsite == null || Uri.parse(magic2tonsite) == null || Uri.parse(magic2tonsite).getAuthority() == null) ? LocaleController.getString(R.string.WebErrorInfo) : LocaleController.formatString(R.string.WebErrorInfoDomain, Uri.parse(magic2tonsite).getAuthority())), this.descriptionView.getPaint().getFontMetricsInt(), false));
+            this.codeView.setText(str2);
+        }
+
+        public void set(String str, String str2) {
+            this.titleView.setText(LocaleController.getString(R.string.WebErrorTitle));
+            this.descriptionView.setText(AndroidUtilities.replaceTags(LocaleController.formatString(R.string.WebErrorInfoBot, str)));
             this.codeView.setText(str2);
         }
 
@@ -5799,11 +5806,8 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         public boolean backButton;
         private final GradientClip clip;
         public WebInstantView.Loader currentInstantLoader;
-        private boolean dangerousShown;
         public ErrorContainer errorContainer;
         private boolean errorShown;
-        private int errorShownCode;
-        private String errorShownDescription;
         public boolean forwardButton;
         private String lastFormattedUrl;
         private String lastUrl;
@@ -5914,7 +5918,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 protected void onErrorShown(boolean z, int i2, String str) {
                     if (z) {
                         PageLayout.this.createErrorContainer();
-                        PageLayout.this.errorContainer.set(getWebView() != null ? getWebView().getUrl() : null, PageLayout.this.errorShownCode = i2, PageLayout.this.errorShownDescription = str);
+                        PageLayout.this.errorContainer.set(getWebView() != null ? getWebView().getUrl() : null, i2, str);
                         PageLayout pageLayout = PageLayout.this;
                         ErrorContainer errorContainer = pageLayout.errorContainer;
                         ArticleViewer articleViewer = ArticleViewer.this;
@@ -5967,10 +5971,9 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 }
 
                 @Override
-                public void onWebViewCreated() {
-                    super.onWebViewCreated();
-                    PageLayout pageLayout = PageLayout.this;
-                    pageLayout.swipeContainer.setWebView(pageLayout.webViewContainer.getWebView());
+                public void onWebViewCreated(BotWebViewContainer.MyWebView myWebView) {
+                    super.onWebViewCreated(myWebView);
+                    PageLayout.this.swipeContainer.setWebView(myWebView);
                 }
 
                 @Override
@@ -6000,6 +6003,11 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             });
             botWebViewContainer.setDelegate(new BotWebViewContainer.Delegate() {
                 @Override
+                public BotSensors getBotSensors() {
+                    return BotWebViewContainer.Delegate.CC.$default$getBotSensors(this);
+                }
+
+                @Override
                 public boolean isClipboardAvailable() {
                     return BotWebViewContainer.Delegate.CC.$default$isClipboardAvailable(this);
                 }
@@ -6022,6 +6030,21 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 }
 
                 @Override
+                public void onEmojiStatusGranted(boolean z) {
+                    BotWebViewContainer.Delegate.CC.$default$onEmojiStatusGranted(this, z);
+                }
+
+                @Override
+                public void onEmojiStatusSet(TLRPC.Document document) {
+                    BotWebViewContainer.Delegate.CC.$default$onEmojiStatusSet(this, document);
+                }
+
+                @Override
+                public String onFullscreenRequested(boolean z) {
+                    return BotWebViewContainer.Delegate.CC.$default$onFullscreenRequested(this, z);
+                }
+
+                @Override
                 public void onInstantClose() {
                     PageLayout pageLayout = PageLayout.this;
                     ArticleViewer articleViewer = ArticleViewer.this;
@@ -6031,6 +6054,21 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                     } else if (articleViewer.pages[0] == pageLayout) {
                         articleViewer.goBack();
                     }
+                }
+
+                @Override
+                public void onLocationGranted(boolean z) {
+                    BotWebViewContainer.Delegate.CC.$default$onLocationGranted(this, z);
+                }
+
+                @Override
+                public void onOpenBackFromTabs() {
+                    BotWebViewContainer.Delegate.CC.$default$onOpenBackFromTabs(this);
+                }
+
+                @Override
+                public void onOrientationLockChanged(boolean z) {
+                    BotWebViewContainer.Delegate.CC.$default$onOrientationLockChanged(this, z);
                 }
 
                 @Override
@@ -6052,6 +6090,11 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
 
                 @Override
                 public void onSetupSecondaryButton(boolean z, boolean z2, String str, int i2, int i3, boolean z3, boolean z4, String str2) {
+                }
+
+                @Override
+                public void onSharedTo(ArrayList arrayList) {
+                    BotWebViewContainer.Delegate.CC.$default$onSharedTo(this, arrayList);
                 }
 
                 @Override
@@ -6112,8 +6155,8 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             });
             webViewSwipeContainer.setDelegate(new ChatAttachAlertBotWebViewLayout.WebViewSwipeContainer.Delegate() {
                 @Override
-                public final void onDismiss() {
-                    ArticleViewer.PageLayout.this.lambda$new$3();
+                public final void onDismiss(boolean z) {
+                    ArticleViewer.PageLayout.this.lambda$new$3(z);
                 }
             });
             webViewSwipeContainer.setScrollListener(new Runnable() {
@@ -6164,7 +6207,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             this.webViewContainer.invalidateViewPortHeight(true);
         }
 
-        public void lambda$new$3() {
+        public void lambda$new$3(boolean z) {
             Sheet sheet = ArticleViewer.this.sheet;
             if (sheet != null) {
                 this.swipeBack = true;
@@ -6256,9 +6299,6 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         }
 
         public int getBackgroundColor() {
-            if (isWeb() && this.dangerousShown) {
-                return -5036514;
-            }
             return (isWeb() && SharedConfig.adaptableColorInBrowser && !this.errorShown) ? this.webBackgroundColor : ArticleViewer.this.getThemedColor(Theme.key_iv_background);
         }
 
@@ -7277,7 +7317,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 bottomSheetTabDialog2.updateNavigationBarColor();
             } else {
                 LaunchActivity.instance.checkSystemBarColors(true, true, true, false);
-                AndroidUtilities.setLightNavigationBar(mo997getWindowView(), AndroidUtilities.computePerceivedBrightness(getNavigationBarColor(ArticleViewer.this.getThemedColor(Theme.key_windowBackgroundGray))) >= 0.721f);
+                AndroidUtilities.setLightNavigationBar(mo999getWindowView(), AndroidUtilities.computePerceivedBrightness(getNavigationBarColor(ArticleViewer.this.getThemedColor(Theme.key_windowBackgroundGray))) >= 0.721f);
             }
         }
 
@@ -7355,7 +7395,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         }
 
         @Override
-        public WindowView mo997getWindowView() {
+        public WindowView mo999getWindowView() {
             return this.windowView;
         }
 
@@ -7366,11 +7406,6 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         @Override
         public boolean isAttachedLightStatusBar() {
             return this.attachedToActionBar && (this.dismissingIntoTabs ? 0.0f : Math.min(this.openProgress, 1.0f - this.dismissProgress) * (1.0f - this.backProgress)) > 0.25f && AndroidUtilities.computePerceivedBrightness(getActionBarColor()) >= 0.721f;
-        }
-
-        @Override
-        public boolean isFullSize() {
-            return true;
         }
 
         @Override

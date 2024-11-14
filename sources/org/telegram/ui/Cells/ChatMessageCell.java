@@ -1061,6 +1061,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             public static void $default$didPressVoteButtons(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, ArrayList arrayList, int i, int i2, int i3) {
             }
 
+            public static void $default$didPressWebPage(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.WebPage webPage, String str, boolean z) {
+                Browser.openUrl(chatMessageCell.getContext(), str);
+            }
+
             public static void $default$didStartVideoStream(ChatMessageCellDelegate chatMessageCellDelegate, MessageObject messageObject) {
             }
 
@@ -2170,6 +2174,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     private boolean checkBotButtonMotionEvent(MotionEvent motionEvent) {
         int i;
+        ChatMessageCellDelegate chatMessageCellDelegate;
         if (this.botButtons.isEmpty()) {
             return false;
         }
@@ -2188,8 +2193,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 botButton.setPressed(false);
                 if (this.currentMessageObject.scheduled) {
                     Toast.makeText(getContext(), LocaleController.getString(R.string.MessageScheduledBotAction), 1).show();
-                } else if (botButton.button != null) {
-                    this.delegate.didPressBotButton(this, botButton.button);
+                } else if (botButton.button != null && (chatMessageCellDelegate = this.delegate) != null) {
+                    chatMessageCellDelegate.didPressBotButton(this, botButton.button);
                 }
             } else {
                 if (motionEvent.getAction() != 3 || (i = this.pressedBotButton) == -1) {
@@ -4804,11 +4809,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         return i2 == 0 ? abs > i : abs > i + (-5);
     }
 
-    private boolean isDrawSelectionBackground() {
-        MessageObject messageObject;
-        return ((isPressed() && this.isCheckPressed) || ((!this.isCheckPressed && this.isPressed) || this.isHighlighted)) && !textIsSelectionMode() && !hasSelectionOverlay() && ((messageObject = this.currentMessageObject) == null || !messageObject.preview);
-    }
-
     public boolean isOpenChatByShare(MessageObject messageObject) {
         ChatMessageCellDelegate chatMessageCellDelegate;
         TLRPC.MessageFwdHeader messageFwdHeader = messageObject.messageOwner.fwd_from;
@@ -4844,7 +4844,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 botButton.setPressed(false);
                 if (!this.currentMessageObject.scheduled && botButton.button != null) {
                     cancelCheckLongPress();
-                    this.delegate.didLongPressBotButton(this, botButton.button);
+                    ChatMessageCellDelegate chatMessageCellDelegate = this.delegate;
+                    if (chatMessageCellDelegate != null) {
+                        chatMessageCellDelegate.didLongPressBotButton(this, botButton.button);
+                    }
                 }
             }
             this.pressedBotButton = -1;
@@ -5093,7 +5096,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.setMessageContent(org.telegram.messenger.MessageObject, org.telegram.messenger.MessageObject$GroupedMessages, boolean, boolean):void");
     }
 
-    private void setMessageObjectInternal(org.telegram.messenger.MessageObject r59) {
+    private void setMessageObjectInternal(org.telegram.messenger.MessageObject r58) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.setMessageObjectInternal(org.telegram.messenger.MessageObject):void");
     }
 
@@ -7550,6 +7553,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     public boolean isDrawPinnedBottom() {
         MessageObject.GroupedMessagePosition groupedMessagePosition = this.currentPosition;
         return this.mediaBackground || this.drawPinnedBottom || (groupedMessagePosition != null && (groupedMessagePosition.flags & 8) == 0 && this.currentMessagesGroup.isDocuments);
+    }
+
+    public boolean isDrawSelectionBackground() {
+        MessageObject messageObject;
+        return ((isPressed() && this.isCheckPressed) || ((!this.isCheckPressed && this.isPressed) || this.isHighlighted)) && !textIsSelectionMode() && !hasSelectionOverlay() && ((messageObject = this.currentMessageObject) == null || !messageObject.preview);
     }
 
     public boolean isDrawTopic() {

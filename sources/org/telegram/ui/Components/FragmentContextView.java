@@ -19,12 +19,11 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.text.Layout;
 import android.text.SpannableStringBuilder;
-import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.MotionEvent;
@@ -64,6 +63,7 @@ import org.telegram.ui.ActionBar.ActionBarMenuSlider;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
+import org.telegram.ui.Components.AnimatedTextView;
 import org.telegram.ui.Components.AudioPlayerAlert;
 import org.telegram.ui.Components.FragmentContextView;
 import org.telegram.ui.Components.SharingLocationsAlert;
@@ -119,10 +119,12 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     private RLottieDrawable muteDrawable;
     private AnimationNotificationsLocker notificationsLocker;
     private AnimationNotificationsLocker notificationsLocker2;
+    private ButtonBounce notifyButtonBounce;
+    private boolean notifyButtonEnabled;
+    private AnimatedTextView.AnimatedTextDrawable notifyText;
     private ImageView playButton;
     private PlayPauseDrawable playPauseDrawable;
     private ActionBarMenuItem playbackSpeedButton;
-    private RectF rect;
     private final Theme.ResourcesProvider resourcesProvider;
     private boolean scheduleRunnableScheduled;
     private View selector;
@@ -137,12 +139,13 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     private ActionBarMenuSlider.SpeedSlider speedSlider;
     private AudioPlayerAlert.ClippingTextViewSwitcher subtitleTextView;
     private boolean supportsCalls;
-    private StaticLayout timeLayout;
     private AudioPlayerAlert.ClippingTextViewSwitcher titleTextView;
+    private int toggleGroupCallStartSubscriptionReqId;
     protected float topPadding;
     private final Runnable updateScheduleTimeRunnable;
     private boolean visible;
     boolean wasDraw;
+    private boolean willBeNotified;
 
     public class AnonymousClass7 extends RLottieImageView {
         private final Runnable pressRunnable;
@@ -261,7 +264,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         this.currentProgress = -1;
         this.currentStyle = -1;
         this.supportsCalls = true;
-        this.rect = new RectF();
+        this.notifyText = new AnimatedTextView.AnimatedTextDrawable(false, true, true);
         this.updateScheduleTimeRunnable = new Runnable() {
             @Override
             public void run() {
@@ -271,12 +274,17 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 }
                 ChatObject.Call groupCall = FragmentContextView.this.chatActivity.getGroupCall();
                 if (groupCall == null || !groupCall.isScheduled()) {
-                    FragmentContextView.this.timeLayout = null;
+                    FragmentContextView.this.notifyButtonEnabled = false;
                     FragmentContextView.this.scheduleRunnableScheduled = false;
                     return;
                 }
                 int currentTime = groupCall.call.schedule_date - FragmentContextView.this.fragment.getConnectionsManager().getCurrentTime();
-                FragmentContextView.this.timeLayout = new StaticLayout(currentTime >= 86400 ? LocaleController.formatPluralString("Days", Math.round(currentTime / 86400.0f), new Object[0]) : AndroidUtilities.formatFullDuration(currentTime), FragmentContextView.this.gradientTextPaint, (int) Math.ceil(FragmentContextView.this.gradientTextPaint.measureText(r2)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                String formatPluralString = currentTime >= 86400 ? LocaleController.formatPluralString("Days", Math.round(currentTime / 86400.0f), new Object[0]) : AndroidUtilities.formatFullDuration(currentTime);
+                AnimatedTextView.AnimatedTextDrawable animatedTextDrawable = FragmentContextView.this.notifyText;
+                if (!FragmentContextView.this.willBeNotified) {
+                    formatPluralString = LocaleController.getString(R.string.VoipChatNotify);
+                }
+                animatedTextDrawable.setText(formatPluralString, true);
                 AndroidUtilities.runOnUIThread(FragmentContextView.this.updateScheduleTimeRunnable, 1000L);
                 FragmentContextView.this.frameLayout.invalidate();
             }
@@ -292,6 +300,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         };
         this.notificationsLocker = new AnimationNotificationsLocker();
         this.notificationsLocker2 = new AnimationNotificationsLocker(new int[]{NotificationCenter.messagesDidLoad});
+        this.toggleGroupCallStartSubscriptionReqId = 0;
         this.resourcesProvider = resourcesProvider;
         this.fragment = baseFragment;
         if (baseFragment instanceof ChatActivityInterface) {
@@ -320,41 +329,53 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         }
         final Context context = getContext();
         BlurredFrameLayout blurredFrameLayout = new BlurredFrameLayout(context, this.fragment.getFragmentView() instanceof SizeNotifierFrameLayout ? (SizeNotifierFrameLayout) this.fragment.getFragmentView() : null) {
+            private final RectF notifyButtonRect = new RectF();
+
             @Override
             public void dispatchDraw(Canvas canvas) {
                 float f;
                 super.dispatchDraw(canvas);
-                if (FragmentContextView.this.currentStyle != 4 || FragmentContextView.this.timeLayout == null) {
-                    return;
-                }
-                int ceil = ((int) Math.ceil(FragmentContextView.this.timeLayout.getLineWidth(0))) + AndroidUtilities.dp(24.0f);
-                if (ceil != FragmentContextView.this.gradientWidth) {
-                    FragmentContextView.this.linearGradient = new LinearGradient(0.0f, 0.0f, ceil * 1.7f, 0.0f, new int[]{-10187532, -7575089, -2860679, -2860679}, new float[]{0.0f, 0.294f, 0.588f, 1.0f}, Shader.TileMode.CLAMP);
-                    FragmentContextView.this.gradientPaint.setShader(FragmentContextView.this.linearGradient);
-                    FragmentContextView.this.gradientWidth = ceil;
-                }
-                ChatObject.Call groupCall = FragmentContextView.this.chatActivity.getGroupCall();
-                if (FragmentContextView.this.fragment == null || groupCall == null || !groupCall.isScheduled()) {
-                    f = 0.0f;
-                } else {
-                    long currentTimeMillis = (groupCall.call.schedule_date * 1000) - FragmentContextView.this.fragment.getConnectionsManager().getCurrentTimeMillis();
-                    f = currentTimeMillis >= 0 ? currentTimeMillis < 5000 ? 1.0f - (((float) currentTimeMillis) / 5000.0f) : 0.0f : 1.0f;
-                    if (currentTimeMillis < 6000) {
-                        invalidate();
+                if (FragmentContextView.this.currentStyle == 4 && FragmentContextView.this.notifyButtonEnabled) {
+                    int ceil = ((int) Math.ceil(FragmentContextView.this.notifyText.getCurrentWidth())) + AndroidUtilities.dp(24.0f);
+                    if (ceil != FragmentContextView.this.gradientWidth) {
+                        FragmentContextView.this.linearGradient = new LinearGradient(0.0f, 0.0f, ceil * 1.7f, 0.0f, new int[]{-10187532, -7575089, -2860679, -2860679}, new float[]{0.0f, 0.294f, 0.588f, 1.0f}, Shader.TileMode.CLAMP);
+                        FragmentContextView.this.gradientPaint.setShader(FragmentContextView.this.linearGradient);
+                        FragmentContextView.this.gradientWidth = ceil;
                     }
+                    ChatObject.Call groupCall = FragmentContextView.this.chatActivity.getGroupCall();
+                    if (FragmentContextView.this.fragment == null || groupCall == null || !groupCall.isScheduled()) {
+                        f = 0.0f;
+                    } else {
+                        long currentTimeMillis = (groupCall.call.schedule_date * 1000) - FragmentContextView.this.fragment.getConnectionsManager().getCurrentTimeMillis();
+                        f = currentTimeMillis >= 0 ? currentTimeMillis < 5000 ? 1.0f - (((float) currentTimeMillis) / 5000.0f) : 0.0f : 1.0f;
+                        if (currentTimeMillis < 6000) {
+                            invalidate();
+                        }
+                    }
+                    FragmentContextView.this.matrix.reset();
+                    FragmentContextView.this.matrix.postTranslate((-FragmentContextView.this.gradientWidth) * 0.7f * f, 0.0f);
+                    FragmentContextView.this.linearGradient.setLocalMatrix(FragmentContextView.this.matrix);
+                    int measuredWidth = (getMeasuredWidth() - ceil) - AndroidUtilities.dp(10.0f);
+                    float f2 = measuredWidth;
+                    float dp = AndroidUtilities.dp(10.0f);
+                    this.notifyButtonRect.set(f2, dp, measuredWidth + ceil, r2 + AndroidUtilities.dp(28.0f));
+                    canvas.save();
+                    float scale = FragmentContextView.this.notifyButtonBounce.getScale(0.1f);
+                    canvas.scale(scale, scale, this.notifyButtonRect.centerX(), this.notifyButtonRect.centerY());
+                    canvas.translate(f2, dp);
+                    RectF rectF = AndroidUtilities.rectTmp;
+                    rectF.set(0.0f, 0.0f, ceil, AndroidUtilities.dp(28.0f));
+                    canvas.drawRoundRect(rectF, AndroidUtilities.dp(16.0f), AndroidUtilities.dp(16.0f), FragmentContextView.this.gradientPaint);
+                    canvas.translate(AndroidUtilities.dp(12.0f), AndroidUtilities.dp(6.0f));
+                    FragmentContextView.this.notifyText.setBounds(0, 0, AndroidUtilities.displaySize.x, AndroidUtilities.dp(16.0f));
+                    FragmentContextView.this.notifyText.draw(canvas);
+                    canvas.restore();
                 }
-                FragmentContextView.this.matrix.reset();
-                FragmentContextView.this.matrix.postTranslate((-FragmentContextView.this.gradientWidth) * 0.7f * f, 0.0f);
-                FragmentContextView.this.linearGradient.setLocalMatrix(FragmentContextView.this.matrix);
-                int measuredWidth = (getMeasuredWidth() - ceil) - AndroidUtilities.dp(10.0f);
-                int dp = AndroidUtilities.dp(10.0f);
-                FragmentContextView.this.rect.set(0.0f, 0.0f, ceil, AndroidUtilities.dp(28.0f));
-                canvas.save();
-                canvas.translate(measuredWidth, dp);
-                canvas.drawRoundRect(FragmentContextView.this.rect, AndroidUtilities.dp(16.0f), AndroidUtilities.dp(16.0f), FragmentContextView.this.gradientPaint);
-                canvas.translate(AndroidUtilities.dp(12.0f), AndroidUtilities.dp(6.0f));
-                FragmentContextView.this.timeLayout.draw(canvas);
-                canvas.restore();
+            }
+
+            @Override
+            public boolean dispatchTouchEvent(android.view.MotionEvent r6) {
+                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.FragmentContextView.AnonymousClass3.dispatchTouchEvent(android.view.MotionEvent):boolean");
             }
 
             @Override
@@ -365,9 +386,21 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 }
                 FragmentContextView.this.avatars.invalidate();
             }
+
+            @Override
+            protected boolean verifyDrawable(Drawable drawable) {
+                return drawable == FragmentContextView.this.notifyText || super.verifyDrawable(drawable);
+            }
         };
         this.frameLayout = blurredFrameLayout;
-        addView(blurredFrameLayout, LayoutHelper.createFrame(-1, 36.0f, 51, 0.0f, 0.0f, 0.0f, 0.0f));
+        this.notifyButtonBounce = new ButtonBounce(blurredFrameLayout);
+        this.notifyText.setOverrideFullWidth(AndroidUtilities.displaySize.x);
+        this.notifyText.setScaleProperty(0.4f);
+        this.notifyText.setCallback(this.frameLayout);
+        this.notifyText.setTextColor(-1);
+        this.notifyText.setTextSize(AndroidUtilities.dp(14.0f));
+        this.notifyText.setTypeface(AndroidUtilities.bold());
+        addView(this.frameLayout, LayoutHelper.createFrame(-1, 36.0f, 51, 0.0f, 0.0f, 0.0f, 0.0f));
         View view = new View(context);
         this.selector = view;
         this.frameLayout.addView(view, LayoutHelper.createFrame(-1, -1.0f));
@@ -1413,7 +1446,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         this.currentStyle = i;
         this.frameLayout.setWillNotDraw(i != 4);
         if (i != 4) {
-            this.timeLayout = null;
+            this.notifyButtonEnabled = false;
         }
         AvatarsImageView avatarsImageView = this.avatars;
         if (avatarsImageView != null) {
@@ -2159,6 +2192,34 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         if (i == 8) {
             this.wasDraw = false;
         }
+    }
+
+    public void toggleScheduledNotify() {
+        ChatActivityInterface chatActivityInterface;
+        ChatObject.Call groupCall;
+        if (this.fragment == null || (chatActivityInterface = this.chatActivity) == null || (groupCall = chatActivityInterface.getGroupCall()) == null || groupCall.call == null) {
+            return;
+        }
+        if (this.toggleGroupCallStartSubscriptionReqId != 0) {
+            this.fragment.getConnectionsManager().cancelRequest(this.toggleGroupCallStartSubscriptionReqId, true);
+            this.toggleGroupCallStartSubscriptionReqId = 0;
+        }
+        TLRPC.TL_phone_toggleGroupCallStartSubscription tL_phone_toggleGroupCallStartSubscription = new TLRPC.TL_phone_toggleGroupCallStartSubscription();
+        tL_phone_toggleGroupCallStartSubscription.call = groupCall.getInputGroupCall();
+        TLRPC.GroupCall groupCall2 = groupCall.call;
+        boolean z = true ^ this.willBeNotified;
+        this.willBeNotified = z;
+        groupCall2.schedule_start_subscribed = z;
+        tL_phone_toggleGroupCallStartSubscription.subscribed = z;
+        this.toggleGroupCallStartSubscriptionReqId = this.fragment.getConnectionsManager().sendRequest(tL_phone_toggleGroupCallStartSubscription, null);
+        if (this.scheduleRunnableScheduled) {
+            AndroidUtilities.cancelRunOnUIThread(this.updateScheduleTimeRunnable);
+            this.scheduleRunnableScheduled = false;
+        }
+        this.updateScheduleTimeRunnable.run();
+        BulletinFactory of = BulletinFactory.of(this.fragment);
+        boolean z2 = this.willBeNotified;
+        of.createSimpleBulletin(z2 ? R.raw.silent_unmute : R.raw.silent_mute, LocaleController.getString(z2 ? R.string.LiveStreamWillNotify : R.string.LiveStreamWillNotNotify)).show();
     }
 
     public void updateColors() {

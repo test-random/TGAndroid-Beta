@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="53989"
-    android:versionName="11.3.5"
+    android:versionCode="54369"
+    android:versionName="11.4.0"
     android:installLocation="auto"
     android:compileSdkVersion="34"
     android:compileSdkVersionCodename="14"
@@ -720,6 +720,9 @@
             android:exported="false"/>
         <receiver
             android:name="org.telegram.messenger.voip.VoIPActionsReceiver"
+            android:exported="false"/>
+        <receiver
+            android:name="org.telegram.messenger.ShortcutResultReceiver"
             android:exported="false"/>
         <provider
             android:name="androidx.core.content.FileProvider"

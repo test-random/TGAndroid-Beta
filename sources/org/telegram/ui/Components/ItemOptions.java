@@ -290,13 +290,20 @@ public class ItemOptions {
         dismiss();
     }
 
-    public static void lambda$addProfile$4(Runnable runnable, View view) {
+    public void lambda$add$2(Runnable runnable, View view) {
+        if (runnable != null) {
+            runnable.run();
+        }
+        dismiss();
+    }
+
+    public static void lambda$addProfile$6(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
     }
 
-    public void lambda$addSpaceGap$3(KeyEvent keyEvent) {
+    public void lambda$addSpaceGap$4(KeyEvent keyEvent) {
         ActionBarPopupWindow actionBarPopupWindow;
         if (keyEvent.getKeyCode() == 4 && keyEvent.getRepeatCount() == 0 && (actionBarPopupWindow = this.actionBarPopupWindow) != null && actionBarPopupWindow.isShowing()) {
             dismiss();
@@ -310,7 +317,7 @@ public class ItemOptions {
         }
     }
 
-    public void lambda$putPremiumLock$2(Runnable runnable, View view) {
+    public void lambda$putPremiumLock$3(Runnable runnable, View view) {
         if (runnable != null) {
             int i = -this.shiftDp;
             this.shiftDp = i;
@@ -320,7 +327,7 @@ public class ItemOptions {
         }
     }
 
-    public static boolean lambda$show$5(View view) {
+    public static boolean lambda$show$7(View view) {
         view.invalidate();
         return true;
     }
@@ -396,6 +403,38 @@ public class ItemOptions {
         return add(i, charSequence, z ? Theme.key_text_RedRegular : Theme.key_actionBarDefaultSubmenuItemIcon, z ? Theme.key_text_RedRegular : Theme.key_actionBarDefaultSubmenuItem, runnable);
     }
 
+    public ItemOptions add(CharSequence charSequence, CharSequence charSequence2, final Runnable runnable) {
+        int i;
+        if (this.context == null) {
+            return this;
+        }
+        ActionBarMenuSubItem actionBarMenuSubItem = new ActionBarMenuSubItem(this.context, false, false, this.resourcesProvider);
+        actionBarMenuSubItem.setPadding(AndroidUtilities.dp(18.0f), 0, AndroidUtilities.dp(18.0f), 0);
+        actionBarMenuSubItem.setText(charSequence);
+        actionBarMenuSubItem.setSubtext(charSequence2);
+        Integer num = this.textColor;
+        int intValue = num != null ? num.intValue() : Theme.getColor(Theme.key_actionBarDefaultSubmenuItem, this.resourcesProvider);
+        Integer num2 = this.iconColor;
+        actionBarMenuSubItem.setColors(intValue, num2 != null ? num2.intValue() : Theme.getColor(Theme.key_actionBarDefaultSubmenuItemIcon, this.resourcesProvider));
+        Integer num3 = this.selectorColor;
+        actionBarMenuSubItem.setSelectorColor(num3 != null ? num3.intValue() : Theme.multAlpha(Theme.getColor(Theme.key_actionBarDefaultSubmenuItem, this.resourcesProvider), 0.12f));
+        actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public final void onClick(View view) {
+                ItemOptions.this.lambda$add$2(runnable, view);
+            }
+        });
+        int i2 = this.minWidthDp;
+        if (i2 > 0) {
+            actionBarMenuSubItem.setMinimumWidth(AndroidUtilities.dp(i2));
+            i = this.minWidthDp;
+        } else {
+            i = -1;
+        }
+        addView(actionBarMenuSubItem, LayoutHelper.createLinear(i, -2));
+        return this;
+    }
+
     public ItemOptions add(CharSequence charSequence, Runnable runnable) {
         return add(0, charSequence, false, runnable);
     }
@@ -451,7 +490,7 @@ public class ItemOptions {
             frameLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    ItemOptions.lambda$addProfile$4(runnable, view);
+                    ItemOptions.lambda$addProfile$6(runnable, view);
                 }
             });
             addView(frameLayout, LayoutHelper.createLinear(-1, 52));
@@ -468,7 +507,7 @@ public class ItemOptions {
         frameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                ItemOptions.lambda$addProfile$4(runnable, view);
+                ItemOptions.lambda$addProfile$6(runnable, view);
             }
         });
         addView(frameLayout, LayoutHelper.createLinear(-1, 52));
@@ -487,7 +526,7 @@ public class ItemOptions {
         actionBarPopupWindowLayout.setDispatchKeyEventListener(new ActionBarPopupWindow.OnDispatchKeyEventListener() {
             @Override
             public final void onDispatchKeyEvent(KeyEvent keyEvent) {
-                ItemOptions.this.lambda$addSpaceGap$3(keyEvent);
+                ItemOptions.this.lambda$addSpaceGap$4(keyEvent);
             }
         });
         this.layout.addView(this.lastLayout, LayoutHelper.createLinear(-1, -2, 0.0f, -8.0f, 0.0f, 0.0f));
@@ -688,7 +727,7 @@ public class ItemOptions {
             actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    ItemOptions.this.lambda$putPremiumLock$2(runnable, view);
+                    ItemOptions.this.lambda$putPremiumLock$3(runnable, view);
                 }
             });
         }
@@ -908,9 +947,9 @@ public class ItemOptions {
                 this.preDrawListener = new ViewTreeObserver.OnPreDrawListener() {
                     @Override
                     public final boolean onPreDraw() {
-                        boolean lambda$show$5;
-                        lambda$show$5 = ItemOptions.lambda$show$5(dimView);
-                        return lambda$show$5;
+                        boolean lambda$show$7;
+                        lambda$show$7 = ItemOptions.lambda$show$7(dimView);
+                        return lambda$show$7;
                     }
                 };
                 viewGroup.getViewTreeObserver().addOnPreDrawListener(this.preDrawListener);

@@ -47,6 +47,9 @@ public abstract class ThemeColors {
         sparseArray.put(Theme.key_dialog_inlineProgress, "dialog_inlineProgress");
         sparseArray.put(Theme.key_dialogSearchBackground, "dialogSearchBackground");
         sparseArray.put(Theme.key_dialogSearchHint, "dialogSearchHint");
+        sparseArray.put(Theme.key_bot_loadingIcon, "bot_loadingIcon");
+        sparseArray.put(Theme.key_gift_ribbon, "gift_ribbon");
+        sparseArray.put(Theme.key_gift_ribbon_soldout, "gift_ribbon_soldout");
         sparseArray.put(Theme.key_dialogSearchIcon, "dialogSearchIcon");
         sparseArray.put(Theme.key_dialogSearchText, "dialogSearchText");
         sparseArray.put(Theme.key_dialogFloatingButton, "dialogFloatingButton");
@@ -826,6 +829,9 @@ public abstract class ThemeColors {
         iArr[Theme.key_dialogCardShadow] = 815372697;
         iArr[Theme.key_dialogGiftsBackground] = -657673;
         iArr[Theme.key_dialogGiftsTabText] = -11118244;
+        iArr[Theme.key_bot_loadingIcon] = -855310;
+        iArr[Theme.key_gift_ribbon] = -12147470;
+        iArr[Theme.key_gift_ribbon_soldout] = -3389625;
         iArr[Theme.key_windowBackgroundWhite] = -1;
         iArr[Theme.key_windowBackgroundUnchecked] = -6445135;
         iArr[Theme.key_windowBackgroundChecked] = -11034919;

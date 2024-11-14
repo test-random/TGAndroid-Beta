@@ -141,6 +141,7 @@ public final class BulletinFactory {
     public static class UndoObject {
         public Runnable onAction;
         public Runnable onUndo;
+        public CharSequence undoText;
     }
 
     private BulletinFactory(FrameLayout frameLayout, Theme.ResourcesProvider resourcesProvider) {
@@ -1163,9 +1164,13 @@ public final class BulletinFactory {
         return create(usersLayout, 5000);
     }
 
+    public Bulletin makeForError(TLRPC.TL_error tL_error) {
+        return !LaunchActivity.isActive ? new Bulletin.EmptyBulletin() : tL_error == null ? createErrorBulletin(LocaleController.formatString(R.string.UnknownError, new Object[0])) : createErrorBulletin(LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text));
+    }
+
     public void showForError(TLRPC.TL_error tL_error) {
         if (LaunchActivity.isActive) {
-            createErrorBulletin(LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text)).show();
+            createErrorBulletin(tL_error == null ? LocaleController.formatString(R.string.UnknownError, new Object[0]) : LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text)).show();
         }
     }
 

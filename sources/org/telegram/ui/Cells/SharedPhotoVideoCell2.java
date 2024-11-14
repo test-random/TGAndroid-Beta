@@ -337,8 +337,7 @@ public class SharedPhotoVideoCell2 extends FrameLayout {
         if (this.isStory) {
             ImageReceiver imageReceiver = this.imageReceiver;
             if ((imageReceiver == null || imageReceiver.getVisible()) && this.isSearchingHashtag && this.authorText != null) {
-                float dp = AndroidUtilities.dp(5.33f);
-                this.authorText.ellipsize((int) (rectF.width() - (2.0f * dp))).setVerticalClipPadding(AndroidUtilities.dp(14.0f)).setShadow(0.4f * f).draw(canvas, rectF.left + dp, rectF.top + AndroidUtilities.dp(this.currentParentColumnsCount <= 2 ? 15.0f : 11.33f), Theme.multAlpha(-1, f), 1.0f);
+                this.authorText.ellipsize((int) (rectF.width() - (2.0f * r0))).setVerticalClipPadding(AndroidUtilities.dp(14.0f)).setShadow(0.4f * f).draw(canvas, rectF.left + AndroidUtilities.dp(5.33f), rectF.top + AndroidUtilities.dp(this.currentParentColumnsCount <= 2 ? 15.0f : 11.33f), Theme.multAlpha(-1, f), 1.0f);
             }
         }
     }

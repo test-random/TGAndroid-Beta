@@ -334,4 +334,13 @@ public class BirthdayController {
         edit.apply();
         NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.premiumPromoUpdated, new Object[0]);
     }
+
+    public boolean isToday(long j) {
+        BirthdayState birthdayState = this.state;
+        if (birthdayState != null && birthdayState.contains(j)) {
+            return true;
+        }
+        TLRPC.UserFull userFull = MessagesController.getInstance(this.currentAccount).getUserFull(j);
+        return userFull != null && isToday(userFull.birthday);
+    }
 }

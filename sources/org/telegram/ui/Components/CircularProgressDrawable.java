@@ -10,7 +10,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import org.telegram.messenger.AndroidUtilities;
 
 public class CircularProgressDrawable extends Drawable {
-    private static final FastOutSlowInInterpolator interpolator = new FastOutSlowInInterpolator();
+    public static final FastOutSlowInInterpolator interpolator = new FastOutSlowInInterpolator();
     private float angleOffset;
     private final RectF bounds;
     private final Paint paint;

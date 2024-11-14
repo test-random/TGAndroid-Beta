@@ -282,7 +282,25 @@ public class TableView extends android.widget.TableLayout {
         ButtonSpan.TextViewButtons textViewButtons = new ButtonSpan.TextViewButtons(getContext());
         textViewButtons.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, this.resourcesProvider));
         textViewButtons.setTextSize(1, 14.0f);
-        textViewButtons.setText(charSequence2);
+        textViewButtons.setText(Emoji.replaceEmoji(charSequence2, textViewButtons.getPaint().getFontMetricsInt(), false));
+        NotificationCenter.listenEmojiLoading(textViewButtons);
+        TableRow tableRow = new TableRow(getContext());
+        tableRow.addView(new TableRowTitle(this, charSequence), new TableRow.LayoutParams(-2, -1));
+        tableRow.addView(new TableRowContent(this, textViewButtons), new TableRow.LayoutParams(0, -1, 1.0f));
+        addView(tableRow);
+        return tableRow;
+    }
+
+    public TableRow addRow(CharSequence charSequence, CharSequence charSequence2, CharSequence charSequence3, Runnable runnable) {
+        ButtonSpan.TextViewButtons textViewButtons = new ButtonSpan.TextViewButtons(getContext());
+        textViewButtons.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, this.resourcesProvider));
+        textViewButtons.setTextSize(1, 14.0f);
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(Emoji.replaceEmoji(charSequence2, textViewButtons.getPaint().getFontMetricsInt(), false));
+        if (charSequence3 != null) {
+            spannableStringBuilder.append((CharSequence) " ").append(ButtonSpan.make(charSequence3, runnable, this.resourcesProvider));
+        }
+        textViewButtons.setText(spannableStringBuilder);
+        NotificationCenter.listenEmojiLoading(textViewButtons);
         TableRow tableRow = new TableRow(getContext());
         tableRow.addView(new TableRowTitle(this, charSequence), new TableRow.LayoutParams(-2, -1));
         tableRow.addView(new TableRowContent(this, textViewButtons), new TableRow.LayoutParams(0, -1, 1.0f));

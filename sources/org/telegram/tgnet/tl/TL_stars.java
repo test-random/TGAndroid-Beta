@@ -10,6 +10,7 @@ public class TL_stars {
     public static class StarGift extends TLObject {
         public int availability_remains;
         public int availability_total;
+        public boolean birthday;
         public long convert_stars;
         public int first_sale_date;
         public int flags;
@@ -51,20 +52,23 @@ public class TL_stars {
         public String chat_invite_hash;
         public int flags;
         public String id;
+        public String invoice_slug;
         public boolean missing_balance;
         public TLRPC.Peer peer;
+        public TLRPC.WebDocument photo;
         public TL_starsSubscriptionPricing pricing;
+        public String title;
         public int until_date;
 
         public static StarsSubscription TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            StarsSubscription tL_starsSubscription = i != -797707802 ? i != 1401868056 ? null : new TL_starsSubscription() : new TL_starsSubscription_old();
-            if (tL_starsSubscription == null && z) {
+            StarsSubscription tL_starsSubscription_layer193 = i != -797707802 ? i != 779004698 ? i != 1401868056 ? null : new TL_starsSubscription_layer193() : new TL_starsSubscription() : new TL_starsSubscription_old();
+            if (tL_starsSubscription_layer193 == null && z) {
                 throw new RuntimeException(String.format("can't parse magic %x in StarsTransaction", Integer.valueOf(i)));
             }
-            if (tL_starsSubscription != null) {
-                tL_starsSubscription.readParams(abstractSerializedData, z);
+            if (tL_starsSubscription_layer193 != null) {
+                tL_starsSubscription_layer193.readParams(abstractSerializedData, z);
             }
-            return tL_starsSubscription;
+            return tL_starsSubscription_layer193;
         }
     }
 
@@ -535,6 +539,7 @@ public class TL_stars {
             this.flags = readInt32;
             this.limited = (readInt32 & 1) != 0;
             this.sold_out = (readInt32 & 2) != 0;
+            this.birthday = (readInt32 & 4) != 0;
             this.id = abstractSerializedData.readInt64(z);
             this.sticker = TLRPC.Document.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
             this.stars = abstractSerializedData.readInt64(z);
@@ -556,7 +561,9 @@ public class TL_stars {
             this.flags = i;
             int i2 = this.sold_out ? i | 2 : i & (-3);
             this.flags = i2;
-            abstractSerializedData.writeInt32(i2);
+            int i3 = this.birthday ? i2 | 4 : i2 & (-5);
+            this.flags = i3;
+            abstractSerializedData.writeInt32(i3);
             abstractSerializedData.writeInt64(this.id);
             this.sticker.serializeToStream(abstractSerializedData);
             abstractSerializedData.writeInt64(this.stars);
@@ -830,6 +837,94 @@ public class TL_stars {
     }
 
     public static class TL_starsSubscription extends StarsSubscription {
+        public static final int constructor = 779004698;
+
+        @Override
+        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+            int readInt32 = abstractSerializedData.readInt32(z);
+            this.flags = readInt32;
+            this.canceled = (readInt32 & 1) != 0;
+            this.can_refulfill = (readInt32 & 2) != 0;
+            this.missing_balance = (readInt32 & 4) != 0;
+            this.id = abstractSerializedData.readString(z);
+            this.peer = TLRPC.Peer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            this.until_date = abstractSerializedData.readInt32(z);
+            this.pricing = TL_starsSubscriptionPricing.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            if ((this.flags & 8) != 0) {
+                this.chat_invite_hash = abstractSerializedData.readString(z);
+            }
+            if ((this.flags & 16) != 0) {
+                this.title = abstractSerializedData.readString(z);
+            }
+            if ((this.flags & 32) != 0) {
+                this.photo = TLRPC.WebDocument.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            }
+            if ((this.flags & 64) != 0) {
+                this.invoice_slug = abstractSerializedData.readString(z);
+            }
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            abstractSerializedData.writeInt32(779004698);
+            int i = this.canceled ? this.flags | 1 : this.flags & (-2);
+            this.flags = i;
+            int i2 = this.can_refulfill ? i | 2 : i & (-3);
+            this.flags = i2;
+            int i3 = this.missing_balance ? i2 | 4 : i2 & (-5);
+            this.flags = i3;
+            abstractSerializedData.writeInt32(i3);
+            abstractSerializedData.writeString(this.id);
+            this.peer.serializeToStream(abstractSerializedData);
+            abstractSerializedData.writeInt32(this.until_date);
+            this.pricing.serializeToStream(abstractSerializedData);
+            if ((this.flags & 8) != 0) {
+                abstractSerializedData.writeString(this.chat_invite_hash);
+            }
+            if ((this.flags & 16) != 0) {
+                abstractSerializedData.writeString(this.title);
+            }
+            if ((this.flags & 32) != 0) {
+                this.photo.serializeToStream(abstractSerializedData);
+            }
+            if ((this.flags & 64) != 0) {
+                abstractSerializedData.writeString(this.invoice_slug);
+            }
+        }
+    }
+
+    public static class TL_starsSubscriptionPricing extends TLObject {
+        public static final int constructor = 88173912;
+        public long amount;
+        public int period;
+
+        public static TL_starsSubscriptionPricing TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+            if (88173912 != i) {
+                if (z) {
+                    throw new RuntimeException(String.format("can't parse magic %x in TL_starsSubscriptionPricing", Integer.valueOf(i)));
+                }
+                return null;
+            }
+            TL_starsSubscriptionPricing tL_starsSubscriptionPricing = new TL_starsSubscriptionPricing();
+            tL_starsSubscriptionPricing.readParams(abstractSerializedData, z);
+            return tL_starsSubscriptionPricing;
+        }
+
+        @Override
+        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+            this.period = abstractSerializedData.readInt32(z);
+            this.amount = abstractSerializedData.readInt64(z);
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            abstractSerializedData.writeInt32(88173912);
+            abstractSerializedData.writeInt32(this.period);
+            abstractSerializedData.writeInt64(this.amount);
+        }
+    }
+
+    public static class TL_starsSubscription_layer193 extends StarsSubscription {
         public static final int constructor = 1401868056;
 
         @Override
@@ -865,37 +960,6 @@ public class TL_stars {
             if ((this.flags & 8) != 0) {
                 abstractSerializedData.writeString(this.chat_invite_hash);
             }
-        }
-    }
-
-    public static class TL_starsSubscriptionPricing extends TLObject {
-        public static final int constructor = 88173912;
-        public long amount;
-        public int period;
-
-        public static TL_starsSubscriptionPricing TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            if (88173912 != i) {
-                if (z) {
-                    throw new RuntimeException(String.format("can't parse magic %x in TL_starsSubscriptionPricing", Integer.valueOf(i)));
-                }
-                return null;
-            }
-            TL_starsSubscriptionPricing tL_starsSubscriptionPricing = new TL_starsSubscriptionPricing();
-            tL_starsSubscriptionPricing.readParams(abstractSerializedData, z);
-            return tL_starsSubscriptionPricing;
-        }
-
-        @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.period = abstractSerializedData.readInt32(z);
-            this.amount = abstractSerializedData.readInt64(z);
-        }
-
-        @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(88173912);
-            abstractSerializedData.writeInt32(this.period);
-            abstractSerializedData.writeInt64(this.amount);
         }
     }
 

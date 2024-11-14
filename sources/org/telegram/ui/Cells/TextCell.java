@@ -552,6 +552,37 @@ public class TextCell extends FrameLayout {
         }
     }
 
+    public void setTextAndCheckAndColorfulIcon(CharSequence charSequence, boolean z, int i, int i2, boolean z2) {
+        this.imageLeft = 21;
+        this.offsetFromImage = getOffsetFromImage(false);
+        this.textView.setText(charSequence);
+        this.textView.setRightDrawable((Drawable) null);
+        this.valueTextView.setVisibility(8);
+        this.valueSpoilersTextView.setVisibility(8);
+        this.valueImageView.setVisibility(8);
+        setColorfulIcon(i2, i);
+        if (this.checkBox == null) {
+            Switch r10 = new Switch(getContext(), this.resourcesProvider);
+            this.checkBox = r10;
+            int i3 = Theme.key_switchTrack;
+            int i4 = Theme.key_switchTrackChecked;
+            int i5 = Theme.key_windowBackgroundWhite;
+            r10.setColors(i3, i4, i5, i5);
+            addView(this.checkBox, LayoutHelper.createFrame(37, 20.0f, (LocaleController.isRTL ? 3 : 5) | 16, 22.0f, 0.0f, 22.0f, 0.0f));
+        }
+        Switch r102 = this.checkBox;
+        if (r102 != null) {
+            r102.setVisibility(0);
+            this.checkBox.setChecked(z, false);
+        }
+        this.needDivider = z2;
+        setWillNotDraw(!z2);
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = this.emojiDrawable;
+        if (swapAnimatedEmojiDrawable != null) {
+            swapAnimatedEmojiDrawable.set((Drawable) null, false);
+        }
+    }
+
     public void setTextAndCheckAndIcon(CharSequence charSequence, boolean z, int i, boolean z2) {
         this.imageLeft = 21;
         this.offsetFromImage = getOffsetFromImage(false);

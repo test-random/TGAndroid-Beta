@@ -123,6 +123,7 @@ import org.telegram.ui.Stars.StarsController;
 import org.telegram.ui.Stars.StarsIntroActivity;
 import org.telegram.ui.Stories.recorder.StoryEntry;
 import org.telegram.ui.TopicsFragment;
+import org.telegram.ui.bots.BotSensors;
 import org.telegram.ui.bots.BotWebViewMenuContainer$ActionBarColorsAnimating;
 import org.telegram.ui.bots.ChatAttachAlertBotWebViewLayout;
 import org.telegram.ui.web.BotWebViewContainer;
@@ -393,6 +394,11 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         }
 
         @Override
+        public BotSensors getBotSensors() {
+            return BotWebViewContainer.Delegate.CC.$default$getBotSensors(this);
+        }
+
+        @Override
         public boolean isClipboardAvailable() {
             return MediaDataController.getInstance(ChatAttachAlert.this.currentAccount).botInAttachMenu(this.val$id);
         }
@@ -419,8 +425,38 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         }
 
         @Override
+        public void onEmojiStatusGranted(boolean z) {
+            BotWebViewContainer.Delegate.CC.$default$onEmojiStatusGranted(this, z);
+        }
+
+        @Override
+        public void onEmojiStatusSet(TLRPC.Document document) {
+            BotWebViewContainer.Delegate.CC.$default$onEmojiStatusSet(this, document);
+        }
+
+        @Override
+        public String onFullscreenRequested(boolean z) {
+            return BotWebViewContainer.Delegate.CC.$default$onFullscreenRequested(this, z);
+        }
+
+        @Override
         public void onInstantClose() {
             onCloseRequested(null);
+        }
+
+        @Override
+        public void onLocationGranted(boolean z) {
+            BotWebViewContainer.Delegate.CC.$default$onLocationGranted(this, z);
+        }
+
+        @Override
+        public void onOpenBackFromTabs() {
+            BotWebViewContainer.Delegate.CC.$default$onOpenBackFromTabs(this);
+        }
+
+        @Override
+        public void onOrientationLockChanged(boolean z) {
+            BotWebViewContainer.Delegate.CC.$default$onOrientationLockChanged(this, z);
         }
 
         @Override
@@ -535,6 +571,11 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
 
         @Override
         public void onSetupSecondaryButton(boolean z, boolean z2, String str, int i, int i2, boolean z3, boolean z4, String str2) {
+        }
+
+        @Override
+        public void onSharedTo(ArrayList arrayList) {
+            BotWebViewContainer.Delegate.CC.$default$onSharedTo(this, arrayList);
         }
 
         @Override

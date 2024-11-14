@@ -5,6 +5,7 @@ import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.view.View;
 import androidx.core.graphics.ColorUtils;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,6 +14,7 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
+import org.telegram.ui.Components.AttachableDrawable;
 
 public class VectorAvatarThumbDrawable extends Drawable implements AnimatedEmojiSpan.InvalidateHolder, AttachableDrawable, NotificationCenter.NotificationCenterDelegate {
     AnimatedEmojiDrawable animatedEmojiDrawable;
@@ -201,6 +203,11 @@ public class VectorAvatarThumbDrawable extends Drawable implements AnimatedEmoji
 
     @Override
     public void setColorFilter(ColorFilter colorFilter) {
+    }
+
+    @Override
+    public void setParent(View view) {
+        AttachableDrawable.CC.$default$setParent(this, view);
     }
 
     public void setParent(ImageReceiver imageReceiver) {

@@ -457,6 +457,7 @@ public abstract class Theme {
     public static final int key_avatar_nameInMessageViolet;
     public static final int key_avatar_subtitleInProfileBlue;
     public static final int key_avatar_text;
+    public static final int key_bot_loadingIcon;
     public static final int key_calls_callReceivedGreenIcon;
     public static final int key_calls_callReceivedRedIcon;
     public static final int key_changephoneinfo_image2;
@@ -905,6 +906,8 @@ public abstract class Theme {
     public static final int key_files_iconText;
     public static final int key_fill_RedDark;
     public static final int key_fill_RedNormal;
+    public static final int key_gift_ribbon;
+    public static final int key_gift_ribbon_soldout;
     public static final int key_graySection;
     public static final int key_graySectionText;
     public static final int key_groupcreate_cursor;

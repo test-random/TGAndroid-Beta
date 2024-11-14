@@ -19,7 +19,7 @@ public class Text {
     private LinearGradient ellipsizeGradient;
     private Matrix ellipsizeMatrix;
     private Paint ellipsizePaint;
-    private int ellipsizeWidth;
+    private float ellipsizeWidth;
     private boolean hackClipBounds;
     private StaticLayout layout;
     private float left;
@@ -34,7 +34,7 @@ public class Text {
 
     public Text(CharSequence charSequence, float f, Typeface typeface) {
         this.maxWidth = 999999.0f;
-        this.ellipsizeWidth = -1;
+        this.ellipsizeWidth = -1.0f;
         TextPaint textPaint = new TextPaint(1);
         this.paint = textPaint;
         textPaint.setTextSize(AndroidUtilities.dp(f));
@@ -44,26 +44,31 @@ public class Text {
 
     public Text(CharSequence charSequence, TextPaint textPaint) {
         this.maxWidth = 999999.0f;
-        this.ellipsizeWidth = -1;
+        this.ellipsizeWidth = -1.0f;
         this.paint = textPaint;
         setText(charSequence);
     }
 
     public void draw(Canvas canvas) {
-        int i;
-        int i2;
         if (this.layout == null) {
             return;
         }
-        if (!this.doNotSave && (i2 = this.ellipsizeWidth) >= 0 && this.width > i2) {
-            canvas.saveLayerAlpha(0.0f, -this.vertPad, i2 - 1, r0.getHeight() + this.vertPad, 255, 31);
+        if (!this.doNotSave) {
+            float f = this.ellipsizeWidth;
+            if (f >= 0.0f && this.width > f) {
+                canvas.saveLayerAlpha(0.0f, -this.vertPad, f - 1.0f, r0.getHeight() + this.vertPad, 255, 31);
+            }
         }
         if (this.hackClipBounds) {
             canvas.drawText(this.layout.getText().toString(), 0.0f, -this.paint.getFontMetricsInt().ascent, this.paint);
         } else {
             this.layout.draw(canvas);
         }
-        if (this.doNotSave || (i = this.ellipsizeWidth) < 0 || this.width <= i) {
+        if (this.doNotSave) {
+            return;
+        }
+        float f2 = this.ellipsizeWidth;
+        if (f2 < 0.0f || this.width <= f2) {
             return;
         }
         if (this.ellipsizeGradient == null) {
@@ -118,8 +123,8 @@ public class Text {
         this.paint.setAlpha(alpha);
     }
 
-    public Text ellipsize(int i) {
-        this.ellipsizeWidth = i;
+    public Text ellipsize(float f) {
+        this.ellipsizeWidth = f;
         return this;
     }
 
@@ -149,8 +154,8 @@ public class Text {
     }
 
     public float getWidth() {
-        int i = this.ellipsizeWidth;
-        return i >= 0 ? Math.min(i, this.width) : this.width;
+        float f = this.ellipsizeWidth;
+        return f >= 0.0f ? Math.min(f, this.width) : this.width;
     }
 
     public Text hackClipBounds() {

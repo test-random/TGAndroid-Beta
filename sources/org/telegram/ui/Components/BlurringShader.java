@@ -230,7 +230,7 @@ public class BlurringShader {
         }
     }
 
-    public static class Program {
+    private static class Program {
         int flipyHandle;
         int gl;
         int gradientBottomHandle;

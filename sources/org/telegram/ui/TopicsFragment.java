@@ -204,10 +204,11 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
     OnTopicSelectedListener onTopicSelectedListener;
     private boolean openAnimationEnded;
     private boolean openVideoChat;
-    private boolean openedForForward;
-    private boolean openedForQuote;
-    private boolean openedForReply;
-    private boolean opnendForSelect;
+    private final boolean openedForBotShare;
+    private final boolean openedForForward;
+    private final boolean openedForQuote;
+    private final boolean openedForReply;
+    private final boolean openedForSelect;
     private ActionBarMenuItem other;
     ActionBarMenuItem otherItem;
     private AvatarDrawable parentAvatarDrawable;
@@ -2186,8 +2187,9 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         this.slideFragmentProgress = 1.0f;
         this.movingDialogFilters = new ArrayList();
         this.chatId = this.arguments.getLong("chat_id", 0L);
-        this.opnendForSelect = this.arguments.getBoolean("for_select", false);
+        this.openedForSelect = this.arguments.getBoolean("for_select", false);
         this.openedForForward = this.arguments.getBoolean("forward_to", false);
+        this.openedForBotShare = this.arguments.getBoolean("bot_share_to", false);
         this.openedForQuote = this.arguments.getBoolean("quote", false);
         this.openedForReply = this.arguments.getBoolean("reply_to", false);
         this.voiceChatHash = this.arguments.getString("voicechat", null);
@@ -2463,7 +2465,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         if (tL_forumTopic == null) {
             return;
         }
-        if (this.opnendForSelect) {
+        if (this.openedForSelect) {
             OnTopicSelectedListener onTopicSelectedListener = this.onTopicSelectedListener;
             if (onTopicSelectedListener != null) {
                 onTopicSelectedListener.onTopicSelected(tL_forumTopic);
@@ -2500,7 +2502,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
     }
 
     public boolean lambda$createView$3(View view, int i, float f, float f2) {
-        if (this.opnendForSelect || getParentLayout() == null || getParentLayout().isInPreviewMode()) {
+        if (this.openedForSelect || getParentLayout() == null || getParentLayout().isInPreviewMode()) {
             return false;
         }
         if (!this.actionBar.isActionModeShowed() && !AndroidUtilities.isTablet() && (view instanceof TopicDialogCell)) {
@@ -3005,7 +3007,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         if (this.createTopicSubmenu == null) {
             return;
         }
-        boolean z2 = (ChatObject.isNotInChat(getMessagesController().getChat(Long.valueOf(this.chatId))) || !ChatObject.canCreateTopic(getMessagesController().getChat(Long.valueOf(this.chatId))) || this.searching || this.opnendForSelect || this.loadingTopics) ? false : true;
+        boolean z2 = (ChatObject.isNotInChat(getMessagesController().getChat(Long.valueOf(this.chatId))) || !ChatObject.canCreateTopic(getMessagesController().getChat(Long.valueOf(this.chatId))) || this.searching || this.openedForSelect || this.loadingTopics) ? false : true;
         this.canShowCreateTopic = z2;
         this.createTopicSubmenu.setVisibility(z2 ? 0 : 8);
         hideFloatingButton(!this.canShowCreateTopic, z);
@@ -3364,12 +3366,14 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         this.avatarContainer.allowDrawStories = getDialogId() < 0;
         this.avatarContainer.setClipChildren(false);
         this.actionBar.addView(this.avatarContainer, 0, LayoutHelper.createFrame(-2, -1.0f, 51, 56.0f, 0.0f, 86.0f, 0.0f));
-        this.avatarContainer.getAvatarImageView().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TopicsFragment.this.openProfile(true);
-            }
-        });
+        if (!this.openedForSelect) {
+            this.avatarContainer.getAvatarImageView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    TopicsFragment.this.openProfile(true);
+                }
+            });
+        }
         this.recyclerListView = new TopicsRecyclerView(context) {
             @Override
             public boolean emptyViewIsVisible() {
@@ -4071,7 +4075,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         if (z) {
             return;
         }
-        if (this.opnendForSelect && this.removeFragmentOnTransitionEnd) {
+        if (this.openedForSelect && this.removeFragmentOnTransitionEnd) {
             removeSelfFromStack();
             DialogsActivity dialogsActivity = this.dialogsActivity;
             if (dialogsActivity != null) {

@@ -20,7 +20,7 @@ import org.telegram.ui.Components.CircularProgressDrawable;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.voip.CellFlickerDrawable;
 
-public class BotButtons extends FrameLayout {
+public abstract class BotButtons extends FrameLayout {
     public final AnimatedColor background;
     private final Paint backgroundPaint;
     public final Button[] buttons;
@@ -292,7 +292,7 @@ public class BotButtons extends FrameLayout {
     }
 
     @Override
-    protected void onMeasure(int i, int i2) {
+    public void onMeasure(int i, int i2) {
         super.onMeasure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(i), 1073741824), View.MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(109.0f) + 1, 1073741824));
     }
 

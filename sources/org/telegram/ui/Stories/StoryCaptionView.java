@@ -229,9 +229,9 @@ public class StoryCaptionView extends NestedScrollView {
             if (f3 < f) {
                 dp = (int) Math.min(dp + AndroidUtilities.dp(12.0f), f - AndroidUtilities.dp(20.0f));
             }
-            int i = dp;
-            this.titleLayout.ellipsize(i).draw(canvas, AndroidUtilities.lerp(AndroidUtilities.dp(10.0f), AndroidUtilities.dp(7.0f), f2), AndroidUtilities.lerp(AndroidUtilities.dp(12.0f), AndroidUtilities.dp(11.0f), f2), -1, 1.0f);
-            this.textLayout.ellipsize(i).draw(canvas, AndroidUtilities.dp(10.0f), AndroidUtilities.dp(30.0f), -1, f4);
+            float f5 = dp;
+            this.titleLayout.ellipsize(f5).draw(canvas, AndroidUtilities.lerp(AndroidUtilities.dp(10.0f), AndroidUtilities.dp(7.0f), f2), AndroidUtilities.lerp(AndroidUtilities.dp(12.0f), AndroidUtilities.dp(11.0f), f2), -1, 1.0f);
+            this.textLayout.ellipsize(f5).draw(canvas, AndroidUtilities.dp(10.0f), AndroidUtilities.dp(30.0f), -1, f4);
             canvas.restore();
         }
 

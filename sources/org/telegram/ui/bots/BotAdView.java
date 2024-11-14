@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -24,6 +25,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.LinkSpanDrawable;
@@ -115,17 +117,27 @@ public class BotAdView extends FrameLayout {
     public static void lambda$new$0(View view) {
     }
 
-    public static void lambda$set$1(Runnable runnable, View view) {
+    public void lambda$set$1(ChatActivity chatActivity, MessageObject messageObject, ClickableSpan clickableSpan) {
+        if (chatActivity != null) {
+            chatActivity.logSponsoredClicked(messageObject, false, false);
+        }
+        clickableSpan.onClick(this.textView);
+    }
+
+    public static void lambda$set$2(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
     }
 
-    public void lambda$set$2(String str, View view) {
+    public void lambda$set$3(ChatActivity chatActivity, MessageObject messageObject, String str, View view) {
+        if (chatActivity != null) {
+            chatActivity.logSponsoredClicked(messageObject, false, false);
+        }
         Browser.openUrl(getContext(), Uri.parse(str), true, false, false, null, null, false, MessagesController.getInstance(UserConfig.selectedAccount).sponsoredLinksInappAllow, false);
     }
 
-    public static void lambda$set$3(Runnable runnable, View view) {
+    public static void lambda$set$4(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
@@ -144,7 +156,7 @@ public class BotAdView extends FrameLayout {
         this.invalidatedMeasure = false;
     }
 
-    public void set(MessageObject messageObject, final Runnable runnable, final Runnable runnable2) {
+    public void set(final ChatActivity chatActivity, final MessageObject messageObject, final Runnable runnable, final Runnable runnable2) {
         BackupImageView backupImageView;
         ImageLocation forPhoto;
         ImageLocation forPhoto2;
@@ -207,22 +219,28 @@ public class BotAdView extends FrameLayout {
         this.titleView.setText(spannableStringBuilder);
         this.textView.setText(replaceEmoji2);
         setLayoutParams(LayoutHelper.createFrame(-1, -2, 83));
+        this.textView.setOnLinkPressListener(new LinkSpanDrawable.LinksTextView.OnLinkPress() {
+            @Override
+            public final void run(ClickableSpan clickableSpan) {
+                BotAdView.this.lambda$set$1(chatActivity, messageObject, clickableSpan);
+            }
+        });
         this.removeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                BotAdView.lambda$set$1(runnable, view);
+                BotAdView.lambda$set$2(runnable, view);
             }
         });
         setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                BotAdView.this.lambda$set$2(str, view);
+                BotAdView.this.lambda$set$3(chatActivity, messageObject, str, view);
             }
         });
         this.closeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                BotAdView.lambda$set$3(runnable2, view);
+                BotAdView.lambda$set$4(runnable2, view);
             }
         });
     }

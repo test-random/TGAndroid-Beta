@@ -32,6 +32,7 @@ public abstract class AudioInfo {
     protected short year;
 
     public static AudioInfo getAudioInfo(File file) {
+        byte b;
         try {
             byte[] bArr = new byte[12];
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
@@ -48,14 +49,14 @@ public abstract class AudioInfo {
                 }
                 return otherAudioInfo;
             }
-            if (file.getAbsolutePath().endsWith("mp3")) {
-                return new MP3Info(bufferedInputStream, file.length());
+            if (!file.getAbsolutePath().endsWith("mp3") && (((b = bArr[0]) != 73 || bArr[1] != 68 || bArr[2] != 51) && (b != 84 || bArr[1] != 65 || bArr[2] != 71))) {
+                OtherAudioInfo otherAudioInfo2 = new OtherAudioInfo(file);
+                if (otherAudioInfo2.failed) {
+                    return null;
+                }
+                return otherAudioInfo2;
             }
-            OtherAudioInfo otherAudioInfo2 = new OtherAudioInfo(file);
-            if (otherAudioInfo2.failed) {
-                return null;
-            }
-            return otherAudioInfo2;
+            return new MP3Info(bufferedInputStream, file.length());
         } catch (Exception unused) {
             return null;
         }

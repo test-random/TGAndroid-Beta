@@ -30,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.OverScroller;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BotFullscreenButtons$$ExternalSyntheticApiModelOutline2;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.ActionBar.BottomSheetTabs;
 import org.telegram.ui.ActionBar.BottomSheetTabsOverlay;
@@ -99,7 +100,7 @@ public class BottomSheetTabsOverlay extends FrameLayout {
 
         public static void lambda$onAnimationEnd$0(BottomSheetTabs.WebTabData webTabData, Sheet sheet, Bitmap bitmap) {
             webTabData.previewBitmap = bitmap;
-            sheet.mo997getWindowView().setDrawingFromOverlay(false);
+            sheet.mo999getWindowView().setDrawingFromOverlay(false);
             sheet.release();
         }
 
@@ -130,7 +131,7 @@ public class BottomSheetTabsOverlay extends FrameLayout {
                 canvas.translate(0.0f, -this.val$tab.viewScroll);
                 view.draw(canvas);
             }
-            this.val$sheet.mo997getWindowView().setDrawingFromOverlay(false);
+            this.val$sheet.mo999getWindowView().setDrawingFromOverlay(false);
             this.val$sheet.release();
             BottomSheetTabsOverlay.this.dismissingSheet = null;
             BottomSheetTabsOverlay.this.invalidate();
@@ -148,9 +149,7 @@ public class BottomSheetTabsOverlay extends FrameLayout {
 
         int getNavigationBarColor(int i);
 
-        SheetView mo997getWindowView();
-
-        boolean isFullSize();
+        SheetView mo999getWindowView();
 
         void release();
 
@@ -301,9 +300,9 @@ public class BottomSheetTabsOverlay extends FrameLayout {
                 canvas.scale(1.0f, AndroidUtilities.lerp(1.0f, 1.25f, f8));
                 BottomSheetTabs.WebTabData webTabData = this.tabData;
                 if (webTabData != null && (obj = webTabData.previewNode) != null && Build.VERSION.SDK_INT >= 29) {
-                    hasDisplayList = BottomSheetTabsOverlay$TabPreview$$ExternalSyntheticApiModelOutline0.m(obj).hasDisplayList();
+                    hasDisplayList = BotFullscreenButtons$$ExternalSyntheticApiModelOutline2.m(obj).hasDisplayList();
                     if (hasDisplayList) {
-                        RenderNode m = BottomSheetTabsOverlay$TabPreview$$ExternalSyntheticApiModelOutline0.m(this.tabData.previewNode);
+                        RenderNode m = BotFullscreenButtons$$ExternalSyntheticApiModelOutline2.m(this.tabData.previewNode);
                         float width2 = rectF.width();
                         width = m.getWidth();
                         float f11 = width2 / width;
@@ -477,10 +476,10 @@ public class BottomSheetTabsOverlay extends FrameLayout {
             int i = this.pos[0];
             int[] iArr = this.pos2;
             rectF.offset(i - iArr[0], r1[1] - iArr[1]);
-            SheetView mo997getWindowView = this.dismissingSheet.mo997getWindowView();
+            SheetView mo999getWindowView = this.dismissingSheet.mo999getWindowView();
             RectF rectF2 = this.rect;
             float f = this.dismissProgress;
-            float drawInto = mo997getWindowView.drawInto(canvas, rectF2, f, this.clipRect, f, false);
+            float drawInto = mo999getWindowView.drawInto(canvas, rectF2, f, this.clipRect, f, false);
             if (this.dismissingTab != null) {
                 this.clipPath.rewind();
                 this.clipPath.addRoundRect(this.clipRect, drawInto, drawInto, Path.Direction.CW);
@@ -679,7 +678,7 @@ public class BottomSheetTabsOverlay extends FrameLayout {
         }
         this.dismissingSheet = sheet;
         sheet.setLastVisible(false);
-        sheet.mo997getWindowView().setDrawingFromOverlay(true);
+        sheet.mo999getWindowView().setDrawingFromOverlay(true);
         invalidate();
         ValueAnimator valueAnimator2 = this.animator;
         if (valueAnimator2 != null) {
@@ -697,11 +696,8 @@ public class BottomSheetTabsOverlay extends FrameLayout {
             }
         });
         this.animator.addListener(new AnonymousClass2(saveState, sheet));
-        if (this.slowerDismiss || sheet.isFullSize()) {
-            AndroidUtilities.applySpring(this.animator, 220.0d, 30.0d, 1.0d);
-        } else {
-            AndroidUtilities.applySpring(this.animator, 350.0d, 30.0d, 1.0d);
-        }
+        AndroidUtilities.applySpring(this.animator, 220.0d, 30.0d, 1.0d);
+        this.animator.setDuration(((float) r13.getDuration()) * 1.2f);
         this.animator.start();
         this.slowerDismiss = false;
         return true;

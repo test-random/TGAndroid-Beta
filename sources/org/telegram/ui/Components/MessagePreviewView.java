@@ -42,7 +42,6 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
-import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
@@ -281,7 +280,7 @@ public abstract class MessagePreviewView extends FrameLayout {
             }
 
             @Override
-            public void onAllAnimationsDone() {
+            protected void onAllAnimationsDone() {
                 super.onAllAnimationsDone();
                 Runnable runnable = this.finishRunnable;
                 if (runnable != null) {
@@ -404,9 +403,7 @@ public abstract class MessagePreviewView extends FrameLayout {
 
                         @Override
                         public boolean canPerformReply() {
-                            boolean canPerformActions;
-                            canPerformActions = canPerformActions();
-                            return canPerformActions;
+                            return canPerformActions();
                         }
 
                         @Override
@@ -616,7 +613,7 @@ public abstract class MessagePreviewView extends FrameLayout {
 
                         @Override
                         public void didPressWebPage(ChatMessageCell chatMessageCell2, TLRPC.WebPage webPage, String str, boolean z) {
-                            Browser.openUrl(chatMessageCell2.getContext(), str);
+                            ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressWebPage(this, chatMessageCell2, webPage, str, z);
                         }
 
                         @Override
@@ -778,7 +775,7 @@ public abstract class MessagePreviewView extends FrameLayout {
                     }
 
                     @Override
-                    public void onLayout(boolean z, int i3, int i4, int i5, int i6) {
+                    protected void onLayout(boolean z, int i3, int i4, int i5, int i6) {
                         super.onLayout(z, i3, i4, i5, i6);
                         Page.this.updateLinkHighlight(this);
                     }
@@ -811,9 +808,7 @@ public abstract class MessagePreviewView extends FrameLayout {
 
                     @Override
                     public boolean canPerformReply() {
-                        boolean canPerformActions;
-                        canPerformActions = canPerformActions();
-                        return canPerformActions;
+                        return canPerformActions();
                     }
 
                     @Override
@@ -1036,7 +1031,7 @@ public abstract class MessagePreviewView extends FrameLayout {
 
                     @Override
                     public void didPressWebPage(ChatMessageCell chatMessageCell2, TLRPC.WebPage webPage, String str, boolean z) {
-                        Browser.openUrl(chatMessageCell2.getContext(), str);
+                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressWebPage(this, chatMessageCell2, webPage, str, z);
                     }
 
                     @Override
@@ -2241,7 +2236,7 @@ public abstract class MessagePreviewView extends FrameLayout {
             }
 
             @Override
-            public void onTabAnimationUpdate(boolean z2) {
+            protected void onTabAnimationUpdate(boolean z2) {
                 MessagePreviewView messagePreviewView = MessagePreviewView.this;
                 messagePreviewView.tabsView.setSelectedTab(messagePreviewView.viewPager.getPositionAnimated());
                 View view = this.viewPages[0];

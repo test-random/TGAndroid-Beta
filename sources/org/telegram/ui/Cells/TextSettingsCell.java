@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.LocaleController;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
@@ -26,6 +27,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RLottieImageView;
 
 public class TextSettingsCell extends FrameLayout {
+    private boolean betterLayout;
     private boolean canDisable;
     private int changeProgressStartDelay;
     private boolean drawLoading;
@@ -55,6 +57,7 @@ public class TextSettingsCell extends FrameLayout {
 
     public TextSettingsCell(Context context, int i, Theme.ResourcesProvider resourcesProvider) {
         super(context);
+        this.betterLayout = BuildVars.DEBUG_PRIVATE_VERSION;
         this.resourcesProvider = resourcesProvider;
         this.padding = i;
         TextView textView = new TextView(context);
@@ -228,7 +231,7 @@ public class TextSettingsCell extends FrameLayout {
     protected void onMeasure(int i, int i2) {
         setMeasuredDimension(View.MeasureSpec.getSize(i), AndroidUtilities.dp(50.0f) + (this.needDivider ? 1 : 0));
         int measuredWidth = ((getMeasuredWidth() - getPaddingLeft()) - getPaddingRight()) - AndroidUtilities.dp(34.0f);
-        int i3 = measuredWidth / 2;
+        int i3 = this.betterLayout ? measuredWidth : measuredWidth / 2;
         if (this.valueImageView.getVisibility() == 0) {
             this.valueImageView.measure(View.MeasureSpec.makeMeasureSpec(i3, Integer.MIN_VALUE), View.MeasureSpec.makeMeasureSpec(getMeasuredHeight(), 1073741824));
         }
@@ -238,14 +241,20 @@ public class TextSettingsCell extends FrameLayout {
             } else {
                 this.imageView.measure(View.MeasureSpec.makeMeasureSpec(i3, Integer.MIN_VALUE), View.MeasureSpec.makeMeasureSpec(getMeasuredHeight(), Integer.MIN_VALUE));
             }
+            if (this.betterLayout) {
+                i3 -= this.imageView.getMeasuredWidth() + AndroidUtilities.dp(8.0f);
+            }
         }
         BackupImageView backupImageView = this.valueBackupImageView;
         if (backupImageView != null) {
             backupImageView.measure(View.MeasureSpec.makeMeasureSpec(backupImageView.getLayoutParams().height, 1073741824), View.MeasureSpec.makeMeasureSpec(this.valueBackupImageView.getLayoutParams().width, 1073741824));
+            if (this.betterLayout) {
+                i3 -= this.valueBackupImageView.getMeasuredWidth() + AndroidUtilities.dp(8.0f);
+            }
         }
         if (this.valueTextView.getVisibility() == 0) {
             this.valueTextView.measure(View.MeasureSpec.makeMeasureSpec(i3, Integer.MIN_VALUE), View.MeasureSpec.makeMeasureSpec(getMeasuredHeight(), 1073741824));
-            measuredWidth = (measuredWidth - this.valueTextView.getMeasuredWidth()) - AndroidUtilities.dp(8.0f);
+            measuredWidth = this.betterLayout ? i3 - (this.valueTextView.getMeasuredWidth() + AndroidUtilities.dp(8.0f)) : (measuredWidth - this.valueTextView.getMeasuredWidth()) - AndroidUtilities.dp(8.0f);
             if (this.valueImageView.getVisibility() == 0) {
                 ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) this.valueImageView.getLayoutParams();
                 if (LocaleController.isRTL) {
@@ -256,6 +265,10 @@ public class TextSettingsCell extends FrameLayout {
             }
         }
         this.textView.measure(View.MeasureSpec.makeMeasureSpec(measuredWidth, 1073741824), View.MeasureSpec.makeMeasureSpec(getMeasuredHeight(), 1073741824));
+    }
+
+    public void setBetterLayout(boolean z) {
+        this.betterLayout = z;
     }
 
     public void setCanDisable(boolean z) {

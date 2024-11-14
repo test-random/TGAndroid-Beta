@@ -3963,13 +3963,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 return;
             }
         }
+        if (clickSelectsDialog()) {
+            onItemLongClick(viewPage.listView, view, i, 0.0f, 0.0f, viewPage.dialogsType, viewPage.dialogsAdapter);
+            return;
+        }
         int i2 = this.initialDialogsType;
         if (i2 == 15 && (view instanceof TextCell)) {
             viewPage.dialogsAdapter.onCreateGroupForThisClick();
-            return;
-        }
-        if (i2 == 10) {
-            onItemLongClick(viewPage.listView, view, i, 0.0f, 0.0f, viewPage.dialogsType, viewPage.dialogsAdapter);
             return;
         }
         if ((i2 == 11 || i2 == 13) && i == 1) {
@@ -4893,7 +4893,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (birthdayState == null || birthdayState.today.size() != 1) {
             UserSelectorBottomSheet.open(0L, birthdayState);
         } else {
-            showDialog(new GiftSheet(getContext(), this.currentAccount, birthdayState.today.get(0).id, null, null));
+            showDialog(new GiftSheet(getContext(), this.currentAccount, birthdayState.today.get(0).id, null, null).setBirthday());
         }
     }
 
@@ -5284,24 +5284,36 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (fixPosition < 0 || fixPosition >= dialogsArray.size() || (dialog = (TLRPC.Dialog) dialogsArray.get(fixPosition)) == null) {
                 return false;
             }
-            if (this.onlySelect) {
-                int i3 = this.initialDialogsType;
-                if ((i3 != 3 && i3 != 10) || !validateSlowModeDialog(dialog.id)) {
+            if (!this.onlySelect) {
+                if (dialog instanceof TLRPC.TL_dialogFolder) {
+                    onArchiveLongPress(view);
                     return false;
                 }
+                if (this.actionBar.isActionModeShowed() && isDialogPinned(dialog)) {
+                    return false;
+                }
+                showOrUpdateActionMode(dialog.id, view);
+                return true;
+            }
+            if ((this.initialDialogsType != 3 && !clickSelectsDialog()) || !validateSlowModeDialog(dialog.id)) {
+                return false;
+            }
+            if (this.initialDialogsType != 1 || !clickSelectsDialog() || !this.canSelectTopics || !getMessagesController().isForum(dialog.id)) {
                 addOrRemoveSelectedDialog(dialog.id, view);
                 updateSelectedCount();
                 return true;
             }
-            if (dialog instanceof TLRPC.TL_dialogFolder) {
-                onArchiveLongPress(view);
-                return false;
-            }
-            if (this.actionBar.isActionModeShowed() && isDialogPinned(dialog)) {
-                return false;
-            }
-            showOrUpdateActionMode(dialog.id, view);
-            return true;
+            Bundle bundle = new Bundle();
+            bundle.putLong("chat_id", -dialog.id);
+            bundle.putBoolean("for_select", true);
+            bundle.putBoolean("forward_to", true);
+            bundle.putBoolean("bot_share_to", this.initialDialogsType == 1);
+            bundle.putBoolean("quote", this.isQuote);
+            bundle.putBoolean("reply_to", this.isReplyTo);
+            TopicsFragment topicsFragment = new TopicsFragment(bundle);
+            topicsFragment.setForwardFromDialogFragment(this);
+            presentFragment(topicsFragment);
+            return false;
         }
         return false;
     }
@@ -7130,6 +7142,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         return true;
     }
 
+    public boolean clickSelectsDialog() {
+        return this.initialDialogsType == 10;
+    }
+
     @Override
     public boolean closeLastFragment() {
         if (!this.rightSlidingDialogContainer.hasFragment()) {
@@ -8678,6 +8694,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     public boolean isStarsSubscriptionHintVisible() {
+        int i;
         if (this.folderId != 0 || !MessagesController.getInstance(this.currentAccount).pendingSuggestions.contains("STARS_SUBSCRIPTION_LOW_BALANCE")) {
             return false;
         }
@@ -8687,9 +8704,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return false;
         }
         long j = -starsController.balance;
-        for (int i = 0; i < starsController.insufficientSubscriptions.size(); i++) {
+        while (i < starsController.insufficientSubscriptions.size()) {
             TL_stars.StarsSubscription starsSubscription = (TL_stars.StarsSubscription) starsController.insufficientSubscriptions.get(i);
-            if (getMessagesController().getChat(Long.valueOf(-DialogObject.getPeerDialogId(starsSubscription.peer))) != null) {
+            long peerDialogId = DialogObject.getPeerDialogId(starsSubscription.peer);
+            MessagesController messagesController = getMessagesController();
+            if (peerDialogId >= 0) {
+                i = messagesController.getUser(Long.valueOf(peerDialogId)) == null ? i + 1 : 0;
+                j += starsSubscription.pricing.amount;
+            } else {
+                if (messagesController.getChat(Long.valueOf(-peerDialogId)) == null) {
+                }
                 j += starsSubscription.pricing.amount;
             }
         }

@@ -135,6 +135,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     private boolean needsQualityThumb;
     private float overrideAlpha;
     private int param;
+    private Runnable parentRunnable;
     private View parentView;
     List<ImageReceiver> preloadReceivers;
     private float pressedProgress;
