@@ -2080,6 +2080,11 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         return this.windowView;
     }
 
+    @Override
+    public boolean hadDialog() {
+        return false;
+    }
+
     public boolean isFullSize() {
         Boolean bool;
         return this.fullscreen || ((bool = this.fullsize) != null ? bool.booleanValue() : this.defaultFullsize);

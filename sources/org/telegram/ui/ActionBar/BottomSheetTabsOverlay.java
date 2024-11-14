@@ -151,6 +151,8 @@ public class BottomSheetTabsOverlay extends FrameLayout {
 
         SheetView mo999getWindowView();
 
+        boolean hadDialog();
+
         void release();
 
         BottomSheetTabs.WebTabData saveState();

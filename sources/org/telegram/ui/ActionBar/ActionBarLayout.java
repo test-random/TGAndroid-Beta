@@ -2426,6 +2426,21 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         layoutParams4.height = -1;
         layoutParams4.gravity = 51;
         this.sheetContainer.setLayoutParams(layoutParams4);
+        EmptyBaseFragment emptyBaseFragment = this.sheetFragment;
+        if (emptyBaseFragment != null) {
+            emptyBaseFragment.setParentLayout(this);
+            EmptyBaseFragment emptyBaseFragment2 = this.sheetFragment;
+            View view = emptyBaseFragment2.fragmentView;
+            if (view == null) {
+                view = emptyBaseFragment2.createView(this.parentActivity);
+            }
+            if (view.getParent() != this.sheetContainer) {
+                AndroidUtilities.removeFromParent(view);
+                this.sheetContainer.addView(view, LayoutHelper.createFrame(-1, -1.0f));
+            }
+            this.sheetFragment.onResume();
+            this.sheetFragment.onBecomeFullyVisible();
+        }
         Iterator it = this.fragmentsStack.iterator();
         while (it.hasNext()) {
             ((BaseFragment) it.next()).setParentLayout(this);

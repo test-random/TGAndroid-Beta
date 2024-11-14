@@ -87,7 +87,7 @@ public class BottomSheetTabDialog extends Dialog {
         if (safeLastFragment == null) {
             return sheet;
         }
-        if (AndroidUtilities.isTablet() || AndroidUtilities.hasDialogOnTop(safeLastFragment)) {
+        if (AndroidUtilities.isTablet() || sheet.hadDialog() || AndroidUtilities.hasDialogOnTop(safeLastFragment)) {
             BottomSheetTabDialog bottomSheetTabDialog = new BottomSheetTabDialog(sheet);
             if (sheet.setDialog(bottomSheetTabDialog)) {
                 bottomSheetTabDialog.windowView.putView();

@@ -6811,13 +6811,14 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         private float backProgress;
         public View containerView;
         public final Context context;
-        private BottomSheetTabDialog dialog;
+        public BottomSheetTabDialog dialog;
         private ValueAnimator dismissAnimator;
         private float dismissProgress;
         private boolean dismissing;
         private boolean dismissingIntoTabs;
         public BaseFragment fragment;
         public boolean fullyAttachedToActionBar;
+        private boolean hadDialog;
         private boolean lastVisible;
         public boolean nestedVerticalScroll;
         private Runnable onDismissListener;
@@ -7399,6 +7400,11 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             return this.windowView;
         }
 
+        @Override
+        public boolean hadDialog() {
+            return this.hadDialog;
+        }
+
         public final boolean halfSize() {
             return true;
         }
@@ -7496,6 +7502,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             checkFullyVisible();
             updateTranslation();
             this.windowView.invalidate();
+            this.windowView.requestLayout();
         }
 
         @Override
@@ -7539,6 +7546,9 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         @Override
         public boolean setDialog(BottomSheetTabDialog bottomSheetTabDialog) {
             this.dialog = bottomSheetTabDialog;
+            if (bottomSheetTabDialog != null) {
+                this.hadDialog = true;
+            }
             return true;
         }
 
@@ -8861,7 +8871,6 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         private boolean maybeStartTracking;
         private boolean movingPage;
         private boolean openingPage;
-        private boolean selfLayout;
         private int startMovingHeaderHeight;
         private boolean startedTracking;
         private int startedTrackingPointerId;
@@ -9258,9 +9267,6 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             int systemWindowInsetLeft2;
             int systemWindowInsetTop;
             ArticleViewer articleViewer;
-            if (this.selfLayout) {
-                return;
-            }
             int i6 = i3 - i;
             int i7 = 0;
             if (ArticleViewer.this.anchorsOffsetMeasuredWidth != i6) {
@@ -13535,6 +13541,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
     }
 
     public void setParentActivity(final Activity activity, BaseFragment baseFragment) {
+        Sheet sheet;
         this.parentFragment = baseFragment;
         int currentAccount = (baseFragment == null || (baseFragment instanceof EmptyBaseFragment)) ? UserConfig.selectedAccount : baseFragment.getCurrentAccount();
         this.currentAccount = currentAccount;
@@ -13542,7 +13549,8 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.messagePlayingDidReset);
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
         NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.messagePlayingDidStart);
-        if (this.parentActivity == activity) {
+        Activity activity2 = this.parentActivity;
+        if (activity2 == activity || !(activity2 == null || !this.isSheet || (sheet = this.sheet) == null || sheet.dialog == null)) {
             updatePaintColors();
             refreshThemeColors();
             return;
@@ -13635,8 +13643,8 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         FrameLayout frameLayout3 = new FrameLayout(activity);
         this.bulletinContainer = frameLayout3;
         FrameLayout frameLayout4 = this.containerView;
-        Sheet sheet = this.sheet;
-        frameLayout4.addView(frameLayout3, LayoutHelper.createFrame(-1, -1.0f, 119, 0.0f, (sheet == null || sheet.halfSize()) ? 0.0f : 56.0f, 0.0f, 0.0f));
+        Sheet sheet2 = this.sheet;
+        frameLayout4.addView(frameLayout3, LayoutHelper.createFrame(-1, -1.0f, 119, 0.0f, (sheet2 == null || sheet2.halfSize()) ? 0.0f : 56.0f, 0.0f, 0.0f));
         this.headerPaint.setColor(-16777216);
         this.statusBarPaint.setColor(-16777216);
         this.headerProgressPaint.setColor(-14408666);
@@ -13660,17 +13668,17 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 if (ArticleViewer.this.addressBarList != null) {
                     ArticleViewer.this.addressBarList.setOpenProgress(f);
                 }
-                Sheet sheet2 = ArticleViewer.this.sheet;
-                if (sheet2 != null) {
-                    sheet2.checkNavColor();
+                Sheet sheet3 = ArticleViewer.this.sheet;
+                if (sheet3 != null) {
+                    sheet3.checkNavColor();
                 }
             }
 
             @Override
             protected void onColorsUpdated() {
-                Sheet sheet2 = ArticleViewer.this.sheet;
-                if (sheet2 != null) {
-                    sheet2.checkNavColor();
+                Sheet sheet3 = ArticleViewer.this.sheet;
+                if (sheet3 != null) {
+                    sheet3.checkNavColor();
                 }
             }
 
