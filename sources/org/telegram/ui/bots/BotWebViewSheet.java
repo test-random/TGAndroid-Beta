@@ -1957,11 +1957,14 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
 
     public void checkNavBarColor() {
         LaunchActivity launchActivity;
-        if (this.dismissed || (launchActivity = LaunchActivity.instance) == null) {
-            return;
+        if (!this.dismissed && (launchActivity = LaunchActivity.instance) != null) {
+            launchActivity.checkSystemBarColors(true, true, true, false);
+            AndroidUtilities.setNavigationBarColor(getWindow(), this.navBarColor, false);
         }
-        launchActivity.checkSystemBarColors(true, true, true, false);
-        AndroidUtilities.setNavigationBarColor(getWindow(), this.navBarColor, false);
+        WindowView windowView = this.windowView;
+        if (windowView != null) {
+            windowView.invalidate();
+        }
     }
 
     public ArticleViewer.ErrorContainer createErrorContainer() {

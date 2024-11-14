@@ -188,7 +188,7 @@ public class BotSensors {
                 SensorManager.getOrientation(fArr, new float[3]);
                 try {
                     JSONObject jSONObject = new JSONObject();
-                    jSONObject.put("alpha", r0[0]);
+                    jSONObject.put("alpha", -r0[0]);
                     jSONObject.put("beta", -r0[1]);
                     jSONObject.put("gamma", r0[2]);
                     BotSensors.this.webView.evaluateJS("window.Telegram.WebView.receiveEvent('device_orientation_changed', " + jSONObject + ");");
