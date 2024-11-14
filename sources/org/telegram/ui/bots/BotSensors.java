@@ -63,15 +63,15 @@ public class BotSensors {
         }
 
         public void post() {
-            if (this.xyz == null) {
+            if (BotSensors.this.webView == null || this.xyz == null) {
                 return;
             }
             this.lastTime = System.currentTimeMillis();
             try {
                 JSONObject jSONObject = new JSONObject();
-                jSONObject.put("x", this.xyz[0]);
-                jSONObject.put("y", this.xyz[1]);
-                jSONObject.put("z", this.xyz[2]);
+                jSONObject.put("x", -this.xyz[0]);
+                jSONObject.put("y", -this.xyz[1]);
+                jSONObject.put("z", -this.xyz[2]);
                 BotSensors.this.webView.evaluateJS("window.Telegram.WebView.receiveEvent('accelerometer_changed', " + jSONObject + ");");
             } catch (Exception unused) {
             }
@@ -118,6 +118,9 @@ public class BotSensors {
         }
 
         public void post() {
+            if (BotSensors.this.webView == null) {
+                return;
+            }
             this.lastTime = System.currentTimeMillis();
             float[] fArr = this.captured;
             try {
@@ -176,7 +179,7 @@ public class BotSensors {
         }
 
         public void post() {
-            if (this.gravity == null || this.geomagnetic == null) {
+            if (this.gravity == null || this.geomagnetic == null || BotSensors.this.webView == null) {
                 return;
             }
             this.lastTime = System.currentTimeMillis();

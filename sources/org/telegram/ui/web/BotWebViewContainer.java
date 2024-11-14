@@ -4145,7 +4145,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
             f = 0.0f;
             f2 = -0.15f;
         } else {
-            f = 0.05f;
+            f = 0.025f;
             f2 = 0.15f;
         }
         int adaptHSV = Theme.adaptHSV(i, f, f2);
