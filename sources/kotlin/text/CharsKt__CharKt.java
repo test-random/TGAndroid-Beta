@@ -1,6 +1,6 @@
 package kotlin.text;
 
-abstract class CharsKt__CharKt extends CharsKt__CharJVMKt {
+public abstract class CharsKt__CharKt extends CharsKt__CharJVMKt {
     public static final boolean equals(char c, char c2, boolean z) {
         if (c == c2) {
             return true;

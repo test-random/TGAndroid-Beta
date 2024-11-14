@@ -1464,61 +1464,32 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         int stableInsetTop;
         int stableInsetRight;
         int stableInsetBottom;
-        int systemWindowInsetBottom;
         WindowInsets consumeSystemWindowInsets;
         WindowInsets windowInsets2;
-        WindowInsets rootWindowInsets;
-        WindowInsets rootWindowInsets2;
-        int stableInsetLeft2;
-        int stableInsetTop2;
-        int stableInsetRight2;
-        int stableInsetBottom2;
-        WindowInsets rootWindowInsets3;
-        int i = Build.VERSION.SDK_INT;
-        if (i >= 29) {
-            rootWindowInsets3 = view.getRootWindowInsets();
-            Insets insets = WindowInsetsCompat.toWindowInsetsCompat(rootWindowInsets3, view).getInsets(WindowInsetsCompat.Type.navigationBars());
-            this.navInsets.set(insets.left, insets.top, insets.right, insets.bottom);
-        } else {
-            this.navInsets.set(0, 0, 0, AndroidUtilities.navigationBarHeight);
+        WindowInsetsCompat windowInsetsCompat = WindowInsetsCompat.toWindowInsetsCompat(windowInsets, view);
+        Insets insets = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.navigationBars());
+        this.navInsets.set(insets.left, insets.top, insets.right, insets.bottom);
+        Insets insets2 = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.statusBars());
+        Rect rect = this.insets;
+        int i = insets2.left;
+        stableInsetLeft = windowInsets.getStableInsetLeft();
+        int max = Math.max(i, stableInsetLeft);
+        int i2 = insets2.top;
+        stableInsetTop = windowInsets.getStableInsetTop();
+        int max2 = Math.max(i2, stableInsetTop);
+        int i3 = insets2.right;
+        stableInsetRight = windowInsets.getStableInsetRight();
+        int max3 = Math.max(i3, stableInsetRight);
+        int i4 = insets2.bottom;
+        stableInsetBottom = windowInsets.getStableInsetBottom();
+        rect.set(max, max2, max3, Math.max(i4, stableInsetBottom));
+        int i5 = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+        if (i5 <= this.insets.bottom || i5 <= AndroidUtilities.dp(20.0f)) {
+            i5 = 0;
         }
-        if (i >= 29) {
-            rootWindowInsets2 = view.getRootWindowInsets();
-            Insets insets2 = WindowInsetsCompat.toWindowInsetsCompat(rootWindowInsets2, view).getInsets(WindowInsetsCompat.Type.displayCutout());
-            Rect rect = this.insets;
-            int i2 = insets2.left;
-            stableInsetLeft2 = windowInsets.getStableInsetLeft();
-            int max = Math.max(i2, stableInsetLeft2);
-            int i3 = insets2.top;
-            stableInsetTop2 = windowInsets.getStableInsetTop();
-            int max2 = Math.max(i3, stableInsetTop2);
-            int i4 = insets2.right;
-            stableInsetRight2 = windowInsets.getStableInsetRight();
-            int max3 = Math.max(i4, stableInsetRight2);
-            int i5 = insets2.bottom;
-            stableInsetBottom2 = windowInsets.getStableInsetBottom();
-            rect.set(max, max2, max3, Math.max(i5, stableInsetBottom2));
-        } else {
-            Rect rect2 = this.insets;
-            stableInsetLeft = windowInsets.getStableInsetLeft();
-            stableInsetTop = windowInsets.getStableInsetTop();
-            stableInsetRight = windowInsets.getStableInsetRight();
-            stableInsetBottom = windowInsets.getStableInsetBottom();
-            rect2.set(stableInsetLeft, stableInsetTop, stableInsetRight, stableInsetBottom);
-        }
-        if (i >= 29) {
-            rootWindowInsets = view.getRootWindowInsets();
-            systemWindowInsetBottom = WindowInsetsCompat.toWindowInsetsCompat(rootWindowInsets, view).getInsets(WindowInsetsCompat.Type.ime()).bottom;
-        } else {
-            systemWindowInsetBottom = windowInsets.getSystemWindowInsetBottom();
-        }
-        if (systemWindowInsetBottom > this.insets.bottom) {
-            this.keyboardInset = systemWindowInsetBottom;
-        } else {
-            this.keyboardInset = 0;
-        }
+        this.keyboardInset = i5;
         updateFullscreenLayout();
-        if (i >= 30) {
+        if (Build.VERSION.SDK_INT >= 30) {
             windowInsets2 = WindowInsets.CONSUMED;
             return windowInsets2;
         }
