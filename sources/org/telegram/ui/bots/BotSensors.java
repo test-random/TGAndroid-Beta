@@ -11,6 +11,8 @@ import org.telegram.ui.bots.BotSensors;
 import org.telegram.ui.web.BotWebViewContainer;
 
 public class BotSensors {
+    private long absoluteOrientationDesiredRefreshRate;
+    private Runnable absoluteOrientationListenerPostponed;
     private Sensor accelerometer;
     private long accelerometerDesiredRefreshRate;
     private Runnable accelerometerListenerPostponed;
@@ -18,15 +20,17 @@ public class BotSensors {
     private long gyroscopeDesiredRefreshRate;
     private Runnable gyroscopeListenerPostponed;
     private Sensor orientationAccelerometer;
-    private long orientationDesiredRefreshRate;
-    private Runnable orientationListenerPostponed;
     private Sensor orientationMagnetometer;
     private boolean paused;
+    private long relativeOrientationDesiredRefreshRate;
+    private Runnable relativeOrientationListenerPostponed;
+    private Sensor rotation;
     private final SensorManager sensorManager;
     private BotWebViewContainer.MyWebView webView;
     private final SensorEventListener accelerometerListener = new AnonymousClass1();
     private final SensorEventListener gyroscopeListener = new AnonymousClass2();
-    private final SensorEventListener orientationListener = new AnonymousClass3();
+    private final SensorEventListener absoluteOrientationListener = new AnonymousClass3();
+    private final SensorEventListener relativeOrientationListener = new AnonymousClass4();
 
     public class AnonymousClass1 implements SensorEventListener {
         private long lastTime;
@@ -152,30 +156,30 @@ public class BotSensors {
 
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
-            if (BotSensors.this.orientationListenerPostponed != null) {
-                AndroidUtilities.cancelRunOnUIThread(BotSensors.this.orientationListenerPostponed);
-                BotSensors.this.orientationListenerPostponed = null;
+            if (BotSensors.this.absoluteOrientationListenerPostponed != null) {
+                AndroidUtilities.cancelRunOnUIThread(BotSensors.this.absoluteOrientationListenerPostponed);
+                BotSensors.this.absoluteOrientationListenerPostponed = null;
             }
             if (BotSensors.this.paused || BotSensors.this.webView == null) {
                 return;
             }
             long currentTimeMillis = System.currentTimeMillis() - this.lastTime;
-            if (currentTimeMillis < BotSensors.this.orientationDesiredRefreshRate) {
-                AndroidUtilities.runOnUIThread(BotSensors.this.orientationListenerPostponed = new Runnable() {
-                    @Override
-                    public final void run() {
-                        BotSensors.AnonymousClass3.this.post();
-                    }
-                }, BotSensors.this.orientationDesiredRefreshRate - currentTimeMillis);
-                return;
-            }
             if (sensorEvent.sensor.getType() == 1) {
                 this.gravity = sensorEvent.values;
             }
             if (sensorEvent.sensor.getType() == 2) {
                 this.geomagnetic = sensorEvent.values;
             }
-            post();
+            if (currentTimeMillis >= BotSensors.this.absoluteOrientationDesiredRefreshRate) {
+                post();
+            } else {
+                AndroidUtilities.runOnUIThread(BotSensors.this.absoluteOrientationListenerPostponed = new Runnable() {
+                    @Override
+                    public final void run() {
+                        BotSensors.AnonymousClass3.this.post();
+                    }
+                }, BotSensors.this.absoluteOrientationDesiredRefreshRate - currentTimeMillis);
+            }
         }
 
         public void post() {
@@ -195,6 +199,75 @@ public class BotSensors {
                     BotSensors.this.webView.evaluateJS("window.Telegram.WebView.receiveEvent('device_orientation_changed', " + jSONObject + ");");
                 } catch (Exception unused) {
                 }
+            }
+        }
+    }
+
+    public class AnonymousClass4 implements SensorEventListener {
+        private long lastTime;
+        private float[] mDeviceRotationMatrix;
+        private float[] mTruncatedRotationVector;
+        private float[] values;
+
+        AnonymousClass4() {
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            if (BotSensors.this.relativeOrientationListenerPostponed != null) {
+                AndroidUtilities.cancelRunOnUIThread(BotSensors.this.relativeOrientationListenerPostponed);
+                BotSensors.this.relativeOrientationListenerPostponed = null;
+            }
+            if (BotSensors.this.paused || BotSensors.this.webView == null) {
+                return;
+            }
+            long currentTimeMillis = System.currentTimeMillis() - this.lastTime;
+            if (currentTimeMillis < BotSensors.this.relativeOrientationDesiredRefreshRate) {
+                AndroidUtilities.runOnUIThread(BotSensors.this.relativeOrientationListenerPostponed = new Runnable() {
+                    @Override
+                    public final void run() {
+                        BotSensors.AnonymousClass4.this.post();
+                    }
+                }, BotSensors.this.relativeOrientationDesiredRefreshRate - currentTimeMillis);
+            } else {
+                if (sensorEvent.sensor.getType() == 15) {
+                    this.values = sensorEvent.values;
+                }
+                post();
+            }
+        }
+
+        public void post() {
+            if (this.values == null || BotSensors.this.webView == null) {
+                return;
+            }
+            this.lastTime = System.currentTimeMillis();
+            if (this.mDeviceRotationMatrix == null) {
+                this.mDeviceRotationMatrix = new float[9];
+            }
+            if (this.mTruncatedRotationVector == null) {
+                this.mTruncatedRotationVector = new float[4];
+            }
+            float[] fArr = this.values;
+            if (fArr.length > 4) {
+                System.arraycopy(fArr, 0, this.mTruncatedRotationVector, 0, 4);
+                SensorManager.getRotationMatrixFromVector(this.mDeviceRotationMatrix, this.mTruncatedRotationVector);
+            } else {
+                SensorManager.getRotationMatrixFromVector(this.mDeviceRotationMatrix, fArr);
+            }
+            SensorManager.getOrientation(this.mDeviceRotationMatrix, new float[3]);
+            try {
+                JSONObject jSONObject = new JSONObject();
+                jSONObject.put("absolute", false);
+                jSONObject.put("alpha", -r0[0]);
+                jSONObject.put("beta", -r0[1]);
+                jSONObject.put("gamma", r0[2]);
+                BotSensors.this.webView.evaluateJS("window.Telegram.WebView.receiveEvent('device_orientation_changed', " + jSONObject + ");");
+            } catch (Exception unused) {
             }
         }
     }
@@ -248,16 +321,25 @@ public class BotSensors {
             }
             Sensor sensor3 = this.orientationAccelerometer;
             if (sensor3 != null) {
-                this.sensorManager.unregisterListener(this.orientationListener, sensor3);
+                this.sensorManager.unregisterListener(this.absoluteOrientationListener, sensor3);
             }
             Sensor sensor4 = this.orientationMagnetometer;
             if (sensor4 != null) {
-                this.sensorManager.unregisterListener(this.orientationListener, sensor4);
+                this.sensorManager.unregisterListener(this.absoluteOrientationListener, sensor4);
             }
-            Runnable runnable3 = this.orientationListenerPostponed;
+            Runnable runnable3 = this.absoluteOrientationListenerPostponed;
             if (runnable3 != null) {
                 AndroidUtilities.cancelRunOnUIThread(runnable3);
-                this.orientationListenerPostponed = null;
+                this.absoluteOrientationListenerPostponed = null;
+            }
+            Sensor sensor5 = this.rotation;
+            if (sensor5 != null) {
+                this.sensorManager.unregisterListener(this.relativeOrientationListener, sensor5);
+            }
+            Runnable runnable4 = this.relativeOrientationListenerPostponed;
+            if (runnable4 != null) {
+                AndroidUtilities.cancelRunOnUIThread(runnable4);
+                this.relativeOrientationListenerPostponed = null;
             }
         }
     }
@@ -277,11 +359,15 @@ public class BotSensors {
                 }
                 Sensor sensor3 = this.orientationAccelerometer;
                 if (sensor3 != null) {
-                    this.sensorManager.registerListener(this.orientationListener, sensor3, getSensorDelay(this.orientationDesiredRefreshRate));
+                    this.sensorManager.registerListener(this.absoluteOrientationListener, sensor3, getSensorDelay(this.absoluteOrientationDesiredRefreshRate));
                 }
                 Sensor sensor4 = this.orientationMagnetometer;
                 if (sensor4 != null) {
-                    this.sensorManager.registerListener(this.orientationListener, sensor4, getSensorDelay(this.orientationDesiredRefreshRate));
+                    this.sensorManager.registerListener(this.absoluteOrientationListener, sensor4, getSensorDelay(this.absoluteOrientationDesiredRefreshRate));
+                }
+                Sensor sensor5 = this.rotation;
+                if (sensor5 != null) {
+                    this.sensorManager.registerListener(this.relativeOrientationListener, sensor5, getSensorDelay(this.relativeOrientationDesiredRefreshRate));
                 }
             }
         }
@@ -327,25 +413,70 @@ public class BotSensors {
         return true;
     }
 
-    public boolean startOrientation(long j) {
-        SensorManager sensorManager = this.sensorManager;
-        if (sensorManager == null) {
+    public boolean startOrientation(boolean z, long j) {
+        Sensor sensor;
+        if (this.sensorManager == null) {
             return false;
         }
-        if (this.orientationMagnetometer != null && this.orientationAccelerometer != null) {
-            return true;
-        }
-        this.orientationAccelerometer = sensorManager.getDefaultSensor(1);
-        Sensor defaultSensor = this.sensorManager.getDefaultSensor(2);
-        this.orientationMagnetometer = defaultSensor;
-        Sensor sensor = this.orientationAccelerometer;
-        if (sensor == null || defaultSensor == null) {
-            return false;
-        }
-        this.orientationDesiredRefreshRate = j;
-        if (!this.paused) {
-            this.sensorManager.registerListener(this.orientationListener, sensor, getSensorDelay(j));
-            this.sensorManager.registerListener(this.orientationListener, this.orientationMagnetometer, getSensorDelay(j));
+        if (z) {
+            if (this.rotation != null) {
+                Runnable runnable = this.relativeOrientationListenerPostponed;
+                if (runnable != null) {
+                    AndroidUtilities.cancelRunOnUIThread(runnable);
+                    this.relativeOrientationListenerPostponed = null;
+                }
+                if (!this.paused && (sensor = this.rotation) != null) {
+                    this.sensorManager.unregisterListener(this.relativeOrientationListener, sensor);
+                }
+                this.rotation = null;
+            }
+            if (this.orientationMagnetometer != null && this.orientationAccelerometer != null) {
+                return true;
+            }
+            this.orientationAccelerometer = this.sensorManager.getDefaultSensor(1);
+            Sensor defaultSensor = this.sensorManager.getDefaultSensor(2);
+            this.orientationMagnetometer = defaultSensor;
+            Sensor sensor2 = this.orientationAccelerometer;
+            if (sensor2 == null || defaultSensor == null) {
+                return false;
+            }
+            this.absoluteOrientationDesiredRefreshRate = j;
+            if (!this.paused) {
+                this.sensorManager.registerListener(this.absoluteOrientationListener, sensor2, getSensorDelay(j));
+                this.sensorManager.registerListener(this.absoluteOrientationListener, this.orientationMagnetometer, getSensorDelay(j));
+            }
+        } else {
+            if (this.orientationMagnetometer != null || this.orientationAccelerometer != null) {
+                Runnable runnable2 = this.absoluteOrientationListenerPostponed;
+                if (runnable2 != null) {
+                    AndroidUtilities.cancelRunOnUIThread(runnable2);
+                    this.absoluteOrientationListenerPostponed = null;
+                }
+                if (!this.paused) {
+                    Sensor sensor3 = this.orientationAccelerometer;
+                    if (sensor3 != null) {
+                        this.sensorManager.unregisterListener(this.absoluteOrientationListener, sensor3);
+                    }
+                    Sensor sensor4 = this.orientationMagnetometer;
+                    if (sensor4 != null) {
+                        this.sensorManager.unregisterListener(this.absoluteOrientationListener, sensor4);
+                    }
+                }
+                this.orientationAccelerometer = null;
+                this.orientationMagnetometer = null;
+            }
+            if (this.rotation != null) {
+                return true;
+            }
+            Sensor defaultSensor2 = this.sensorManager.getDefaultSensor(15);
+            this.rotation = defaultSensor2;
+            if (defaultSensor2 == null) {
+                return false;
+            }
+            this.relativeOrientationDesiredRefreshRate = j;
+            if (!this.paused) {
+                this.sensorManager.registerListener(this.relativeOrientationListener, defaultSensor2, getSensorDelay(j));
+            }
         }
         return true;
     }
@@ -404,25 +535,35 @@ public class BotSensors {
             return false;
         }
         Sensor sensor = this.orientationAccelerometer;
-        if (sensor == null && this.orientationMagnetometer == null) {
+        if (sensor == null && this.orientationMagnetometer == null && this.rotation == null) {
             return true;
         }
         if (!this.paused) {
             if (sensor != null) {
-                sensorManager.unregisterListener(this.orientationListener, sensor);
+                sensorManager.unregisterListener(this.absoluteOrientationListener, sensor);
             }
             Sensor sensor2 = this.orientationMagnetometer;
             if (sensor2 != null) {
-                this.sensorManager.unregisterListener(this.orientationListener, sensor2);
+                this.sensorManager.unregisterListener(this.absoluteOrientationListener, sensor2);
+            }
+            Sensor sensor3 = this.rotation;
+            if (sensor3 != null) {
+                this.sensorManager.unregisterListener(this.relativeOrientationListener, sensor3);
             }
         }
-        Runnable runnable = this.orientationListenerPostponed;
+        Runnable runnable = this.absoluteOrientationListenerPostponed;
         if (runnable != null) {
             AndroidUtilities.cancelRunOnUIThread(runnable);
-            this.orientationListenerPostponed = null;
+            this.absoluteOrientationListenerPostponed = null;
+        }
+        Runnable runnable2 = this.relativeOrientationListenerPostponed;
+        if (runnable2 != null) {
+            AndroidUtilities.cancelRunOnUIThread(runnable2);
+            this.relativeOrientationListenerPostponed = null;
         }
         this.orientationAccelerometer = null;
         this.orientationMagnetometer = null;
+        this.rotation = null;
         return true;
     }
 }
