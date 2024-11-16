@@ -1229,6 +1229,8 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             this.recentSearchObjectsById.clear();
             sb = new StringBuilder("1");
         }
+        String str = this.lastSearchText;
+        filterRecent(str != null ? str.trim() : null);
         notifyDataSetChanged();
         MessagesStorage.getInstance(this.currentAccount).getStorageQueue().postRunnable(new Runnable() {
             @Override
@@ -1688,6 +1690,8 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         return new RecyclerListView.Holder(view);
     }
 
+    public abstract void openBotApp(TLRPC.User user);
+
     protected abstract void openPublicPosts();
 
     public void putRecentSearch(final long j, TLObject tLObject) {
@@ -1702,6 +1706,8 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         recentSearchObject.did = j;
         recentSearchObject.object = tLObject;
         recentSearchObject.date = (int) (System.currentTimeMillis() / 1000);
+        String str = this.lastSearchText;
+        filterRecent(str != null ? str.trim() : null);
         notifyDataSetChanged();
         MessagesStorage.getInstance(this.currentAccount).getStorageQueue().postRunnable(new Runnable() {
             @Override

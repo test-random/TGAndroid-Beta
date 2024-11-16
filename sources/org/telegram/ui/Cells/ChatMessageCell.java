@@ -4970,7 +4970,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         TLRPC.Message message;
         GroupMedia groupMedia;
         MessageObject messageObject = this.currentMessageObject;
-        return (messageObject == null || (message = messageObject.messageOwner) == null || ((messageObject.type != 29 || ((groupMedia = this.groupMedia) != null && !groupMedia.hidden)) && !message.noforwards && !messageObject.isVoiceOnce() && !this.currentMessageObject.hasRevealedExtendedMedia())) ? false : true;
+        return (messageObject == null || (message = messageObject.messageOwner) == null || ((messageObject.type != 29 || ((groupMedia = this.groupMedia) != null && groupMedia.hidden)) && !message.noforwards && !messageObject.isVoiceOnce() && !this.currentMessageObject.hasRevealedExtendedMedia())) ? false : true;
     }
 
     private int layoutFactCheck(int r28) {

@@ -7968,6 +7968,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             return;
         }
         final AlertDialog alertDialog = new AlertDialog(getContext(), 3);
+        alertDialog.showDelayed(200L);
         final int loadGiftOptions = BoostRepository.loadGiftOptions(this.currentAccount, null, new Utilities.Callback() {
             @Override
             public final void run(Object obj) {
@@ -7980,7 +7981,6 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 ChatActivityEnterView.this.lambda$createGiftButton$9(loadGiftOptions, dialogInterface);
             }
         });
-        alertDialog.showDelayed(200L);
     }
 
     public void lambda$createGiftButton$8(AlertDialog alertDialog, TLRPC.User user, boolean z, List list) {

@@ -79,8 +79,9 @@ public abstract class SetupEmojiStatusSheet {
                 }
             }, 0L, 320L, CubicBezierInterpolator.EASE_OUT_QUINT);
             this.highlight = false;
-            paint.setColor(-1);
-            paint2.setColor(-1);
+            int i = Theme.key_windowBackgroundWhite;
+            paint.setColor(Theme.getColor(i));
+            paint2.setColor(Theme.getColor(i));
             paint2.setShadowLayer(AndroidUtilities.dp(2.33f), 0.0f, AndroidUtilities.dp(2.0f), Theme.multAlpha(-16777216, 0.18f));
             AvatarDrawable avatarDrawable = new AvatarDrawable();
             avatarDrawable.setInfo(user);
@@ -109,8 +110,9 @@ public abstract class SetupEmojiStatusSheet {
                 }
             }, 0L, 320L, CubicBezierInterpolator.EASE_OUT_QUINT);
             this.highlight = true;
-            paint.setColor(-1);
-            paint2.setColor(-1);
+            int i = Theme.key_windowBackgroundWhite;
+            paint.setColor(Theme.getColor(i));
+            paint2.setColor(Theme.getColor(i));
             paint2.setShadowLayer(AndroidUtilities.dp(2.33f), 0.0f, AndroidUtilities.dp(2.0f), Theme.multAlpha(-16777216, 0.18f));
             AvatarDrawable avatarDrawable = new AvatarDrawable();
             avatarDrawable.setInfo(user);
@@ -147,7 +149,7 @@ public abstract class SetupEmojiStatusSheet {
             RectF rectF = this.rect;
             imageReceiver.setImageCoords(rectF.left, rectF.top, AndroidUtilities.dp(32.0f), AndroidUtilities.dp(32.0f));
             this.userImageReceiver.draw(canvas);
-            this.text.draw(canvas, AndroidUtilities.dp(36.0f) + this.rect.left, this.rect.centerY(), -16777216, 1.0f);
+            this.text.draw(canvas, AndroidUtilities.dp(36.0f) + this.rect.left, this.rect.centerY(), Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), 1.0f);
             if (this.highlight) {
                 float dp3 = this.rect.right - AndroidUtilities.dp(22.66f);
                 canvas.drawCircle(dp3, this.rect.centerY(), AndroidUtilities.dp(24.0f), this.backgroundPaint2);

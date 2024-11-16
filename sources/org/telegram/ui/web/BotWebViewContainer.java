@@ -70,10 +70,8 @@ import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.DownloadController;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MrzRecognizer;
@@ -94,7 +92,6 @@ import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarLayout;
-import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
@@ -3851,61 +3848,8 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         return this.isPageLoaded;
     }
 
-    public void loadFlickerAndSettingsItem(int i, long j, ActionBarMenuSubItem actionBarMenuSubItem) {
-        TLRPC.TL_attachMenuBot tL_attachMenuBot;
-        TL_bots.BotInfo botInfo;
-        TL_bots.botAppSettings botappsettings;
-        TLRPC.User user = MessagesController.getInstance(i).getUser(Long.valueOf(j));
-        TLRPC.UserFull userFull = MessagesController.getInstance(i).getUserFull(j);
-        String publicUsername = UserObject.getPublicUsername(user);
-        if (publicUsername != null && publicUsername.equals("DurgerKingBot")) {
-            this.flickerView.setVisibility(0);
-            this.flickerView.setAlpha(1.0f);
-            this.flickerView.setImage(null, null, SvgHelper.getDrawable(R.raw.durgerking_placeholder, Integer.valueOf(getColor(Theme.key_windowBackgroundGray))));
-            setupFlickerParams(false);
-            return;
-        }
-        Iterator<TLRPC.TL_attachMenuBot> it = MediaDataController.getInstance(i).getAttachMenuBots().bots.iterator();
-        while (true) {
-            if (!it.hasNext()) {
-                tL_attachMenuBot = null;
-                break;
-            } else {
-                tL_attachMenuBot = it.next();
-                if (tL_attachMenuBot.bot_id == j) {
-                    break;
-                }
-            }
-        }
-        boolean z = true;
-        if (tL_attachMenuBot != null) {
-            TLRPC.TL_attachMenuBotIcon placeholderStaticAttachMenuBotIcon = MediaDataController.getPlaceholderStaticAttachMenuBotIcon(tL_attachMenuBot);
-            if (placeholderStaticAttachMenuBotIcon == null) {
-                placeholderStaticAttachMenuBotIcon = MediaDataController.getStaticAttachMenuBotIcon(tL_attachMenuBot);
-            } else {
-                z = false;
-            }
-            if (placeholderStaticAttachMenuBotIcon == null) {
-                return;
-            }
-            this.flickerView.setVisibility(0);
-            this.flickerView.setAlpha(1.0f);
-            this.flickerView.setImage(ImageLocation.getForDocument(placeholderStaticAttachMenuBotIcon.icon), (String) null, (Drawable) null, tL_attachMenuBot);
-        } else {
-            if (userFull == null || (botInfo = userFull.bot_info) == null || (botappsettings = botInfo.app_settings) == null || botappsettings.placeholder_svg_path == null) {
-                return;
-            }
-            this.flickerView.setVisibility(0);
-            this.flickerView.setAlpha(1.0f);
-            SvgHelper.SvgDrawable drawableByPath = SvgHelper.getDrawableByPath(userFull.bot_info.app_settings.placeholder_svg_path, 512, 512);
-            this.flickerViewDrawable = drawableByPath;
-            if (drawableByPath != null) {
-                drawableByPath.setColor(this.flickerViewColor);
-                this.flickerViewDrawable.setupGradient(Theme.key_bot_loadingIcon, this.resourcesProvider, 1.0f, false);
-            }
-            this.flickerView.setImage(null, null, this.flickerViewDrawable);
-        }
-        setupFlickerParams(z);
+    public void loadFlickerAndSettingsItem(int r10, long r11, org.telegram.ui.ActionBar.ActionBarMenuSubItem r13) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.web.BotWebViewContainer.loadFlickerAndSettingsItem(int, long, org.telegram.ui.ActionBar.ActionBarMenuSubItem):void");
     }
 
     public void loadUrl(int i, final String str) {

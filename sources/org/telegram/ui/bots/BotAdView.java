@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -88,6 +89,7 @@ public class BotAdView extends FrameLayout {
         LinkSpanDrawable.LinksTextView linksTextView = new LinkSpanDrawable.LinksTextView(context);
         this.textView = linksTextView;
         linksTextView.setTextSize(1, 13.0f);
+        linksTextView.setLinkTextColor(Theme.getColor(Theme.key_chat_messageLinkIn, resourcesProvider));
         linksTextView.setTextColor(Theme.getColor(i2, resourcesProvider));
         linearLayout2.addView(linksTextView, LayoutHelper.createLinear(-1, -2, 0.0f, 0.0f, 0.0f, 0.0f));
         NotificationCenter.listenEmojiLoading(linksTextView);
@@ -120,6 +122,16 @@ public class BotAdView extends FrameLayout {
     public void lambda$set$1(ChatActivity chatActivity, MessageObject messageObject, ClickableSpan clickableSpan) {
         if (chatActivity != null) {
             chatActivity.logSponsoredClicked(messageObject, false, false);
+        }
+        if (clickableSpan instanceof URLSpan) {
+            String url = ((URLSpan) clickableSpan).getURL();
+            if (url != null) {
+                url = url.trim();
+            }
+            if (chatActivity != null && url != null && (url.startsWith("$") || url.startsWith("#"))) {
+                chatActivity.openHashtagSearch(url, true);
+                return;
+            }
         }
         clickableSpan.onClick(this.textView);
     }

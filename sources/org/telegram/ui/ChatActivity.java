@@ -20980,7 +20980,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         };
         final ItemOptions makeSwipeback = makeOptions.makeSwipeback();
-        makeSwipeback.add(R.drawable.ic_ab_back, LocaleController.getString(R.string.Back), new ChatActivity$$ExternalSyntheticLambda229(makeOptions));
+        makeSwipeback.add(R.drawable.ic_ab_back, LocaleController.getString(R.string.Back), new ChatActivity$$ExternalSyntheticLambda230(makeOptions));
         makeSwipeback.addGap();
         makeSwipeback.add(R.drawable.msg_addbot, LocaleController.getString(R.string.CreateNewContact), new Runnable() {
             @Override
@@ -28001,7 +28001,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 lambda$applyChatLinkMessageMaybe$230 = ChatActivity.this.lambda$applyChatLinkMessageMaybe$230((TLRPC.MessageEntity) obj);
                 return lambda$applyChatLinkMessageMaybe$230;
             }
-        }).collect(Collectors.toCollection(new ChatActivity$$ExternalSyntheticLambda294())), this.resolvedChatLink.message, this.chatActivityEnterView.getEditField().getPaint().getFontMetricsInt());
+        }).collect(Collectors.toCollection(new ChatActivity$$ExternalSyntheticLambda295())), this.resolvedChatLink.message, this.chatActivityEnterView.getEditField().getPaint().getFontMetricsInt());
         if (applyMessageEntities != null && applyMessageEntities.length() > 0 && applyMessageEntities.charAt(0) == '@') {
             applyMessageEntities = TextUtils.concat(" ", applyMessageEntities);
         }
@@ -31322,8 +31322,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public void lambda$openHashtagSearch$325(final String str) {
-        boolean z;
+    public void lambda$openHashtagSearch$325(String str) {
+        openHashtagSearch(str, false);
+    }
+
+    public void openHashtagSearch(final String str, boolean z) {
+        boolean z2;
         ChatSearchTabs chatSearchTabs;
         ActionBarMenuItem actionBarMenuItem;
         if (str.isEmpty()) {
@@ -31332,17 +31336,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (str.startsWith("#") || str.startsWith("$")) {
             HintView2 hintView2 = this.savedMessagesHint;
             if (hintView2 == null || !hintView2.shown()) {
-                z = false;
+                z2 = false;
             } else {
                 this.savedMessagesHint.hide();
-                z = true;
+                z2 = true;
             }
             HintView2 hintView22 = this.savedMessagesSearchHint;
             if (hintView22 != null && hintView22.shown()) {
                 this.savedMessagesSearchHint.hide();
-                z = true;
+                z2 = true;
             }
-            if (z) {
+            if (z2) {
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public final void run() {
@@ -31392,7 +31396,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (imageView != null) {
                 imageView.setVisibility(8);
             }
-            if (contains || (ChatObject.isChannelAndNotMegaGroup(this.currentChat) && ChatObject.isPublic(this.currentChat) && this.searchingHashtag != null)) {
+            if (contains || z || (ChatObject.isChannelAndNotMegaGroup(this.currentChat) && ChatObject.isPublic(this.currentChat) && this.searchingHashtag != null)) {
                 this.defaultSearchPage = 2;
             } else {
                 this.defaultSearchPage = 0;
@@ -31429,7 +31433,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 this.messagesSearchListContainer.setPadding(0, 0, 0, getHashtagTabsHeight());
                 updateSearchListEmptyView();
             }
-            if (contains && this.searchingHashtag != null && (chatSearchTabs = this.hashtagSearchTabs) != null) {
+            if ((contains || z) && this.searchingHashtag != null && (chatSearchTabs = this.hashtagSearchTabs) != null) {
                 int currentPosition = chatSearchTabs.tabs.getCurrentPosition();
                 int i = this.defaultSearchPage;
                 if (currentPosition != i) {

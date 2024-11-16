@@ -7773,7 +7773,7 @@ public class MessagesController extends BaseController implements NotificationCe
             }
             botWebViewSheet = new BotWebViewSheet(baseFragment2.getContext(), baseFragment2.getResourceProvider());
             botWebViewSheet.setDefaultFullsize(true);
-            botWebViewSheet.setNeedsContext(true);
+            botWebViewSheet.setNeedsContext(false);
         } else {
             TL_bots.BotInfo botInfo = botInfoArr[0];
             if (botInfo == null || !(botInfo.menu_button instanceof TL_bots.TL_botMenuButton)) {

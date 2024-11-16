@@ -693,7 +693,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
             return (i3 == 0 && i2 == 0) ? LocaleController.getString("P2PContacts", R.string.P2PContacts) : (i3 == 0 || i2 == 0) ? i2 != 0 ? LocaleController.formatString(R.string.P2PContactsMinus, Integer.valueOf(i2)) : LocaleController.formatString(R.string.P2PContactsPlus, Integer.valueOf(i3)) : LocaleController.formatString(R.string.P2PContactsMinusPlus, Integer.valueOf(i2), Integer.valueOf(i3));
         }
         if (i3 == 0 && i2 == 0) {
-            return z ? LocaleController.getString(R.string.LastSeenContactsPremium) : (bool2 == null || !bool2.booleanValue()) ? LocaleController.getString(R.string.LastSeenContacts) : LocaleController.getString(R.string.PrivacyValueOnlyBots);
+            return z ? LocaleController.getString(R.string.LastSeenContactsPremium) : (bool2 == null || !bool2.booleanValue()) ? LocaleController.getString(R.string.LastSeenContacts) : LocaleController.getString(R.string.PrivacyContactsAndBotUsers);
         }
         if (i3 != 0 && i2 != 0) {
             return LocaleController.formatString((bool2 == null || !bool2.booleanValue()) ? z ? R.string.LastSeenContactsPremiumMinusPlus : R.string.LastSeenContactsMinusPlus : R.string.PrivacyContactsAndBotUsersMinusPlus, Integer.valueOf(i2), Integer.valueOf(i3));

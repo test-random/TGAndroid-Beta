@@ -368,7 +368,7 @@ public class BotLocation {
         float verticalAccuracyMeters;
         JSONObject jSONObject = new JSONObject();
         try {
-            jSONObject.put("available", true);
+            jSONObject.put("available", location != null);
         } catch (Exception e) {
             FileLog.e(e);
         }

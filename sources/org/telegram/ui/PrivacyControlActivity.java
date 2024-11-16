@@ -988,23 +988,23 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
     }
 
     private void checkPrivacy() {
+        int i;
         Boolean bool;
-        Boolean bool2;
         ArrayList arrayList;
         ArrayList<Long> arrayList2;
-        int i = this.rulesType;
-        if (i == 10) {
+        int i2 = this.rulesType;
+        if (i2 == 10) {
             TLRPC.TL_globalPrivacySettings globalPrivacySettings = ContactsController.getInstance(this.currentAccount).getGlobalPrivacySettings();
-            int i2 = (globalPrivacySettings == null || !globalPrivacySettings.new_noncontact_peers_require_premium) ? 0 : 2;
-            this.currentType = i2;
-            this.initialRulesType = i2;
+            int i3 = (globalPrivacySettings == null || !globalPrivacySettings.new_noncontact_peers_require_premium) ? 0 : 2;
+            this.currentType = i3;
+            this.initialRulesType = i3;
             this.currentMinus = new ArrayList();
             this.currentPlus = new ArrayList();
             return;
         }
         boolean[] zArr = this.currentPlusPremium;
         boolean[] zArr2 = this.initialPlusPremium;
-        boolean z = i == 1;
+        boolean z = i2 == 1;
         zArr2[0] = z;
         zArr[0] = z;
         zArr2[1] = false;
@@ -1013,7 +1013,7 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
         boolean[] zArr4 = this.initialPlusMiniapps;
         zArr4[0] = false;
         zArr3[0] = false;
-        boolean z2 = i == 12;
+        boolean z2 = i2 == 12;
         zArr4[1] = z2;
         zArr3[1] = z2;
         zArr4[2] = false;
@@ -1024,96 +1024,90 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
         if (privacyRules == null || privacyRules.size() == 0) {
             this.currentType = 1;
         } else {
-            Boolean bool3 = null;
+            Boolean bool2 = null;
             char c = 65535;
             boolean z3 = false;
             boolean z4 = false;
-            for (int i3 = 0; i3 < privacyRules.size(); i3++) {
-                TLRPC.PrivacyRule privacyRule = privacyRules.get(i3);
+            for (int i4 = 0; i4 < privacyRules.size(); i4++) {
+                TLRPC.PrivacyRule privacyRule = privacyRules.get(i4);
                 if (privacyRule instanceof TLRPC.TL_privacyValueAllowChatParticipants) {
                     TLRPC.TL_privacyValueAllowChatParticipants tL_privacyValueAllowChatParticipants = (TLRPC.TL_privacyValueAllowChatParticipants) privacyRule;
                     int size = tL_privacyValueAllowChatParticipants.chats.size();
-                    int i4 = 0;
-                    while (i4 < size) {
-                        this.currentPlus.add(Long.valueOf(-tL_privacyValueAllowChatParticipants.chats.get(i4).longValue()));
-                        i4++;
-                        bool3 = bool3;
+                    for (int i5 = 0; i5 < size; i5++) {
+                        this.currentPlus.add(Long.valueOf(-tL_privacyValueAllowChatParticipants.chats.get(i5).longValue()));
                     }
-                    bool = bool3;
+                } else if (privacyRule instanceof TLRPC.TL_privacyValueDisallowChatParticipants) {
+                    TLRPC.TL_privacyValueDisallowChatParticipants tL_privacyValueDisallowChatParticipants = (TLRPC.TL_privacyValueDisallowChatParticipants) privacyRule;
+                    int size2 = tL_privacyValueDisallowChatParticipants.chats.size();
+                    for (int i6 = 0; i6 < size2; i6++) {
+                        this.currentMinus.add(Long.valueOf(-tL_privacyValueDisallowChatParticipants.chats.get(i6).longValue()));
+                    }
                 } else {
-                    bool = bool3;
-                    if (privacyRule instanceof TLRPC.TL_privacyValueDisallowChatParticipants) {
-                        TLRPC.TL_privacyValueDisallowChatParticipants tL_privacyValueDisallowChatParticipants = (TLRPC.TL_privacyValueDisallowChatParticipants) privacyRule;
-                        int size2 = tL_privacyValueDisallowChatParticipants.chats.size();
-                        for (int i5 = 0; i5 < size2; i5++) {
-                            this.currentMinus.add(Long.valueOf(-tL_privacyValueDisallowChatParticipants.chats.get(i5).longValue()));
-                        }
+                    if (privacyRule instanceof TLRPC.TL_privacyValueAllowUsers) {
+                        arrayList = this.currentPlus;
+                        arrayList2 = ((TLRPC.TL_privacyValueAllowUsers) privacyRule).users;
+                    } else if (privacyRule instanceof TLRPC.TL_privacyValueDisallowUsers) {
+                        arrayList = this.currentMinus;
+                        arrayList2 = ((TLRPC.TL_privacyValueDisallowUsers) privacyRule).users;
+                    } else if (privacyRule instanceof TLRPC.TL_privacyValueAllowPremium) {
+                        z3 = true;
                     } else {
-                        if (privacyRule instanceof TLRPC.TL_privacyValueAllowUsers) {
-                            arrayList = this.currentPlus;
-                            arrayList2 = ((TLRPC.TL_privacyValueAllowUsers) privacyRule).users;
-                        } else if (privacyRule instanceof TLRPC.TL_privacyValueDisallowUsers) {
-                            arrayList = this.currentMinus;
-                            arrayList2 = ((TLRPC.TL_privacyValueDisallowUsers) privacyRule).users;
+                        if (privacyRule instanceof TLRPC.TL_privacyValueAllowBots) {
+                            bool = Boolean.TRUE;
+                        } else if (privacyRule instanceof TLRPC.TL_privacyValueDisallowBots) {
+                            bool = Boolean.FALSE;
                         } else {
-                            if (privacyRule instanceof TLRPC.TL_privacyValueAllowPremium) {
-                                bool3 = bool;
-                                z3 = true;
-                            } else {
-                                if (privacyRule instanceof TLRPC.TL_privacyValueAllowBots) {
-                                    bool2 = Boolean.TRUE;
-                                } else if (privacyRule instanceof TLRPC.TL_privacyValueDisallowBots) {
-                                    bool2 = Boolean.FALSE;
-                                } else {
-                                    boolean z5 = privacyRule instanceof TLRPC.TL_privacyValueAllowAll;
-                                    if (!z5) {
-                                        boolean z6 = privacyRule instanceof TLRPC.TL_privacyValueDisallowAll;
-                                        if (!z6 || z4) {
-                                            if (privacyRule instanceof TLRPC.TL_privacyValueAllowContacts) {
-                                                bool3 = bool;
+                            boolean z5 = privacyRule instanceof TLRPC.TL_privacyValueAllowAll;
+                            if (!z5) {
+                                boolean z6 = privacyRule instanceof TLRPC.TL_privacyValueDisallowAll;
+                                if (!z6 || z4) {
+                                    if (privacyRule instanceof TLRPC.TL_privacyValueAllowContacts) {
+                                        c = 2;
+                                        z4 = true;
+                                    } else if (c == 65535) {
+                                        if (!z5) {
+                                            if (!z6 || z4) {
                                                 c = 2;
-                                                z4 = true;
-                                            } else if (c == 65535) {
-                                                if (!z5) {
-                                                    if (!z6 || z4) {
-                                                        bool3 = bool;
-                                                        c = 2;
-                                                    }
-                                                }
                                             }
                                         }
-                                        bool3 = bool;
-                                        c = 1;
                                     }
-                                    bool3 = bool;
-                                    c = 0;
                                 }
-                                bool3 = bool2;
+                                c = 1;
                             }
+                            c = 0;
                         }
-                        arrayList.addAll(arrayList2);
+                        bool2 = bool;
+                    }
+                    arrayList.addAll(arrayList2);
+                }
+            }
+            if (c == 0 || (c == 65535 && (this.currentMinus.size() > 0 || !(bool2 == null || bool2.booleanValue())))) {
+                i = 2;
+                this.currentType = 0;
+            } else {
+                i = 2;
+                if (c != 2) {
+                    if (c != 65535 || this.currentMinus.size() <= 0 || this.currentPlus.size() <= 0) {
+                        if (c == 1 || (c == 65535 && (this.currentPlus.size() > 0 || (bool2 != null && bool2.booleanValue())))) {
+                            this.currentType = 1;
+                        }
+                        i = 2;
+                    } else {
+                        i = 2;
                     }
                 }
-                bool3 = bool;
+                this.currentType = i;
             }
-            Boolean bool4 = bool3;
-            if (c == 0 || (c == 65535 && this.currentMinus.size() > 0)) {
-                this.currentType = 0;
-            } else if (c == 2 || (c == 65535 && this.currentMinus.size() > 0 && this.currentPlus.size() > 0)) {
-                this.currentType = 2;
-            } else if (c == 1 || (c == 65535 && this.currentPlus.size() > 0)) {
-                this.currentType = 1;
-            }
-            int i6 = this.currentType;
-            char c2 = i6 == 2 ? (char) 0 : (char) 1;
+            int i7 = this.currentType;
+            char c2 = i7 == i ? (char) 0 : (char) 1;
             boolean[] zArr5 = this.currentPlusPremium;
             this.initialPlusPremium[c2] = z3;
             zArr5[c2] = z3;
             boolean[] zArr6 = this.currentPlusMiniapps;
             boolean[] zArr7 = this.initialPlusMiniapps;
-            boolean z7 = bool4 != null;
-            zArr7[i6] = z7;
-            zArr6[i6] = z7;
+            boolean z7 = bool2 != null;
+            zArr7[i7] = z7;
+            zArr6[i7] = z7;
             View view = this.doneButton;
             if (view != null) {
                 view.setAlpha(0.0f);
@@ -1130,12 +1124,12 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
         if (this.rulesType == 6) {
             ArrayList<TLRPC.PrivacyRule> privacyRules2 = ContactsController.getInstance(this.currentAccount).getPrivacyRules(7);
             if (privacyRules2 != null && privacyRules2.size() != 0) {
-                int i7 = 0;
+                int i8 = 0;
                 while (true) {
-                    if (i7 >= privacyRules2.size()) {
+                    if (i8 >= privacyRules2.size()) {
                         break;
                     }
-                    TLRPC.PrivacyRule privacyRule2 = privacyRules2.get(i7);
+                    TLRPC.PrivacyRule privacyRule2 = privacyRules2.get(i8);
                     if (privacyRule2 instanceof TLRPC.TL_privacyValueAllowAll) {
                         break;
                     }
@@ -1147,7 +1141,7 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
                             this.currentSubType = 1;
                             break;
                         }
-                        i7++;
+                        i8++;
                     }
                 }
             }

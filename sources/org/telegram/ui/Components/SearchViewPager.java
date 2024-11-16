@@ -286,6 +286,19 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
             }
 
             @Override
+            public void openBotApp(TLRPC.User user) {
+                if (user == null) {
+                    return;
+                }
+                BaseFragment baseFragment = SearchViewPager.this.parent;
+                if (baseFragment instanceof DialogsActivity) {
+                    ((DialogsActivity) baseFragment).closeSearching();
+                }
+                MessagesController.getInstance(SearchViewPager.this.currentAccount).openApp(user, 0);
+                putRecentSearch(user.id, user);
+            }
+
+            @Override
             protected void openPublicPosts() {
                 SearchViewPager searchViewPager = SearchViewPager.this;
                 HashtagsSearchAdapter hashtagsSearchAdapter = searchViewPager.hashtagSearchAdapter;
