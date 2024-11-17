@@ -627,10 +627,13 @@ public class ItemOptions {
 
     public int getItemsCount() {
         ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout = this.lastLayout;
+        int i = 0;
+        if (actionBarPopupWindowLayout == null && this.layout == null) {
+            return 0;
+        }
         if (actionBarPopupWindowLayout == this.layout) {
             return actionBarPopupWindowLayout.getItemsCount();
         }
-        int i = 0;
         int i2 = 0;
         while (i < this.layout.getChildCount() - 1) {
             View childAt = i == this.layout.getChildCount() + (-1) ? this.lastLayout : this.layout.getChildAt(i);
