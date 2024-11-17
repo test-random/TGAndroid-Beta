@@ -464,11 +464,15 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
         if (isReady()) {
             return;
         }
-        BillingUtilities.extractCurrencyExp(this.currencyExpMap);
-        if (BuildVars.useInvoiceBilling()) {
-            return;
+        try {
+            BillingUtilities.extractCurrencyExp(this.currencyExpMap);
+            if (BuildVars.useInvoiceBilling()) {
+                return;
+            }
+            this.billingClient.startConnection(this);
+        } catch (Exception e) {
+            FileLog.e(e);
         }
-        this.billingClient.startConnection(this);
     }
 
     public boolean startManageSubscription(Context context, String str) {

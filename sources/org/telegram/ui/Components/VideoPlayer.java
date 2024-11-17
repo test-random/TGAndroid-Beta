@@ -646,7 +646,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 }
                 i3++;
             }
-            String str = tL_documentAttributeVideo == null ? null : tL_documentAttributeVideo.video_codec;
+            String lowerCase = tL_documentAttributeVideo == null ? null : tL_documentAttributeVideo.video_codec.toLowerCase();
             videoUri.currentAccount = i;
             videoUri.document = document;
             videoUri.docId = document.id;
@@ -666,7 +666,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 }
                 videoUri.m3u8uri = fromFile2;
             }
-            videoUri.codec = str;
+            videoUri.codec = lowerCase;
             long j = document.size;
             videoUri.size = j;
             if (tL_documentAttributeVideo != null) {

@@ -176,6 +176,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
     public float showOffsetY;
     private boolean silent;
     private SpringAnimation springAnimation;
+    private boolean superDismissed;
     private ChatAttachAlertBotWebViewLayout.WebViewSwipeContainer swipeContainer;
     private int swipeContainerFromHeight;
     private int swipeContainerFromWidth;
@@ -378,7 +379,10 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
                     BotWebViewSheet.this.webViewContainer.destroyWebView();
                     NotificationCenter.getInstance(BotWebViewSheet.this.currentAccount).removeObserver(BotWebViewSheet.this, NotificationCenter.webViewResultSent);
                     NotificationCenter.getGlobalInstance().removeObserver(BotWebViewSheet.this, NotificationCenter.didSetNewTheme);
-                    BotWebViewSheet.super.dismiss();
+                    if (!BotWebViewSheet.this.superDismissed) {
+                        BotWebViewSheet.super.dismiss();
+                        BotWebViewSheet.this.superDismissed = true;
+                    }
                     lastFragment.presentFragment(new INavigationLayout.NavigationParams(new ChatActivity(bundle)).setRemoveLast(true));
                 }
             }
@@ -781,7 +785,13 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         public boolean dispatchTouchEvent(MotionEvent motionEvent) {
             LaunchActivity launchActivity = LaunchActivity.instance;
             BottomSheetTabs bottomSheetTabs = launchActivity != null ? launchActivity.getBottomSheetTabs() : null;
-            return (bottomSheetTabs == null || motionEvent.getY() < ((float) ((getHeight() - BotWebViewSheet.this.insets.bottom) - (bottomSheetTabs == null ? 0 : (int) (bottomSheetTabs.getHeight(true) * (1.0f - BotWebViewSheet.this.fullscreenProgress))))) || motionEvent.getY() > ((float) (getHeight() - BotWebViewSheet.this.insets.bottom)) || AndroidUtilities.isTablet()) ? super.dispatchTouchEvent(motionEvent) : bottomSheetTabs.touchEvent(motionEvent.getAction(), motionEvent.getX(), motionEvent.getY() - ((getHeight() - BotWebViewSheet.this.insets.bottom) - r1));
+            if (bottomSheetTabs != null && BotWebViewSheet.this.insets != null) {
+                int height = (int) (bottomSheetTabs.getHeight(true) * (1.0f - BotWebViewSheet.this.fullscreenProgress));
+                if (motionEvent.getY() >= (getHeight() - BotWebViewSheet.this.insets.bottom) - height && motionEvent.getY() <= getHeight() - BotWebViewSheet.this.insets.bottom && !AndroidUtilities.isTablet()) {
+                    return bottomSheetTabs.touchEvent(motionEvent.getAction(), motionEvent.getX(), motionEvent.getY() - ((getHeight() - BotWebViewSheet.this.insets.bottom) - height));
+                }
+            }
+            return super.dispatchTouchEvent(motionEvent);
         }
 
         @Override
@@ -978,6 +988,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         this.defaultFullsize = false;
         this.fullsize = null;
         this.fileItems = new HashMap();
+        this.superDismissed = false;
         this.resetOffsetY = true;
         this.attached = false;
         this.resourcesProvider = resourcesProvider;
@@ -1243,6 +1254,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         }
         if (z2) {
             setBackgroundColor((isCurrentThemeDark ? botappsettings.background_dark_color : botappsettings.background_color) | (-16777216), true, z);
+            setNavigationBarColor((isCurrentThemeDark ? botappsettings.background_dark_color : botappsettings.background_color) | (-16777216), z);
         }
     }
 
@@ -1314,7 +1326,10 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
     }
 
     public void lambda$dismiss$46(Runnable runnable) {
-        super.dismiss();
+        if (!this.superDismissed) {
+            super.dismiss();
+            this.superDismissed = true;
+        }
         if (runnable != null) {
             runnable.run();
         }
@@ -1936,7 +1951,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
     public void checkNavBarColor() {
         LaunchActivity launchActivity;
         if (!this.dismissed && (launchActivity = LaunchActivity.instance) != null) {
-            launchActivity.checkSystemBarColors(true, true, true, false);
+            launchActivity.setNavigationBarColor(this.navBarColor, true);
             AndroidUtilities.setNavigationBarColor(getWindow(), this.navBarColor, false);
         }
         WindowView windowView = this.windowView;
@@ -2169,6 +2184,9 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
 
     @Override
     public void release() {
+        if (this.superDismissed) {
+            return;
+        }
         try {
             super.dismiss();
         } catch (Exception e) {
@@ -2521,6 +2539,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
             this.windowView.setAlpha(0.0f);
             this.windowView.addOnLayoutChangeListener(new AnonymousClass11());
             super.show();
+            this.superDismissed = false;
             activeSheets.add(this);
         }
     }
