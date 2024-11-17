@@ -47,6 +47,7 @@ public class TL_stars {
     }
 
     public static class StarsSubscription extends TLObject {
+        public boolean bot_canceled;
         public boolean can_refulfill;
         public boolean canceled;
         public String chat_invite_hash;
@@ -846,6 +847,7 @@ public class TL_stars {
             this.canceled = (readInt32 & 1) != 0;
             this.can_refulfill = (readInt32 & 2) != 0;
             this.missing_balance = (readInt32 & 4) != 0;
+            this.bot_canceled = (readInt32 & 128) != 0;
             this.id = abstractSerializedData.readString(z);
             this.peer = TLRPC.Peer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
             this.until_date = abstractSerializedData.readInt32(z);
@@ -873,7 +875,9 @@ public class TL_stars {
             this.flags = i2;
             int i3 = this.missing_balance ? i2 | 4 : i2 & (-5);
             this.flags = i3;
-            abstractSerializedData.writeInt32(i3);
+            int i4 = this.bot_canceled ? i3 | 128 : i3 & (-129);
+            this.flags = i4;
+            abstractSerializedData.writeInt32(i4);
             abstractSerializedData.writeString(this.id);
             this.peer.serializeToStream(abstractSerializedData);
             abstractSerializedData.writeInt32(this.until_date);

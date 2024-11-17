@@ -297,12 +297,12 @@ public abstract class SetupEmojiStatusSheet {
         final Context context = findActivity;
         final boolean[] zArr = new boolean[1];
         final boolean[] zArr2 = new boolean[1];
-        AlertDialog create = new AlertDialog.Builder(context, null).setTopImage(new UserEmojiStatusDrawable(UserConfig.getInstance(i).getCurrentUser()), Theme.getColor(Theme.key_dialogTopBackground)).setMessage(AndroidUtilities.replaceTags(LocaleController.formatString(R.string.BotEmojiStatusPermissionRequest, UserObject.getUserName(user), UserObject.getUserName(user)))).setPositiveButton("Allow", new DialogInterface.OnClickListener() {
+        AlertDialog create = new AlertDialog.Builder(context, null).setTopImage(new UserEmojiStatusDrawable(UserConfig.getInstance(i).getCurrentUser()), Theme.getColor(Theme.key_dialogTopBackground)).setMessage(AndroidUtilities.replaceTags(LocaleController.formatString(R.string.BotEmojiStatusPermissionRequest, UserObject.getUserName(user), UserObject.getUserName(user)))).setPositiveButton(LocaleController.getString(R.string.BotEmojiStatusPermissionAllow), new DialogInterface.OnClickListener() {
             @Override
             public final void onClick(DialogInterface dialogInterface, int i2) {
                 SetupEmojiStatusSheet.lambda$askPermission$12(i, zArr2, zArr, callback2, context, user, userFull, dialogInterface, i2);
             }
-        }).setNegativeButton("Decline", null).create();
+        }).setNegativeButton(LocaleController.getString(R.string.BotEmojiStatusPermissionDecline), null).create();
         create.show();
         create.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override

@@ -1601,28 +1601,33 @@ public class StarsIntroActivity extends GradientHeaderActivity implements Notifi
         }
 
         public void set(TL_stars.StarsSubscription starsSubscription, boolean z) {
-            String userName;
-            TextView textView;
+            boolean z2;
             String str;
+            TextView textView;
+            String str2;
             int i;
             long peerDialogId = DialogObject.getPeerDialogId(starsSubscription.peer);
             this.threeLines = !TextUtils.isEmpty(starsSubscription.title);
+            MessagesController messagesController = MessagesController.getInstance(this.currentAccount);
             if (peerDialogId < 0) {
-                TLRPC.Chat chat = MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(-peerDialogId));
+                TLRPC.Chat chat = messagesController.getChat(Long.valueOf(-peerDialogId));
                 AvatarDrawable avatarDrawable = new AvatarDrawable();
                 avatarDrawable.setInfo(chat);
                 this.imageView.setForUserOrChat(chat, avatarDrawable);
-                userName = chat != null ? chat.title : null;
+                str = chat != null ? chat.title : null;
+                z2 = false;
             } else {
-                TLRPC.User user = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(peerDialogId));
+                TLRPC.User user = messagesController.getUser(Long.valueOf(peerDialogId));
                 AvatarDrawable avatarDrawable2 = new AvatarDrawable();
                 avatarDrawable2.setInfo(user);
                 this.imageView.setForUserOrChat(user, avatarDrawable2);
-                userName = UserObject.getUserName(user);
+                String userName = UserObject.getUserName(user);
+                z2 = !UserObject.isBot(user);
+                str = userName;
             }
             long currentTime = ConnectionsManager.getInstance(this.currentAccount).getCurrentTime();
             SimpleTextView simpleTextView = this.titleView;
-            simpleTextView.setText(Emoji.replaceEmoji(userName, simpleTextView.getPaint().getFontMetricsInt(), false));
+            simpleTextView.setText(Emoji.replaceEmoji(str, simpleTextView.getPaint().getFontMetricsInt(), false));
             if (TextUtils.isEmpty(starsSubscription.title)) {
                 this.productView.setVisibility(8);
             } else {
@@ -1641,14 +1646,13 @@ public class StarsIntroActivity extends GradientHeaderActivity implements Notifi
                 this.productView.setText(spannableStringBuilder);
             }
             this.subtitleView.setTextSize(1, this.threeLines ? 13.0f : 14.0f);
-            if (starsSubscription.canceled) {
+            if (starsSubscription.canceled || starsSubscription.bot_canceled) {
                 TextView textView2 = this.subtitleView;
                 long j = starsSubscription.until_date;
                 textView2.setText(LocaleController.formatString(j < currentTime ? R.string.StarsSubscriptionExpired : R.string.StarsSubscriptionExpires, LocaleController.formatDateChat(j)));
                 this.priceTitleView.setVisibility(8);
                 this.priceSubtitleView.setTextColor(Theme.getColor(Theme.key_color_red, this.resourcesProvider));
-                textView = this.priceSubtitleView;
-                i = R.string.StarsSubscriptionStatusCancelled;
+                this.priceSubtitleView.setText(LocaleController.getString(starsSubscription.bot_canceled ? z2 ? R.string.StarsSubscriptionStatusBizCancelled : R.string.StarsSubscriptionStatusBotCancelled : R.string.StarsSubscriptionStatusCancelled));
             } else {
                 long j2 = starsSubscription.until_date;
                 if (j2 < currentTime) {
@@ -1663,27 +1667,23 @@ public class StarsIntroActivity extends GradientHeaderActivity implements Notifi
                     this.priceTitleView.setText(StarsIntroActivity.replaceStarsWithPlain("⭐️ " + Long.toString(starsSubscription.pricing.amount), 0.8f));
                     this.priceSubtitleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2, this.resourcesProvider));
                     int i2 = starsSubscription.pricing.period;
-                    if (i2 != 2592000) {
-                        if (i2 != 60) {
-                            if (i2 == 300) {
-                                textView = this.priceSubtitleView;
-                                str = "per 5 minutes";
-                            }
-                            this.needDivider = z;
-                            setWillNotDraw(!z);
-                        }
+                    if (i2 == 2592000) {
                         textView = this.priceSubtitleView;
-                        str = "per minute";
-                        textView.setText(str);
-                        this.needDivider = z;
-                        setWillNotDraw(!z);
+                        i = R.string.StarsParticipantSubscriptionPerMonth;
+                    } else {
+                        if (i2 == 60) {
+                            textView = this.priceSubtitleView;
+                            str2 = "per minute";
+                        } else if (i2 == 300) {
+                            textView = this.priceSubtitleView;
+                            str2 = "per 5 minutes";
+                        }
+                        textView.setText(str2);
                     }
-                    textView = this.priceSubtitleView;
-                    i = R.string.StarsParticipantSubscriptionPerMonth;
                 }
+                str2 = LocaleController.getString(i);
+                textView.setText(str2);
             }
-            str = LocaleController.getString(i);
-            textView.setText(str);
             this.needDivider = z;
             setWillNotDraw(!z);
         }
