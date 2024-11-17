@@ -3812,10 +3812,6 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         if (!(getParent() instanceof ChatAttachAlertBotWebViewLayout.WebViewSwipeContainer)) {
             return 0;
         }
-        ChatAttachAlertBotWebViewLayout.WebViewSwipeContainer webViewSwipeContainer = (ChatAttachAlertBotWebViewLayout.WebViewSwipeContainer) getParent();
-        if (webViewSwipeContainer.isFullSize()) {
-            return (int) (((webViewSwipeContainer.getMeasuredHeight() - webViewSwipeContainer.getOffsetY()) - webViewSwipeContainer.getTopActionBarOffsetY()) + this.viewPortHeightOffset);
-        }
         return 0;
     }
 

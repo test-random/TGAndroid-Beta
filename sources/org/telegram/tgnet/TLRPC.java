@@ -3551,6 +3551,9 @@ public class TLRPC {
                 case -1730095465:
                     tL_messageActionPhoneCall = new TL_messageActionGeoProximityReached();
                     break;
+                case -1682706620:
+                    tL_messageActionPhoneCall = new TL_messageActionStarGift_layer192();
+                    break;
                 case -1615153660:
                     tL_messageActionPhoneCall = new TL_messageActionHistoryClear();
                     break;
