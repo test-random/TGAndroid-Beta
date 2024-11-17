@@ -155,6 +155,8 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
     private final Rect navInsets;
     private boolean needCloseConfirmation;
     private boolean needsContext;
+    private ValueAnimator openAnimator;
+    private float openedProgress;
     private ItemOptions options;
     private BotFullscreenButtons.OptionsIcon optionsIcon;
     private ActionBarMenuItem optionsItem;
@@ -737,7 +739,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
                 return;
             }
             if (BotWebViewSheet.this.passcodeView.getVisibility() != 0 && BotWebViewSheet.this.fullscreenProgress < 1.0f && BotWebViewSheet.this.fullscreenProgress > 0.0f) {
-                this.navbarPaint.setColor(BotWebViewSheet.this.navBarColor);
+                this.navbarPaint.setColor(Theme.multAlpha(BotWebViewSheet.this.navBarColor, BotWebViewSheet.this.openedProgress));
                 if (BotWebViewSheet.this.navInsets.left > 0) {
                     canvas.drawRect(0.0f, 0.0f, BotWebViewSheet.this.navInsets.left, getHeight(), this.navbarPaint);
                 }
@@ -765,7 +767,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
                 canvas.restore();
             }
             if (BotWebViewSheet.this.passcodeView.getVisibility() != 0) {
-                this.navbarPaint.setColor(BotWebViewSheet.this.navBarColor);
+                this.navbarPaint.setColor(Theme.multAlpha(BotWebViewSheet.this.navBarColor, BotWebViewSheet.this.openedProgress));
                 if (BotWebViewSheet.this.navInsets.left > 0) {
                     canvas.drawRect(0.0f, 0.0f, BotWebViewSheet.this.navInsets.left * (1.0f - BotWebViewSheet.this.fullscreenProgress), getHeight(), this.navbarPaint);
                 }
@@ -1287,7 +1289,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         return Theme.getColor(i, this.resourcesProvider);
     }
 
-    public void lambda$createErrorContainer$50(View view) {
+    public void lambda$createErrorContainer$51(View view) {
         BotWebViewContainer.MyWebView webView = this.webViewContainer.getWebView();
         if (webView != null) {
             webView.reload();
@@ -1491,7 +1493,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         WindowInsetsCompat windowInsetsCompat = WindowInsetsCompat.toWindowInsetsCompat(windowInsets, view);
         Insets insets = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.navigationBars());
         this.navInsets.set(insets.left, insets.top, insets.right, insets.bottom);
-        Insets insets2 = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.statusBars());
+        Insets insets2 = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.navigationBars());
         Rect rect = this.insets;
         int i = insets2.left;
         stableInsetLeft = windowInsets.getStableInsetLeft();
@@ -1671,7 +1673,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         });
     }
 
-    public void lambda$setActionBarColor$49(int i, int i2, BotWebViewMenuContainer$ActionBarColorsAnimating botWebViewMenuContainer$ActionBarColorsAnimating, ValueAnimator valueAnimator) {
+    public void lambda$setActionBarColor$50(int i, int i2, BotWebViewMenuContainer$ActionBarColorsAnimating botWebViewMenuContainer$ActionBarColorsAnimating, ValueAnimator valueAnimator) {
         float floatValue = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         this.actionBarColor = ColorUtils.blendARGB(i, i2, floatValue);
         checkNavBarColor();
@@ -1682,7 +1684,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         this.windowView.invalidate();
     }
 
-    public void lambda$setBackgroundColor$47(int i, int i2, ValueAnimator valueAnimator) {
+    public void lambda$setBackgroundColor$48(int i, int i2, ValueAnimator valueAnimator) {
         this.backgroundPaint.setColor(ColorUtils.blendARGB(i, i2, ((Float) valueAnimator.getAnimatedValue()).floatValue()));
         updateActionBarColors();
         this.windowView.invalidate();
@@ -1693,8 +1695,13 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         }
     }
 
-    public void lambda$setNavigationBarColor$48(int i, int i2, ValueAnimator valueAnimator) {
+    public void lambda$setNavigationBarColor$49(int i, int i2, ValueAnimator valueAnimator) {
         this.navBarColor = ColorUtils.blendARGB(i, i2, ((Float) valueAnimator.getAnimatedValue()).floatValue());
+        checkNavBarColor();
+    }
+
+    public void lambda$setOpen$47(ValueAnimator valueAnimator) {
+        this.openedProgress = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         checkNavBarColor();
     }
 
@@ -1950,9 +1957,8 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
 
     public void checkNavBarColor() {
         LaunchActivity launchActivity;
-        if (!this.dismissed && (launchActivity = LaunchActivity.instance) != null) {
-            launchActivity.setNavigationBarColor(this.navBarColor, true);
-            AndroidUtilities.setNavigationBarColor(getWindow(), this.navBarColor, false);
+        if (!this.superDismissed && (launchActivity = LaunchActivity.instance) != null) {
+            launchActivity.checkSystemBarColors(true, true, true, false);
         }
         WindowView windowView = this.windowView;
         if (windowView != null) {
@@ -1970,7 +1976,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
             this.errorContainer.buttonView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    BotWebViewSheet.this.lambda$createErrorContainer$50(view);
+                    BotWebViewSheet.this.lambda$createErrorContainer$51(view);
                 }
             });
             this.errorContainer.setBackgroundColor(this.backgroundPaint.getColor());
@@ -2020,6 +2026,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
             return;
         }
         this.dismissed = true;
+        setOpen(false);
         AndroidUtilities.cancelRunOnUIThread(this.pollRunnable);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.webViewResultSent);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.botDownloadsUpdate);
@@ -2069,7 +2076,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
 
     @Override
     public int getNavigationBarColor(int i) {
-        return this.navBarColor;
+        return ColorUtils.blendARGB(i, this.navBarColor, this.openedProgress);
     }
 
     @Override
@@ -2192,6 +2199,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         } catch (Exception e) {
             FileLog.e(e);
         }
+        setOpen(false);
     }
 
     public void requestWebView(org.telegram.ui.ActionBar.BaseFragment r14, org.telegram.ui.bots.WebViewRequestProps r15) {
@@ -2271,7 +2279,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
             duration.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    BotWebViewSheet.this.lambda$setActionBarColor$49(i2, i, botWebViewMenuContainer$ActionBarColorsAnimating, valueAnimator);
+                    BotWebViewSheet.this.lambda$setActionBarColor$50(i2, i, botWebViewMenuContainer$ActionBarColorsAnimating, valueAnimator);
                 }
             });
             duration.addListener(new AnimatorListenerAdapter() {
@@ -2317,7 +2325,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
             this.backgroundColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
-                    BotWebViewSheet.this.lambda$setBackgroundColor$47(color, i, valueAnimator2);
+                    BotWebViewSheet.this.lambda$setBackgroundColor$48(color, i, valueAnimator2);
                 }
             });
             this.backgroundColorAnimator.addListener(new AnimatorListenerAdapter() {
@@ -2500,7 +2508,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
             duration.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    BotWebViewSheet.this.lambda$setNavigationBarColor$48(i2, i, valueAnimator);
+                    BotWebViewSheet.this.lambda$setNavigationBarColor$49(i2, i, valueAnimator);
                 }
             });
             duration.addListener(new AnimatorListenerAdapter() {
@@ -2522,6 +2530,34 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         this.needsContext = z;
     }
 
+    public void setOpen(final boolean z) {
+        ValueAnimator valueAnimator = this.openAnimator;
+        if (valueAnimator != null) {
+            valueAnimator.cancel();
+        }
+        if (Math.abs(this.openedProgress - (z ? 1.0f : 0.0f)) < 0.01f) {
+            return;
+        }
+        ValueAnimator ofFloat = ValueAnimator.ofFloat(this.openedProgress, z ? 1.0f : 0.0f);
+        this.openAnimator = ofFloat;
+        ofFloat.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                BotWebViewSheet.this.openedProgress = z ? 1.0f : 0.0f;
+                BotWebViewSheet.this.checkNavBarColor();
+            }
+        });
+        this.openAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
+                BotWebViewSheet.this.lambda$setOpen$47(valueAnimator2);
+            }
+        });
+        this.openAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
+        this.openAnimator.setDuration(220L);
+        this.openAnimator.start();
+    }
+
     public void setParentActivity(Activity activity) {
         this.parentActivity = activity;
     }
@@ -2536,6 +2572,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
     @Override
     public void show() {
         if (AndroidUtilities.isSafeToShow(getContext())) {
+            setOpen(true);
             this.windowView.setAlpha(0.0f);
             this.windowView.addOnLayoutChangeListener(new AnonymousClass11());
             super.show();
