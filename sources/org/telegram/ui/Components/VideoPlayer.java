@@ -632,6 +632,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
             TLRPC.TL_documentAttributeVideo tL_documentAttributeVideo;
             Uri fromFile;
             Uri fromFile2;
+            String str;
             VideoUri videoUri = new VideoUri();
             int i3 = 0;
             while (true) {
@@ -646,7 +647,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 }
                 i3++;
             }
-            String lowerCase = tL_documentAttributeVideo == null ? null : tL_documentAttributeVideo.video_codec.toLowerCase();
+            String lowerCase = (tL_documentAttributeVideo == null || (str = tL_documentAttributeVideo.video_codec) == null) ? null : str.toLowerCase();
             videoUri.currentAccount = i;
             videoUri.document = document;
             videoUri.docId = document.id;
