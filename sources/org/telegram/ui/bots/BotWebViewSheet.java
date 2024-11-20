@@ -1493,7 +1493,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         WindowInsetsCompat windowInsetsCompat = WindowInsetsCompat.toWindowInsetsCompat(windowInsets, view);
         Insets insets = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.navigationBars());
         this.navInsets.set(insets.left, insets.top, insets.right, insets.bottom);
-        Insets insets2 = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.navigationBars());
+        Insets insets2 = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.systemBars());
         Rect rect = this.insets;
         int i = insets2.left;
         stableInsetLeft = windowInsets.getStableInsetLeft();
@@ -1507,13 +1507,18 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         int i4 = insets2.bottom;
         stableInsetBottom = windowInsets.getStableInsetBottom();
         rect.set(max, max2, max3, Math.max(i4, stableInsetBottom));
-        int i5 = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom;
-        if (i5 <= this.insets.bottom || i5 <= AndroidUtilities.dp(20.0f)) {
-            i5 = 0;
+        int i5 = Build.VERSION.SDK_INT;
+        if (i5 <= 28) {
+            Rect rect2 = this.insets;
+            rect2.top = Math.max(rect2.top, AndroidUtilities.getStatusBarHeight(getContext()));
         }
-        this.keyboardInset = i5;
+        int i6 = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+        if (i6 <= this.insets.bottom || i6 <= AndroidUtilities.dp(20.0f)) {
+            i6 = 0;
+        }
+        this.keyboardInset = i6;
         updateFullscreenLayout();
-        if (Build.VERSION.SDK_INT >= 30) {
+        if (i5 >= 30) {
             windowInsets2 = WindowInsets.CONSUMED;
             return windowInsets2;
         }
@@ -2673,8 +2678,9 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
                 return;
             }
             WindowManager.LayoutParams attributes = window.getAttributes();
+            int i = Build.VERSION.SDK_INT <= 28 ? 1024 : 512;
             boolean z = this.fullscreen;
-            attributes.flags = z ? attributes.flags | 512 : attributes.flags & (-513);
+            attributes.flags = z ? i | attributes.flags : (i ^ (-1)) & attributes.flags;
             if (!z || (((botButtons = this.botButtons) != null && botButtons.getTotalHeight() > 0) || this.windowView.drawingFromOverlay)) {
                 windowView = this.windowView;
                 systemUiVisibility = windowView.getSystemUiVisibility() & (-3);
