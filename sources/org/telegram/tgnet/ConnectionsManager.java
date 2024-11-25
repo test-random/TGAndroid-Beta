@@ -878,33 +878,13 @@ public class ConnectionsManager extends BaseController {
 
     private void listen(int i, RequestDelegateInternal requestDelegateInternal, QuickAckDelegate quickAckDelegate, WriteToSocketDelegate writeToSocketDelegate) {
         this.requestCallbacks.put(Integer.valueOf(i), new RequestCallbacks(requestDelegateInternal, quickAckDelegate, writeToSocketDelegate));
-        FileLog.d("{rc} listen(" + this.currentAccount + ", " + i + "): " + this.requestCallbacks.size() + " requests' callbacks");
     }
 
     private void listenCancel(int i, Runnable runnable) {
-        StringBuilder sb;
-        String str;
         RequestCallbacks requestCallbacks = this.requestCallbacks.get(Integer.valueOf(i));
         if (requestCallbacks != null) {
             requestCallbacks.onCancelled = runnable;
-            sb = new StringBuilder();
-            sb.append("{rc} listenCancel(");
-            sb.append(this.currentAccount);
-            sb.append(", ");
-            sb.append(i);
-            str = "): ";
-        } else {
-            sb = new StringBuilder();
-            sb.append("{rc} listenCancel(");
-            sb.append(this.currentAccount);
-            sb.append(", ");
-            sb.append(i);
-            str = "): callback not found, ";
         }
-        sb.append(str);
-        sb.append(this.requestCallbacks.size());
-        sb.append(" requests' callbacks");
-        FileLog.d(sb.toString());
     }
 
     public static native void native_applyDatacenterAddress(int i, int i2, String str, int i3);
@@ -1043,92 +1023,37 @@ public class ConnectionsManager extends BaseController {
     }
 
     public static void onRequestClear(int i, int i2, boolean z) {
-        StringBuilder sb;
-        String str;
         ConnectionsManager connectionsManager = getInstance(i);
         if (connectionsManager == null) {
             return;
         }
         RequestCallbacks requestCallbacks = connectionsManager.requestCallbacks.get(Integer.valueOf(i2));
         if (z) {
-            if (requestCallbacks != null) {
-                Runnable runnable = requestCallbacks.onCancelled;
-                if (runnable != null) {
-                    runnable.run();
-                }
-                connectionsManager.requestCallbacks.remove(Integer.valueOf(i2));
-                sb = new StringBuilder();
-                sb.append("{rc} onRequestClear(");
-                sb.append(i);
-                sb.append(", ");
-                sb.append(i2);
-                sb.append(", ");
-                sb.append(z);
-                str = "): request to cancel is found ";
-            } else {
-                sb = new StringBuilder();
-                sb.append("{rc} onRequestClear(");
-                sb.append(i);
-                sb.append(", ");
-                sb.append(i2);
-                sb.append(", ");
-                sb.append(z);
-                str = "): request to cancel is not found ";
-            }
-        } else {
             if (requestCallbacks == null) {
                 return;
             }
-            connectionsManager.requestCallbacks.remove(Integer.valueOf(i2));
-            sb = new StringBuilder();
-            sb.append("{rc} onRequestClear(");
-            sb.append(i);
-            sb.append(", ");
-            sb.append(i2);
-            sb.append(", ");
-            sb.append(z);
-            str = "): ";
+            Runnable runnable = requestCallbacks.onCancelled;
+            if (runnable != null) {
+                runnable.run();
+            }
+        } else if (requestCallbacks == null) {
+            return;
         }
-        sb.append(str);
-        sb.append(connectionsManager.requestCallbacks.size());
-        sb.append(" requests' callbacks");
-        FileLog.d(sb.toString());
+        connectionsManager.requestCallbacks.remove(Integer.valueOf(i2));
     }
 
     public static void onRequestComplete(int i, int i2, long j, int i3, String str, int i4, long j2, long j3, int i5) {
-        StringBuilder sb;
+        RequestDelegateInternal requestDelegateInternal;
         ConnectionsManager connectionsManager = getInstance(i);
         if (connectionsManager == null) {
             return;
         }
         RequestCallbacks requestCallbacks = connectionsManager.requestCallbacks.get(Integer.valueOf(i2));
         connectionsManager.requestCallbacks.remove(Integer.valueOf(i2));
-        if (requestCallbacks != null) {
-            RequestDelegateInternal requestDelegateInternal = requestCallbacks.onComplete;
-            if (requestDelegateInternal != null) {
-                requestDelegateInternal.run(j, i3, str, i4, j2, j3, i5);
-            }
-            sb = new StringBuilder();
-            sb.append("{rc} onRequestComplete(");
-            sb.append(i);
-            sb.append(", ");
-            sb.append(i2);
-            sb.append("): found request ");
-            sb.append(i2);
-            sb.append(", ");
-        } else {
-            sb = new StringBuilder();
-            sb.append("{rc} onRequestComplete(");
-            sb.append(i);
-            sb.append(", ");
-            sb.append(i2);
-            sb.append("): not found request ");
-            sb.append(i2);
-            sb.append("! ");
+        if (requestCallbacks == null || (requestDelegateInternal = requestCallbacks.onComplete) == null) {
+            return;
         }
-        sb.append(connectionsManager.requestCallbacks.size());
-        sb.append(" requests' callbacks");
-        FileLog.d(sb.toString());
+        requestDelegateInternal.run(j, i3, str, i4, j2, j3, i5);
     }
 
     public static void onRequestNewServerIpAndPort(final int i, final int i2) {
@@ -1141,73 +1066,23 @@ public class ConnectionsManager extends BaseController {
     }
 
     public static void onRequestQuickAck(int i, int i2) {
-        StringBuilder sb;
+        RequestCallbacks requestCallbacks;
+        QuickAckDelegate quickAckDelegate;
         ConnectionsManager connectionsManager = getInstance(i);
-        if (connectionsManager == null) {
+        if (connectionsManager == null || (requestCallbacks = connectionsManager.requestCallbacks.get(Integer.valueOf(i2))) == null || (quickAckDelegate = requestCallbacks.onQuickAck) == null) {
             return;
         }
-        RequestCallbacks requestCallbacks = connectionsManager.requestCallbacks.get(Integer.valueOf(i2));
-        if (requestCallbacks != null) {
-            QuickAckDelegate quickAckDelegate = requestCallbacks.onQuickAck;
-            if (quickAckDelegate != null) {
-                quickAckDelegate.run();
-            }
-            sb = new StringBuilder();
-            sb.append("{rc} onRequestQuickAck(");
-            sb.append(i);
-            sb.append(", ");
-            sb.append(i2);
-            sb.append("): found request ");
-            sb.append(i2);
-            sb.append(", ");
-        } else {
-            sb = new StringBuilder();
-            sb.append("{rc} onRequestQuickAck(");
-            sb.append(i);
-            sb.append(", ");
-            sb.append(i2);
-            sb.append("): not found request ");
-            sb.append(i2);
-            sb.append("! ");
-        }
-        sb.append(connectionsManager.requestCallbacks.size());
-        sb.append(" requests' callbacks");
-        FileLog.d(sb.toString());
+        quickAckDelegate.run();
     }
 
     public static void onRequestWriteToSocket(int i, int i2) {
-        StringBuilder sb;
+        RequestCallbacks requestCallbacks;
+        WriteToSocketDelegate writeToSocketDelegate;
         ConnectionsManager connectionsManager = getInstance(i);
-        if (connectionsManager == null) {
+        if (connectionsManager == null || (requestCallbacks = connectionsManager.requestCallbacks.get(Integer.valueOf(i2))) == null || (writeToSocketDelegate = requestCallbacks.onWriteToSocket) == null) {
             return;
         }
-        RequestCallbacks requestCallbacks = connectionsManager.requestCallbacks.get(Integer.valueOf(i2));
-        if (requestCallbacks != null) {
-            WriteToSocketDelegate writeToSocketDelegate = requestCallbacks.onWriteToSocket;
-            if (writeToSocketDelegate != null) {
-                writeToSocketDelegate.run();
-            }
-            sb = new StringBuilder();
-            sb.append("{rc} onRequestWriteToSocket(");
-            sb.append(i);
-            sb.append(", ");
-            sb.append(i2);
-            sb.append("): found request ");
-            sb.append(i2);
-            sb.append(", ");
-        } else {
-            sb = new StringBuilder();
-            sb.append("{rc} onRequestWriteToSocket(");
-            sb.append(i);
-            sb.append(", ");
-            sb.append(i2);
-            sb.append("): not found request ");
-            sb.append(i2);
-            sb.append("! ");
-        }
-        sb.append(connectionsManager.requestCallbacks.size());
-        sb.append(" requests' callbacks");
-        FileLog.d(sb.toString());
+        writeToSocketDelegate.run();
     }
 
     public static void onSessionCreated(final int i) {
