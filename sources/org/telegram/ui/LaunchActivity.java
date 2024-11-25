@@ -5073,7 +5073,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     @Override
-    public boolean didSelectDialogs(final org.telegram.ui.DialogsActivity r39, final java.util.ArrayList r40, final java.lang.CharSequence r41, final boolean r42, boolean r43, int r44, org.telegram.ui.TopicsFragment r45) {
+    public boolean didSelectDialogs(final org.telegram.ui.DialogsActivity r40, final java.util.ArrayList r41, final java.lang.CharSequence r42, final boolean r43, boolean r44, int r45, org.telegram.ui.TopicsFragment r46) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.LaunchActivity.didSelectDialogs(org.telegram.ui.DialogsActivity, java.util.ArrayList, java.lang.CharSequence, boolean, boolean, int, org.telegram.ui.TopicsFragment):boolean");
     }
 
