@@ -165,22 +165,27 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
             return j;
         }
 
+        public void destroyContent() {
+            VideoPlayerHolderBase videoPlayerHolderBase = this.videoPlayer;
+            if (videoPlayerHolderBase != null) {
+                videoPlayerHolderBase.pause();
+                this.videoPlayer.release(null);
+                this.videoPlayer = null;
+            }
+            TextureView textureView = this.textureView;
+            if (textureView != null) {
+                AndroidUtilities.removeFromParent(textureView);
+                this.textureView = null;
+            }
+            this.textureViewReady = false;
+        }
+
         public boolean hasContent() {
             return this.content != null;
         }
 
         public void setContent(StoryEntry storyEntry) {
-            VideoPlayerHolderBase videoPlayerHolderBase = this.videoPlayer;
-            if (videoPlayerHolderBase != null) {
-                videoPlayerHolderBase.release(null);
-                this.videoPlayer = null;
-            }
-            TextureView textureView = this.textureView;
-            if (textureView != null) {
-                CollageLayoutView2.this.removeView(textureView);
-                this.textureView = null;
-            }
-            this.textureViewReady = false;
+            destroyContent();
             this.content = storyEntry;
             StringBuilder sb = new StringBuilder();
             sb.append((int) Math.ceil(AndroidUtilities.displaySize.x / AndroidUtilities.density));
@@ -204,9 +209,9 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
                         this.imageReceiver.clearImage();
                     }
                 }
-                TextureView textureView2 = new TextureView(CollageLayoutView2.this.getContext());
-                this.textureView = textureView2;
-                CollageLayoutView2.this.addView(textureView2);
+                TextureView textureView = new TextureView(CollageLayoutView2.this.getContext());
+                this.textureView = textureView;
+                CollageLayoutView2.this.addView(textureView);
                 AnonymousClass3 anonymousClass3 = new AnonymousClass3();
                 this.videoPlayer = anonymousClass3;
                 anonymousClass3.allowMultipleInstances(true);
@@ -266,16 +271,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
                         part3.boundsTransition = 1.0f;
                         if (CollageLayoutView2.this.removingParts.contains(part3)) {
                             Part.this.imageReceiver.onDetachedFromWindow();
-                            VideoPlayerHolderBase videoPlayerHolderBase = Part.this.videoPlayer;
-                            if (videoPlayerHolderBase != null) {
-                                videoPlayerHolderBase.release(null);
-                                Part.this.videoPlayer = null;
-                            }
-                            TextureView textureView = Part.this.textureView;
-                            if (textureView != null) {
-                                AndroidUtilities.removeFromParent(textureView);
-                                Part.this.textureView = null;
-                            }
+                            Part.this.destroyContent();
                             Part part4 = Part.this;
                             CollageLayoutView2.this.removingParts.remove(part4);
                         }
@@ -290,16 +286,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
                 this.boundsTransition = 1.0f;
                 if (part == null) {
                     this.imageReceiver.onDetachedFromWindow();
-                    VideoPlayerHolderBase videoPlayerHolderBase = this.videoPlayer;
-                    if (videoPlayerHolderBase != null) {
-                        videoPlayerHolderBase.release(null);
-                        this.videoPlayer = null;
-                    }
-                    TextureView textureView = this.textureView;
-                    if (textureView != null) {
-                        AndroidUtilities.removeFromParent(textureView);
-                        this.textureView = null;
-                    }
+                    destroyContent();
                     CollageLayoutView2.this.removingParts.remove(this);
                 }
             }

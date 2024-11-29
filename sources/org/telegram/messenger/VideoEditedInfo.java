@@ -11,8 +11,6 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.video.MediaCodecPlayer;
 import org.telegram.messenger.video.MediaCodecVideoConvertor;
@@ -27,7 +25,6 @@ import org.telegram.ui.Components.Paint.Views.LinkPreview;
 import org.telegram.ui.Components.PhotoFilterView;
 import org.telegram.ui.Components.Point;
 import org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble;
-import org.telegram.ui.Components.VideoPlayer;
 import org.telegram.ui.Stories.recorder.CollageLayout;
 import org.telegram.ui.Stories.recorder.StoryEntry;
 import org.telegram.ui.Stories.recorder.Weather;
@@ -434,7 +431,6 @@ public class VideoEditedInfo {
         public float framesPerDraw;
         public int height;
         public boolean isVideo;
-        public CountDownLatch latch;
         public float left;
         public boolean loop;
         public float msPerFrame;
@@ -446,9 +442,7 @@ public class VideoEditedInfo {
         public FloatBuffer posBuffer;
         public float right;
         public SurfaceTexture surfaceTexture;
-        public AtomicBoolean updateTex;
         public FloatBuffer uvBuffer;
-        public VideoPlayer videoPlayer;
         public float volume;
         public int width;
 

@@ -242,6 +242,8 @@ public class BotStarsController {
             this.count = 0;
             this.endReached = false;
             this.error = false;
+            this.lastRequestTime = 0L;
+            this.lastOffset = null;
         }
 
         public Sort getSort() {
@@ -272,12 +274,27 @@ public class BotStarsController {
             });
         }
 
+        public void reload() {
+            clear();
+            cancel();
+            load();
+        }
+
+        public void remove(long j) {
+            for (int i = 0; i < this.bots.size(); i++) {
+                if (((TL_payments.starRefProgram) this.bots.get(i)).bot_id == j) {
+                    this.bots.remove(i);
+                    this.count--;
+                    NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.channelSuggestedBotsUpdate, Long.valueOf(this.dialogId));
+                    return;
+                }
+            }
+        }
+
         public void setSort(Sort sort) {
             if (this.sorting != sort) {
                 this.sorting = sort;
-                clear();
-                cancel();
-                load();
+                reload();
             }
         }
     }

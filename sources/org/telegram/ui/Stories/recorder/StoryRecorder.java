@@ -5756,6 +5756,10 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         if (frameLayout != null) {
             Bulletin.removeDelegate(frameLayout);
         }
+        CollageLayoutView2 collageLayoutView2 = this.collageLayoutView;
+        if (collageLayoutView2 != null) {
+            collageLayoutView2.clear(true);
+        }
     }
 
     public void onNavigateEnd(int i, int i2) {

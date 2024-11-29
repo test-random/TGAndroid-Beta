@@ -361,6 +361,7 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
     public void lambda$createView$4(TLObject tLObject, AlertDialog alertDialog) {
         if (tLObject instanceof TL_payments.connectedStarRefBots) {
             BotStarsController.getInstance(this.currentAccount).getChannelConnectedBots(this.dialogId).applyEdit((TL_payments.connectedStarRefBots) tLObject);
+            BotStarsController.getInstance(this.currentAccount).getChannelSuggestedBots(this.dialogId).reload();
             this.adapter.update(true);
         }
         alertDialog.dismiss();
@@ -468,6 +469,7 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
             safeLastFragment.presentFragment(new ChannelAffiliateProgramsFragment(j));
         }
         if (connectedbotstarref != null) {
+            BotStarsController.getInstance(i).getChannelSuggestedBots(j).remove(connectedbotstarref.bot_id);
             BulletinFactory.of(showShareAffiliateAlert(context, i, connectedbotstarref, j, resourcesProvider).topBulletinContainer, resourcesProvider).createUsersBulletin(user, LocaleController.getString(R.string.AffiliateProgramJoinedTitle), LocaleController.getString(R.string.AffiliateProgramJoinedText)).show();
         }
     }
