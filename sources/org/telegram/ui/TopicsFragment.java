@@ -3054,15 +3054,15 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
 
     private void updateSubtitle() {
         String string;
+        TLRPC.ChatFull chatFull;
         TLRPC.ChatParticipants chatParticipants;
-        TLRPC.ChatFull chatFull = getMessagesController().getChatFull(this.chatId);
-        TLRPC.ChatFull chatFull2 = this.chatFull;
-        if (chatFull2 != null && (chatParticipants = chatFull2.participants) != null) {
-            chatFull.participants = chatParticipants;
+        TLRPC.ChatFull chatFull2 = getMessagesController().getChatFull(this.chatId);
+        if (chatFull2 != null && (chatFull = this.chatFull) != null && (chatParticipants = chatFull.participants) != null) {
+            chatFull2.participants = chatParticipants;
         }
-        this.chatFull = chatFull;
-        if (chatFull != null) {
-            int i = chatFull.participants_count;
+        this.chatFull = chatFull2;
+        if (chatFull2 != null) {
+            int i = chatFull2.participants_count;
             if (i <= 0) {
                 TLRPC.Chat chat = getMessagesController().getChat(Long.valueOf(this.chatId));
                 if (chat != null) {

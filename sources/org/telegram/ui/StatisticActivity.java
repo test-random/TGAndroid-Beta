@@ -3236,6 +3236,9 @@ public class StatisticActivity extends BaseFragment implements NotificationCente
             }
         } else {
             if (i == NotificationCenter.boostByChannelCreated) {
+                if (getParentLayout() == null) {
+                    return;
+                }
                 TLRPC.Chat chat = (TLRPC.Chat) objArr[0];
                 boolean booleanValue = ((Boolean) objArr[1]).booleanValue();
                 List fragmentStack = getParentLayout().getFragmentStack();

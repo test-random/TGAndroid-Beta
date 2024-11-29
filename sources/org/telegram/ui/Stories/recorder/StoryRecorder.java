@@ -1361,7 +1361,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                 }).start();
             }
             StoryRecorder storyRecorder = StoryRecorder.this;
-            storyRecorder.switchToEditMode((!storyRecorder.collageLayoutView.hasLayout() || TextUtils.isEmpty(StoryRecorder.this.outputEntry.audioPath)) ? -1 : 2, true, true);
+            storyRecorder.switchToEditMode((storyRecorder.collageLayoutView.hasLayout() && StoryRecorder.this.collageLayoutView.hasVideo() && !TextUtils.isEmpty(StoryRecorder.this.outputEntry.audioPath)) ? 2 : -1, true, true);
         }
 
         @Override

@@ -606,7 +606,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
                 AndroidUtilities.cancelRunOnUIThread(runnable);
                 this.onLongPressPart = null;
             }
-            if (!this.reorderingTouch && getFilledProgress() < 1.0f && this.pressedPart != null && partAt != null && MathUtils.distance(motionEvent.getX(), motionEvent.getY(), this.tx, this.ty) > AndroidUtilities.touchSlop * 1.2f) {
+            if (!this.reorderingTouch && getFilledProgress() >= 1.0f && this.pressedPart != null && partAt != null && MathUtils.distance(motionEvent.getX(), motionEvent.getY(), this.tx, this.ty) > AndroidUtilities.touchSlop * 1.2f) {
                 this.reorderingTouch = true;
                 this.reorderingPart = this.pressedPart;
                 this.dx = 0.0f;
@@ -826,6 +826,17 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
 
     public boolean hasLayout() {
         return this.currentLayout.parts.size() > 1;
+    }
+
+    public boolean hasVideo() {
+        Iterator it = this.parts.iterator();
+        while (it.hasNext()) {
+            Part part = (Part) it.next();
+            if (part.content != null && part.content.isVideo) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void highlight(int i) {
