@@ -8,7 +8,6 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Rect;
 import android.os.Build;
-import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -17,7 +16,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.ChannelMonetizationLayout;
+import org.telegram.ui.Cells.SlideIntChooseView;
 import org.telegram.ui.Components.AnimatedTextView;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
@@ -28,6 +27,7 @@ public class SlideIntChooseView extends FrameLayout {
     private float maxTextEmojiSaturation;
     private ValueAnimator maxTextEmojiSaturationAnimator;
     private final AnimatedTextView minText;
+    private int minValueAllowed;
     private Options options;
     private final Theme.ResourcesProvider resourcesProvider;
     private final SeekBarView seekBarView;
@@ -39,27 +39,43 @@ public class SlideIntChooseView extends FrameLayout {
 
     public static class Options {
         public int max;
-        public int maxStringResId;
         public int min;
-        public int minStringResId;
-        public String resId;
         public int style;
-        public int valueMaxStringResId;
-        public int valueMinStringResId;
-        public int valueStringResId;
+        public Utilities.CallbackReturn toString;
 
-        public static Options make(int i, String str, int i2, int i3) {
+        public static String lambda$make$0(String str, Integer num) {
+            return LocaleController.formatPluralString(str, num.intValue(), new Object[0]);
+        }
+
+        public static Options make(int i, int i2, int i3, Utilities.CallbackReturn callbackReturn) {
             Options options = new Options();
             options.style = i;
             options.min = i2;
-            options.resId = str;
             options.max = i3;
+            options.toString = callbackReturn;
+            return options;
+        }
+
+        public static Options make(int i, final String str, int i2, int i3) {
+            Options options = new Options();
+            options.style = i;
+            options.min = i2;
+            options.max = i3;
+            options.toString = new Utilities.CallbackReturn() {
+                @Override
+                public final Object run(Object obj) {
+                    String lambda$make$0;
+                    lambda$make$0 = SlideIntChooseView.Options.lambda$make$0(str, (Integer) obj);
+                    return lambda$make$0;
+                }
+            };
             return options;
         }
     }
 
     public SlideIntChooseView(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
+        this.minValueAllowed = Integer.MIN_VALUE;
         this.toMaxTextEmojiSaturation = -1.0f;
         this.resourcesProvider = resourcesProvider;
         AnimatedTextView animatedTextView = new AnimatedTextView(context, true, true, true);
@@ -115,16 +131,21 @@ public class SlideIntChooseView extends FrameLayout {
 
             @Override
             public void onSeekBarDrag(boolean z, float f) {
-                int round;
-                if (SlideIntChooseView.this.options == null || SlideIntChooseView.this.whenChanged == null || SlideIntChooseView.this.value == (round = Math.round(SlideIntChooseView.this.options.min + (SlideIntChooseView.this.stepsCount * f)))) {
+                if (SlideIntChooseView.this.options == null || SlideIntChooseView.this.whenChanged == null) {
                     return;
                 }
-                SlideIntChooseView.this.value = round;
-                AndroidUtilities.vibrateCursor(SlideIntChooseView.this.seekBarView);
-                SlideIntChooseView slideIntChooseView = SlideIntChooseView.this;
-                slideIntChooseView.updateTexts(slideIntChooseView.value, true);
-                if (SlideIntChooseView.this.whenChanged != null) {
-                    SlideIntChooseView.this.whenChanged.run(Integer.valueOf(SlideIntChooseView.this.value));
+                int round = Math.round(SlideIntChooseView.this.options.min + (SlideIntChooseView.this.stepsCount * f));
+                if (SlideIntChooseView.this.minValueAllowed != Integer.MIN_VALUE) {
+                    round = Math.max(round, SlideIntChooseView.this.minValueAllowed);
+                }
+                if (SlideIntChooseView.this.value != round) {
+                    SlideIntChooseView.this.value = round;
+                    AndroidUtilities.vibrateCursor(SlideIntChooseView.this.seekBarView);
+                    SlideIntChooseView slideIntChooseView = SlideIntChooseView.this;
+                    slideIntChooseView.updateTexts(slideIntChooseView.value, true);
+                    if (SlideIntChooseView.this.whenChanged != null) {
+                        SlideIntChooseView.this.whenChanged.run(Integer.valueOf(SlideIntChooseView.this.value));
+                    }
                 }
             }
 
@@ -145,10 +166,6 @@ public class SlideIntChooseView extends FrameLayout {
             AndroidUtilities.adjustBrightnessColorMatrix(colorMatrix, (1.0f - this.maxTextEmojiSaturation) * (-0.3f));
         }
         this.maxText.setEmojiColorFilter(new ColorMatrixColorFilter(colorMatrix));
-    }
-
-    private CharSequence processText(int i, int i2) {
-        return ChannelMonetizationLayout.replaceTON(AndroidUtilities.replaceTags(LocaleController.getString(i).replace("%d", "" + i2)), this.valueText.getPaint());
     }
 
     private void setMaxTextEmojiSaturation(final float f, boolean z) {
@@ -212,30 +229,27 @@ public class SlideIntChooseView extends FrameLayout {
         updateTexts(i, false);
     }
 
+    public void setMinValueAllowed(int i) {
+        this.minValueAllowed = i;
+        if (this.value < i) {
+            this.value = i;
+        }
+        this.seekBarView.setMinProgress(Utilities.clamp01((i - this.options.min) / this.stepsCount));
+        updateTexts(this.value, false);
+        invalidate();
+    }
+
     public void updateTexts(int i, boolean z) {
-        AnimatedTextView animatedTextView;
-        CharSequence processText;
         this.minText.cancelAnimation();
         this.maxText.cancelAnimation();
-        if (TextUtils.isEmpty(this.options.resId)) {
-            Options options = this.options;
-            int i2 = i <= options.min ? options.valueMinStringResId : i < options.max ? options.valueStringResId : options.valueMaxStringResId;
-            this.valueText.cancelAnimation();
-            this.valueText.setText(processText(i2, i), z);
-            AnimatedTextView animatedTextView2 = this.minText;
-            Options options2 = this.options;
-            animatedTextView2.setText(processText(options2.minStringResId, options2.min), z);
-            animatedTextView = this.maxText;
-            Options options3 = this.options;
-            processText = processText(options3.maxStringResId, options3.max);
-        } else {
-            this.valueText.cancelAnimation();
-            this.valueText.setText(LocaleController.formatPluralString(this.options.resId, i, new Object[0]), z);
-            this.minText.setText("" + this.options.min, z);
-            animatedTextView = this.maxText;
-            processText = "" + this.options.max;
-        }
-        animatedTextView.setText(processText, z);
+        this.valueText.cancelAnimation();
+        this.valueText.setText((CharSequence) this.options.toString.run(Integer.valueOf(i)), z);
+        AnimatedTextView animatedTextView = this.minText;
+        Options options = this.options;
+        animatedTextView.setText((CharSequence) options.toString.run(Integer.valueOf(options.min)), z);
+        AnimatedTextView animatedTextView2 = this.maxText;
+        Options options2 = this.options;
+        animatedTextView2.setText((CharSequence) options2.toString.run(Integer.valueOf(options2.max)), z);
         this.maxText.setTextColor(Theme.getColor(i >= this.options.max ? Theme.key_windowBackgroundWhiteValueText : Theme.key_windowBackgroundWhiteGrayText, this.resourcesProvider), z);
         setMaxTextEmojiSaturation(i >= this.options.max ? 1.0f : 0.0f, z);
     }

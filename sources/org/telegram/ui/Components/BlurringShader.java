@@ -6,15 +6,20 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.RecordingCanvas;
 import android.graphics.RectF;
+import android.graphics.RenderEffect;
 import android.graphics.RenderNode;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 import java.nio.Buffer;
@@ -26,6 +31,7 @@ import java.util.Iterator;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BotFullscreenButtons$$ExternalSyntheticApiModelOutline2;
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.R;
@@ -58,10 +64,14 @@ public class BlurringShader {
     private int width;
 
     public static class BlurManager {
+        private Object blurRenderNode;
         private EGLContext context;
         private BlurringShader currentShader;
         private Bitmap fallbackBitmap;
         public int padding;
+        private Object renderNode;
+        private int renderNodeBackgroundColor;
+        private View renderNodeView;
         private final View view;
         private final ArrayList parents = new ArrayList();
         private final ArrayList holders = new ArrayList();
@@ -187,6 +197,10 @@ public class BlurringShader {
             return this.textureLock;
         }
 
+        public boolean hasRenderNode() {
+            return this.blurRenderNode != null;
+        }
+
         public void invalidate() {
             Iterator it = this.holders.iterator();
             while (it.hasNext()) {
@@ -217,6 +231,32 @@ public class BlurringShader {
             this.i = i2 + 1;
             sb.append(i2);
             this.fallbackBitmap = thumbBlurer.getBitmap(bitmap, sb.toString(), i, 0, z);
+        }
+
+        public void setRenderNode(View view, Object obj, int i) {
+            RenderEffect createBlurEffect;
+            int width;
+            int height;
+            RecordingCanvas beginRecording;
+            this.renderNodeView = view;
+            this.renderNode = obj;
+            this.renderNodeBackgroundColor = i;
+            if (obj == null || Build.VERSION.SDK_INT < 31) {
+                this.blurRenderNode = null;
+                return;
+            }
+            RenderNode m = BotFullscreenButtons$$ExternalSyntheticApiModelOutline2.m(obj);
+            RenderNode renderNode = new RenderNode("blurRenderNode");
+            createBlurEffect = RenderEffect.createBlurEffect(AndroidUtilities.dp(35.0f), AndroidUtilities.dp(35.0f), Shader.TileMode.CLAMP);
+            renderNode.setRenderEffect(createBlurEffect);
+            width = m.getWidth();
+            height = m.getHeight();
+            renderNode.setPosition(0, 0, width, height);
+            beginRecording = renderNode.beginRecording();
+            beginRecording.drawColor(i);
+            beginRecording.drawRenderNode(m);
+            renderNode.endRecording();
+            this.blurRenderNode = renderNode;
         }
 
         public void setShader(BlurringShader blurringShader) {
@@ -264,14 +304,20 @@ public class BlurringShader {
 
     public static class StoryBlurDrawer {
         private boolean animateBitmapChange;
+        private Integer bgColor;
         private BitmapShader bitmapShader;
         RectF bounds;
+        private final Path clipPath;
+        private int clipPathHeight;
+        private int clipPathWidth;
         public final ColorMatrix colorMatrix;
         private ValueAnimator crossfadeAnimator;
         private boolean customOffset;
         private float customOffsetX;
         private float customOffsetY;
         private Bitmap lastBitmap;
+        private final int[] loc1;
+        private final int[] loc2;
         private final BlurManager manager;
         private final Matrix matrix;
         public Paint oldPaint;
@@ -283,13 +329,104 @@ public class BlurringShader {
         private final int type;
         private final View view;
         private boolean wasDark;
+        public boolean xfer;
 
         public StoryBlurDrawer(BlurManager blurManager, View view, int i) {
             this(blurManager, view, i, false);
         }
 
-        public StoryBlurDrawer(final org.telegram.ui.Components.BlurringShader.BlurManager r7, android.view.View r8, int r9, boolean r10) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.BlurringShader.StoryBlurDrawer.<init>(org.telegram.ui.Components.BlurringShader$BlurManager, android.view.View, int, boolean):void");
+        public StoryBlurDrawer(final BlurManager blurManager, View view, int i, boolean z) {
+            float f;
+            this.oldPaint = new Paint(3);
+            this.paint = new Paint(3);
+            this.clipPath = new Path();
+            this.matrix = new Matrix();
+            this.bounds = new RectF();
+            this.wasDark = false;
+            this.loc1 = new int[2];
+            this.loc2 = new int[2];
+            this.manager = blurManager;
+            this.view = view;
+            this.type = i;
+            this.animateBitmapChange = z;
+            ColorMatrix colorMatrix = new ColorMatrix();
+            this.colorMatrix = colorMatrix;
+            if (i == 0) {
+                AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.45f);
+            } else {
+                if (i == 5) {
+                    Paint paint = this.paint;
+                    PorterDuff.Mode mode = PorterDuff.Mode.SRC_IN;
+                    paint.setXfermode(new PorterDuffXfermode(mode));
+                    this.oldPaint.setXfermode(new PorterDuffXfermode(mode));
+                } else if (i == 2) {
+                    Paint paint2 = this.paint;
+                    PorterDuff.Mode mode2 = PorterDuff.Mode.SRC_IN;
+                    paint2.setXfermode(new PorterDuffXfermode(mode2));
+                    this.oldPaint.setXfermode(new PorterDuffXfermode(mode2));
+                    AndroidUtilities.adjustBrightnessColorMatrix(colorMatrix, 0.4f);
+                } else {
+                    if (i == 1) {
+                        AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.35f);
+                        AndroidUtilities.adjustBrightnessColorMatrix(colorMatrix, 0.7f);
+                        f = 1.5f;
+                    } else if (i == 3) {
+                        AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.5f);
+                    } else if (i == 4) {
+                        this.bgColor = -10329502;
+                        AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.6f);
+                        AndroidUtilities.adjustBrightnessColorMatrix(colorMatrix, 0.3f);
+                        f = 1.2f;
+                    } else if (i == 6) {
+                        AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.4f);
+                        AndroidUtilities.multiplyBrightnessColorMatrix(colorMatrix, 0.35f);
+                    } else if (i == 7) {
+                        AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.5f);
+                        f = 0.95f;
+                    } else if (i == 8) {
+                        AndroidUtilities.adjustBrightnessColorMatrix(colorMatrix, -0.15f);
+                        AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.47f);
+                    } else if (i == 9) {
+                        Paint paint3 = this.paint;
+                        PorterDuff.Mode mode3 = PorterDuff.Mode.SRC_IN;
+                        paint3.setXfermode(new PorterDuffXfermode(mode3));
+                        this.oldPaint.setXfermode(new PorterDuffXfermode(mode3));
+                        AndroidUtilities.adjustBrightnessColorMatrix(colorMatrix, 0.4f);
+                        AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.45f);
+                        this.xfer = true;
+                    } else if (i == 10) {
+                        colorMatrix.setSaturation(1.6f);
+                        AndroidUtilities.multiplyBrightnessColorMatrix(colorMatrix, this.wasDark ? 0.97f : 0.92f);
+                        AndroidUtilities.adjustBrightnessColorMatrix(colorMatrix, this.wasDark ? 0.12f : -0.06f);
+                    }
+                    AndroidUtilities.multiplyBrightnessColorMatrix(colorMatrix, f);
+                }
+                AndroidUtilities.adjustSaturationColorMatrix(colorMatrix, 0.3f);
+                this.xfer = true;
+            }
+            this.paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+            this.oldPaint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+            if (view.isAttachedToWindow() && blurManager != null) {
+                blurManager.attach(this);
+            }
+            view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View view2) {
+                    BlurManager blurManager2 = blurManager;
+                    if (blurManager2 != null) {
+                        blurManager2.attach(StoryBlurDrawer.this);
+                    }
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View view2) {
+                    BlurManager blurManager2 = blurManager;
+                    if (blurManager2 != null) {
+                        blurManager2.detach(StoryBlurDrawer.this);
+                    }
+                    StoryBlurDrawer.this.recycle();
+                }
+            });
         }
 
         private void animateOldPaint() {
@@ -310,6 +447,11 @@ public class BlurringShader {
             this.crossfadeAnimator.start();
         }
 
+        private int getBackgroundColor() {
+            Integer num = this.bgColor;
+            return num != null ? num.intValue() : this.manager.renderNodeBackgroundColor;
+        }
+
         public void lambda$animateOldPaint$0(ValueAnimator valueAnimator) {
             this.oldPaintAlpha = ((Float) valueAnimator.getAnimatedValue()).floatValue();
             this.view.invalidate();
@@ -322,38 +464,46 @@ public class BlurringShader {
             paint.setShader(null);
         }
 
-        private boolean setupMatrix(int i, int i2) {
-            BlurManager blurManager;
+        private boolean setupMatrix(int i, int i2, boolean z) {
+            View view;
             this.matrix.reset();
+            BlurManager blurManager = this.manager;
+            View view2 = blurManager != null ? z ? blurManager.renderNodeView : blurManager.view : null;
             if (this.customOffset) {
                 this.matrix.postTranslate(-this.customOffsetX, -this.customOffsetY);
-            } else {
-                View view = this.view;
+            } else if (this.manager != null) {
+                View view3 = this.view;
                 do {
-                    this.matrix.preScale(1.0f / view.getScaleX(), 1.0f / view.getScaleY(), view.getPivotX(), view.getPivotY());
-                    this.matrix.preRotate(-view.getRotation(), view.getPivotX(), view.getPivotY());
-                    this.matrix.preTranslate(-view.getX(), -view.getY());
-                    if (!(view.getParent() instanceof View) || (view = (View) view.getParent()) == null || (blurManager = this.manager) == null) {
+                    this.matrix.preScale(1.0f / view3.getScaleX(), 1.0f / view3.getScaleY(), view3.getPivotX(), view3.getPivotY());
+                    this.matrix.preRotate(-view3.getRotation(), view3.getPivotX(), view3.getPivotY());
+                    this.matrix.preTranslate(-view3.getX(), -view3.getY());
+                    if (!(view3.getParent() instanceof View) || (view3 = (View) view3.getParent()) == null) {
                         break;
                     }
-                } while (!blurManager.parents.contains(view));
-                BlurManager blurManager2 = this.manager;
-                if (blurManager2 != null && blurManager2.view != view) {
-                    int indexOf = this.manager.parents.indexOf(view) + 1;
+                } while (!this.manager.parents.contains(view3));
+                if (view2 != view3) {
+                    int indexOf = this.manager.parents.indexOf(view3) + 1;
+                    if (indexOf == 0 && (view = (View) this.manager.parents.get(indexOf)) != null) {
+                        view3.getLocationOnScreen(this.loc1);
+                        view.getLocationOnScreen(this.loc2);
+                        Matrix matrix = this.matrix;
+                        int i3 = this.loc2[0];
+                        int[] iArr = this.loc1;
+                        matrix.preTranslate(i3 - iArr[0], r3[1] - iArr[1]);
+                    }
                     while (indexOf >= 0 && indexOf < this.manager.parents.size()) {
-                        View view2 = (View) this.manager.parents.get(indexOf);
-                        if (view2 != null) {
-                            this.matrix.postTranslate(view2.getX(), view2.getY());
-                            this.matrix.postScale(1.0f / view2.getScaleX(), 1.0f / view2.getScaleY(), view2.getPivotX(), view2.getPivotY());
-                            this.matrix.postRotate(view2.getRotation(), view2.getPivotX(), view2.getPivotY());
+                        View view4 = (View) this.manager.parents.get(indexOf);
+                        if (view4 != null) {
+                            this.matrix.preScale(view4.getScaleX(), view4.getScaleY(), view4.getPivotX(), view4.getPivotY());
+                            this.matrix.preRotate(view4.getRotation(), view4.getPivotX(), view4.getPivotY());
+                            this.matrix.preTranslate(view4.getX(), view4.getY());
                             indexOf++;
                         }
                     }
                 }
             }
-            BlurManager blurManager3 = this.manager;
-            if (blurManager3 != null && blurManager3.view != null) {
-                this.matrix.preScale(this.manager.view.getWidth() / i, this.manager.view.getHeight() / i2);
+            if (view2 != null) {
+                this.matrix.preScale(view2.getWidth() / i, view2.getHeight() / i2);
             }
             return true;
         }
@@ -378,6 +528,18 @@ public class BlurringShader {
             matrix.postTranslate(rectF.left, rectF.top);
             this.matrix.preScale(width, height);
             this.bitmapShader.setLocalMatrix(this.matrix);
+        }
+
+        public void drawRect(Canvas canvas) {
+            drawRect(canvas, 0.0f, 0.0f, 1.0f);
+        }
+
+        public void drawRect(Canvas canvas, float f, float f2, float f3) {
+            drawRect(canvas, f, f2, f3, true);
+        }
+
+        public void drawRect(android.graphics.Canvas r6, float r7, float r8, float r9, boolean r10) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.BlurringShader.StoryBlurDrawer.drawRect(android.graphics.Canvas, float, float, float, boolean):void");
         }
 
         public Paint getPaint(float f) {
@@ -406,7 +568,7 @@ public class BlurringShader {
                 this.bitmapShader = bitmapShader2;
                 this.paint.setShader(bitmapShader2);
             }
-            if (!setupMatrix(bitmap.getWidth(), bitmap.getHeight())) {
+            if (!setupMatrix(bitmap.getWidth(), bitmap.getHeight(), false)) {
                 return null;
             }
             this.matrix.postTranslate(-f2, -f3);
@@ -439,6 +601,7 @@ public class BlurringShader {
                 float alpha = 1.0f;
                 private final Paint dimPaint = new Paint(1);
                 private final android.graphics.Rect rect = new android.graphics.Rect();
+                private final Path clipPath = new Path();
 
                 private Paint getPaint() {
                     Bitmap bitmap;

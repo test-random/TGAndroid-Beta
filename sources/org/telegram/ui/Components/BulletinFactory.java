@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import androidx.core.graphics.ColorUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -1162,6 +1163,10 @@ public final class BulletinFactory {
             usersLayout.setButton(new Bulletin.UndoButton(getContext(), true, this.resourcesProvider).setText(LocaleController.getString(R.string.Undo)).setUndoAction(undoObject.onUndo).setDelayedAction(undoObject.onAction));
         }
         return create(usersLayout, 5000);
+    }
+
+    public Bulletin createUsersBulletin(TLObject tLObject, CharSequence charSequence, CharSequence charSequence2) {
+        return createUsersBulletin(Arrays.asList(tLObject), charSequence, charSequence2, null);
     }
 
     public Bulletin makeForError(TLRPC.TL_error tL_error) {

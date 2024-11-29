@@ -89,6 +89,8 @@ import org.telegram.ui.Stars.StarsIntroActivity;
 import org.telegram.ui.StatisticActivity;
 import org.telegram.ui.Stories.recorder.ButtonWithCounterView;
 import org.telegram.ui.TwoStepVerificationActivity;
+import org.telegram.ui.bots.AffiliateProgramFragment;
+import org.telegram.ui.bots.ChannelAffiliateProgramsFragment;
 
 public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implements NestedScrollingParent3 {
     public static ChannelMonetizationLayout instance;
@@ -389,12 +391,12 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
 
         public void lambda$loadTransactions$2(TLObject tLObject, int i, TLRPC.TL_error tL_error, boolean z, boolean z2) {
             Runnable runnable;
-            if (tLObject instanceof TL_stars.TL_payments_starsStatus) {
-                TL_stars.TL_payments_starsStatus tL_payments_starsStatus = (TL_stars.TL_payments_starsStatus) tLObject;
-                MessagesController.getInstance(this.currentAccount).putUsers(tL_payments_starsStatus.users, false);
-                MessagesController.getInstance(this.currentAccount).putChats(tL_payments_starsStatus.chats, false);
-                this.starsTransactions.addAll(tL_payments_starsStatus.history);
-                this.starsLastOffset = tL_payments_starsStatus.next_offset;
+            if (tLObject instanceof TL_stars.StarsStatus) {
+                TL_stars.StarsStatus starsStatus = (TL_stars.StarsStatus) tLObject;
+                MessagesController.getInstance(this.currentAccount).putUsers(starsStatus.users, false);
+                MessagesController.getInstance(this.currentAccount).putChats(starsStatus.chats, false);
+                this.starsTransactions.addAll(starsStatus.history);
+                this.starsLastOffset = starsStatus.next_offset;
                 updateLists(true, true);
                 this.loadingTransactions[i] = false;
             } else if (tL_error != null) {
@@ -1203,6 +1205,10 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
                 arrayList.add(UItem.asShadow(-6, this.starsBalanceInfo));
             }
         }
+        if (MessagesController.getInstance(this.currentAccount).starrefConnectAllowed) {
+            arrayList.add(AffiliateProgramFragment.ColorfulTextCell.Factory.as(4, Theme.getColor(Theme.key_color_green, this.resourcesProvider), R.drawable.filled_earn_stars, ChatEditActivity.applyNewSpan(LocaleController.getString(R.string.ChannelAffiliateProgramRowTitle)), LocaleController.getString(R.string.ChannelAffiliateProgramRowText)));
+            arrayList.add(UItem.asShadow(-7, null));
+        }
         arrayList.add(this.transactionsLayout.hasTransactions() ? UItem.asFullscreenCustom(this.transactionsLayout, 0) : UItem.asShadow(-10, null));
     }
 
@@ -1857,7 +1863,12 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
     }
 
     public void onClick(UItem uItem, View view, int i, float f, float f2) {
-        if (uItem.id == 1) {
+        int i2 = uItem.id;
+        if (i2 != 1) {
+            if (i2 == 4) {
+                this.fragment.presentFragment(new ChannelAffiliateProgramsFragment(this.dialogId));
+            }
+        } else {
             if (this.currentBoostLevel >= MessagesController.getInstance(this.currentAccount).channelRestrictSponsoredLevelMin) {
                 this.switchOffValue = !this.switchOffValue;
                 AndroidUtilities.cancelRunOnUIThread(this.sendCpmUpdateRunnable);

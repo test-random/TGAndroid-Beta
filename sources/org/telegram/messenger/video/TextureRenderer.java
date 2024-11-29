@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -13,27 +14,37 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.opengl.EGLContext;
 import android.opengl.GLES20;
+import android.opengl.GLUtils;
 import android.os.Build;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
+import android.view.Surface;
 import android.view.View;
 import java.io.File;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.Bitmaps;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.Utilities;
 import org.telegram.messenger.VideoEditedInfo;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
@@ -46,6 +57,7 @@ import org.telegram.ui.Components.Paint.Views.EditTextOutline;
 import org.telegram.ui.Components.Paint.Views.LinkPreview;
 import org.telegram.ui.Components.Paint.Views.LocationMarker;
 import org.telegram.ui.Components.RLottieDrawable;
+import org.telegram.ui.Components.VideoPlayer;
 
 public class TextureRenderer {
     private static final String FRAGMENT_EXTERNAL_MASK_SHADER = "#extension GL_OES_EGL_image_external : require\nprecision highp float;\nvarying vec2 vTextureCoord;\nvarying vec2 MTextureCoord;\nuniform samplerExternalOES sTexture;\nuniform sampler2D sMask;\nvoid main() {\n  gl_FragColor = texture2D(sTexture, vTextureCoord) * texture2D(sMask, MTextureCoord).a;\n}\n";
@@ -53,6 +65,8 @@ public class TextureRenderer {
     private static final String FRAGMENT_MASK_SHADER = "precision highp float;\nvarying vec2 vTextureCoord;\nvarying vec2 MTextureCoord;\nuniform sampler2D sTexture;\nuniform sampler2D sMask;\nvoid main() {\n  gl_FragColor = texture2D(sTexture, vTextureCoord) * texture2D(sMask, MTextureCoord).a;\n}\n";
     private static final String FRAGMENT_SHADER = "precision highp float;\nvarying vec2 vTextureCoord;\nuniform sampler2D sTexture;\nvoid main() {\n  gl_FragColor = texture2D(sTexture, vTextureCoord);\n}\n";
     private static final String GRADIENT_FRAGMENT_SHADER = "precision highp float;\nvarying vec2 vTextureCoord;\nuniform vec4 gradientTopColor;\nuniform vec4 gradientBottomColor;\nfloat interleavedGradientNoise(vec2 n) {\n    return fract(52.9829189 * fract(.06711056 * n.x + .00583715 * n.y));\n}\nvoid main() {\n  gl_FragColor = mix(gradientTopColor, gradientBottomColor, vTextureCoord.y + (.2 * interleavedGradientNoise(gl_FragCoord.xy) - .1));\n}\n";
+    public static final boolean USE_EXOPLAYER = false;
+    public static final boolean USE_MEDIACODEC = true;
     private static final String VERTEX_SHADER = "uniform mat4 uMVPMatrix;\nuniform mat4 uSTMatrix;\nattribute vec4 aPosition;\nattribute vec4 aTextureCoord;\nvarying vec2 vTextureCoord;\nvoid main() {\n  gl_Position = uMVPMatrix * aPosition;\n  vTextureCoord = (uSTMatrix * aTextureCoord).xy;\n}\n";
     private static final String VERTEX_SHADER_300 = "#version 320 es\nuniform mat4 uMVPMatrix;\nuniform mat4 uSTMatrix;\nin vec4 aPosition;\nin vec4 aTextureCoord;\nout vec2 vTextureCoord;\nvoid main() {\n  gl_Position = uMVPMatrix * aPosition;\n  vTextureCoord = (uSTMatrix * aTextureCoord).xy;\n}\n";
     private static final String VERTEX_SHADER_MASK = "uniform mat4 uMVPMatrix;\nuniform mat4 uSTMatrix;\nattribute vec4 aPosition;\nattribute vec4 aTextureCoord;\nattribute vec4 mTextureCoord;\nvarying vec2 vTextureCoord;\nvarying vec2 MTextureCoord;\nvoid main() {\n  gl_Position = uMVPMatrix * aPosition;\n  vTextureCoord = (uSTMatrix * aTextureCoord).xy;\n  MTextureCoord = (uSTMatrix * mTextureCoord).xy;\n}\n";
@@ -73,6 +87,8 @@ public class TextureRenderer {
     private int blurShaderProgram;
     private int[] blurTexture;
     private FloatBuffer blurVerticesBuffer;
+    private ArrayList<VideoEditedInfo.Part> collageParts;
+    private int[] collageTextures;
     private final MediaController.CropState cropState;
     private ArrayList<AnimatedEmojiDrawable> emojiDrawables;
     private FilterShaders filterShaders;
@@ -82,6 +98,7 @@ public class TextureRenderer {
     private int gradientTopColor;
     private int gradientTopColorHandle;
     private FloatBuffer gradientVerticesBuffer;
+    private final Handler handler;
     private int imageHeight;
     private int imageOrientation;
     private String imagePath;
@@ -103,15 +120,20 @@ public class TextureRenderer {
     private int originalWidth;
     private String paintPath;
     private int[] paintTexture;
+    private final EGLContext parentContext;
     Path path;
     private FloatBuffer renderTextureBuffer;
     private Bitmap roundBitmap;
     private Canvas roundCanvas;
     private Path roundClipPath;
     private int simpleInputTexCoordHandle;
+    private int simpleInputTexCoordHandleOES;
     private int simplePositionHandle;
+    private int simplePositionHandleOES;
     private int simpleShaderProgram;
+    private int simpleShaderProgramOES;
     private int simpleSourceImageHandle;
+    private int simpleSourceImageHandleOES;
     private Bitmap stickerBitmap;
     private Canvas stickerCanvas;
     private int[] stickerTexture;
@@ -137,8 +159,8 @@ public class TextureRenderer {
     private final RectF roundDst = new RectF();
     private boolean firstFrame = true;
 
-    public TextureRenderer(org.telegram.messenger.MediaController.SavedFilterState r28, java.lang.String r29, java.lang.String r30, java.lang.String r31, java.util.ArrayList<org.telegram.messenger.VideoEditedInfo.MediaEntity> r32, org.telegram.messenger.MediaController.CropState r33, int r34, int r35, int r36, int r37, int r38, float r39, boolean r40, java.lang.Integer r41, java.lang.Integer r42, org.telegram.ui.Stories.recorder.StoryEntry.HDRInfo r43, org.telegram.messenger.video.MediaCodecVideoConvertor.ConvertVideoParams r44) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.video.TextureRenderer.<init>(org.telegram.messenger.MediaController$SavedFilterState, java.lang.String, java.lang.String, java.lang.String, java.util.ArrayList, org.telegram.messenger.MediaController$CropState, int, int, int, int, int, float, boolean, java.lang.Integer, java.lang.Integer, org.telegram.ui.Stories.recorder.StoryEntry$HDRInfo, org.telegram.messenger.video.MediaCodecVideoConvertor$ConvertVideoParams):void");
+    public TextureRenderer(org.telegram.messenger.MediaController.SavedFilterState r28, java.lang.String r29, java.lang.String r30, java.lang.String r31, java.util.ArrayList<org.telegram.messenger.VideoEditedInfo.MediaEntity> r32, org.telegram.messenger.MediaController.CropState r33, int r34, int r35, int r36, int r37, int r38, float r39, boolean r40, java.lang.Integer r41, java.lang.Integer r42, org.telegram.ui.Stories.recorder.StoryEntry.HDRInfo r43, org.telegram.messenger.video.MediaCodecVideoConvertor.ConvertVideoParams r44, android.os.Handler r45, android.opengl.EGLContext r46) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.video.TextureRenderer.<init>(org.telegram.messenger.MediaController$SavedFilterState, java.lang.String, java.lang.String, java.lang.String, java.util.ArrayList, org.telegram.messenger.MediaController$CropState, int, int, int, int, int, float, boolean, java.lang.Integer, java.lang.Integer, org.telegram.ui.Stories.recorder.StoryEntry$HDRInfo, org.telegram.messenger.video.MediaCodecVideoConvertor$ConvertVideoParams, android.os.Handler, android.opengl.EGLContext):void");
     }
 
     private void applyRoundRadius(VideoEditedInfo.MediaEntity mediaEntity, Bitmap bitmap, int i) {
@@ -214,6 +236,38 @@ public class TextureRenderer {
         return 0;
     }
 
+    private void destroyCollagePart(int i, VideoEditedInfo.Part part) {
+        if (part == null) {
+            return;
+        }
+        AnimatedFileDrawable animatedFileDrawable = part.animatedFileDrawable;
+        if (animatedFileDrawable != null) {
+            animatedFileDrawable.recycle();
+            part.animatedFileDrawable = null;
+        }
+        final VideoPlayer videoPlayer = part.videoPlayer;
+        if (videoPlayer != null) {
+            Log.i("lolkek", "videoPlayer#" + i + " releasePlayer");
+            part.videoPlayer = null;
+            this.handler.post(new Runnable() {
+                @Override
+                public final void run() {
+                    VideoPlayer.this.releasePlayer(true);
+                }
+            });
+        }
+        MediaCodecPlayer mediaCodecPlayer = part.player;
+        if (mediaCodecPlayer != null) {
+            mediaCodecPlayer.release();
+            part.player = null;
+        }
+        SurfaceTexture surfaceTexture = part.surfaceTexture;
+        if (surfaceTexture != null) {
+            surfaceTexture.release();
+            part.surfaceTexture = null;
+        }
+    }
+
     private void drawBackground() {
         int i = this.NUM_GRADIENT_SHADER;
         if (i < 0) {
@@ -238,6 +292,43 @@ public class TextureRenderer {
         GLES20.glUniformMatrix4fv(this.muMVPMatrixHandle[this.NUM_GRADIENT_SHADER], 1, false, this.mMVPMatrix, 0);
         GLES20.glUniform4f(this.gradientTopColorHandle, Color.red(this.gradientTopColor) / 255.0f, Color.green(this.gradientTopColor) / 255.0f, Color.blue(this.gradientTopColor) / 255.0f, Color.alpha(this.gradientTopColor) / 255.0f);
         GLES20.glUniform4f(this.gradientBottomColorHandle, Color.red(this.gradientBottomColor) / 255.0f, Color.green(this.gradientBottomColor) / 255.0f, Color.blue(this.gradientBottomColor) / 255.0f, Color.alpha(this.gradientBottomColor) / 255.0f);
+        GLES20.glDrawArrays(5, 0, 4);
+    }
+
+    private void drawCollagePart(int i, VideoEditedInfo.Part part, long j) {
+        boolean z;
+        int i2;
+        int i3;
+        int i4;
+        int i5;
+        if (part.isVideo) {
+            GLES20.glUseProgram(this.simpleShaderProgramOES);
+            GLES20.glActiveTexture(33987);
+            GLES20.glBindTexture(36197, this.collageTextures[i]);
+            GLES20.glUniform1i(this.simpleSourceImageHandleOES, 3);
+            GLES20.glEnableVertexAttribArray(this.simpleInputTexCoordHandleOES);
+            z = false;
+            i2 = 8;
+            i3 = 2;
+            i4 = 5126;
+            GLES20.glVertexAttribPointer(this.simpleInputTexCoordHandleOES, 2, 5126, false, 8, (Buffer) part.uvBuffer);
+            GLES20.glEnableVertexAttribArray(this.simplePositionHandleOES);
+            i5 = this.simplePositionHandleOES;
+        } else {
+            GLES20.glUseProgram(this.simpleShaderProgram);
+            GLES20.glActiveTexture(33986);
+            GLES20.glBindTexture(3553, this.collageTextures[i]);
+            GLES20.glUniform1i(this.simpleSourceImageHandle, 2);
+            GLES20.glEnableVertexAttribArray(this.simpleInputTexCoordHandle);
+            z = false;
+            i2 = 8;
+            i3 = 2;
+            i4 = 5126;
+            GLES20.glVertexAttribPointer(this.simpleInputTexCoordHandle, 2, 5126, false, 8, (Buffer) part.uvBuffer);
+            GLES20.glEnableVertexAttribArray(this.simplePositionHandle);
+            i5 = this.simplePositionHandle;
+        }
+        GLES20.glVertexAttribPointer(i5, i3, i4, z, i2, part.posBuffer);
         GLES20.glDrawArrays(5, 0, 4);
     }
 
@@ -334,6 +425,116 @@ public class TextureRenderer {
             GLES20.glBindTexture(3553, i);
         }
         GLES20.glDrawArrays(5, 0, 4);
+    }
+
+    private FloatBuffer floats(float[] fArr) {
+        FloatBuffer asFloatBuffer = ByteBuffer.allocateDirect(fArr.length * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        asFloatBuffer.put(fArr).position(0);
+        return asFloatBuffer;
+    }
+
+    private void initCollagePart(int i, VideoEditedInfo.Part part) {
+        AtomicInteger atomicInteger = new AtomicInteger(part.width);
+        AtomicInteger atomicInteger2 = new AtomicInteger(part.height);
+        AtomicInteger atomicInteger3 = new AtomicInteger(0);
+        if (part.isVideo) {
+            GLES20.glBindTexture(36197, this.collageTextures[i]);
+            GLES20.glTexParameteri(36197, 10241, 9728);
+            GLES20.glTexParameteri(36197, 10240, 9728);
+            GLES20.glTexParameteri(36197, 10242, 33071);
+            GLES20.glTexParameteri(36197, 10243, 33071);
+            SurfaceTexture surfaceTexture = new SurfaceTexture(this.collageTextures[i]);
+            part.surfaceTexture = surfaceTexture;
+            surfaceTexture.setDefaultBufferSize(part.width, part.height);
+            try {
+                part.player = new MediaCodecPlayer(part.path, new Surface(part.surfaceTexture));
+            } catch (Exception e) {
+                FileLog.e(e);
+                part.player = null;
+            }
+            MediaCodecPlayer mediaCodecPlayer = part.player;
+            if (mediaCodecPlayer != null) {
+                atomicInteger.set(mediaCodecPlayer.getOrientedWidth());
+                atomicInteger2.set(part.player.getOrientedHeight());
+                atomicInteger3.set(part.player.getOrientation());
+            }
+        } else {
+            GLES20.glBindTexture(3553, this.collageTextures[i]);
+            GLES20.glTexParameteri(3553, 10241, 9729);
+            GLES20.glTexParameteri(3553, 10240, 9729);
+            GLES20.glTexParameteri(3553, 10242, 33071);
+            GLES20.glTexParameteri(3553, 10243, 33071);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inMutable = true;
+            Bitmap decodeFile = BitmapFactory.decodeFile(part.path, options);
+            Pair<Integer, Integer> imageOrientation = AndroidUtilities.getImageOrientation(part.path);
+            if (((Integer) imageOrientation.first).intValue() != 0 || ((Integer) imageOrientation.second).intValue() != 0) {
+                Matrix matrix = new Matrix();
+                if (((Integer) imageOrientation.second).intValue() != 0) {
+                    matrix.postScale(((Integer) imageOrientation.second).intValue() == 1 ? -1.0f : 1.0f, ((Integer) imageOrientation.second).intValue() != 2 ? 1.0f : -1.0f);
+                }
+                if (((Integer) imageOrientation.first).intValue() != 0) {
+                    matrix.postRotate(((Integer) imageOrientation.first).intValue());
+                }
+                decodeFile = Bitmaps.createBitmap(decodeFile, 0, 0, decodeFile.getWidth(), decodeFile.getHeight(), matrix, true);
+            }
+            Bitmap bitmap = decodeFile;
+            GLUtils.texImage2D(3553, 0, bitmap, 0);
+            atomicInteger.set(bitmap.getWidth());
+            atomicInteger2.set(bitmap.getHeight());
+        }
+        float[] fArr = {part.part.l(2.0f) - 1.0f, -(part.part.t(2.0f) - 1.0f), part.part.r(2.0f) - 1.0f, -(part.part.t(2.0f) - 1.0f), part.part.l(2.0f) - 1.0f, -(part.part.b(2.0f) - 1.0f), part.part.r(2.0f) - 1.0f, -(part.part.b(2.0f) - 1.0f)};
+        float w = part.part.w(this.transformedWidth);
+        float h = part.part.h(this.transformedHeight);
+        int i2 = atomicInteger.get();
+        int i3 = atomicInteger2.get();
+        int i4 = atomicInteger3.get();
+        float f = i2;
+        float f2 = i3;
+        float max = 1.0f / Math.max(w / f, h / f2);
+        float f3 = ((w * max) / f) / 2.0f;
+        float f4 = ((h * max) / f2) / 2.0f;
+        float f5 = 0.5f - f3;
+        float f6 = 0.5f - f4;
+        float f7 = f3 + 0.5f;
+        char c = 4;
+        float f8 = f4 + 0.5f;
+        char c2 = 5;
+        char c3 = 6;
+        char c4 = 7;
+        float[] fArr2 = {f5, f6, f7, f6, f5, f8, f7, f8};
+        while (i4 > 0) {
+            float f9 = fArr2[0];
+            float f10 = fArr2[1];
+            fArr2[0] = fArr2[c];
+            fArr2[1] = fArr2[c2];
+            fArr2[c] = fArr2[c3];
+            fArr2[c2] = fArr2[c4];
+            fArr2[c3] = fArr2[2];
+            fArr2[c4] = fArr2[3];
+            fArr2[2] = f9;
+            fArr2[3] = f10;
+            i4 -= 90;
+            c2 = 5;
+            c3 = 6;
+            c = 4;
+            c4 = 7;
+        }
+        while (i4 < 0) {
+            float f11 = fArr2[0];
+            float f12 = fArr2[1];
+            fArr2[0] = fArr2[2];
+            fArr2[1] = fArr2[3];
+            fArr2[2] = fArr2[6];
+            fArr2[3] = fArr2[7];
+            fArr2[6] = fArr2[4];
+            fArr2[7] = fArr2[5];
+            fArr2[4] = f11;
+            fArr2[5] = f12;
+            i4 += 90;
+        }
+        part.posBuffer = floats(fArr);
+        part.uvBuffer = floats(fArr2);
     }
 
     private void initLinkEntity(VideoEditedInfo.MediaEntity mediaEntity) {
@@ -645,6 +846,27 @@ public class TextureRenderer {
         editTextOutline.draw(new Canvas(mediaEntity.bitmap));
     }
 
+    private boolean isCollage() {
+        return this.collageParts != null;
+    }
+
+    public static void lambda$stepCollagePart$1(int i, long j, VideoEditedInfo.Part part, Runnable runnable) {
+        Log.i("lolkek", "stepCollagePart: i=" + i + " seek DONE to " + j + " currentPosition=" + part.videoPlayer.getCurrentPosition());
+        runnable.run();
+    }
+
+    private void stepCollagePart(int i, VideoEditedInfo.Part part, long j) {
+        long j2 = (j / 1000000) - part.offset;
+        float f = part.right;
+        float f2 = (float) part.duration;
+        long clamp = Utilities.clamp(j2, f * f2, part.left * f2);
+        MediaCodecPlayer mediaCodecPlayer = part.player;
+        if (mediaCodecPlayer == null || !mediaCodecPlayer.ensure(clamp)) {
+            return;
+        }
+        part.surfaceTexture.updateTexImage();
+    }
+
     public void changeFragmentShader(String str, String str2, boolean z) {
         int createProgram;
         int createProgram2;
@@ -792,6 +1014,12 @@ public class TextureRenderer {
                 GLES20.glDrawArrays(5, 0, 4);
             }
         }
+        if (isCollage()) {
+            for (int i14 = 0; i14 < this.collageParts.size(); i14++) {
+                stepCollagePart(i14, this.collageParts.get(i14), j);
+                drawCollagePart(i14, this.collageParts.get(i14), j);
+            }
+        }
         if (this.isPhoto || this.paintTexture != null || this.stickerTexture != null) {
             GLES20.glUseProgram(this.simpleShaderProgram);
             GLES20.glActiveTexture(33984);
@@ -800,9 +1028,8 @@ public class TextureRenderer {
             GLES20.glVertexAttribPointer(this.simpleInputTexCoordHandle, 2, 5126, false, 8, (Buffer) this.textureBuffer);
             GLES20.glEnableVertexAttribArray(this.simplePositionHandle);
         }
-        int i14 = this.imagePathIndex;
-        if (i14 >= 0) {
-            drawTexture(true, this.paintTexture[i14], -10000.0f, -10000.0f, -10000.0f, -10000.0f, 0.0f, false, this.useMatrixForImagePath && this.isPhoto, -1);
+        if (this.imagePathIndex >= 0 && !isCollage()) {
+            drawTexture(true, this.paintTexture[this.imagePathIndex], -10000.0f, -10000.0f, -10000.0f, -10000.0f, 0.0f, false, this.useMatrixForImagePath && this.isPhoto, -1);
         }
         int i15 = this.paintPathIndex;
         if (i15 >= 0) {
@@ -847,6 +1074,16 @@ public class TextureRenderer {
                 if (bitmap != null) {
                     bitmap.recycle();
                     mediaEntity.bitmap = null;
+                }
+            }
+        }
+        ArrayList<VideoEditedInfo.Part> arrayList2 = this.collageParts;
+        if (arrayList2 != null) {
+            Iterator<VideoEditedInfo.Part> it = arrayList2.iterator();
+            while (it.hasNext()) {
+                it.next();
+                for (int i2 = 0; i2 < this.collageParts.size(); i2++) {
+                    destroyCollagePart(i2, this.collageParts.get(i2));
                 }
             }
         }

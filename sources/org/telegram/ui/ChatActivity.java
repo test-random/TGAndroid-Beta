@@ -11766,15 +11766,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ChatActivity.this.lambda$openSearchWithUser$326(user);
         }
 
-        public void lambda$didPressAnimatedEmoji$28(TLRPC.InputStickerSet inputStickerSet) {
-            ArrayList arrayList = new ArrayList(1);
-            arrayList.add(inputStickerSet);
-            ChatActivity chatActivity = ChatActivity.this;
-            EmojiPacksAlert emojiPacksAlert = new EmojiPacksAlert(chatActivity, chatActivity.getParentActivity(), ChatActivity.this.themeDelegate, arrayList);
-            emojiPacksAlert.setCalcMandatoryInsets(ChatActivity.this.isKeyboardVisible());
-            ChatActivity.this.showDialog(emojiPacksAlert);
-        }
-
         public void lambda$didPressChannelRecommendation$25(View view) {
             if (((BaseFragment) ChatActivity.this).parentLayout != null) {
                 ((BaseFragment) ChatActivity.this).parentLayout.expandPreviewFragment();
@@ -11816,7 +11807,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ChatActivity.this.factCheckHint.show();
         }
 
-        public void lambda$didPressImage$31(MessageObject messageObject) {
+        public void lambda$didPressImage$30(MessageObject messageObject) {
             if (ChatActivity.this.checkSlowModeAlert()) {
                 SendMessagesHelper.SendMessageParams of = SendMessagesHelper.SendMessageParams.of(messageObject.getDiceEmoji(), ChatActivity.this.dialog_id, ChatActivity.this.replyingMessageObject, ChatActivity.this.getThreadMessage(), null, false, null, null, null, true, 0, null, false);
                 of.quick_reply_shortcut_id = ChatActivity.this.getQuickReplyId();
@@ -11826,7 +11817,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        public void lambda$didPressInstantButton$32(TLObject tLObject, boolean z) {
+        public void lambda$didPressInstantButton$31(TLObject tLObject, boolean z) {
             ChatActivity.this.progressDialogCurrent.end();
             if (!(tLObject instanceof TLRPC.TL_messages_stickerSet)) {
                 BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.error, LocaleController.getString(z ? R.string.AddEmojiNotFound : R.string.AddStickersNotFound)).show(true);
@@ -11854,16 +11845,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ChatActivity.this.showDialog(emojiPacksAlert);
         }
 
-        public void lambda$didPressInstantButton$33(final boolean z, final TLObject tLObject, TLRPC.TL_error tL_error) {
+        public void lambda$didPressInstantButton$32(final boolean z, final TLObject tLObject, TLRPC.TL_error tL_error) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$32(tLObject, z);
+                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$31(tLObject, z);
                 }
             });
         }
 
-        public void lambda$didPressInstantButton$34(int i) {
+        public void lambda$didPressInstantButton$33(int i) {
             ConnectionsManager.getInstance(((BaseFragment) ChatActivity.this).currentAccount).cancelRequest(i, true);
         }
 
@@ -11947,31 +11938,31 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ChatActivity.this.closeMenu();
         }
 
-        public void lambda$didPressReplyMessage$29(MessageObject messageObject) {
+        public void lambda$didPressReplyMessage$28(MessageObject messageObject) {
             ChatActivity.this.progressDialogAtMessageId = messageObject.getId();
             ChatActivity.this.progressDialogAtMessageType = 0;
         }
 
-        public void lambda$didPressReplyMessage$30(int i, final MessageObject messageObject) {
+        public void lambda$didPressReplyMessage$29(int i, final MessageObject messageObject) {
             ChatActivity.this.scrollToMessageId(i, messageObject.getId(), true, messageObject.getDialogId() == ChatActivity.this.mergeDialogId ? 1 : 0, true, 0, new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressReplyMessage$29(messageObject);
+                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressReplyMessage$28(messageObject);
                 }
             });
         }
 
-        public static void lambda$didPressRevealSensitiveContent$35(boolean[] zArr, View view) {
+        public static void lambda$didPressRevealSensitiveContent$34(boolean[] zArr, View view) {
             boolean z = !zArr[0];
             zArr[0] = z;
             ((CheckBoxCell) view).setChecked(z, true);
         }
 
-        public void lambda$didPressRevealSensitiveContent$36() {
+        public void lambda$didPressRevealSensitiveContent$35() {
             ChatActivity.this.presentFragment(new ThemeActivity(0).highlightSensitiveRow());
         }
 
-        public void lambda$didPressRevealSensitiveContent$37(boolean[] zArr, TL_account.contentSettings contentsettings, ChatMessageCell chatMessageCell, DialogInterface dialogInterface, int i) {
+        public void lambda$didPressRevealSensitiveContent$36(boolean[] zArr, TL_account.contentSettings contentsettings, ChatMessageCell chatMessageCell, DialogInterface dialogInterface, int i) {
             if (!zArr[0]) {
                 if (chatMessageCell.getMessageObject() != null) {
                     chatMessageCell.getMessageObject().isSensitiveCached = Boolean.FALSE;
@@ -11984,7 +11975,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 BulletinFactory.of(ChatActivity.this).createSimpleBulletinDetail(R.raw.chats_infotip, AndroidUtilities.replaceArrows(AndroidUtilities.premiumText(LocaleController.getString(R.string.SensitiveContentSettingsToast), new Runnable() {
                     @Override
                     public final void run() {
-                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$36();
+                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$35();
                     }
                 }), true)).show(true);
             }
@@ -11999,7 +11990,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        public void lambda$didPressRevealSensitiveContent$38(AlertDialog alertDialog, final ChatMessageCell chatMessageCell, final TL_account.contentSettings contentsettings) {
+        public void lambda$didPressRevealSensitiveContent$37(AlertDialog alertDialog, final ChatMessageCell chatMessageCell, final TL_account.contentSettings contentsettings) {
             alertDialog.dismissUnless(200L);
             final boolean[] zArr = new boolean[1];
             FrameLayout frameLayout = new FrameLayout(ChatActivity.this.getContext());
@@ -12012,7 +12003,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 checkBoxCell.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public final void onClick(View view) {
-                        ChatActivity.ChatMessageCellDelegate.lambda$didPressRevealSensitiveContent$35(zArr, view);
+                        ChatActivity.ChatMessageCellDelegate.lambda$didPressRevealSensitiveContent$34(zArr, view);
                     }
                 });
             }
@@ -12020,7 +12011,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             chatActivity.showDialog(new AlertDialog.Builder(chatActivity.getContext(), ChatActivity.this.getResourceProvider()).setTitle(LocaleController.getString(R.string.MessageShowSensitiveContentMediaTitle)).setMessage(LocaleController.getString(R.string.MessageShowSensitiveContentMediaText)).setView(frameLayout).setCustomViewOffset(9).setNegativeButton(LocaleController.getString(R.string.Cancel), null).setPositiveButton(LocaleController.getString(R.string.MessageShowSensitiveContentButton), new DialogInterface.OnClickListener() {
                 @Override
                 public final void onClick(DialogInterface dialogInterface, int i) {
-                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$37(zArr, contentsettings, chatMessageCell, dialogInterface, i);
+                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$36(zArr, contentsettings, chatMessageCell, dialogInterface, i);
                 }
             }).create());
         }
@@ -12249,24 +12240,27 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public boolean didPressAnimatedEmoji(ChatMessageCell chatMessageCell, AnimatedEmojiSpan animatedEmojiSpan) {
-            Bulletin createContainsEmojiBulletin;
-            if (!ChatActivity.this.getMessagesController().premiumFeaturesBlocked() && animatedEmojiSpan != null && !animatedEmojiSpan.standard) {
-                long documentId = animatedEmojiSpan.getDocumentId();
-                TLRPC.Document document = animatedEmojiSpan.document;
-                if (document == null) {
-                    document = AnimatedEmojiDrawable.findDocument(((BaseFragment) ChatActivity.this).currentAccount, documentId);
-                }
-                if (document != null && (createContainsEmojiBulletin = BulletinFactory.of(ChatActivity.this).createContainsEmojiBulletin(document, 0, new Utilities.Callback() {
-                    @Override
-                    public final void run(Object obj) {
-                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressAnimatedEmoji$28((TLRPC.InputStickerSet) obj);
-                    }
-                })) != null) {
-                    createContainsEmojiBulletin.show();
-                    return true;
-                }
+            TLRPC.InputStickerSet inputStickerSet;
+            if (ChatActivity.this.getMessagesController().premiumFeaturesBlocked() || animatedEmojiSpan == null || animatedEmojiSpan.standard) {
+                return false;
             }
-            return false;
+            long documentId = animatedEmojiSpan.getDocumentId();
+            TLRPC.Document document = animatedEmojiSpan.document;
+            if (document == null) {
+                document = AnimatedEmojiDrawable.findDocument(((BaseFragment) ChatActivity.this).currentAccount, documentId);
+            }
+            if (document == null || (inputStickerSet = MessageObject.getInputStickerSet(document)) == null) {
+                return false;
+            }
+            MediaDataController.getInstance(UserConfig.selectedAccount).getStickerSet(inputStickerSet, true);
+            ArrayList arrayList = new ArrayList(1);
+            arrayList.add(inputStickerSet);
+            ChatActivity chatActivity = ChatActivity.this;
+            EmojiPacksAlert emojiPacksAlert = new EmojiPacksAlert(chatActivity, chatActivity.getParentActivity(), ChatActivity.this.themeDelegate, arrayList);
+            emojiPacksAlert.setPreviewEmoji(document);
+            emojiPacksAlert.setCalcMandatoryInsets(ChatActivity.this.isKeyboardVisible());
+            ChatActivity.this.showDialog(emojiPacksAlert);
+            return true;
         }
 
         @Override
@@ -12480,7 +12474,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 Browser.Progress makeProgressForPaidMedia = ChatActivity.this.makeProgressForPaidMedia(chatMessageCell);
                 StarsController starsController = StarsController.getInstance(((BaseFragment) ChatActivity.this).currentAccount);
                 Objects.requireNonNull(makeProgressForPaidMedia);
-                Runnable pay = starsController.pay(messageObject, new ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda11(makeProgressForPaidMedia));
+                Runnable pay = starsController.pay(messageObject, new ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10(makeProgressForPaidMedia));
                 if (pay != null) {
                     makeProgressForPaidMedia.onCancel(pay);
                     makeProgressForPaidMedia.init();
@@ -12810,13 +12804,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         final int sendRequest = ConnectionsManager.getInstance(((BaseFragment) ChatActivity.this).currentAccount).sendRequest(tL_messages_getStickerSet, new RequestDelegate() {
                             @Override
                             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                                ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$33(z, tLObject, tL_error);
+                                ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$32(z, tLObject, tL_error);
                             }
                         });
                         ChatActivity.this.progressDialogCurrent.onCancel(new Runnable() {
                             @Override
                             public final void run() {
-                                ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$34(sendRequest);
+                                ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$33(sendRequest);
                             }
                         });
                         return;
@@ -12916,7 +12910,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.getMessagesController().getContentSettings(new Utilities.Callback() {
                     @Override
                     public final void run(Object obj) {
-                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$38(alertDialog, chatMessageCell, (TL_account.contentSettings) obj);
+                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$37(alertDialog, chatMessageCell, (TL_account.contentSettings) obj);
                     }
                 });
             } else {
@@ -24867,6 +24861,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         TLRPC.WebPage webPage;
         ?? r9;
         TLRPC.User user = null;
+        boolean z2 = false;
         LongSparseArray longSparseArray = null;
         int i4 = 0;
         while (i4 < arrayList.size()) {
@@ -24898,7 +24893,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         if (messageAction instanceof TLRPC.TL_messageActionGameScore) {
                             messageObject2.generateGameMessageText(user);
                         } else if (messageAction instanceof TLRPC.TL_messageActionPaymentSent) {
-                            messageObject2.generatePaymentSentMessageText(user);
+                            messageObject2.generatePaymentSentMessageText(user, z2);
+                        } else if (messageAction instanceof TLRPC.TL_messageActionPaymentSentMe) {
+                            messageObject2.generatePaymentSentMessageText(user, true);
                         }
                     }
                     if (messageObject3.isWebpage() && messageObject2.isWebpage() && (webPage = (tL_messageMediaWebPage = (TLRPC.TL_messageMediaWebPage) MessageObject.getMedia(messageObject3.messageOwner)).webpage) != null && "telegram_story".equals(webPage.type)) {
@@ -25067,6 +25064,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
             i4++;
             user = null;
+            z2 = false;
         }
         if (longSparseArray != null) {
             for (int i13 = 0; i13 < longSparseArray.size(); i13++) {

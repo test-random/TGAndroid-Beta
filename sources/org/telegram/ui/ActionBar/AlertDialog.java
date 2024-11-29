@@ -631,6 +631,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         float f = 0.8f;
         this.blurAlpha = 0.8f;
         this.resourcesProvider = resourcesProvider;
+        this.progressViewStyle = i;
         int themedColor = getThemedColor(Theme.key_dialogBackground);
         this.backgroundColor = themedColor;
         boolean z = AndroidUtilities.computePerceivedBrightness(themedColor) < 0.721f;
@@ -651,7 +652,6 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
             this.shadowDrawable.getPadding(this.backgroundPaddings);
         }
         this.withCancelDialog = this.progressViewStyle == 3;
-        this.progressViewStyle = i;
     }
 
     private boolean canTextInput(View view) {

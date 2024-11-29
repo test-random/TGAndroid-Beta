@@ -1918,7 +1918,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
 
         @Override
-        protected void drawBlur(BlurringShader.StoryBlurDrawer storyBlurDrawer, Canvas canvas, RectF rectF, float f, boolean z, float f2, float f3, boolean z2) {
+        protected void drawBlur(BlurringShader.StoryBlurDrawer storyBlurDrawer, Canvas canvas, RectF rectF, float f, boolean z, float f2, float f3, boolean z2, float f4) {
             canvas.save();
             this.path.rewind();
             this.path.addRoundRect(rectF, f, f, Path.Direction.CW);
@@ -1928,7 +1928,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             } else {
                 canvas.translate(f2, f3);
             }
-            PhotoViewer.this.drawCaptionBlur(canvas, storyBlurDrawer, z ? -8882056 : -14277082, z2 ? z ? 0 : 855638016 : 1140850688, false, !z, !z && z2);
+            PhotoViewer.this.drawCaptionBlur(canvas, storyBlurDrawer, Theme.multAlpha(z ? -8882056 : -14277082, f4), Theme.multAlpha(z2 ? z ? 0 : 855638016 : 1140850688, f4), false, !z, !z && z2);
             canvas.restore();
         }
 
@@ -17398,7 +17398,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
 
             @Override
-            protected void drawBlur(BlurringShader.StoryBlurDrawer storyBlurDrawer, Canvas canvas, RectF rectF, float f, boolean z, float f2, float f3, boolean z2) {
+            protected void drawBlur(BlurringShader.StoryBlurDrawer storyBlurDrawer, Canvas canvas, RectF rectF, float f, boolean z, float f2, float f3, boolean z2, float f4) {
                 canvas.save();
                 this.path.rewind();
                 this.path.addRoundRect(rectF, f, f, Path.Direction.CW);
@@ -17408,7 +17408,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 } else {
                     canvas.translate(f2, f3);
                 }
-                PhotoViewer.this.drawCaptionBlur(canvas, storyBlurDrawer, z ? -8882056 : -14277082, z2 ? z ? 0 : 855638016 : 1140850688, false, !z, !z && z2);
+                PhotoViewer.this.drawCaptionBlur(canvas, storyBlurDrawer, Theme.multAlpha(z ? -8882056 : -14277082, f4), Theme.multAlpha(z2 ? z ? 0 : 855638016 : 1140850688, f4), false, !z, !z && z2);
                 canvas.restore();
             }
 

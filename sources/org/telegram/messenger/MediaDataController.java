@@ -180,6 +180,7 @@ public class MediaDataController extends BaseController {
     private boolean[] loadingRecentStickers;
     boolean loadingSavedReactions;
     private boolean loadingSearchLocal;
+    private final HashMap<SearchStickersKey, Integer> loadingSearchStickersKeys;
     private final HashMap<String, ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>>> loadingStickerSets;
     private final HashSet<String> loadingStickerSetsKeys;
     private boolean[] loadingStickers;
@@ -218,6 +219,7 @@ public class MediaDataController extends BaseController {
     public ArrayList<MessageObject> searchResultMessages;
     public ArrayList<MessageObject> searchServerResultMessages;
     private SparseArray<MessageObject>[] searchServerResultMessagesMap;
+    private final android.util.LruCache<SearchStickersKey, SearchStickersResult> searchStickerResults;
     public final HashMap<String, Utilities.Callback<Boolean>> shortcutCallbacks;
     private TLRPC.TL_messages_stickerSet stickerSetDefaultChannelStatuses;
     private TLRPC.TL_messages_stickerSet stickerSetDefaultStatuses;
@@ -433,6 +435,51 @@ public class MediaDataController extends BaseController {
         void run(ArrayList<KeywordResult> arrayList, String str);
     }
 
+    public static class SearchStickersKey {
+        public final boolean emojis;
+        public final String lang_code;
+        public final String q;
+
+        public SearchStickersKey(boolean z, String str, String str2) {
+            this.emojis = z;
+            this.lang_code = str;
+            this.q = str2;
+        }
+
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            SearchStickersKey searchStickersKey = (SearchStickersKey) obj;
+            return this.emojis == searchStickersKey.emojis && Objects.equals(this.lang_code, searchStickersKey.lang_code) && Objects.equals(this.q, searchStickersKey.q);
+        }
+
+        public int hashCode() {
+            return Objects.hash(Boolean.valueOf(this.emojis), this.lang_code, this.q);
+        }
+    }
+
+    public static class SearchStickersResult {
+        public final ArrayList<TLRPC.Document> documents;
+        public Integer next_offset;
+
+        private SearchStickersResult() {
+            this.documents = new ArrayList<>();
+        }
+
+        SearchStickersResult(AnonymousClass1 anonymousClass1) {
+            this();
+        }
+
+        public void apply(TLRPC.TL_messages_foundStickers tL_messages_foundStickers) {
+            this.documents.addAll(tL_messages_foundStickers.stickers);
+            this.next_offset = (tL_messages_foundStickers.flags & 1) != 0 ? Integer.valueOf(tL_messages_foundStickers.next_offset) : null;
+        }
+    }
+
     static {
         for (int i = 0; i < 4; i++) {
             lockObjects[i] = new Object();
@@ -533,6 +580,8 @@ public class MediaDataController extends BaseController {
         this.savedReactions = new ArrayList<>();
         this.draftVoicesLoaded = false;
         this.draftVoices = new LongSparseArray();
+        this.loadingSearchStickersKeys = new HashMap<>();
+        this.searchStickerResults = new android.util.LruCache<>(25);
         String str = "drafts";
         if (this.currentAccount == 0) {
             context = ApplicationLoader.applicationContext;
@@ -1305,7 +1354,9 @@ public class MediaDataController extends BaseController {
                     } else if (messageAction instanceof TLRPC.TL_messageActionGameScore) {
                         messageObject2.generateGameMessageText(null);
                     } else if (messageAction instanceof TLRPC.TL_messageActionPaymentSent) {
-                        messageObject2.generatePaymentSentMessageText(null);
+                        messageObject2.generatePaymentSentMessageText(null, false);
+                    } else if (messageAction instanceof TLRPC.TL_messageActionPaymentSentMe) {
+                        messageObject2.generatePaymentSentMessageText(null, true);
                     }
                 }
                 z2 = true;
@@ -5000,6 +5051,27 @@ public class MediaDataController extends BaseController {
         });
     }
 
+    public void lambda$searchStickers$247(SearchStickersKey searchStickersKey, SearchStickersResult searchStickersResult, TLObject tLObject, Utilities.Callback callback) {
+        this.loadingSearchStickersKeys.remove(searchStickersKey);
+        if (searchStickersResult == null) {
+            searchStickersResult = new SearchStickersResult(null);
+        }
+        if (tLObject instanceof TLRPC.TL_messages_foundStickers) {
+            searchStickersResult.apply((TLRPC.TL_messages_foundStickers) tLObject);
+        }
+        this.searchStickerResults.put(searchStickersKey, searchStickersResult);
+        callback.run(searchStickersResult.documents);
+    }
+
+    public void lambda$searchStickers$248(final SearchStickersKey searchStickersKey, final SearchStickersResult searchStickersResult, final Utilities.Callback callback, final TLObject tLObject, TLRPC.TL_error tL_error) {
+        AndroidUtilities.runOnUIThread(new Runnable() {
+            @Override
+            public final void run() {
+                MediaDataController.this.lambda$searchStickers$247(searchStickersKey, searchStickersResult, tLObject, callback);
+            }
+        });
+    }
+
     public static void lambda$setPlaceholderImage$31(String str, BackupImageView backupImageView, String str2, TLRPC.TL_messages_stickerSet tL_messages_stickerSet) {
         TLRPC.Document document;
         if (tL_messages_stickerSet == null) {
@@ -6182,6 +6254,14 @@ public class MediaDataController extends BaseController {
         }
         runnable.run();
         return true;
+    }
+
+    public void cancelSearchStickers(SearchStickersKey searchStickersKey) {
+        Integer remove;
+        if (searchStickersKey == null || (remove = this.loadingSearchStickersKeys.remove(searchStickersKey)) == null) {
+            return;
+        }
+        getConnectionsManager().cancelRequest(remove.intValue(), true);
     }
 
     public void checkAllMedia(boolean z) {
@@ -8715,7 +8795,7 @@ public class MediaDataController extends BaseController {
             LongSparseArray longSparseArray = this.removingStickerSetsUndos;
             long j = arrayList.get(i8).set.id;
             Objects.requireNonNull(delayedAction);
-            longSparseArray.put(j, new MediaDataController$$ExternalSyntheticLambda15(delayedAction));
+            longSparseArray.put(j, new MediaDataController$$ExternalSyntheticLambda16(delayedAction));
         }
         Bulletin.make(baseFragment, stickerSetBulletinLayout, 2750).show();
     }
@@ -9180,6 +9260,37 @@ public class MediaDataController extends BaseController {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaDataController.searchMessagesInChat(java.lang.String, long, long, int, int, long, boolean, org.telegram.tgnet.TLRPC$User, org.telegram.tgnet.TLRPC$Chat, boolean, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction):void");
     }
 
+    public SearchStickersKey searchStickers(boolean z, String str, String str2, Utilities.Callback<ArrayList<TLRPC.Document>> callback) {
+        return searchStickers(z, str, str2, callback, false);
+    }
+
+    public SearchStickersKey searchStickers(boolean z, String str, String str2, final Utilities.Callback<ArrayList<TLRPC.Document>> callback, boolean z2) {
+        if (callback == null) {
+            return null;
+        }
+        final SearchStickersKey searchStickersKey = new SearchStickersKey(z, str, str2);
+        final SearchStickersResult searchStickersResult = this.searchStickerResults.get(searchStickersKey);
+        if ((searchStickersResult == null || (searchStickersResult.next_offset != null && z2)) && !this.loadingSearchStickersKeys.containsKey(searchStickersKey)) {
+            TLRPC.TL_messages_searchStickers tL_messages_searchStickers = new TLRPC.TL_messages_searchStickers();
+            tL_messages_searchStickers.emojis = searchStickersKey.emojis;
+            if (!TextUtils.isEmpty(searchStickersKey.lang_code)) {
+                tL_messages_searchStickers.lang_code.add(searchStickersKey.lang_code);
+            }
+            tL_messages_searchStickers.q = searchStickersKey.q;
+            tL_messages_searchStickers.limit = 50;
+            tL_messages_searchStickers.offset = searchStickersResult == null ? 0 : searchStickersResult.next_offset.intValue();
+            this.loadingSearchStickersKeys.put(searchStickersKey, Integer.valueOf(getConnectionsManager().sendRequest(tL_messages_searchStickers, new RequestDelegate() {
+                @Override
+                public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
+                    MediaDataController.this.lambda$searchStickers$248(searchStickersKey, searchStickersResult, callback, tLObject, tL_error);
+                }
+            })));
+        } else {
+            callback.run(searchStickersResult != null ? searchStickersResult.documents : new ArrayList<>());
+        }
+        return searchStickersKey;
+    }
+
     public void setDoubleTapReaction(String str) {
         MessagesController.getEmojiSettings(this.currentAccount).edit().putString("reaction_on_double_tap", str).apply();
         this.doubleTapReaction = str;
@@ -9350,7 +9461,7 @@ public class MediaDataController extends BaseController {
         LongSparseArray longSparseArray = this.removingStickerSetsUndos;
         long j = stickerSet.id;
         Objects.requireNonNull(delayedAction);
-        longSparseArray.put(j, new MediaDataController$$ExternalSyntheticLambda15(delayedAction));
+        longSparseArray.put(j, new MediaDataController$$ExternalSyntheticLambda16(delayedAction));
         Bulletin.make(baseFragment, stickerSetBulletinLayout, 2750).show();
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.stickersDidLoad, Integer.valueOf(i5), Boolean.TRUE);
     }

@@ -529,6 +529,7 @@ public class UniversalAdapter extends AdapterWithDiffUtils {
             case 14:
                 SlideChooseView slideChooseView = (SlideChooseView) viewHolder.itemView;
                 slideChooseView.setOptions(item.intValue, item.texts);
+                slideChooseView.setMinAllowedIndex((int) item.longValue);
                 slideChooseView.setCallback(new SlideChooseView.Callback() {
                     @Override
                     public final void onOptionSelected(int i11) {
@@ -542,7 +543,9 @@ public class UniversalAdapter extends AdapterWithDiffUtils {
                 });
                 return;
             case 15:
-                ((SlideIntChooseView) viewHolder.itemView).set(item.intValue, (SlideIntChooseView.Options) item.object, item.intCallback);
+                SlideIntChooseView slideIntChooseView = (SlideIntChooseView) viewHolder.itemView;
+                slideIntChooseView.set(item.intValue, (SlideIntChooseView.Options) item.object, item.intCallback);
+                slideIntChooseView.setMinValueAllowed((int) item.longValue);
                 return;
             case 16:
                 QuickRepliesActivity.QuickReplyView quickReplyView = (QuickRepliesActivity.QuickReplyView) viewHolder.itemView;

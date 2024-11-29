@@ -2,11 +2,14 @@ package org.telegram.ui.Components;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
+import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -26,6 +29,7 @@ import org.telegram.messenger.Emoji;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserObject;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
@@ -34,12 +38,15 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.UserCell;
 import org.telegram.ui.Components.BlurringShader;
+import org.telegram.ui.Components.ItemOptions;
 import org.telegram.ui.Components.MessagePreviewView;
 import org.telegram.ui.ProfileActivity;
 import org.telegram.ui.Stories.recorder.HintView2;
 
 public class ItemOptions {
     private ActionBarPopupWindow actionBarPopupWindow;
+    private boolean allowCenter;
+    private boolean blur;
     private ViewGroup container;
     private Context context;
     private int dimAlpha;
@@ -47,6 +54,7 @@ public class ItemOptions {
     private Runnable dismissListener;
     private boolean dontDismiss;
     private boolean drawScrim;
+    private int fixedWidthDp;
     private boolean forceBottom;
     private boolean forceTop;
     private int foregroundIndex;
@@ -67,6 +75,8 @@ public class ItemOptions {
     private Theme.ResourcesProvider resourcesProvider;
     private View scrimView;
     private Drawable scrimViewBackground;
+    private int scrimViewPadding;
+    private int scrimViewRoundRadius;
     private Integer selectorColor;
     private int shiftDp;
     public boolean swipeback;
@@ -76,26 +86,45 @@ public class ItemOptions {
     private android.graphics.Rect viewAdditionalOffsets;
 
     public class DimView extends View {
+        private Bitmap blurBitmap;
+        private Paint blurPaint;
+        private final RectF bounds;
         private final Bitmap cachedBitmap;
         private final Paint cachedBitmapPaint;
+        private final Path clipPath;
         private final float clipTop;
         private final int dim;
 
         public DimView(Context context) {
             super(context);
+            this.clipPath = new Path();
+            this.bounds = new RectF();
             this.clipTop = (ItemOptions.this.scrimView == null || !(ItemOptions.this.scrimView.getParent() instanceof View)) ? 0.0f : ((View) ItemOptions.this.scrimView.getParent()).getY() + ItemOptions.this.scrimView.getY();
             this.dim = ColorUtils.setAlphaComponent(0, ItemOptions.this.dimAlpha);
-            if (!ItemOptions.this.drawScrim || !(ItemOptions.this.scrimView instanceof UserCell) || !(ItemOptions.this.fragment instanceof ProfileActivity)) {
+            if (ItemOptions.this.drawScrim && (ItemOptions.this.scrimView instanceof UserCell) && (ItemOptions.this.fragment instanceof ProfileActivity)) {
+                this.cachedBitmapPaint = new Paint(3);
+                Bitmap createBitmap = Bitmap.createBitmap(ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.width(), ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.height(), Bitmap.Config.ARGB_8888);
+                this.cachedBitmap = createBitmap;
+                Canvas canvas = new Canvas(createBitmap);
+                canvas.translate(ItemOptions.this.viewAdditionalOffsets.left, ItemOptions.this.viewAdditionalOffsets.top);
+                ItemOptions.this.scrimView.draw(canvas);
+            } else {
                 this.cachedBitmapPaint = null;
                 this.cachedBitmap = null;
-                return;
             }
-            this.cachedBitmapPaint = new Paint(3);
-            Bitmap createBitmap = Bitmap.createBitmap(ItemOptions.this.scrimView.getWidth() + ItemOptions.this.viewAdditionalOffsets.width(), ItemOptions.this.scrimView.getHeight() + ItemOptions.this.viewAdditionalOffsets.height(), Bitmap.Config.ARGB_8888);
-            this.cachedBitmap = createBitmap;
-            Canvas canvas = new Canvas(createBitmap);
-            canvas.translate(ItemOptions.this.viewAdditionalOffsets.left, ItemOptions.this.viewAdditionalOffsets.top);
-            ItemOptions.this.scrimView.draw(canvas);
+            if (ItemOptions.this.blur) {
+                this.blurPaint = new Paint(3);
+                AndroidUtilities.makeGlobalBlurBitmap(new Utilities.Callback() {
+                    @Override
+                    public final void run(Object obj) {
+                        ItemOptions.DimView.this.lambda$new$0((Bitmap) obj);
+                    }
+                }, 12.0f);
+            }
+        }
+
+        public void lambda$new$0(Bitmap bitmap) {
+            this.blurBitmap = bitmap;
         }
 
         @Override
@@ -113,7 +142,15 @@ public class ItemOptions {
             int height2;
             int i6;
             super.onDraw(canvas);
-            canvas.drawColor(this.dim);
+            if (this.blurBitmap != null) {
+                canvas.save();
+                float max = Math.max(getWidth() / this.blurBitmap.getWidth(), getHeight() / this.blurBitmap.getHeight());
+                canvas.scale(max, max);
+                canvas.drawBitmap(this.blurBitmap, 0.0f, 0.0f, this.blurPaint);
+                canvas.restore();
+            } else {
+                canvas.drawColor(this.dim);
+            }
             if (ItemOptions.this.drawScrim) {
                 if (this.cachedBitmap != null && (ItemOptions.this.scrimView.getParent() instanceof View)) {
                     canvas.save();
@@ -139,6 +176,13 @@ public class ItemOptions {
                         }
                         drawable2.setBounds(i4, i5, width2, height2 + i6);
                         ItemOptions.this.scrimViewBackground.draw(canvas);
+                    }
+                    if (ItemOptions.this.scrimViewPadding > 0 || ItemOptions.this.scrimViewRoundRadius > 0) {
+                        this.clipPath.rewind();
+                        RectF rectF = AndroidUtilities.rectTmp;
+                        rectF.set((-ItemOptions.this.viewAdditionalOffsets.left) + (ItemOptions.this.scrimViewPadding * getAlpha()), (-ItemOptions.this.viewAdditionalOffsets.top) + (ItemOptions.this.scrimViewPadding * getAlpha()), ((-ItemOptions.this.viewAdditionalOffsets.left) + this.cachedBitmap.getWidth()) - (ItemOptions.this.scrimViewPadding * getAlpha()), ((-ItemOptions.this.viewAdditionalOffsets.top) + this.cachedBitmap.getHeight()) - (ItemOptions.this.scrimViewPadding * getAlpha()));
+                        this.clipPath.addRoundRect(rectF, ItemOptions.this.scrimViewRoundRadius * getAlpha(), ItemOptions.this.scrimViewRoundRadius * getAlpha(), Path.Direction.CW);
+                        canvas.clipPath(this.clipPath);
                     }
                     canvas.drawBitmap(this.cachedBitmap, -ItemOptions.this.viewAdditionalOffsets.left, -ItemOptions.this.viewAdditionalOffsets.top, this.cachedBitmapPaint);
                 } else {
@@ -169,11 +213,33 @@ public class ItemOptions {
                         drawable.setBounds(i, i2, width, height + i3);
                         ItemOptions.this.scrimViewBackground.draw(canvas);
                     }
-                    ItemOptions.this.scrimView.draw(canvas);
+                    if (ItemOptions.this.scrimViewPadding > 0 || ItemOptions.this.scrimViewRoundRadius > 0) {
+                        this.clipPath.rewind();
+                        if (ItemOptions.this.scrimView instanceof ScrimView) {
+                            ((ScrimView) ItemOptions.this.scrimView).getBounds(this.bounds);
+                        } else {
+                            this.bounds.set(0.0f, 0.0f, getWidth(), getHeight());
+                        }
+                        RectF rectF2 = AndroidUtilities.rectTmp;
+                        rectF2.set((-ItemOptions.this.viewAdditionalOffsets.left) + this.bounds.left + (ItemOptions.this.scrimViewPadding * getAlpha()), (-ItemOptions.this.viewAdditionalOffsets.top) + this.bounds.top + (ItemOptions.this.scrimViewPadding * getAlpha()), ((-ItemOptions.this.viewAdditionalOffsets.left) + this.bounds.right) - (ItemOptions.this.scrimViewPadding * getAlpha()), ((-ItemOptions.this.viewAdditionalOffsets.top) + this.bounds.bottom) - (ItemOptions.this.scrimViewPadding * getAlpha()));
+                        this.clipPath.addRoundRect(rectF2, ItemOptions.this.scrimViewRoundRadius * getAlpha(), ItemOptions.this.scrimViewRoundRadius * getAlpha(), Path.Direction.CW);
+                        canvas.clipPath(this.clipPath);
+                    }
+                    if (ItemOptions.this.scrimView instanceof ScrimView) {
+                        ((ScrimView) ItemOptions.this.scrimView).drawScrim(canvas, getAlpha());
+                    } else {
+                        ItemOptions.this.scrimView.draw(canvas);
+                    }
                 }
                 canvas.restore();
             }
         }
+    }
+
+    public interface ScrimView {
+        void drawScrim(Canvas canvas, float f);
+
+        void getBounds(RectF rectF);
     }
 
     private ItemOptions(ViewGroup viewGroup, Theme.ResourcesProvider resourcesProvider, View view, boolean z) {
@@ -290,20 +356,34 @@ public class ItemOptions {
         dismiss();
     }
 
-    public void lambda$add$2(Runnable runnable, View view) {
+    public void lambda$add$4(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
         dismiss();
     }
 
-    public static void lambda$addProfile$6(Runnable runnable, View view) {
+    public void lambda$addChat$3(Runnable runnable, View view) {
+        if (runnable != null) {
+            runnable.run();
+        }
+        dismiss();
+    }
+
+    public void lambda$addChecked$2(Runnable runnable, View view) {
+        if (runnable != null) {
+            runnable.run();
+        }
+        dismiss();
+    }
+
+    public static void lambda$addProfile$8(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
     }
 
-    public void lambda$addSpaceGap$4(KeyEvent keyEvent) {
+    public void lambda$addSpaceGap$6(KeyEvent keyEvent) {
         ActionBarPopupWindow actionBarPopupWindow;
         if (keyEvent.getKeyCode() == 4 && keyEvent.getRepeatCount() == 0 && (actionBarPopupWindow = this.actionBarPopupWindow) != null && actionBarPopupWindow.isShowing()) {
             dismiss();
@@ -317,7 +397,7 @@ public class ItemOptions {
         }
     }
 
-    public void lambda$putPremiumLock$3(Runnable runnable, View view) {
+    public void lambda$putPremiumLock$5(Runnable runnable, View view) {
         if (runnable != null) {
             int i = -this.shiftDp;
             this.shiftDp = i;
@@ -327,7 +407,16 @@ public class ItemOptions {
         }
     }
 
-    public static boolean lambda$show$7(View view) {
+    public void lambda$show$10(ValueAnimator valueAnimator) {
+        View view = this.dimView;
+        if (view != null) {
+            if (this.scrimViewRoundRadius > 0 || this.scrimViewPadding > 0) {
+                view.invalidate();
+            }
+        }
+    }
+
+    public static boolean lambda$show$9(View view) {
         view.invalidate();
         return true;
     }
@@ -421,7 +510,7 @@ public class ItemOptions {
         actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                ItemOptions.this.lambda$add$2(runnable, view);
+                ItemOptions.this.lambda$add$4(runnable, view);
             }
         });
         int i2 = this.minWidthDp;
@@ -437,6 +526,44 @@ public class ItemOptions {
 
     public ItemOptions add(CharSequence charSequence, Runnable runnable) {
         return add(0, charSequence, false, runnable);
+    }
+
+    public org.telegram.ui.Components.ItemOptions addChat(org.telegram.tgnet.TLObject r17, boolean r18, final java.lang.Runnable r19) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ItemOptions.addChat(org.telegram.tgnet.TLObject, boolean, java.lang.Runnable):org.telegram.ui.Components.ItemOptions");
+    }
+
+    public ItemOptions addChecked(boolean z, CharSequence charSequence, final Runnable runnable) {
+        int i;
+        if (this.context == null) {
+            return this;
+        }
+        int i2 = Theme.key_actionBarDefaultSubmenuItem;
+        int i3 = Theme.key_actionBarDefaultSubmenuItemIcon;
+        ActionBarMenuSubItem actionBarMenuSubItem = new ActionBarMenuSubItem(this.context, true, false, false, this.resourcesProvider);
+        actionBarMenuSubItem.setPadding(AndroidUtilities.dp(18.0f), 0, AndroidUtilities.dp(18.0f), 0);
+        actionBarMenuSubItem.setText(charSequence);
+        actionBarMenuSubItem.setChecked(z);
+        Integer num = this.textColor;
+        int intValue = num != null ? num.intValue() : Theme.getColor(i2, this.resourcesProvider);
+        Integer num2 = this.iconColor;
+        actionBarMenuSubItem.setColors(intValue, num2 != null ? num2.intValue() : Theme.getColor(i3, this.resourcesProvider));
+        Integer num3 = this.selectorColor;
+        actionBarMenuSubItem.setSelectorColor(num3 != null ? num3.intValue() : Theme.multAlpha(Theme.getColor(i2, this.resourcesProvider), 0.12f));
+        actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public final void onClick(View view) {
+                ItemOptions.this.lambda$addChecked$2(runnable, view);
+            }
+        });
+        int i4 = this.minWidthDp;
+        if (i4 > 0) {
+            actionBarMenuSubItem.setMinimumWidth(AndroidUtilities.dp(i4));
+            i = this.minWidthDp;
+        } else {
+            i = -1;
+        }
+        addView(actionBarMenuSubItem, LayoutHelper.createLinear(i, -2));
+        return this;
     }
 
     public ItemOptions addGap() {
@@ -490,7 +617,7 @@ public class ItemOptions {
             frameLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    ItemOptions.lambda$addProfile$6(runnable, view);
+                    ItemOptions.lambda$addProfile$8(runnable, view);
                 }
             });
             addView(frameLayout, LayoutHelper.createLinear(-1, 52));
@@ -507,7 +634,7 @@ public class ItemOptions {
         frameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                ItemOptions.lambda$addProfile$6(runnable, view);
+                ItemOptions.lambda$addProfile$8(runnable, view);
             }
         });
         addView(frameLayout, LayoutHelper.createLinear(-1, 52));
@@ -526,7 +653,7 @@ public class ItemOptions {
         actionBarPopupWindowLayout.setDispatchKeyEventListener(new ActionBarPopupWindow.OnDispatchKeyEventListener() {
             @Override
             public final void onDispatchKeyEvent(KeyEvent keyEvent) {
-                ItemOptions.this.lambda$addSpaceGap$4(keyEvent);
+                ItemOptions.this.lambda$addSpaceGap$6(keyEvent);
             }
         });
         this.layout.addView(this.lastLayout, LayoutHelper.createLinear(-1, -2, 0.0f, -8.0f, 0.0f, 0.0f));
@@ -576,6 +703,11 @@ public class ItemOptions {
         } else {
             this.lastLayout.addView(view, layoutParams);
         }
+        return this;
+    }
+
+    public ItemOptions allowCenter(boolean z) {
+        this.allowCenter = z;
         return this;
     }
 
@@ -730,7 +862,7 @@ public class ItemOptions {
             actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    ItemOptions.this.lambda$putPremiumLock$3(runnable, view);
+                    ItemOptions.this.lambda$putPremiumLock$5(runnable, view);
                 }
             });
         }
@@ -746,6 +878,11 @@ public class ItemOptions {
             }
             i2++;
         }
+        return this;
+    }
+
+    public ItemOptions setBlur(boolean z) {
+        this.blur = z;
         return this;
     }
 
@@ -797,6 +934,11 @@ public class ItemOptions {
         return this;
     }
 
+    public ItemOptions setFixedWidth(int i) {
+        this.fixedWidthDp = i;
+        return this;
+    }
+
     public ItemOptions setGapBackgroundColor(int i) {
         this.gapBackgroundColor = Integer.valueOf(i);
         int i2 = 0;
@@ -841,6 +983,12 @@ public class ItemOptions {
 
     public ItemOptions setOnDismiss(Runnable runnable) {
         this.dismissListener = runnable;
+        return this;
+    }
+
+    public ItemOptions setRoundRadius(int i, int i2) {
+        this.scrimViewRoundRadius = i;
+        this.scrimViewPadding = i2;
         return this;
     }
 
@@ -911,38 +1059,73 @@ public class ItemOptions {
     }
 
     public ItemOptions show() {
+        float f;
+        float f2;
+        int width;
         int height;
+        float x;
+        float x2;
+        float measuredWidth;
         if (this.actionBarPopupWindow != null || this.linearLayout != null || getItemsCount() <= 0) {
             return this;
         }
         setupSelectors();
-        if (this.minWidthDp > 0) {
+        if (this.fixedWidthDp > 0) {
             int i = 0;
             while (i < this.layout.getChildCount() - 1) {
                 View childAt = i == this.layout.getChildCount() - 1 ? this.lastLayout : this.layout.getChildAt(i);
                 if (childAt instanceof ActionBarPopupWindow.ActionBarPopupWindowLayout) {
                     ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout = (ActionBarPopupWindow.ActionBarPopupWindowLayout) childAt;
                     for (int i2 = 0; i2 < actionBarPopupWindowLayout.getItemsCount(); i2++) {
-                        actionBarPopupWindowLayout.getItemAt(i2).setMinimumWidth(AndroidUtilities.dp(this.minWidthDp));
+                        actionBarPopupWindowLayout.getItemAt(i2).getLayoutParams().width = AndroidUtilities.dp(this.fixedWidthDp);
                     }
                 }
                 i++;
             }
+        } else if (this.minWidthDp > 0) {
+            int i3 = 0;
+            while (i3 < this.layout.getChildCount() - 1) {
+                View childAt2 = i3 == this.layout.getChildCount() - 1 ? this.lastLayout : this.layout.getChildAt(i3);
+                if (childAt2 instanceof ActionBarPopupWindow.ActionBarPopupWindowLayout) {
+                    ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout2 = (ActionBarPopupWindow.ActionBarPopupWindowLayout) childAt2;
+                    for (int i4 = 0; i4 < actionBarPopupWindowLayout2.getItemsCount(); i4++) {
+                        actionBarPopupWindowLayout2.getItemAt(i4).setMinimumWidth(AndroidUtilities.dp(this.minWidthDp));
+                    }
+                }
+                i3++;
+            }
         }
-        final ViewGroup viewGroup = this.container;
+        ViewGroup viewGroup = this.container;
         if (viewGroup == null) {
             viewGroup = this.fragment.getParentLayout().getOverlayContainerView();
         }
-        if (this.context != null && viewGroup != null) {
-            float f = AndroidUtilities.displaySize.y / 2.0f;
+        final ViewGroup viewGroup2 = viewGroup;
+        if (this.context != null && viewGroup2 != null) {
+            float f3 = AndroidUtilities.displaySize.y / 2.0f;
             View view = this.scrimView;
             if (view != null) {
-                getPointOnScreen(view, viewGroup, this.point);
-                f = this.point[1];
+                getPointOnScreen(view, viewGroup2, this.point);
+                float[] fArr = this.point;
+                float f4 = fArr[1];
+                f = fArr[0];
+                f3 = f4;
+            } else {
+                f = 0.0f;
             }
-            float f2 = f;
+            RectF rectF = new RectF();
+            View view2 = this.scrimView;
+            if (view2 instanceof ScrimView) {
+                ((ScrimView) view2).getBounds(rectF);
+            } else {
+                rectF.set(0.0f, 0.0f, view2.getMeasuredWidth(), this.scrimView.getMeasuredHeight());
+            }
+            float f5 = f + rectF.left;
+            float f6 = f3 + rectF.top;
             if (this.ignoreX) {
                 this.point[0] = 0.0f;
+                f2 = 0.0f;
+            } else {
+                f2 = f5;
             }
             if (this.dimAlpha > 0) {
                 final DimView dimView = new DimView(this.context);
@@ -950,18 +1133,22 @@ public class ItemOptions {
                 this.preDrawListener = new ViewTreeObserver.OnPreDrawListener() {
                     @Override
                     public final boolean onPreDraw() {
-                        boolean lambda$show$7;
-                        lambda$show$7 = ItemOptions.lambda$show$7(dimView);
-                        return lambda$show$7;
+                        boolean lambda$show$9;
+                        lambda$show$9 = ItemOptions.lambda$show$9(dimView);
+                        return lambda$show$9;
                     }
                 };
-                viewGroup.getViewTreeObserver().addOnPreDrawListener(this.preDrawListener);
-                viewGroup.addView(this.dimView, LayoutHelper.createFrame(-1, -1.0f));
+                viewGroup2.getViewTreeObserver().addOnPreDrawListener(this.preDrawListener);
+                viewGroup2.addView(this.dimView, LayoutHelper.createFrame(-1, -1.0f));
                 this.dimView.setAlpha(0.0f);
-                this.dimView.animate().alpha(1.0f).setDuration(150L);
+                this.dimView.animate().alpha(1.0f).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public final void onAnimationUpdate(ValueAnimator valueAnimator) {
+                        ItemOptions.this.lambda$show$10(valueAnimator);
+                    }
+                }).setDuration(150L);
             }
-            this.layout.measure(View.MeasureSpec.makeMeasureSpec(viewGroup.getMeasuredWidth(), Integer.MIN_VALUE), View.MeasureSpec.makeMeasureSpec(viewGroup.getMeasuredHeight(), Integer.MIN_VALUE));
-            final ViewGroup viewGroup2 = viewGroup;
+            this.layout.measure(View.MeasureSpec.makeMeasureSpec(viewGroup2.getMeasuredWidth(), Integer.MIN_VALUE), View.MeasureSpec.makeMeasureSpec(viewGroup2.getMeasuredHeight(), Integer.MIN_VALUE));
             ActionBarPopupWindow actionBarPopupWindow = new ActionBarPopupWindow(this.layout, -2, -2) {
                 @Override
                 public void dismiss() {
@@ -978,7 +1165,7 @@ public class ItemOptions {
                 @Override
                 public void onDismiss() {
                     ItemOptions.this.actionBarPopupWindow = null;
-                    ItemOptions.this.dismissDim(viewGroup);
+                    ItemOptions.this.dismissDim(viewGroup2);
                     if (ItemOptions.this.dismissListener != null) {
                         ItemOptions.this.dismissListener.run();
                         ItemOptions.this.dismissListener = null;
@@ -992,32 +1179,51 @@ public class ItemOptions {
             this.actionBarPopupWindow.setInputMethodMode(2);
             this.actionBarPopupWindow.setSoftInputMode(0);
             if (AndroidUtilities.isTablet()) {
-                f2 += viewGroup.getPaddingTop();
-                viewGroup.getPaddingLeft();
+                f6 += viewGroup2.getPaddingTop();
+                f2 -= viewGroup2.getPaddingLeft();
             }
-            int measuredWidth = this.scrimView != null ? this.gravity == 5 ? (int) (((this.point[0] + r1.getMeasuredWidth()) - this.layout.getMeasuredWidth()) + viewGroup.getX()) : (int) (viewGroup.getX() + this.point[0]) : (viewGroup.getWidth() - this.layout.getMeasuredWidth()) / 2;
-            if (this.forceBottom) {
-                height = (int) ((Math.min(f2 + this.scrimView.getMeasuredHeight(), AndroidUtilities.displaySize.y) - this.layout.getMeasuredHeight()) + viewGroup.getY());
-            } else if (this.scrimView != null) {
-                if (this.forceTop || this.layout.getMeasuredHeight() + f2 + AndroidUtilities.dp(16.0f) > AndroidUtilities.displaySize.y - AndroidUtilities.navigationBarHeight) {
-                    f2 = (f2 - this.scrimView.getMeasuredHeight()) - this.layout.getMeasuredHeight();
+            if (this.scrimView != null) {
+                int i5 = this.gravity;
+                if (i5 == 5) {
+                    x2 = viewGroup2.getX() + f2 + rectF.width();
+                    measuredWidth = this.layout.getMeasuredWidth();
+                } else if (i5 == 1) {
+                    x2 = viewGroup2.getX() + f2 + (rectF.width() / 2.0f);
+                    measuredWidth = this.layout.getMeasuredWidth() / 2.0f;
+                } else {
+                    x = viewGroup2.getX() + f2;
+                    width = (int) x;
                 }
-                height = (int) (f2 + this.scrimView.getMeasuredHeight() + viewGroup.getY());
+                x = x2 - measuredWidth;
+                width = (int) x;
             } else {
-                height = (viewGroup.getHeight() - this.layout.getMeasuredHeight()) / 2;
+                width = (viewGroup2.getWidth() - this.layout.getMeasuredWidth()) / 2;
+            }
+            if (this.forceBottom) {
+                height = (int) ((Math.min(f6 + rectF.height(), AndroidUtilities.displaySize.y) - this.layout.getMeasuredHeight()) + viewGroup2.getY());
+            } else if (this.scrimView != null) {
+                if (this.forceTop || rectF.height() + f6 + this.layout.getMeasuredHeight() + AndroidUtilities.dp(16.0f) > AndroidUtilities.displaySize.y - AndroidUtilities.navigationBarHeight) {
+                    f6 = (f6 - rectF.height()) - this.layout.getMeasuredHeight();
+                    if (this.allowCenter && Math.max(0.0f, rectF.height() + f6) + this.layout.getMeasuredHeight() > this.point[1] + rectF.top && rectF.height() == this.scrimView.getHeight()) {
+                        f6 = (((viewGroup2.getHeight() - this.layout.getMeasuredHeight()) / 2.0f) - rectF.height()) - viewGroup2.getY();
+                    }
+                }
+                height = (int) (f6 + rectF.height() + viewGroup2.getY());
+            } else {
+                height = (viewGroup2.getHeight() - this.layout.getMeasuredHeight()) / 2;
             }
             BaseFragment baseFragment = this.fragment;
             if (baseFragment != null && baseFragment.getFragmentView() != null) {
                 this.fragment.getFragmentView().getRootView().dispatchTouchEvent(AndroidUtilities.emptyMotionEvent());
             } else if (this.container != null) {
-                viewGroup.dispatchTouchEvent(AndroidUtilities.emptyMotionEvent());
+                viewGroup2.dispatchTouchEvent(AndroidUtilities.emptyMotionEvent());
             }
             ActionBarPopupWindow actionBarPopupWindow2 = this.actionBarPopupWindow;
-            float f3 = measuredWidth + this.translateX;
-            this.offsetX = f3;
-            float f4 = height + this.translateY;
-            this.offsetY = f4;
-            actionBarPopupWindow2.showAtLocation(viewGroup, 0, (int) f3, (int) f4);
+            float f7 = width + this.translateX;
+            this.offsetX = f7;
+            float f8 = height + this.translateY;
+            this.offsetY = f8;
+            actionBarPopupWindow2.showAtLocation(viewGroup2, 0, (int) f7, (int) f8);
         }
         return this;
     }

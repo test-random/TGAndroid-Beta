@@ -16,6 +16,7 @@ import org.telegram.tgnet.tl.TL_stats;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Business.BusinessLinksActivity;
 import org.telegram.ui.Business.QuickRepliesController;
+import org.telegram.ui.Cells.SlideIntChooseView;
 import org.telegram.ui.ChannelMonetizationLayout;
 import org.telegram.ui.Components.ListView.AdapterWithDiffUtils;
 import org.telegram.ui.StatisticActivity;
@@ -294,6 +295,15 @@ public class UItem extends AdapterWithDiffUtils.Item {
         return uItem;
     }
 
+    public static UItem asIntSlideView(int i, int i2, int i3, int i4, Utilities.CallbackReturn callbackReturn, Utilities.Callback callback) {
+        UItem uItem = new UItem(15, false);
+        uItem.intValue = i3;
+        uItem.intCallback = callback;
+        uItem.object = SlideIntChooseView.Options.make(i, i2, i4, callbackReturn);
+        uItem.longValue = -1L;
+        return uItem;
+    }
+
     public static UItem asLargeQuickReply(QuickRepliesController.QuickReply quickReply) {
         UItem uItem = new UItem(17, false);
         uItem.object = quickReply;
@@ -399,6 +409,7 @@ public class UItem extends AdapterWithDiffUtils.Item {
         uItem.texts = strArr;
         uItem.intValue = i;
         uItem.intCallback = callback;
+        uItem.longValue = -1L;
         return uItem;
     }
 
@@ -585,6 +596,11 @@ public class UItem extends AdapterWithDiffUtils.Item {
 
     public UItem setLocked(boolean z) {
         this.locked = z;
+        return this;
+    }
+
+    public UItem setMinSliderValue(int i) {
+        this.longValue = i;
         return this;
     }
 

@@ -1511,7 +1511,7 @@ public class StarsReactionsSheet extends BottomSheet {
                 StarsReactionsSheet.this.lambda$new$4(messageObject, starsController, chatActivity, value);
             }
         };
-        if (!starsController.balanceAvailable() || starsController.getBalance() >= value) {
+        if (!starsController.balanceAvailable() || starsController.getBalance().amount >= value) {
             runnable.run();
         } else {
             new StarsIntroActivity.StarsNeededSheet(context, resourcesProvider, value, 5, chat == null ? "" : chat.title, runnable).show();

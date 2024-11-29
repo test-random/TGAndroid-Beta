@@ -3788,7 +3788,7 @@ public class MessageObject {
         return true;
     }
 
-    private void updateMessageText(java.util.AbstractMap<java.lang.Long, org.telegram.tgnet.TLRPC.User> r28, java.util.AbstractMap<java.lang.Long, org.telegram.tgnet.TLRPC.Chat> r29, androidx.collection.LongSparseArray r30, androidx.collection.LongSparseArray r31) {
+    private void updateMessageText(java.util.AbstractMap<java.lang.Long, org.telegram.tgnet.TLRPC.User> r31, java.util.AbstractMap<java.lang.Long, org.telegram.tgnet.TLRPC.Chat> r32, androidx.collection.LongSparseArray r33, androidx.collection.LongSparseArray r34) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessageObject.updateMessageText(java.util.AbstractMap, java.util.AbstractMap, androidx.collection.LongSparseArray, androidx.collection.LongSparseArray):void");
     }
 
@@ -4572,8 +4572,9 @@ public class MessageObject {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessageObject.generateLinkDescription():void");
     }
 
-    public void generatePaymentSentMessageText(TLRPC.User user) {
+    public void generatePaymentSentMessageText(TLRPC.User user, boolean z) {
         String str;
+        String formatString;
         if (user == null) {
             user = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(getDialogId()));
         }
@@ -4591,7 +4592,15 @@ public class MessageObject {
             str = "<error>";
         }
         MessageObject messageObject = this.replyMessageObject;
-        this.messageText = (messageObject == null || !(getMedia(messageObject) instanceof TLRPC.TL_messageMediaInvoice)) ? this.messageOwner.action.recurring_init ? LocaleController.formatString(R.string.PaymentSuccessfullyPaidNoItemRecurrent, str, firstName) : LocaleController.formatString("PaymentSuccessfullyPaidNoItem", R.string.PaymentSuccessfullyPaidNoItem, str, firstName) : this.messageOwner.action.recurring_init ? LocaleController.formatString(R.string.PaymentSuccessfullyPaidRecurrent, str, firstName, getMedia(this.replyMessageObject).title) : LocaleController.formatString("PaymentSuccessfullyPaid", R.string.PaymentSuccessfullyPaid, str, firstName, getMedia(this.replyMessageObject).title);
+        if (messageObject == null || !(getMedia(messageObject) instanceof TLRPC.TL_messageMediaInvoice)) {
+            TLRPC.MessageAction messageAction2 = this.messageOwner.action;
+            int i = messageAction2.subscription_until_date;
+            formatString = i != 0 ? z ? LocaleController.formatString(R.string.PaymentSuccessfullyPaidMeNoItemSubscription, firstName, str, LocaleController.formatDateTime(i, false)) : LocaleController.formatString(R.string.PaymentSuccessfullyPaidSubscriptionNoItem, str, firstName, LocaleController.formatDateTime(i, false)) : (!messageAction2.recurring_init || z) ? LocaleController.formatString(R.string.PaymentSuccessfullyPaidNoItem, str, firstName) : LocaleController.formatString(R.string.PaymentSuccessfullyPaidNoItemRecurrent, str, firstName);
+        } else {
+            TLRPC.MessageAction messageAction3 = this.messageOwner.action;
+            formatString = messageAction3.subscription_until_date != 0 ? z ? LocaleController.formatString(R.string.PaymentSuccessfullyPaidMeSubscription, firstName, str, getMedia(this.replyMessageObject).title, LocaleController.formatDateTime(this.messageOwner.action.subscription_until_date, false)) : LocaleController.formatString(R.string.PaymentSuccessfullyPaidSubscription, str, firstName, getMedia(this.replyMessageObject).title, LocaleController.formatDateTime(this.messageOwner.action.subscription_until_date, false)) : (!messageAction3.recurring_init || z) ? LocaleController.formatString(R.string.PaymentSuccessfullyPaid, str, firstName, getMedia(this.replyMessageObject).title) : LocaleController.formatString(R.string.PaymentSuccessfullyPaidRecurrent, str, firstName, getMedia(this.replyMessageObject).title);
+        }
+        this.messageText = formatString;
         this.messageText = StarsIntroActivity.replaceStars(this.messageText);
     }
 

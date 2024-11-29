@@ -25,7 +25,7 @@ public class ToggleButton2 extends View implements FlashViews.Invertable {
     private Bitmap activeBitmap;
     private final Paint activeBitmapPaint;
     private final Paint activePaint;
-    private AnimatedFloat animatedSelected;
+    private final AnimatedFloat animatedSelected;
     private ValueAnimator animator;
     private final Path clipPath;
     private int currentIcon;
@@ -49,24 +49,21 @@ public class ToggleButton2 extends View implements FlashViews.Invertable {
     public void lambda$setIcon$0(AtomicBoolean atomicBoolean, int i, ValueAnimator valueAnimator) {
         float floatValue = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         this.scale = Math.abs(floatValue - 0.5f) + 0.5f;
+        if (floatValue >= 0.5f && !atomicBoolean.get()) {
+            atomicBoolean.set(true);
+            setDrawable(i);
+        }
+        invalidate();
+    }
+
+    public void lambda$setIcon$1(AtomicBoolean atomicBoolean, Drawable drawable, ValueAnimator valueAnimator) {
+        float floatValue = ((Float) valueAnimator.getAnimatedValue()).floatValue();
+        this.scale = Math.abs(floatValue - 0.5f) + 0.5f;
         if (floatValue < 0.5f || atomicBoolean.get()) {
             return;
         }
         atomicBoolean.set(true);
-        setDrawable(i);
-    }
-
-    private void setDrawable(int i) {
-        this.drawable = getContext().getResources().getDrawable(i).mutate();
-        Bitmap bitmap = this.activeBitmap;
-        if (bitmap != null) {
-            bitmap.recycle();
-            this.activeBitmap = null;
-        }
-        if (this.activeBitmap != null || i == 0) {
-            return;
-        }
-        this.activeBitmap = BitmapFactory.decodeResource(getResources(), i);
+        setDrawable(drawable);
     }
 
     @Override
@@ -123,10 +120,40 @@ public class ToggleButton2 extends View implements FlashViews.Invertable {
         }
     }
 
+    public void setDrawable(int i) {
+        this.drawable = getContext().getResources().getDrawable(i).mutate();
+        Bitmap bitmap = this.activeBitmap;
+        if (bitmap != null) {
+            bitmap.recycle();
+            this.activeBitmap = null;
+        }
+        if (this.activeBitmap == null && i != 0) {
+            this.activeBitmap = BitmapFactory.decodeResource(getResources(), i);
+        }
+        invalidate();
+    }
+
+    public void setDrawable(Drawable drawable) {
+        this.drawable = drawable;
+        Bitmap bitmap = this.activeBitmap;
+        if (bitmap != null) {
+            bitmap.recycle();
+            this.activeBitmap = null;
+        }
+        if (this.activeBitmap == null && drawable != null && drawable.getIntrinsicWidth() > 0 && drawable.getIntrinsicHeight() > 0) {
+            Bitmap createBitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            this.activeBitmap = createBitmap;
+            drawable.setBounds(0, 0, createBitmap.getWidth(), this.activeBitmap.getHeight());
+            drawable.draw(new Canvas(this.activeBitmap));
+        }
+        invalidate();
+    }
+
     public void setIcon(final int i, boolean z) {
         if (this.currentIcon == i) {
             return;
         }
+        this.currentIcon = i;
         ValueAnimator valueAnimator = this.animator;
         if (valueAnimator != null) {
             valueAnimator.cancel();
@@ -148,6 +175,31 @@ public class ToggleButton2 extends View implements FlashViews.Invertable {
         }
     }
 
+    public void setIcon(final Drawable drawable, boolean z) {
+        if (this.drawable == drawable) {
+            return;
+        }
+        ValueAnimator valueAnimator = this.animator;
+        if (valueAnimator != null) {
+            valueAnimator.cancel();
+            this.animator = null;
+        }
+        if (!z) {
+            this.scale = 1.0f;
+            setDrawable(drawable);
+        } else {
+            this.animator = ValueAnimator.ofFloat(0.0f, 1.0f).setDuration(150L);
+            final AtomicBoolean atomicBoolean = new AtomicBoolean();
+            this.animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
+                    ToggleButton2.this.lambda$setIcon$1(atomicBoolean, drawable, valueAnimator2);
+                }
+            });
+            this.animator.start();
+        }
+    }
+
     @Override
     public void setInvert(float f) {
         Drawable drawable = this.drawable;
@@ -161,6 +213,14 @@ public class ToggleButton2 extends View implements FlashViews.Invertable {
     @Override
     public void setSelected(boolean z) {
         this.selected = z;
+        invalidate();
+    }
+
+    public void setSelected(boolean z, boolean z2) {
+        this.selected = z;
+        if (!z2) {
+            this.animatedSelected.set(z ? 1.0f : 0.0f, true);
+        }
         invalidate();
     }
 }

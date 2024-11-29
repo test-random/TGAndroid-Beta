@@ -99,6 +99,7 @@ import org.telegram.ui.Stories.recorder.StoryPrivacyBottomSheet;
 
 public class StoryPrivacyBottomSheet extends BottomSheet implements NotificationCenter.NotificationCenterDelegate {
     private int activePage;
+    private boolean allowCover;
     private boolean allowScreenshots;
     private boolean allowSmallChats;
     private boolean applyWhenDismiss;
@@ -3432,6 +3433,7 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
         this.selectedContactsCount = 0;
         this.allowScreenshots = true;
         this.keepOnMyPage = false;
+        this.allowCover = true;
         this.canChangePeer = true;
         this.messageUsers = new ArrayList();
         this.activePage = 1;
@@ -3479,6 +3481,7 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
         this.selectedContactsCount = 0;
         this.allowScreenshots = true;
         this.keepOnMyPage = false;
+        this.allowCover = true;
         this.canChangePeer = true;
         this.messageUsers = new ArrayList();
         this.activePage = 1;
@@ -3958,6 +3961,19 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
 
     public StoryPrivacyBottomSheet whenSelectedShare(Utilities.Callback callback) {
         this.onDone2 = callback;
+        return this;
+    }
+
+    public StoryPrivacyBottomSheet allowCover(boolean z) {
+        this.allowCover = z;
+        ViewPagerFixed viewPagerFixed = this.viewPager;
+        if (viewPagerFixed != null) {
+            for (View view : viewPagerFixed.getViewPages()) {
+                if (view instanceof Page) {
+                    ((Page) view).updateButton(false);
+                }
+            }
+        }
         return this;
     }
 

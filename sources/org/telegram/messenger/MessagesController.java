@@ -470,6 +470,9 @@ public class MessagesController extends BaseController implements NotificationCe
     public boolean stargiftsBlocked;
     public int stargiftsConvertPeriodMax;
     public int stargiftsMessageLengthMax;
+    public boolean starrefConnectAllowed;
+    public boolean starrefProgramAllowed;
+    public Set<String> starrefStartParamPrefixes;
     public boolean starsGiftsEnabled;
     public boolean starsLocked;
     public long starsPaidPostAmountMax;
@@ -2217,6 +2220,7 @@ public class MessagesController extends BaseController implements NotificationCe
         this.emojiSounds = new HashMap<>();
         this.emojiInteractions = new HashMap<>();
         this.showAnnualPerMonth = false;
+        this.starrefStartParamPrefixes = new HashSet();
         this.directPaymentsCurrency = new ArrayList();
         this.emojiStatusUntilValues = new LongSparseArray();
         this.photoSuggestion = new SparseArray<>();
@@ -2496,6 +2500,9 @@ public class MessagesController extends BaseController implements NotificationCe
         this.starsUsdSellRate1000 = this.mainPreferences.getFloat("starsUsdSellRate1000", 2000.0f);
         this.starsUsdWithdrawRate1000 = this.mainPreferences.getFloat("starsUsdWithdrawRate1000", 1200.0f);
         this.sponsoredLinksInappAllow = this.mainPreferences.getBoolean("sponsoredLinksInappAllow", false);
+        this.starrefProgramAllowed = this.mainPreferences.getBoolean("starrefProgramAllowed", false);
+        this.starrefConnectAllowed = this.mainPreferences.getBoolean("starrefConnectAllowed", false);
+        this.starrefStartParamPrefixes = this.mainPreferences.getStringSet("starrefStartParamPrefixes", new HashSet(Arrays.asList("_tgr_")));
         this.paidReactionsAnonymousTime = this.mainPreferences.getLong("paidReactionsAnonymousTime", 0L);
         this.paidReactionsAnonymous = (!this.mainPreferences.contains("paidReactionsAnonymous") || System.currentTimeMillis() - this.paidReactionsAnonymousTime >= 7200000) ? null : Boolean.valueOf(this.mainPreferences.getBoolean("paidReactionsAnonymous", false));
         scheduleTranscriptionUpdate();

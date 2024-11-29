@@ -1258,10 +1258,57 @@ public abstract class Theme {
         }
     }
 
-    public class AnonymousClass10 extends MessageDrawable {
+    class AnonymousClass10 implements SensorEventListener {
+        AnonymousClass10() {
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            Runnable runnable;
+            float f = sensorEvent.values[0];
+            if (f <= 0.0f) {
+                f = 0.1f;
+            }
+            if (ApplicationLoader.mainInterfacePaused || !ApplicationLoader.isScreenOn) {
+                return;
+            }
+            float unused = Theme.lastBrightnessValue = f > 500.0f ? 1.0f : ((float) Math.ceil((Math.log(f) * 9.932299613952637d) + 27.05900001525879d)) / 100.0f;
+            if (Theme.lastBrightnessValue > Theme.autoNightBrighnessThreshold) {
+                if (Theme.switchNightRunnableScheduled) {
+                    boolean unused2 = Theme.switchNightRunnableScheduled = false;
+                    AndroidUtilities.cancelRunOnUIThread(Theme.switchNightBrightnessRunnable);
+                }
+                if (Theme.switchDayRunnableScheduled) {
+                    return;
+                }
+                boolean unused3 = Theme.switchDayRunnableScheduled = true;
+                runnable = Theme.switchDayBrightnessRunnable;
+            } else {
+                if (MediaController.getInstance().isRecordingOrListeningByProximity()) {
+                    return;
+                }
+                if (Theme.switchDayRunnableScheduled) {
+                    boolean unused4 = Theme.switchDayRunnableScheduled = false;
+                    AndroidUtilities.cancelRunOnUIThread(Theme.switchDayBrightnessRunnable);
+                }
+                if (Theme.switchNightRunnableScheduled) {
+                    return;
+                }
+                boolean unused5 = Theme.switchNightRunnableScheduled = true;
+                runnable = Theme.switchNightBrightnessRunnable;
+            }
+            AndroidUtilities.runOnUIThread(runnable, Theme.access$3000());
+        }
+    }
+
+    public class AnonymousClass11 extends MessageDrawable {
         final SparseIntArray val$colors;
 
-        AnonymousClass10(int i, boolean z, boolean z2, SparseIntArray sparseIntArray) {
+        AnonymousClass11(int i, boolean z, boolean z2, SparseIntArray sparseIntArray) {
             super(i, z, z2);
             r4 = sparseIntArray;
         }
@@ -1275,19 +1322,6 @@ public abstract class Theme {
         @Override
         protected int getCurrentColor(int i) {
             return r4.get(i);
-        }
-    }
-
-    public class AnonymousClass11 extends BackgroundGradientDrawable.ListenerAdapter {
-        AnonymousClass11() {
-        }
-
-        @Override
-        public void onSizeReady(int i, int i2) {
-            Point point = AndroidUtilities.displaySize;
-            if ((point.x <= point.y) == (i <= i2)) {
-                NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.didSetNewWallpapper, new Object[0]);
-            }
         }
     }
 
@@ -1305,10 +1339,23 @@ public abstract class Theme {
     }
 
     public class AnonymousClass13 extends BackgroundGradientDrawable.ListenerAdapter {
+        AnonymousClass13() {
+        }
+
+        @Override
+        public void onSizeReady(int i, int i2) {
+            Point point = AndroidUtilities.displaySize;
+            if ((point.x <= point.y) == (i <= i2)) {
+                NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.didSetNewWallpapper, new Object[0]);
+            }
+        }
+    }
+
+    public class AnonymousClass14 extends BackgroundGradientDrawable.ListenerAdapter {
         final View val$ownerView;
         final boolean val$thumb;
 
-        AnonymousClass13(boolean z, View view) {
+        AnonymousClass14(boolean z, View view) {
             r1 = z;
             r2 = view;
         }
@@ -1357,6 +1404,55 @@ public abstract class Theme {
     }
 
     public class AnonymousClass6 extends Drawable {
+        private final Paint paint;
+        final int val$color;
+        final int val$size;
+        final int val$strokeWidth;
+
+        AnonymousClass6(int i, int i2, int i3) {
+            this.val$strokeWidth = i;
+            this.val$color = i2;
+            this.val$size = i3;
+            Paint paint = new Paint(1);
+            this.paint = paint;
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(i);
+            paint.setColor(i2);
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            Rect bounds = getBounds();
+            canvas.drawCircle(bounds.centerX(), bounds.centerY(), this.val$size / 2.0f, this.paint);
+        }
+
+        @Override
+        public int getIntrinsicHeight() {
+            return this.val$size + this.val$strokeWidth;
+        }
+
+        @Override
+        public int getIntrinsicWidth() {
+            return this.val$size + this.val$strokeWidth;
+        }
+
+        @Override
+        public int getOpacity() {
+            return -2;
+        }
+
+        @Override
+        public void setAlpha(int i) {
+            this.paint.setAlpha(i);
+        }
+
+        @Override
+        public void setColorFilter(ColorFilter colorFilter) {
+            this.paint.setColorFilter(colorFilter);
+        }
+    }
+
+    public class AnonymousClass7 extends Drawable {
         private RectF rect = new RectF();
         final Paint val$backgroundPaint;
         final View val$containerView;
@@ -1364,7 +1460,7 @@ public abstract class Theme {
         final ResourcesProvider val$resourcesProvider;
         final View val$view;
 
-        AnonymousClass6(View view, View view2, int i, Paint paint, ResourcesProvider resourcesProvider) {
+        AnonymousClass7(View view, View view2, int i, Paint paint, ResourcesProvider resourcesProvider) {
             r1 = view;
             r2 = view2;
             r3 = i;
@@ -1411,12 +1507,12 @@ public abstract class Theme {
         }
     }
 
-    public class AnonymousClass7 extends Drawable {
+    public class AnonymousClass8 extends Drawable {
         RectF rect;
         final int val$maskType;
         final int val$radius;
 
-        AnonymousClass7(int i, int i2) {
+        AnonymousClass8(int i, int i2) {
             r1 = i;
             r2 = i2;
         }
@@ -1464,11 +1560,11 @@ public abstract class Theme {
         }
     }
 
-    public class AnonymousClass8 extends Drawable {
+    public class AnonymousClass9 extends Drawable {
         final int val$leftInset;
         final int val$rightInset;
 
-        AnonymousClass8(int i, int i2) {
+        AnonymousClass9(int i, int i2) {
             r1 = i;
             r2 = i2;
         }
@@ -1490,53 +1586,6 @@ public abstract class Theme {
 
         @Override
         public void setColorFilter(ColorFilter colorFilter) {
-        }
-    }
-
-    class AnonymousClass9 implements SensorEventListener {
-        AnonymousClass9() {
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int i) {
-        }
-
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-            Runnable runnable;
-            float f = sensorEvent.values[0];
-            if (f <= 0.0f) {
-                f = 0.1f;
-            }
-            if (ApplicationLoader.mainInterfacePaused || !ApplicationLoader.isScreenOn) {
-                return;
-            }
-            float unused = Theme.lastBrightnessValue = f > 500.0f ? 1.0f : ((float) Math.ceil((Math.log(f) * 9.932299613952637d) + 27.05900001525879d)) / 100.0f;
-            if (Theme.lastBrightnessValue > Theme.autoNightBrighnessThreshold) {
-                if (Theme.switchNightRunnableScheduled) {
-                    boolean unused2 = Theme.switchNightRunnableScheduled = false;
-                    AndroidUtilities.cancelRunOnUIThread(Theme.switchNightBrightnessRunnable);
-                }
-                if (Theme.switchDayRunnableScheduled) {
-                    return;
-                }
-                boolean unused3 = Theme.switchDayRunnableScheduled = true;
-                runnable = Theme.switchDayBrightnessRunnable;
-            } else {
-                if (MediaController.getInstance().isRecordingOrListeningByProximity()) {
-                    return;
-                }
-                if (Theme.switchDayRunnableScheduled) {
-                    boolean unused4 = Theme.switchDayRunnableScheduled = false;
-                    AndroidUtilities.cancelRunOnUIThread(Theme.switchDayBrightnessRunnable);
-                }
-                if (Theme.switchNightRunnableScheduled) {
-                    return;
-                }
-                boolean unused5 = Theme.switchNightRunnableScheduled = true;
-                runnable = Theme.switchNightBrightnessRunnable;
-            }
-            AndroidUtilities.runOnUIThread(runnable, Theme.access$3000());
         }
     }
 
@@ -5468,7 +5517,7 @@ public abstract class Theme {
                 final int val$leftInset;
                 final int val$rightInset;
 
-                AnonymousClass8(int i22, int i32) {
+                AnonymousClass9(int i22, int i32) {
                     r1 = i22;
                     r2 = i32;
                 }
@@ -5984,6 +6033,57 @@ public abstract class Theme {
         return themeInfo;
     }
 
+    public static Drawable createOutlineCircleDrawable(int i, int i2, int i3) {
+        return new Drawable(i3, i2, i) {
+            private final Paint paint;
+            final int val$color;
+            final int val$size;
+            final int val$strokeWidth;
+
+            AnonymousClass6(int i32, int i22, int i4) {
+                this.val$strokeWidth = i32;
+                this.val$color = i22;
+                this.val$size = i4;
+                Paint paint = new Paint(1);
+                this.paint = paint;
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(i32);
+                paint.setColor(i22);
+            }
+
+            @Override
+            public void draw(Canvas canvas) {
+                Rect bounds = getBounds();
+                canvas.drawCircle(bounds.centerX(), bounds.centerY(), this.val$size / 2.0f, this.paint);
+            }
+
+            @Override
+            public int getIntrinsicHeight() {
+                return this.val$size + this.val$strokeWidth;
+            }
+
+            @Override
+            public int getIntrinsicWidth() {
+                return this.val$size + this.val$strokeWidth;
+            }
+
+            @Override
+            public int getOpacity() {
+                return -2;
+            }
+
+            @Override
+            public void setAlpha(int i4) {
+                this.paint.setAlpha(i4);
+            }
+
+            @Override
+            public void setColorFilter(ColorFilter colorFilter) {
+                this.paint.setColorFilter(colorFilter);
+            }
+        };
+    }
+
     public static void createProfileResources(Context context) {
         if (profile_verifiedDrawable == null) {
             profile_aboutTextPaint = new TextPaint(1);
@@ -6100,7 +6200,7 @@ public abstract class Theme {
             final ResourcesProvider val$resourcesProvider;
             final View val$view;
 
-            AnonymousClass6(View view3, View view22, int i2, Paint paint2, ResourcesProvider resourcesProvider2) {
+            AnonymousClass7(View view3, View view22, int i2, Paint paint2, ResourcesProvider resourcesProvider2) {
                 r1 = view3;
                 r2 = view22;
                 r3 = i2;

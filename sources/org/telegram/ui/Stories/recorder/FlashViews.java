@@ -308,6 +308,10 @@ public class FlashViews {
         flashTo(0.85f, 240L, null);
     }
 
+    public void remove(Invertable invertable) {
+        this.invertableViews.remove(invertable);
+    }
+
     public void setIntensity(float f) {
         this.intensity = f;
         update();

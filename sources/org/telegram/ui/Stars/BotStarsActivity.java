@@ -51,6 +51,7 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChannelMonetizationLayout;
 import org.telegram.ui.Charts.data.ChartData;
+import org.telegram.ui.ChatEditActivity;
 import org.telegram.ui.Components.AnimatedTextView;
 import org.telegram.ui.Components.Bulletin;
 import org.telegram.ui.Components.BulletinFactory;
@@ -71,6 +72,8 @@ import org.telegram.ui.StatisticActivity;
 import org.telegram.ui.Stories.recorder.ButtonWithCounterView;
 import org.telegram.ui.TwoStepVerificationActivity;
 import org.telegram.ui.TwoStepVerificationSetupActivity;
+import org.telegram.ui.bots.AffiliateProgramFragment;
+import org.telegram.ui.bots.ChannelAffiliateProgramsFragment;
 
 public class BotStarsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     private ButtonWithCounterView adsButton;
@@ -119,6 +122,7 @@ public class BotStarsActivity extends BaseFragment implements NotificationCenter
     private ColoredImageSpan[] starRef = new ColoredImageSpan[1];
     private int shakeDp = 4;
     private final int BALANCE = 1;
+    private final int BUTTON_AFFILIATE = 2;
     private boolean tonTransactionsLoading = false;
     private boolean tonTransactionsEndReached = false;
     private int tonTransactionsCount = 0;
@@ -355,6 +359,10 @@ public class BotStarsActivity extends BaseFragment implements NotificationCenter
             arrayList.add(UItem.asBlackHeader(LocaleController.getString(R.string.BotStarsAvailableBalance)));
             arrayList.add(UItem.asCustom(1, this.balanceLayout));
             arrayList.add(UItem.asShadow(-3, this.withdrawInfo));
+            if (getMessagesController().starrefConnectAllowed) {
+                arrayList.add(AffiliateProgramFragment.ColorfulTextCell.Factory.as(2, Theme.getColor(Theme.key_color_green, this.resourceProvider), R.drawable.filled_earn_stars, ChatEditActivity.applyNewSpan(LocaleController.getString(R.string.BotAffiliateProgramRowTitle)), LocaleController.getString(R.string.BotAffiliateProgramRowText)));
+                arrayList.add(UItem.asShadow(-4, null));
+            }
             asShadow = UItem.asFullscreenCustom(this.transactionsLayout, 0);
         } else {
             if (i != 1) {
@@ -863,6 +871,8 @@ public class BotStarsActivity extends BaseFragment implements NotificationCenter
             StarsIntroActivity.showTransactionSheet(getContext(), true, this.bot_id, this.currentAccount, (TL_stars.StarsTransaction) uItem.object, getResourceProvider());
         } else if (uItem.object instanceof TL_stats.BroadcastRevenueTransaction) {
             ChannelMonetizationLayout.showTransactionSheet(getContext(), this.currentAccount, (TL_stats.BroadcastRevenueTransaction) uItem.object, this.bot_id, this.resourceProvider);
+        } else if (uItem.id == 2) {
+            presentFragment(new ChannelAffiliateProgramsFragment(this.bot_id));
         }
     }
 

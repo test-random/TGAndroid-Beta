@@ -2,7 +2,6 @@ package org.telegram.ui.Stories.recorder;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -25,6 +24,7 @@ import org.telegram.ui.Components.CubicBezierInterpolator;
 public class SliderView extends View {
     private final Path clipPath;
     private final int currentType;
+    public int fixWidth;
     private int h;
     private float lastTouchX;
     private float maxVolume;
@@ -246,47 +246,8 @@ public class SliderView extends View {
     }
 
     @Override
-    protected void onMeasure(int i, int i2) {
-        float f;
-        this.r = this.currentType == 3 ? AndroidUtilities.dpf2(8.0f) : AndroidUtilities.dpf2(6.33f);
-        this.textPaint.setTextSize(AndroidUtilities.dp(16.0f));
-        this.text.setTextSize(AndroidUtilities.dp(15.0f));
-        if (this.currentType == 0) {
-            this.w = (int) Math.min(this.textPaint.measureText(LocaleController.getString(R.string.StoryAudioRemove)) + AndroidUtilities.dp(88.0f), View.MeasureSpec.getSize(i));
-            f = 48.0f;
-        } else {
-            this.w = AndroidUtilities.dp(190.0f);
-            f = 44.0f;
-        }
-        this.h = AndroidUtilities.dp(f);
-        setMeasuredDimension(this.w, this.h);
-        if (this.currentType == 0) {
-            float dp = AndroidUtilities.dp(25.0f);
-            float f2 = this.h / 2.0f;
-            this.speaker1Paint.setPathEffect(new CornerPathEffect(AndroidUtilities.dpf2(1.33f)));
-            this.speaker1Path.rewind();
-            this.speaker1Path.moveTo(dp - AndroidUtilities.dpf2(8.66f), f2 - AndroidUtilities.dpf2(2.9f));
-            this.speaker1Path.lineTo(dp - AndroidUtilities.dpf2(3.0f), f2 - AndroidUtilities.dpf2(2.9f));
-            this.speaker1Path.lineTo(dp - AndroidUtilities.dpf2(3.0f), AndroidUtilities.dpf2(2.9f) + f2);
-            this.speaker1Path.lineTo(dp - AndroidUtilities.dpf2(8.66f), AndroidUtilities.dpf2(2.9f) + f2);
-            this.speaker1Path.close();
-            this.speaker2Paint.setPathEffect(new CornerPathEffect(AndroidUtilities.dpf2(2.66f)));
-            this.speaker2Path.rewind();
-            this.speaker2Path.moveTo(dp - AndroidUtilities.dpf2(7.5f), f2);
-            this.speaker2Path.lineTo(dp, f2 - AndroidUtilities.dpf2(7.33f));
-            this.speaker2Path.lineTo(dp, AndroidUtilities.dpf2(7.33f) + f2);
-            this.speaker2Path.close();
-            this.speakerWave1Path.rewind();
-            RectF rectF = AndroidUtilities.rectTmp;
-            rectF.set((dp - AndroidUtilities.dpf2(0.33f)) - AndroidUtilities.dp(4.33f), f2 - AndroidUtilities.dp(4.33f), (dp - AndroidUtilities.dpf2(0.33f)) + AndroidUtilities.dp(4.33f), AndroidUtilities.dp(4.33f) + f2);
-            this.speakerWave1Path.arcTo(rectF, -60.0f, 120.0f);
-            this.speakerWave1Path.close();
-            this.speakerWave2Paint.setStyle(Paint.Style.STROKE);
-            this.speakerWave2Paint.setStrokeWidth(AndroidUtilities.dp(2.0f));
-            this.speakerWave2Path.rewind();
-            rectF.set((dp - AndroidUtilities.dpf2(0.33f)) - AndroidUtilities.dp(8.0f), f2 - AndroidUtilities.dp(8.0f), (dp - AndroidUtilities.dpf2(0.33f)) + AndroidUtilities.dp(8.0f), f2 + AndroidUtilities.dp(8.0f));
-            this.speakerWave2Path.arcTo(rectF, -70.0f, 140.0f);
-        }
+    protected void onMeasure(int r10, int r11) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.SliderView.onMeasure(int, int):void");
     }
 
     public SliderView setMinMax(float f, float f2) {

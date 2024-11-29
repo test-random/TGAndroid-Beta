@@ -560,6 +560,7 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
         this.stickers = null;
         this.stickersMap = null;
         notifyDataSetChanged();
+        this.visibleByStickersSearch = false;
         if (this.lastReqId != 0) {
             ConnectionsManager.getInstance(this.currentAccount).cancelRequest(this.lastReqId, true);
             this.lastReqId = 0;
@@ -706,6 +707,7 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
                 this.searchResultSuggestions = null;
                 this.searchResultCommandsHelp = null;
                 this.searchResultCommandsUsers = null;
+                this.visibleByStickersSearch = false;
                 this.delegate.needChangePanelVisibility((this.searchResultBotContext.isEmpty() && this.searchResultBotContextSwitch == null && this.searchResultBotWebViewSwitch == null) ? false : true);
                 if (!z2) {
                     notifyDataSetChanged();
@@ -1609,7 +1611,7 @@ public class MentionsAdapter extends RecyclerListView.SelectionAdapter implement
         searchForContextBotResults(true, user, str2, this.nextQueryOffset);
     }
 
-    public void lambda$searchUsernameOrHashtag$7(final java.lang.CharSequence r30, final int r31, final java.util.ArrayList r32, final boolean r33, final boolean r34) {
+    public void lambda$searchUsernameOrHashtag$7(final java.lang.CharSequence r31, final int r32, final java.util.ArrayList r33, final boolean r34, final boolean r35) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.MentionsAdapter.lambda$searchUsernameOrHashtag$7(java.lang.CharSequence, int, java.util.ArrayList, boolean, boolean):void");
     }
 

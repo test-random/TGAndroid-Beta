@@ -3,14 +3,22 @@ package org.telegram.messenger;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.SurfaceTexture;
 import android.text.TextUtils;
 import android.view.View;
+import java.io.File;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.telegram.messenger.MediaController;
+import org.telegram.messenger.video.MediaCodecPlayer;
 import org.telegram.messenger.video.MediaCodecVideoConvertor;
 import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.SerializedData;
+import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.Components.AnimatedFileDrawable;
@@ -19,6 +27,8 @@ import org.telegram.ui.Components.Paint.Views.LinkPreview;
 import org.telegram.ui.Components.PhotoFilterView;
 import org.telegram.ui.Components.Point;
 import org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble;
+import org.telegram.ui.Components.VideoPlayer;
+import org.telegram.ui.Stories.recorder.CollageLayout;
 import org.telegram.ui.Stories.recorder.StoryEntry;
 import org.telegram.ui.Stories.recorder.Weather;
 
@@ -29,6 +39,8 @@ public class VideoEditedInfo {
     public int bitrate;
     public String blurPath;
     public boolean canceled;
+    public CollageLayout collage;
+    public ArrayList<Part> collageParts;
     public int compressQuality;
     public MediaController.CropState cropState;
     public TLRPC.InputEncryptedFile encryptedFile;
@@ -74,7 +86,6 @@ public class VideoEditedInfo {
     public long wallpaperPeerId = Long.MIN_VALUE;
     public boolean needUpdateProgress = false;
     public boolean shouldLimitFps = true;
-    public boolean tryUseHevc = false;
     public ArrayList<MediaCodecVideoConvertor.MixedSoundInfo> mixedSoundInfos = new ArrayList<>();
 
     public static class EmojiEntity extends TLRPC.TL_messageEntityCustomEmoji {
@@ -415,6 +426,130 @@ public class VideoEditedInfo {
         }
     }
 
+    public static class Part extends TLObject {
+        public AnimatedFileDrawable animatedFileDrawable;
+        public float currentFrame;
+        public long duration;
+        public int flags;
+        public float framesPerDraw;
+        public int height;
+        public boolean isVideo;
+        public CountDownLatch latch;
+        public float left;
+        public boolean loop;
+        public float msPerFrame;
+        public boolean muted;
+        public long offset;
+        public CollageLayout.Part part;
+        public String path;
+        public MediaCodecPlayer player;
+        public FloatBuffer posBuffer;
+        public float right;
+        public SurfaceTexture surfaceTexture;
+        public AtomicBoolean updateTex;
+        public FloatBuffer uvBuffer;
+        public VideoPlayer videoPlayer;
+        public float volume;
+        public int width;
+
+        public Part() {
+            this.volume = 1.0f;
+            this.offset = 0L;
+            this.loop = true;
+        }
+
+        public Part(StoryEntry storyEntry) {
+            this.volume = 1.0f;
+            this.offset = 0L;
+            this.loop = true;
+            this.isVideo = storyEntry.isVideo;
+            this.muted = storyEntry.muted;
+            this.path = storyEntry.file.getAbsolutePath();
+            this.volume = storyEntry.videoVolume;
+            this.loop = storyEntry.videoLoop;
+            this.offset = storyEntry.videoOffset;
+            this.left = storyEntry.videoLeft;
+            this.right = storyEntry.videoRight;
+            this.width = storyEntry.width;
+            this.height = storyEntry.height;
+            this.duration = storyEntry.duration;
+        }
+
+        public static ArrayList<Part> toParts(StoryEntry storyEntry) {
+            if (storyEntry == null || storyEntry.collageContent == null) {
+                return null;
+            }
+            ArrayList<Part> arrayList = new ArrayList<>();
+            for (int i = 0; i < storyEntry.collageContent.size(); i++) {
+                Part part = new Part((StoryEntry) storyEntry.collageContent.get(i));
+                part.part = (CollageLayout.Part) storyEntry.collage.parts.get(i);
+                arrayList.add(part);
+            }
+            return arrayList;
+        }
+
+        public static ArrayList<StoryEntry> toStoryEntries(ArrayList<Part> arrayList) {
+            if (arrayList == null) {
+                return null;
+            }
+            ArrayList<StoryEntry> arrayList2 = new ArrayList<>();
+            Iterator<Part> it = arrayList.iterator();
+            while (it.hasNext()) {
+                Part next = it.next();
+                StoryEntry storyEntry = new StoryEntry();
+                storyEntry.isVideo = next.isVideo;
+                storyEntry.muted = next.muted;
+                storyEntry.file = new File(next.path);
+                storyEntry.videoVolume = next.volume;
+                storyEntry.videoLoop = next.loop;
+                storyEntry.videoOffset = next.offset;
+                storyEntry.videoLeft = next.left;
+                storyEntry.videoRight = next.right;
+                storyEntry.width = next.width;
+                storyEntry.height = next.height;
+                storyEntry.duration = next.duration;
+                arrayList2.add(storyEntry);
+            }
+            return arrayList2;
+        }
+
+        @Override
+        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+            int readInt32 = abstractSerializedData.readInt32(z);
+            this.flags = readInt32;
+            this.isVideo = (readInt32 & 1) != 0;
+            this.loop = (readInt32 & 2) != 0;
+            this.muted = (readInt32 & 4) != 0;
+            this.path = abstractSerializedData.readString(z);
+            this.volume = abstractSerializedData.readFloat(z);
+            this.offset = abstractSerializedData.readInt64(z);
+            this.left = abstractSerializedData.readFloat(z);
+            this.right = abstractSerializedData.readFloat(z);
+            this.width = abstractSerializedData.readInt32(z);
+            this.height = abstractSerializedData.readInt32(z);
+            this.duration = abstractSerializedData.readInt64(z);
+        }
+
+        @Override
+        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+            int i = this.isVideo ? this.flags | 1 : this.flags & (-2);
+            this.flags = i;
+            int i2 = this.loop ? i | 2 : i & (-3);
+            this.flags = i2;
+            int i3 = this.muted ? i2 | 4 : i2 & (-5);
+            this.flags = i3;
+            abstractSerializedData.writeInt32(i3);
+            abstractSerializedData.writeString(this.path);
+            abstractSerializedData.writeFloat(this.volume);
+            abstractSerializedData.writeInt64(this.offset);
+            abstractSerializedData.writeFloat(this.left);
+            abstractSerializedData.writeFloat(this.right);
+            abstractSerializedData.writeInt32(this.width);
+            abstractSerializedData.writeInt32(this.height);
+            abstractSerializedData.writeInt64(this.duration);
+        }
+    }
+
     public boolean canAutoPlaySourceVideo() {
         return this.roundVideo;
     }
@@ -443,7 +578,7 @@ public class VideoEditedInfo {
                 i += bArr2.length;
             }
             SerializedData serializedData = new SerializedData(i);
-            serializedData.writeInt32(10);
+            serializedData.writeInt32(11);
             serializedData.writeInt64(this.avatarStartTime);
             serializedData.writeInt32(this.originalBitrate);
             if (this.filterState != null) {
@@ -537,6 +672,16 @@ public class VideoEditedInfo {
             }
             serializedData.writeFloat(this.volume);
             serializedData.writeBool(this.isSticker);
+            CollageLayout collageLayout = this.collage;
+            if (collageLayout == null || this.collageParts == null || collageLayout.parts.size() <= 1 || this.collageParts.isEmpty()) {
+                serializedData.writeInt32(1450380236);
+            } else {
+                serializedData.writeInt32(-559038737);
+                serializedData.writeString(this.collage.toString());
+                for (int i4 = 0; i4 < this.collageParts.size(); i4++) {
+                    this.collageParts.get(i4).serializeToStream(serializedData);
+                }
+            }
             bytesToHex = Utilities.bytesToHex(serializedData.toByteArray());
             serializedData.cleanup();
         }
@@ -668,6 +813,16 @@ public class VideoEditedInfo {
                         }
                         if (readInt32 >= 10) {
                             this.isSticker = serializedData.readBool(false);
+                        }
+                        if (readInt32 >= 11 && serializedData.readInt32(false) == -559038737) {
+                            this.collage = new CollageLayout(serializedData.readString(false));
+                            this.collageParts = new ArrayList<>();
+                            for (int i4 = 0; i4 < this.collage.parts.size(); i4++) {
+                                Part part = new Part();
+                                part.part = (CollageLayout.Part) this.collage.parts.get(i4);
+                                part.readParams(serializedData, false);
+                                this.collageParts.add(part);
+                            }
                         }
                         serializedData.cleanup();
                     }

@@ -2745,6 +2745,10 @@ public class AndroidUtilities {
         return -1;
     }
 
+    public static boolean intersect1d(float f, float f2, float f3, float f4) {
+        return Math.max(f, f2) > Math.min(f3, f4) && Math.max(f3, f4) > Math.min(f, f2);
+    }
+
     public static boolean intersect1d(int i, int i2, int i3, int i4) {
         return Math.max(i, i2) > Math.min(i3, i4) && Math.max(i3, i4) > Math.min(i, i2);
     }

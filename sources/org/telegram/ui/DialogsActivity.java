@@ -8703,7 +8703,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             starsController.loadInsufficientSubscriptions();
             return false;
         }
-        long j = -starsController.balance;
+        long j = -starsController.balance.amount;
         while (i < starsController.insufficientSubscriptions.size()) {
             TL_stars.StarsSubscription starsSubscription = (TL_stars.StarsSubscription) starsController.insufficientSubscriptions.get(i);
             long peerDialogId = DialogObject.getPeerDialogId(starsSubscription.peer);

@@ -20,6 +20,10 @@ public interface VideoEncoder {
         public static boolean $default$isHardwareEncoder(VideoEncoder videoEncoder) {
             return true;
         }
+
+        public static VideoCodecStatus $default$setRates(VideoEncoder videoEncoder, RateControlParameters rateControlParameters) {
+            return videoEncoder.setRateAllocation(rateControlParameters.bitrate, (int) Math.ceil(rateControlParameters.framerateFps));
+        }
     }
 
     public static class BitrateAllocation {

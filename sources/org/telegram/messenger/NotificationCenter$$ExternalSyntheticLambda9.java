@@ -9,6 +9,6 @@ public final class NotificationCenter$$ExternalSyntheticLambda9 implements Runna
 
     @Override
     public final void run() {
-        NotificationCenter.m658$r8$lambda$9dQim8d25IPx2oXhlGL0yS9ITQ(this.f$0);
+        NotificationCenter.m659$r8$lambda$9dQim8d25IPx2oXhlGL0yS9ITQ(this.f$0);
     }
 }

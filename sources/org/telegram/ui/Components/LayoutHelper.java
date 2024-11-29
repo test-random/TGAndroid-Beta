@@ -12,6 +12,12 @@ public abstract class LayoutHelper {
         return new FrameLayout.LayoutParams(getSize(f), getSize(f2), i);
     }
 
+    public static FrameLayout.LayoutParams createFrame(float f, float f2, int i, float f3, float f4, float f5, float f6) {
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(getSize(f), getSize(f2), i);
+        layoutParams.setMargins(AndroidUtilities.dp(f3), AndroidUtilities.dp(f4), AndroidUtilities.dp(f5), AndroidUtilities.dp(f6));
+        return layoutParams;
+    }
+
     public static FrameLayout.LayoutParams createFrame(int i, float f) {
         return new FrameLayout.LayoutParams(getSize(i), getSize(f));
     }

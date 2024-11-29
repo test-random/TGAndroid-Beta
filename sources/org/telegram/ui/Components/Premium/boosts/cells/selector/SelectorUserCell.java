@@ -58,7 +58,7 @@ public class SelectorUserCell extends BaseCell {
         addView(imageView, LayoutHelper.createFrame(32, 32.0f, (LocaleController.isRTL ? 3 : 5) | 16, 12.0f, 0.0f, 12.0f, 0.0f));
     }
 
-    private String buildCountDownTime(long j) {
+    public static String buildCountDownTime(long j) {
         long j2 = j / 3600000;
         long j3 = j % 3600000;
         long j4 = j3 / 60000;

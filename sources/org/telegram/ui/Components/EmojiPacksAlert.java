@@ -36,7 +36,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.DocumentObject;
+import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaDataController;
@@ -340,8 +343,8 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
         }
     }
 
-    public class AnonymousClass8 extends ShareAlert {
-        AnonymousClass8(Context context, ArrayList arrayList, String str, boolean z, String str2, boolean z2, Theme.ResourcesProvider resourcesProvider) {
+    public class AnonymousClass9 extends ShareAlert {
+        AnonymousClass9(Context context, ArrayList arrayList, String str, boolean z, String str2, boolean z2, Theme.ResourcesProvider resourcesProvider) {
             super(context, arrayList, str, z, str2, z2, resourcesProvider);
         }
 
@@ -361,7 +364,7 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    EmojiPacksAlert.AnonymousClass8.this.lambda$onSend$0(longSparseArray, i);
+                    EmojiPacksAlert.AnonymousClass9.this.lambda$onSend$0(longSparseArray, i);
                 }
             }, 100L);
         }
@@ -589,6 +592,9 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
         ArrayList lineDrawablesTmp;
         private Paint paint;
         private Path path;
+        private ImageReceiver previewImageReceiver;
+        private boolean previewImageVisible;
+        private final AnimatedFloat previewImageVisibleT;
         private final AnimatedFloat statusBarT;
         ArrayList unusedArrays;
         ArrayList unusedLineDrawables;
@@ -682,7 +688,9 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
             this.lineDrawablesTmp = new ArrayList();
             this.unusedArrays = new ArrayList();
             this.unusedLineDrawables = new ArrayList();
-            this.statusBarT = new AnimatedFloat(this, 0L, 350L, CubicBezierInterpolator.EASE_OUT_QUINT);
+            CubicBezierInterpolator cubicBezierInterpolator = CubicBezierInterpolator.EASE_OUT_QUINT;
+            this.statusBarT = new AnimatedFloat(this, 0L, 350L, cubicBezierInterpolator);
+            this.previewImageVisibleT = new AnimatedFloat(this, 0L, 320L, cubicBezierInterpolator);
         }
 
         private AnimatedEmojiSpan[] getAnimatedEmojiSpans() {
@@ -701,6 +709,8 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
+            DrawingInBackgroundLine drawingInBackgroundLine;
+            DrawingInBackgroundLine drawingInBackgroundLine2;
             AnimatedEmojiSpan animatedEmojiSpan;
             if (this.attached) {
                 this.paint.setColor(EmojiPacksAlert.this.getThemedColor(Theme.key_dialogBackground));
@@ -709,10 +719,27 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
                 float f = EmojiPacksAlert.this.lastY = r1.getListTop();
                 float f2 = this.statusBarT.set(f <= ((float) ((BottomSheet) EmojiPacksAlert.this).containerView.getPaddingTop()));
                 float lerp = AndroidUtilities.lerp(f, 0.0f, f2);
-                float dp = AndroidUtilities.dp((1.0f - f2) * 14.0f);
+                if (this.previewImageReceiver != null) {
+                    float dp = AndroidUtilities.dp(140.0f);
+                    float dp2 = AndroidUtilities.dp(20.0f);
+                    if (lerp < dp + dp2) {
+                        this.previewImageVisible = false;
+                    }
+                    this.previewImageReceiver.setAlpha(this.previewImageVisibleT.set(this.previewImageVisible));
+                    if (this.previewImageReceiver.getAlpha() > 0.0f) {
+                        float alpha = ((this.previewImageReceiver.getAlpha() * 0.4f) + 0.6f) * dp;
+                        float f3 = alpha / 2.0f;
+                        this.previewImageReceiver.setImageCoords((getWidth() / 2.0f) - f3, ((lerp - dp2) - (dp / 2.0f)) - f3, alpha, alpha);
+                        this.previewImageReceiver.draw(canvas);
+                    } else {
+                        this.previewImageReceiver.onDetachedFromWindow();
+                        this.previewImageReceiver = null;
+                    }
+                }
+                float dp3 = AndroidUtilities.dp((1.0f - f2) * 14.0f);
                 RectF rectF = AndroidUtilities.rectTmp;
-                rectF.set(getPaddingLeft(), lerp, getWidth() - getPaddingRight(), getBottom() + dp);
-                this.path.addRoundRect(rectF, dp, dp, Path.Direction.CW);
+                rectF.set(getPaddingLeft(), lerp, getWidth() - getPaddingRight(), getBottom() + dp3);
+                this.path.addRoundRect(rectF, dp3, dp3, Path.Direction.CW);
                 canvas.drawPath(this.path, this.paint);
                 boolean z = f2 > 0.5f;
                 Boolean bool = this.lastOpen;
@@ -723,9 +750,9 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
                 }
                 Theme.dialogs_onlineCirclePaint.setColor(EmojiPacksAlert.this.getThemedColor(Theme.key_sheet_scrollUp));
                 Theme.dialogs_onlineCirclePaint.setAlpha((int) (MathUtils.clamp(lerp / AndroidUtilities.dp(20.0f), 0.0f, 1.0f) * Theme.dialogs_onlineCirclePaint.getAlpha()));
-                int dp2 = AndroidUtilities.dp(36.0f);
-                float dp3 = lerp + AndroidUtilities.dp(10.0f);
-                rectF.set((getMeasuredWidth() - dp2) / 2, dp3, (getMeasuredWidth() + dp2) / 2, AndroidUtilities.dp(4.0f) + dp3);
+                int dp4 = AndroidUtilities.dp(36.0f);
+                float dp5 = lerp + AndroidUtilities.dp(10.0f);
+                rectF.set((getMeasuredWidth() - dp4) / 2, dp5, (getMeasuredWidth() + dp4) / 2, AndroidUtilities.dp(4.0f) + dp5);
                 canvas.drawRoundRect(rectF, AndroidUtilities.dp(2.0f), AndroidUtilities.dp(2.0f), Theme.dialogs_onlineCirclePaint);
                 EmojiPacksAlert.this.shadowView.setVisibility((EmojiPacksAlert.this.listView.canScrollVertically(1) || EmojiPacksAlert.this.removeButtonView.getVisibility() == 0) ? 0 : 4);
                 if (EmojiPacksAlert.this.listView != null) {
@@ -773,45 +800,43 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
                     this.lineDrawablesTmp.addAll(this.lineDrawables);
                     this.lineDrawables.clear();
                     long currentTimeMillis = System.currentTimeMillis();
-                    int i3 = 0;
-                    while (true) {
-                        DrawingInBackgroundLine drawingInBackgroundLine = null;
-                        if (i3 >= this.viewsGroupedByLines.size()) {
-                            break;
-                        }
+                    for (int i3 = 0; i3 < this.viewsGroupedByLines.size(); i3++) {
                         ArrayList arrayList4 = (ArrayList) this.viewsGroupedByLines.valueAt(i3);
                         View view = (View) arrayList4.get(0);
                         int childAdapterPosition = EmojiPacksAlert.this.listView.getChildAdapterPosition(view);
                         int i4 = 0;
                         while (true) {
                             if (i4 >= this.lineDrawablesTmp.size()) {
+                                drawingInBackgroundLine = null;
                                 break;
+                            } else {
+                                if (((DrawingInBackgroundLine) this.lineDrawablesTmp.get(i4)).position == childAdapterPosition) {
+                                    drawingInBackgroundLine = (DrawingInBackgroundLine) this.lineDrawablesTmp.get(i4);
+                                    this.lineDrawablesTmp.remove(i4);
+                                    break;
+                                }
+                                i4++;
                             }
-                            if (((DrawingInBackgroundLine) this.lineDrawablesTmp.get(i4)).position == childAdapterPosition) {
-                                drawingInBackgroundLine = (DrawingInBackgroundLine) this.lineDrawablesTmp.get(i4);
-                                this.lineDrawablesTmp.remove(i4);
-                                break;
-                            }
-                            i4++;
                         }
                         if (drawingInBackgroundLine == null) {
                             if (this.unusedLineDrawables.isEmpty()) {
-                                drawingInBackgroundLine = new DrawingInBackgroundLine();
-                                drawingInBackgroundLine.setLayerNum(7);
+                                drawingInBackgroundLine2 = new DrawingInBackgroundLine();
+                                drawingInBackgroundLine2.setLayerNum(7);
                             } else {
                                 ArrayList arrayList5 = this.unusedLineDrawables;
-                                drawingInBackgroundLine = (DrawingInBackgroundLine) arrayList5.remove(arrayList5.size() - 1);
+                                drawingInBackgroundLine2 = (DrawingInBackgroundLine) arrayList5.remove(arrayList5.size() - 1);
                             }
-                            drawingInBackgroundLine.position = childAdapterPosition;
-                            drawingInBackgroundLine.onAttachToWindow();
+                            drawingInBackgroundLine2.position = childAdapterPosition;
+                            drawingInBackgroundLine2.onAttachToWindow();
+                        } else {
+                            drawingInBackgroundLine2 = drawingInBackgroundLine;
                         }
-                        this.lineDrawables.add(drawingInBackgroundLine);
-                        drawingInBackgroundLine.imageViewEmojis = arrayList4;
+                        this.lineDrawables.add(drawingInBackgroundLine2);
+                        drawingInBackgroundLine2.imageViewEmojis = arrayList4;
                         canvas.save();
                         canvas.translate(0.0f, view.getY() + view.getPaddingTop());
-                        drawingInBackgroundLine.draw(canvas, currentTimeMillis, getMeasuredWidth(), view.getMeasuredHeight() - view.getPaddingBottom(), 1.0f);
+                        drawingInBackgroundLine2.draw(canvas, currentTimeMillis, getMeasuredWidth(), view.getMeasuredHeight() - view.getPaddingBottom(), 1.0f);
                         canvas.restore();
-                        i3++;
                     }
                     for (int i5 = 0; i5 < this.lineDrawablesTmp.size(); i5++) {
                         if (this.unusedLineDrawables.size() < 3) {
@@ -827,10 +852,10 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
                     canvas.restore();
                     if (EmojiPacksAlert.this.listView.getAlpha() < 1.0f) {
                         int width = getWidth() / 2;
-                        int height = (((int) dp3) + getHeight()) / 2;
-                        int dp4 = AndroidUtilities.dp(16.0f);
+                        int height = (((int) dp5) + getHeight()) / 2;
+                        int dp6 = AndroidUtilities.dp(16.0f);
                         EmojiPacksAlert.this.progressDrawable.setAlpha((int) ((1.0f - EmojiPacksAlert.this.listView.getAlpha()) * 255.0f));
-                        EmojiPacksAlert.this.progressDrawable.setBounds(width - dp4, height - dp4, width + dp4, height + dp4);
+                        EmojiPacksAlert.this.progressDrawable.setBounds(width - dp6, height - dp6, width + dp6, height + dp6);
                         EmojiPacksAlert.this.progressDrawable.draw(canvas);
                         invalidate();
                     }
@@ -847,10 +872,21 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
             return super.dispatchTouchEvent(motionEvent);
         }
 
+        public void hidePreviewEmoji() {
+            if (this.previewImageVisible) {
+                this.previewImageVisible = false;
+                invalidate();
+            }
+        }
+
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
             this.attached = true;
+            ImageReceiver imageReceiver = this.previewImageReceiver;
+            if (imageReceiver != null) {
+                imageReceiver.onAttachedToWindow();
+            }
         }
 
         @Override
@@ -865,6 +901,28 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
             }
             this.lineDrawables.clear();
             AnimatedEmojiSpan.release(this, (LongSparseArray<AnimatedEmojiDrawable>) EmojiPacksAlert.this.animatedEmojiDrawables);
+            ImageReceiver imageReceiver = this.previewImageReceiver;
+            if (imageReceiver != null) {
+                imageReceiver.onDetachedFromWindow();
+            }
+        }
+
+        public void setPreviewEmoji(TLRPC.Document document) {
+            ImageReceiver imageReceiver = new ImageReceiver(this);
+            this.previewImageReceiver = imageReceiver;
+            if (this.attached) {
+                imageReceiver.onAttachedToWindow();
+            }
+            this.previewImageVisible = true;
+            this.previewImageVisibleT.set(1.0f, true);
+            TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(document.thumbs, 90);
+            this.previewImageReceiver.setImage(ImageLocation.getForDocument(document), "140_140", ImageLocation.getForDocument(closestPhotoSizeWithSize, document), "140_140", DocumentObject.getSvgThumb(document.thumbs, Theme.key_windowBackgroundWhiteGrayIcon, 0.2f, true), 0L, null, null, 0);
+            this.previewImageReceiver.setLayerNum(7);
+            this.previewImageReceiver.setAllowStartLottieAnimation(true);
+            this.previewImageReceiver.setAllowStartAnimation(true);
+            this.previewImageReceiver.setAutoRepeat(1);
+            this.previewImageReceiver.setAllowDecodeSingleFrame(true);
+            this.previewImageReceiver.setParentView(this);
         }
 
         public void updateEmojiDrawables() {
@@ -1843,12 +1901,12 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
         if (parentActivity == null) {
             parentActivity = getContext();
         }
-        AnonymousClass8 anonymousClass8 = new AnonymousClass8(parentActivity, null, sb2, false, sb2, false, this.resourcesProvider);
+        AnonymousClass9 anonymousClass9 = new AnonymousClass9(parentActivity, null, sb2, false, sb2, false, this.resourcesProvider);
         BaseFragment baseFragment2 = this.fragment;
         if (baseFragment2 != null) {
-            baseFragment2.showDialog(anonymousClass8);
+            baseFragment2.showDialog(anonymousClass9);
         } else {
-            anonymousClass8.show();
+            anonymousClass9.show();
         }
     }
 
@@ -2022,6 +2080,10 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
 
     @Override
     public void dismiss() {
+        ContentView contentView = this.contentView;
+        if (contentView != null) {
+            contentView.hidePreviewEmoji();
+        }
         super.dismiss();
         EmojiPacksLoader emojiPacksLoader = this.customEmojiPacks;
         if (emojiPacksLoader != null) {
@@ -2067,6 +2129,10 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.stickersDidLoad);
+    }
+
+    public void setPreviewEmoji(TLRPC.Document document) {
+        this.contentView.setPreviewEmoji(document);
     }
 
     @Override

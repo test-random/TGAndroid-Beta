@@ -20,6 +20,7 @@ public class SlideChooseView extends View {
     private Drawable[] leftDrawables;
     private Paint linePaint;
     private int lineSize;
+    private int minIndex;
     private boolean moving;
     private AnimatedFloat movingAnimatedHolder;
     private int[] optionsSizes;
@@ -56,6 +57,7 @@ public class SlideChooseView extends View {
     public SlideChooseView(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
         this.dashedFrom = -1;
+        this.minIndex = Integer.MIN_VALUE;
         CubicBezierInterpolator cubicBezierInterpolator = CubicBezierInterpolator.DEFAULT;
         this.selectedIndexAnimatedHolder = new AnimatedFloat(this, 120L, cubicBezierInterpolator);
         this.movingAnimatedHolder = new AnimatedFloat(this, 150L, cubicBezierInterpolator);
@@ -115,7 +117,7 @@ public class SlideChooseView extends View {
     }
 
     @Override
-    protected void onDraw(android.graphics.Canvas r22) {
+    protected void onDraw(android.graphics.Canvas r23) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.SlideChooseView.onDraw(android.graphics.Canvas):void");
     }
 
@@ -138,7 +140,7 @@ public class SlideChooseView extends View {
     }
 
     @Override
-    public boolean onTouchEvent(android.view.MotionEvent r9) {
+    public boolean onTouchEvent(android.view.MotionEvent r10) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.SlideChooseView.onTouchEvent(android.view.MotionEvent):boolean");
     }
 
@@ -153,6 +155,20 @@ public class SlideChooseView extends View {
 
     public void setDashedFrom(int i) {
         this.dashedFrom = i;
+    }
+
+    public void setMinAllowedIndex(int i) {
+        String[] strArr;
+        if (i != -1 && (strArr = this.optionsStr) != null) {
+            i = Math.min(i, strArr.length - 1);
+        }
+        if (this.minIndex != i) {
+            this.minIndex = i;
+            if (this.selectedIndex < i) {
+                this.selectedIndex = i;
+            }
+            invalidate();
+        }
     }
 
     public void setOptions(int i, Drawable[] drawableArr, String... strArr) {

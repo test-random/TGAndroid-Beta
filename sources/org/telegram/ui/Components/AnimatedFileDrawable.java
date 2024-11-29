@@ -306,44 +306,55 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
     public static native void prepareToSeek(long j);
 
     public void scheduleNextGetFrame() {
-        if (this.loadFrameTask == null) {
+        scheduleNextGetFrame(true, false);
+    }
+
+    private void scheduleNextGetFrame(boolean z, boolean z2) {
+        Runnable runnable;
+        Runnable runnable2;
+        if (this.loadFrameTask == null || z2) {
             if (((this.PRERENDER_FRAME && this.nextRenderingBitmap2 == null) || this.nextRenderingBitmap == null) && canLoadFrames() && !this.destroyWhenDone) {
                 if (!this.isRunning) {
-                    boolean z = this.decodeSingleFrame;
-                    if (!z) {
+                    boolean z3 = this.decodeSingleFrame;
+                    if (!z3) {
                         return;
                     }
-                    if (z && this.singleFrameDecoded) {
+                    if (z3 && this.singleFrameDecoded) {
                         return;
                     }
                 }
                 if ((this.parents.size() != 0 || this.ignoreNoParent) && !this.generatingCache) {
                     long j = 0;
-                    if (this.lastFrameDecodeTime != 0) {
+                    if (z && this.lastFrameDecodeTime != 0) {
                         long j2 = this.invalidateAfter;
                         j = Math.min(j2, Math.max(0L, j2 - (System.currentTimeMillis() - this.lastFrameDecodeTime)));
                     }
                     if (this.useSharedQueue) {
                         if (this.limitFps) {
-                            Runnable runnable = this.loadFrameRunnable;
-                            this.loadFrameTask = runnable;
-                            DispatchQueuePoolBackground.execute(runnable);
-                            return;
-                        } else {
-                            ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = executor;
-                            Runnable runnable2 = this.loadFrameRunnable;
-                            this.loadFrameTask = runnable2;
-                            scheduledThreadPoolExecutor.schedule(runnable2, j, TimeUnit.MILLISECONDS);
+                            Runnable runnable3 = this.loadFrameRunnable;
+                            this.loadFrameTask = runnable3;
+                            DispatchQueuePoolBackground.execute(runnable3);
                             return;
                         }
+                        if (z2 && (runnable2 = this.loadFrameTask) != null) {
+                            executor.remove(runnable2);
+                        }
+                        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = executor;
+                        Runnable runnable4 = this.loadFrameRunnable;
+                        this.loadFrameTask = runnable4;
+                        scheduledThreadPoolExecutor.schedule(runnable4, j, TimeUnit.MILLISECONDS);
+                        return;
                     }
                     if (this.decodeQueue == null) {
                         this.decodeQueue = new DispatchQueue("decodeQueue" + this);
                     }
+                    if (z2 && (runnable = this.loadFrameTask) != null) {
+                        this.decodeQueue.cancelRunnable(runnable);
+                    }
                     DispatchQueue dispatchQueue = this.decodeQueue;
-                    Runnable runnable3 = this.loadFrameRunnable;
-                    this.loadFrameTask = runnable3;
-                    dispatchQueue.postRunnable(runnable3, j);
+                    Runnable runnable5 = this.loadFrameRunnable;
+                    this.loadFrameTask = runnable5;
+                    dispatchQueue.postRunnable(runnable5, j);
                 }
             }
         }
@@ -873,7 +884,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
                 if (z2 && this.decodeSingleFrame) {
                     this.singleFrameDecoded = false;
                     if (this.loadFrameTask == null) {
-                        scheduleNextGetFrame();
+                        scheduleNextGetFrame(false, true);
                     } else {
                         this.forceDecodeAfterNextFrame = true;
                     }

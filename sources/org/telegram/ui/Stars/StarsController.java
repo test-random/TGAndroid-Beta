@@ -62,7 +62,6 @@ import org.telegram.ui.bots.BotWebViewSheet;
 public class StarsController {
     private static volatile StarsController[] Instance = new StarsController[4];
     private static final Object[] lockObjects = new Object[4];
-    public long balance;
     private boolean balanceLoaded;
     private boolean balanceLoading;
     public final int currentAccount;
@@ -88,6 +87,7 @@ public class StarsController {
     public boolean subscriptionsEndReached;
     public boolean subscriptionsLoading;
     public String subscriptionsOffset;
+    public TL_stars.StarsAmount balance = new TL_stars.StarsAmount(0);
     public final ArrayList[] transactions = {new ArrayList(), new ArrayList(), new ArrayList()};
     public final boolean[] transactionsExist = new boolean[3];
     private final String[] offset = new String[3];
@@ -1248,46 +1248,46 @@ public class StarsController {
         boolean z2;
         boolean z3 = !this.balanceLoaded;
         this.lastBalanceLoaded = System.currentTimeMillis();
-        if (tLObject instanceof TL_stars.TL_payments_starsStatus) {
-            TL_stars.TL_payments_starsStatus tL_payments_starsStatus = (TL_stars.TL_payments_starsStatus) tLObject;
-            MessagesController.getInstance(this.currentAccount).putUsers(tL_payments_starsStatus.users, false);
-            MessagesController.getInstance(this.currentAccount).putChats(tL_payments_starsStatus.chats, false);
+        if (tLObject instanceof TL_stars.StarsStatus) {
+            TL_stars.StarsStatus starsStatus = (TL_stars.StarsStatus) tLObject;
+            MessagesController.getInstance(this.currentAccount).putUsers(starsStatus.users, false);
+            MessagesController.getInstance(this.currentAccount).putChats(starsStatus.chats, false);
             if (this.transactions[0].isEmpty()) {
-                Iterator<TL_stars.StarsTransaction> it = tL_payments_starsStatus.history.iterator();
+                Iterator<TL_stars.StarsTransaction> it = starsStatus.history.iterator();
                 while (it.hasNext()) {
                     TL_stars.StarsTransaction next = it.next();
                     this.transactions[0].add(next);
-                    this.transactions[next.stars > 0 ? (char) 1 : (char) 2].add(next);
+                    this.transactions[next.stars.amount > 0 ? (char) 1 : (char) 2].add(next);
                 }
                 for (int i = 0; i < 3; i++) {
                     this.transactionsExist[i] = !this.transactions[i].isEmpty() || this.transactionsExist[i];
                     boolean[] zArr = this.endReached;
-                    boolean z4 = (tL_payments_starsStatus.flags & 1) == 0;
+                    boolean z4 = (starsStatus.flags & 1) == 0;
                     zArr[i] = z4;
                     if (z4) {
                         this.loading[i] = false;
                     }
-                    this.offset[i] = zArr[i] ? null : tL_payments_starsStatus.next_offset;
+                    this.offset[i] = zArr[i] ? null : starsStatus.next_offset;
                 }
                 z = true;
             } else {
                 z = false;
             }
             if (this.subscriptions.isEmpty()) {
-                this.subscriptions.addAll(tL_payments_starsStatus.subscriptions);
+                this.subscriptions.addAll(starsStatus.subscriptions);
                 this.subscriptionsLoading = false;
-                this.subscriptionsOffset = tL_payments_starsStatus.subscriptions_next_offset;
-                this.subscriptionsEndReached = (tL_payments_starsStatus.flags & 4) == 0;
+                this.subscriptionsOffset = starsStatus.subscriptions_next_offset;
+                this.subscriptionsEndReached = (starsStatus.flags & 4) == 0;
                 z2 = true;
             } else {
                 z2 = false;
             }
-            long j = this.balance;
-            long j2 = tL_payments_starsStatus.balance;
-            if (j != j2) {
+            long j = this.balance.amount;
+            TL_stars.StarsAmount starsAmount = starsStatus.balance;
+            if (j != starsAmount.amount) {
                 z3 = true;
             }
-            this.balance = j2;
+            this.balance = starsAmount;
             this.minus = 0L;
         } else {
             z = false;
@@ -1693,12 +1693,12 @@ public class StarsController {
 
     public void lambda$loadInsufficientSubscriptions$21(TLObject tLObject) {
         this.insufficientSubscriptionsLoading = false;
-        if (tLObject instanceof TL_stars.TL_payments_starsStatus) {
-            TL_stars.TL_payments_starsStatus tL_payments_starsStatus = (TL_stars.TL_payments_starsStatus) tLObject;
-            MessagesController.getInstance(this.currentAccount).putUsers(tL_payments_starsStatus.users, false);
-            MessagesController.getInstance(this.currentAccount).putChats(tL_payments_starsStatus.chats, false);
-            this.insufficientSubscriptions.addAll(tL_payments_starsStatus.subscriptions);
-            updateBalance(tL_payments_starsStatus.balance);
+        if (tLObject instanceof TL_stars.StarsStatus) {
+            TL_stars.StarsStatus starsStatus = (TL_stars.StarsStatus) tLObject;
+            MessagesController.getInstance(this.currentAccount).putUsers(starsStatus.users, false);
+            MessagesController.getInstance(this.currentAccount).putChats(starsStatus.chats, false);
+            this.insufficientSubscriptions.addAll(starsStatus.subscriptions);
+            updateBalance(starsStatus.balance);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starSubscriptionsLoaded, new Object[0]);
         }
     }
@@ -1781,14 +1781,14 @@ public class StarsController {
 
     public void lambda$loadSubscriptions$19(TLObject tLObject) {
         this.subscriptionsLoading = false;
-        if (tLObject instanceof TL_stars.TL_payments_starsStatus) {
-            TL_stars.TL_payments_starsStatus tL_payments_starsStatus = (TL_stars.TL_payments_starsStatus) tLObject;
-            MessagesController.getInstance(this.currentAccount).putUsers(tL_payments_starsStatus.users, false);
-            MessagesController.getInstance(this.currentAccount).putChats(tL_payments_starsStatus.chats, false);
-            this.subscriptions.addAll(tL_payments_starsStatus.subscriptions);
-            this.subscriptionsEndReached = (tL_payments_starsStatus.flags & 4) == 0;
-            this.subscriptionsOffset = tL_payments_starsStatus.subscriptions_next_offset;
-            updateBalance(tL_payments_starsStatus.balance);
+        if (tLObject instanceof TL_stars.StarsStatus) {
+            TL_stars.StarsStatus starsStatus = (TL_stars.StarsStatus) tLObject;
+            MessagesController.getInstance(this.currentAccount).putUsers(starsStatus.users, false);
+            MessagesController.getInstance(this.currentAccount).putChats(starsStatus.chats, false);
+            this.subscriptions.addAll(starsStatus.subscriptions);
+            this.subscriptionsEndReached = (starsStatus.flags & 4) == 0;
+            this.subscriptionsOffset = starsStatus.subscriptions_next_offset;
+            updateBalance(starsStatus.balance);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starSubscriptionsLoaded, new Object[0]);
         }
     }
@@ -1804,17 +1804,17 @@ public class StarsController {
 
     public void lambda$loadTransactions$17(int i, TLObject tLObject) {
         this.loading[i] = false;
-        if (tLObject instanceof TL_stars.TL_payments_starsStatus) {
-            TL_stars.TL_payments_starsStatus tL_payments_starsStatus = (TL_stars.TL_payments_starsStatus) tLObject;
-            MessagesController.getInstance(this.currentAccount).putUsers(tL_payments_starsStatus.users, false);
-            MessagesController.getInstance(this.currentAccount).putChats(tL_payments_starsStatus.chats, false);
-            this.transactions[i].addAll(tL_payments_starsStatus.history);
+        if (tLObject instanceof TL_stars.StarsStatus) {
+            TL_stars.StarsStatus starsStatus = (TL_stars.StarsStatus) tLObject;
+            MessagesController.getInstance(this.currentAccount).putUsers(starsStatus.users, false);
+            MessagesController.getInstance(this.currentAccount).putChats(starsStatus.chats, false);
+            this.transactions[i].addAll(starsStatus.history);
             this.transactionsExist[i] = !this.transactions[i].isEmpty() || this.transactionsExist[i];
             boolean[] zArr = this.endReached;
-            boolean z = (tL_payments_starsStatus.flags & 1) == 0;
+            boolean z = (starsStatus.flags & 1) == 0;
             zArr[i] = z;
-            this.offset[i] = z ? null : tL_payments_starsStatus.next_offset;
-            updateBalance(tL_payments_starsStatus.balance);
+            this.offset[i] = z ? null : starsStatus.next_offset;
+            updateBalance(starsStatus.balance);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starTransactionsLoaded, new Object[0]);
         }
     }
@@ -1889,7 +1889,7 @@ public class StarsController {
     }
 
     public void lambda$openPaymentForm$71(long j, final boolean[] zArr, final Utilities.Callback callback, Context context, Theme.ResourcesProvider resourcesProvider, boolean z, String str, final MessageObject messageObject, final TLRPC.InputInvoice inputInvoice, final TLRPC.TL_payments_paymentFormStars tL_payments_paymentFormStars, final int i, final Utilities.Callback callback2) {
-        if (this.balance >= j) {
+        if (this.balance.amount >= j) {
             payAfterConfirmed(messageObject, inputInvoice, tL_payments_paymentFormStars, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
@@ -2307,7 +2307,7 @@ public class StarsController {
     }
 
     public void lambda$subscribeTo$77(long j, int i, final boolean[] zArr, final Utilities.Callback2 callback2, Context context, Theme.ResourcesProvider resourcesProvider, final TLRPC.ChatInvite chatInvite, final String str, final Utilities.Callback callback) {
-        if (this.balance >= j) {
+        if (this.balance.amount >= j) {
             payAfterConfirmed(str, chatInvite, new Utilities.Callback2() {
                 @Override
                 public final void run(Object obj, Object obj2) {
@@ -2491,7 +2491,7 @@ public class StarsController {
     }
 
     public void lambda$showStarsTopup$23(Activity activity, long j, String str) {
-        if (getBalance() < j && j > 0) {
+        if (getBalance().amount < j && j > 0) {
             new StarsIntroActivity.StarsNeededSheet(activity, null, j, 4, str, new Runnable() {
                 @Override
                 public final void run() {
@@ -2868,19 +2868,19 @@ public class StarsController {
         return this.endReached[i];
     }
 
-    public long getBalance() {
+    public long getBalance(boolean z) {
+        return getBalance(z, null).amount;
+    }
+
+    public TL_stars.StarsAmount getBalance() {
         return getBalance((Runnable) null);
     }
 
-    public long getBalance(Runnable runnable) {
+    public TL_stars.StarsAmount getBalance(Runnable runnable) {
         return getBalance(true, runnable);
     }
 
-    public long getBalance(boolean z) {
-        return getBalance(z, null);
-    }
-
-    public long getBalance(boolean z, final Runnable runnable) {
+    public TL_stars.StarsAmount getBalance(boolean z, final Runnable runnable) {
         if ((!this.balanceLoaded || System.currentTimeMillis() - this.lastBalanceLoaded > 60000) && !this.balanceLoading) {
             this.balanceLoading = true;
             TL_stars.TL_payments_getStarsStatus tL_payments_getStarsStatus = new TL_stars.TL_payments_getStarsStatus();
@@ -2892,7 +2892,13 @@ public class StarsController {
                 }
             });
         }
-        return Math.max(0L, this.balance - (z ? this.minus : 0L));
+        if (!z || this.minus <= 0) {
+            return this.balance;
+        }
+        TL_stars.StarsAmount starsAmount = new TL_stars.StarsAmount();
+        starsAmount.amount = Math.max(0L, this.balance.amount - this.minus);
+        starsAmount.nanos = this.balance.nanos;
+        return starsAmount;
     }
 
     public Context getContext(ChatActivity chatActivity) {
@@ -3453,9 +3459,9 @@ public class StarsController {
         }
     }
 
-    public void updateBalance(long j) {
-        if (this.balance != j) {
-            this.balance = j;
+    public void updateBalance(TL_stars.StarsAmount starsAmount) {
+        if (!this.balance.equals(starsAmount)) {
+            this.balance = starsAmount;
             this.minus = 0L;
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starBalanceUpdated, new Object[0]);
         } else if (this.minus != 0) {

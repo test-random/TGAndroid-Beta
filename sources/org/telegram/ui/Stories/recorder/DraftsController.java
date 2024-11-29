@@ -26,6 +26,7 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Stories.recorder.CollageLayout;
 
 public class DraftsController {
     public final int currentAccount;
@@ -51,6 +52,8 @@ public class DraftsController {
         public String botLang;
         public String caption;
         public ArrayList captionEntities;
+        public CollageLayout collage;
+        public ArrayList collageParts;
         public long date;
         public long duration;
         public long editDocumentId;
@@ -249,11 +252,7 @@ public class DraftsController {
             if (abstractSerializedData.remaining() > 0) {
                 this.isError = abstractSerializedData.readBool(z);
                 int readInt326 = abstractSerializedData.readInt32(z);
-                if (readInt326 == 1450380236) {
-                    this.error = null;
-                } else {
-                    this.error = TLRPC.TL_error.TLdeserialize(abstractSerializedData, readInt326, z);
-                }
+                this.error = readInt326 != 1450380236 ? TLRPC.TL_error.TLdeserialize(abstractSerializedData, readInt326, z) : null;
                 this.fullThumb = abstractSerializedData.readString(z);
             }
             if (abstractSerializedData.remaining() > 0 && abstractSerializedData.readInt32(z) == -1739392570) {
@@ -291,6 +290,17 @@ public class DraftsController {
                 if (readInt327 != 1450380236) {
                     this.botEdit = TLRPC.InputMedia.TLdeserialize(abstractSerializedData, readInt327, z);
                 }
+            }
+            if (abstractSerializedData.remaining() <= 0 || abstractSerializedData.readInt32(z) != -559038737) {
+                return;
+            }
+            this.collage = new CollageLayout(abstractSerializedData.readString(z));
+            this.collageParts = new ArrayList();
+            for (int i6 = 0; i6 < this.collage.parts.size(); i6++) {
+                VideoEditedInfo.Part part = new VideoEditedInfo.Part();
+                part.readParams(abstractSerializedData, z);
+                part.part = (CollageLayout.Part) this.collage.parts.get(i6);
+                this.collageParts.add(part);
             }
         }
 
@@ -367,6 +377,8 @@ public class DraftsController {
             this.botId = storyEntry.botId;
             this.botLang = storyEntry.botLang;
             this.botEdit = storyEntry.editingBotPreview;
+            this.collage = storyEntry.collage;
+            this.collageParts = VideoEditedInfo.Part.toParts(storyEntry);
         }
 
         public int getObjectSize() {
@@ -469,10 +481,13 @@ public class DraftsController {
             storyEntry.botId = this.botId;
             storyEntry.botLang = this.botLang;
             storyEntry.editingBotPreview = this.botEdit;
+            storyEntry.collage = this.collage;
+            storyEntry.collageContent = VideoEditedInfo.Part.toStoryEntries(this.collageParts);
             return storyEntry;
         }
 
         public void toStream(AbstractSerializedData abstractSerializedData) {
+            ArrayList arrayList;
             abstractSerializedData.writeInt32(-1318387531);
             abstractSerializedData.writeInt64(this.date);
             abstractSerializedData.writeString(this.thumb);
@@ -502,16 +517,16 @@ public class DraftsController {
             abstractSerializedData.writeInt32(this.gradientBottomColor);
             abstractSerializedData.writeString(this.caption);
             abstractSerializedData.writeInt32(481674261);
-            ArrayList arrayList = this.captionEntities;
-            abstractSerializedData.writeInt32(arrayList == null ? 0 : arrayList.size());
+            ArrayList arrayList2 = this.captionEntities;
+            abstractSerializedData.writeInt32(arrayList2 == null ? 0 : arrayList2.size());
             if (this.captionEntities != null) {
                 for (int i2 = 0; i2 < this.captionEntities.size(); i2++) {
                     ((TLRPC.MessageEntity) this.captionEntities.get(i2)).serializeToStream(abstractSerializedData);
                 }
             }
             abstractSerializedData.writeInt32(481674261);
-            ArrayList arrayList2 = this.privacyRules;
-            abstractSerializedData.writeInt32(arrayList2 == null ? 0 : arrayList2.size());
+            ArrayList arrayList3 = this.privacyRules;
+            abstractSerializedData.writeInt32(arrayList3 == null ? 0 : arrayList3.size());
             if (this.privacyRules != null) {
                 for (int i3 = 0; i3 < this.privacyRules.size(); i3++) {
                     ((TLRPC.InputPrivacyRule) this.privacyRules.get(i3)).serializeToStream(abstractSerializedData);
@@ -521,8 +536,8 @@ public class DraftsController {
             abstractSerializedData.writeString(this.paintFilePath);
             abstractSerializedData.writeInt64(this.averageDuration);
             abstractSerializedData.writeInt32(481674261);
-            ArrayList arrayList3 = this.mediaEntities;
-            abstractSerializedData.writeInt32(arrayList3 == null ? 0 : arrayList3.size());
+            ArrayList arrayList4 = this.mediaEntities;
+            abstractSerializedData.writeInt32(arrayList4 == null ? 0 : arrayList4.size());
             if (this.mediaEntities != null) {
                 for (int i4 = 0; i4 < this.mediaEntities.size(); i4++) {
                     ((VideoEditedInfo.MediaEntity) this.mediaEntities.get(i4)).serializeTo(abstractSerializedData, true);
@@ -614,6 +629,17 @@ public class DraftsController {
                 abstractSerializedData.writeInt32(1450380236);
             } else {
                 inputMedia.serializeToStream(abstractSerializedData);
+            }
+            CollageLayout collageLayout = this.collage;
+            if (collageLayout == null || collageLayout.parts.size() <= 1 || (arrayList = this.collageParts) == null || arrayList.size() <= 1) {
+                abstractSerializedData.writeInt32(1450380236);
+                return;
+            }
+            abstractSerializedData.writeInt32(-559038737);
+            abstractSerializedData.writeString(this.collage.toString());
+            Iterator it = this.collageParts.iterator();
+            while (it.hasNext()) {
+                ((VideoEditedInfo.Part) it.next()).serializeToStream(abstractSerializedData);
             }
         }
     }
@@ -759,11 +785,34 @@ public class DraftsController {
         }
     }
 
-    public void lambda$load$2(java.util.ArrayList r13) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.DraftsController.lambda$load$2(java.util.ArrayList):void");
+    public void lambda$load$2(ArrayList arrayList) {
+        File file;
+        long currentTimeMillis = System.currentTimeMillis();
+        ArrayList arrayList2 = new ArrayList();
+        ArrayList arrayList3 = new ArrayList();
+        for (int i = 0; i < arrayList.size(); i++) {
+            StoryEntry entry = ((StoryDraft) arrayList.get(i)).toEntry();
+            if (entry != null) {
+                if (entry.isCollage() || ((file = entry.file) != null && file.exists())) {
+                    if (entry.isEdit) {
+                        this.drafts.add(entry);
+                        arrayList2.add(Long.valueOf(entry.draftId));
+                    } else {
+                        this.drafts.add(entry);
+                        arrayList2.add(Long.valueOf(entry.draftId));
+                    }
+                }
+                arrayList3.add(entry);
+            }
+        }
+        delete(arrayList3);
+        this.loading = false;
+        this.loaded = true;
+        NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.storiesDraftsUpdated, new Object[0]);
     }
 
     public void lambda$loadFailed$3(ArrayList arrayList) {
+        File file;
         long currentTimeMillis = System.currentTimeMillis();
         ArrayList arrayList2 = new ArrayList();
         ArrayList arrayList3 = new ArrayList();
@@ -771,12 +820,11 @@ public class DraftsController {
         for (int i = 0; i < arrayList.size(); i++) {
             StoryEntry entry = ((StoryDraft) arrayList.get(i)).toEntry();
             if (entry != null) {
-                File file = entry.file;
-                if (file == null || !file.exists() || currentTimeMillis - entry.draftDate > 604800000) {
-                    arrayList3.add(entry);
-                } else {
+                if ((entry.isCollage() || ((file = entry.file) != null && file.exists())) && currentTimeMillis - entry.draftDate <= 604800000) {
                     arrayList4.add(entry);
                     arrayList2.add(Long.valueOf(entry.draftId));
+                } else {
+                    arrayList3.add(entry);
                 }
             }
         }

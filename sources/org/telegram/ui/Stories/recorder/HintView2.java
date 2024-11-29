@@ -1077,6 +1077,14 @@ public class HintView2 extends View {
         return this;
     }
 
+    public void show(boolean z) {
+        if (z) {
+            show();
+        } else {
+            hide();
+        }
+    }
+
     public boolean shown() {
         return this.shown;
     }

@@ -67,6 +67,7 @@ public abstract class CaptionContainerView extends FrameLayout {
     public ImageView applyButton;
     private Drawable applyButtonCheck;
     private CombinedDrawable applyButtonDrawable;
+    public boolean atTop;
     protected final BlurringShader.StoryBlurDrawer backgroundBlur;
     protected final Paint backgroundPaint;
     int beforeScrollY;
@@ -76,7 +77,7 @@ public abstract class CaptionContainerView extends FrameLayout {
     private final BlurringShader.BlurManager blurManager;
     private Paint blurPaint;
     private final ButtonBounce bounce;
-    private final RectF bounds;
+    public final RectF bounds;
     protected final BlurringShader.StoryBlurDrawer captionBlur;
     private final RectF clickBounds;
     private int codePointCount;
@@ -429,6 +430,7 @@ public abstract class CaptionContainerView extends FrameLayout {
         super(context);
         Paint paint = new Paint(1);
         this.backgroundPaint = paint;
+        this.atTop = false;
         Paint paint2 = new Paint(1);
         this.fadePaint = paint2;
         LinearGradient linearGradient = new LinearGradient(0.0f, 0.0f, 0.0f, AndroidUtilities.dp(10.0f), new int[]{-65536, 0}, new float[]{0.05f, 1.0f}, Shader.TileMode.CLAMP);
@@ -519,7 +521,7 @@ public abstract class CaptionContainerView extends FrameLayout {
                         this.blurDrawer = new BlurringShader.StoryBlurDrawer(blurManager, view, 7);
                     }
                     CaptionContainerView captionContainerView2 = CaptionContainerView.this;
-                    captionContainerView2.drawBlur(this.blurDrawer, canvas, captionContainerView2.rectF, 0.0f, false, 0.0f, -view.getY(), false);
+                    captionContainerView2.drawBlur(this.blurDrawer, canvas, captionContainerView2.rectF, 0.0f, false, 0.0f, -view.getY(), false, 1.0f);
                 }
             }
 
@@ -667,7 +669,7 @@ public abstract class CaptionContainerView extends FrameLayout {
                 CaptionContainerView.this.rectF.set(rect);
                 if (CaptionContainerView.this.customBlur()) {
                     CaptionContainerView captionContainerView = CaptionContainerView.this;
-                    captionContainerView.drawBlur(captionContainerView.mentionBackgroundBlur, canvas, CaptionContainerView.this.rectF, f, false, -CaptionContainerView.this.mentionContainer.getX(), -CaptionContainerView.this.mentionContainer.getY(), false);
+                    captionContainerView.drawBlur(captionContainerView.mentionBackgroundBlur, canvas, CaptionContainerView.this.rectF, f, false, -CaptionContainerView.this.mentionContainer.getX(), -CaptionContainerView.this.mentionContainer.getY(), false, 1.0f);
                     return;
                 }
                 Paint paint2 = CaptionContainerView.this.mentionBackgroundBlur.getPaint(1.0f);
@@ -764,7 +766,7 @@ public abstract class CaptionContainerView extends FrameLayout {
         canvas.translate(-this.editText.getEditText().hintLayoutX, 0.0f);
         canvas.saveLayerAlpha(0.0f, 0.0f, this.hintTextBitmap.getWidth(), this.hintTextBitmap.getHeight(), 255, 31);
         this.rectF.set(0.0f, 1.0f, this.hintTextBitmap.getWidth(), this.hintTextBitmap.getHeight() - 1);
-        drawBlur(this.captionBlur, canvas, this.rectF, 0.0f, true, (-this.editText.getX()) - r8.getPaddingLeft(), ((-this.editText.getY()) - r8.getPaddingTop()) - r8.getExtendedPaddingTop(), true);
+        drawBlur(this.captionBlur, canvas, this.rectF, 0.0f, true, (-this.editText.getX()) - r8.getPaddingLeft(), ((-this.editText.getY()) - r8.getPaddingTop()) - r8.getExtendedPaddingTop(), true, 1.0f);
         canvas.save();
         this.hintTextBitmapPaint.setAlpha(165);
         canvas.drawBitmap(this.hintTextBitmap, 0.0f, 0.0f, this.hintTextBitmapPaint);
@@ -812,7 +814,7 @@ public abstract class CaptionContainerView extends FrameLayout {
         } else {
             path.rewind();
         }
-        float lerp = AndroidUtilities.lerp(AndroidUtilities.dp(21.0f), 0, this.keyboardT);
+        float lerp = AndroidUtilities.lerp(AndroidUtilities.dp(21.0f), 0, this.atTop ? 0.0f : this.keyboardT);
         Path path2 = this.replyClipPath;
         RectF rectF3 = this.bounds;
         Path.Direction direction = Path.Direction.CW;
@@ -1063,12 +1065,10 @@ public abstract class CaptionContainerView extends FrameLayout {
         this.editText.hidePopup(true);
     }
 
-    protected boolean customBlur() {
-        return false;
-    }
+    protected abstract boolean customBlur();
 
     @Override
-    protected void dispatchDraw(android.graphics.Canvas r30) {
+    public void dispatchDraw(android.graphics.Canvas r31) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.CaptionContainerView.dispatchDraw(android.graphics.Canvas):void");
     }
 
@@ -1095,6 +1095,7 @@ public abstract class CaptionContainerView extends FrameLayout {
                 }
             }
         }
+        this.keyboardNotifier.ignore(false);
         this.editText.getEditText().setForceCursorEnd(true);
         this.editText.getEditText().requestFocus();
         this.editText.openKeyboard();
@@ -1103,8 +1104,7 @@ public abstract class CaptionContainerView extends FrameLayout {
         return true;
     }
 
-    protected void drawBlur(BlurringShader.StoryBlurDrawer storyBlurDrawer, Canvas canvas, RectF rectF, float f, boolean z, float f2, float f3, boolean z2) {
-    }
+    protected abstract void drawBlur(BlurringShader.StoryBlurDrawer storyBlurDrawer, Canvas canvas, RectF rectF, float f, boolean z, float f2, float f3, boolean z2, float f4);
 
     public void drawBlurBitmap(Bitmap bitmap, float f) {
         Utilities.stackBlurBitmap(bitmap, (int) f);

@@ -24,8 +24,8 @@ import org.telegram.ui.Components.RLottieImageView;
 
 public class ActionBarMenuSubItem extends FrameLayout {
     boolean bottom;
-    private CheckBox2 checkView;
-    private boolean checkViewLeft;
+    public CheckBox2 checkView;
+    public boolean checkViewLeft;
     private boolean enabled;
     private ValueAnimator enabledAnimator;
     boolean expandIfMultiline;
@@ -40,7 +40,7 @@ public class ActionBarMenuSubItem extends FrameLayout {
     int selectorRad;
     public TextView subtextView;
     private int textColor;
-    private TextView textView;
+    public TextView textView;
     boolean top;
 
     public ActionBarMenuSubItem(android.content.Context r6, int r7, boolean r8, boolean r9, org.telegram.ui.ActionBar.Theme.ResourcesProvider r10) {

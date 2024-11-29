@@ -1656,10 +1656,9 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
         public void lambda$onCreate$19(Activity activity, final TL_stories.StoryItem storyItem, StoryViewer storyViewer, final SharedResources sharedResources) {
             StoryViewer.VideoPlayerHolder videoPlayerHolder;
             StoryRecorder storyRecorder = StoryRecorder.getInstance(activity, PeerStoriesView.this.currentAccount);
-            PeerStoriesView peerStoriesView = PeerStoriesView.this;
-            VideoPlayerSharedScope videoPlayerSharedScope = peerStoriesView.playerSharedScope;
+            VideoPlayerSharedScope videoPlayerSharedScope = PeerStoriesView.this.playerSharedScope;
             long j = (videoPlayerSharedScope == null || (videoPlayerHolder = videoPlayerSharedScope.player) == null) ? 0L : videoPlayerHolder.currentPosition;
-            StoryEntry fromStoryItem = StoryEntry.fromStoryItem(peerStoriesView.currentStory.getPath(), PeerStoriesView.this.currentStory.storyItem);
+            StoryEntry fromStoryItem = StoryEntry.fromStoryItem(PeerStoriesView.this.currentStory.getPath(), PeerStoriesView.this.currentStory.storyItem);
             fromStoryItem.editStoryPeerId = PeerStoriesView.this.dialogId;
             fromStoryItem.cover = StoryEntry.getCoverTime(PeerStoriesView.this.currentStory.storyItem);
             StoryEntry copy = fromStoryItem.copy();
@@ -2057,10 +2056,9 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
             File file;
             StoryViewer.VideoPlayerHolder videoPlayerHolder;
             StoryRecorder storyRecorder = StoryRecorder.getInstance(activity, PeerStoriesView.this.currentAccount);
-            PeerStoriesView peerStoriesView = PeerStoriesView.this;
-            VideoPlayerSharedScope videoPlayerSharedScope = peerStoriesView.playerSharedScope;
+            VideoPlayerSharedScope videoPlayerSharedScope = PeerStoriesView.this.playerSharedScope;
             long j = (videoPlayerSharedScope == null || (videoPlayerHolder = videoPlayerSharedScope.player) == null) ? 0L : videoPlayerHolder.currentPosition;
-            DraftsController draftsController = MessagesController.getInstance(peerStoriesView.currentAccount).getStoriesController().getDraftsController();
+            DraftsController draftsController = MessagesController.getInstance(PeerStoriesView.this.currentAccount).getStoriesController().getDraftsController();
             TL_stories.StoryItem storyItem = PeerStoriesView.this.currentStory.storyItem;
             StoryEntry forEdit = draftsController.getForEdit(storyItem.dialogId, storyItem);
             if (forEdit == null || forEdit.isRepostMessage || (file = forEdit.file) == null || !file.exists()) {

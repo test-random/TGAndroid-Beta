@@ -664,7 +664,7 @@ public class StoryViewer implements NotificationCenter.NotificationCenterDelegat
         }
 
         @Override
-        public void requestPlayer(org.telegram.tgnet.TLRPC.Document r21, android.net.Uri r22, long r23, org.telegram.ui.Stories.PeerStoriesView.VideoPlayerSharedScope r25) {
+        public void requestPlayer(org.telegram.tgnet.TLRPC.Document r22, android.net.Uri r23, long r24, org.telegram.ui.Stories.PeerStoriesView.VideoPlayerSharedScope r26) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.StoryViewer.AnonymousClass5.requestPlayer(org.telegram.tgnet.TLRPC$Document, android.net.Uri, long, org.telegram.ui.Stories.PeerStoriesView$VideoPlayerSharedScope):void");
         }
 
@@ -1698,7 +1698,7 @@ public class StoryViewer implements NotificationCenter.NotificationCenterDelegat
                     return;
                 }
                 this.playerSavedPosition = videoPlayerHolder.currentPosition;
-                videoPlayerHolder.release(null);
+                this.playerHolder.release(null);
                 this.playerHolder = null;
                 return;
             }
@@ -1829,7 +1829,7 @@ public class StoryViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     @Override
-    public View mo998getWindowView() {
+    public View mo1003getWindowView() {
         return this.windowView;
     }
 

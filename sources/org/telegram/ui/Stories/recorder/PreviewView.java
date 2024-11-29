@@ -65,6 +65,7 @@ public abstract class PreviewView extends FrameLayout {
     private Bitmap bitmap;
     private final Paint bitmapPaint;
     private final BlurringShader.BlurManager blurManager;
+    private CollageLayoutView2 collage;
     private float cx;
     private float cy;
     private boolean doNotSpanRotation;
@@ -225,14 +226,16 @@ public abstract class PreviewView extends FrameLayout {
         @Override
         public void onProgressChange(long j, boolean z) {
             VideoPlayer videoPlayer;
-            boolean z2;
             if (!z) {
                 PreviewView.this.seekTo(j);
                 return;
             }
+            boolean z2 = true;
             if (PreviewView.this.videoPlayer != null) {
                 videoPlayer = PreviewView.this.videoPlayer;
-                z2 = true;
+            } else if (PreviewView.this.isCollage()) {
+                PreviewView.this.collage.seekTo(j, true);
+                return;
             } else {
                 if (PreviewView.this.audioPlayer == null) {
                     return;
@@ -245,6 +248,9 @@ public abstract class PreviewView extends FrameLayout {
 
         @Override
         public void onProgressDragChange(boolean z) {
+            if (PreviewView.this.isCollage()) {
+                PreviewView.this.collage.forceNotRestorePosition();
+            }
             PreviewView.this.updatePauseReason(-4, z);
         }
 
@@ -313,6 +319,22 @@ public abstract class PreviewView extends FrameLayout {
         }
 
         @Override
+        public void onVideoLeftChange(int i, float f) {
+            if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                return;
+            }
+            ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoLeft = f;
+        }
+
+        @Override
+        public void onVideoOffsetChange(int i, long j) {
+            if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                return;
+            }
+            ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoOffset = j;
+        }
+
+        @Override
         public void onVideoRightChange(float f) {
             if (PreviewView.this.entry == null) {
                 return;
@@ -322,12 +344,35 @@ public abstract class PreviewView extends FrameLayout {
         }
 
         @Override
+        public void onVideoRightChange(int i, float f) {
+            if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                return;
+            }
+            ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoRight = f;
+        }
+
+        @Override
+        public void onVideoSelected(int i) {
+            if (PreviewView.this.collage != null) {
+                PreviewView.this.collage.highlight(i);
+            }
+        }
+
+        @Override
         public void onVideoVolumeChange(float f) {
             if (PreviewView.this.entry == null) {
                 return;
             }
             PreviewView.this.entry.videoVolume = f;
             PreviewView.this.checkVolumes();
+        }
+
+        @Override
+        public void onVideoVolumeChange(int i, float f) {
+            if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                return;
+            }
+            ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoVolume = f;
         }
     }
 
@@ -774,11 +819,10 @@ public abstract class PreviewView extends FrameLayout {
     }
 
     public void lambda$new$10() {
-        VideoPlayer videoPlayer = this.roundPlayer;
-        if (videoPlayer == null || this.videoPlayer != null || this.timelineView == null) {
+        if (this.roundPlayer == null || this.videoPlayer != null || isCollage() || this.timelineView == null) {
             return;
         }
-        long currentPosition = videoPlayer.getCurrentPosition();
+        long currentPosition = this.roundPlayer.getCurrentPosition();
         StoryEntry storyEntry = this.entry;
         if (storyEntry != null) {
             float f = (float) currentPosition;
@@ -786,10 +830,10 @@ public abstract class PreviewView extends FrameLayout {
             float f3 = (float) storyEntry.roundDuration;
             if ((f < f2 * f3 || f > storyEntry.roundRight * f3) && System.currentTimeMillis() - this.seekedLastTime > 500) {
                 this.seekedLastTime = System.currentTimeMillis();
-                VideoPlayer videoPlayer2 = this.roundPlayer;
+                VideoPlayer videoPlayer = this.roundPlayer;
                 StoryEntry storyEntry2 = this.entry;
                 long j = storyEntry2.roundLeft * ((float) storyEntry2.roundDuration);
-                videoPlayer2.seekTo(j);
+                videoPlayer.seekTo(j);
                 updateAudioPlayer(true);
                 currentPosition = j;
             }
@@ -833,11 +877,10 @@ public abstract class PreviewView extends FrameLayout {
     }
 
     public void lambda$new$9() {
-        VideoPlayer videoPlayer = this.audioPlayer;
-        if (videoPlayer == null || this.videoPlayer != null || this.roundPlayer != null || this.timelineView == null) {
+        if (this.audioPlayer == null || this.videoPlayer != null || this.roundPlayer != null || this.timelineView == null || isCollage()) {
             return;
         }
-        long currentPosition = videoPlayer.getCurrentPosition();
+        long currentPosition = this.audioPlayer.getCurrentPosition();
         StoryEntry storyEntry = this.entry;
         if (storyEntry != null) {
             float f = (float) currentPosition;
@@ -845,10 +888,10 @@ public abstract class PreviewView extends FrameLayout {
             float f3 = (float) storyEntry.audioDuration;
             if ((f < f2 * f3 || f > storyEntry.audioRight * f3) && System.currentTimeMillis() - this.seekedLastTime > 500) {
                 this.seekedLastTime = System.currentTimeMillis();
-                VideoPlayer videoPlayer2 = this.audioPlayer;
+                VideoPlayer videoPlayer = this.audioPlayer;
                 StoryEntry storyEntry2 = this.entry;
                 long j = storyEntry2.audioLeft * ((float) storyEntry2.audioDuration);
-                videoPlayer2.seekTo(j);
+                videoPlayer.seekTo(j);
                 currentPosition = j;
             }
         }
@@ -933,6 +976,13 @@ public abstract class PreviewView extends FrameLayout {
 
     public void seekTo(long j) {
         seekTo(j, false);
+    }
+
+    private void setupCollage(StoryEntry storyEntry) {
+        TimelineView timelineView = this.timelineView;
+        if (timelineView != null) {
+            timelineView.setCollage(storyEntry != null ? storyEntry.collageContent : null);
+        }
     }
 
     public void setupGradient() {
@@ -1127,29 +1177,29 @@ public abstract class PreviewView extends FrameLayout {
         return true;
     }
 
-    public void updateAudioPlayer(boolean r9) {
+    public void updateAudioPlayer(boolean r13) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.PreviewView.updateAudioPlayer(boolean):void");
     }
 
     public void updateRoundPlayer(boolean z) {
-        VideoPlayer videoPlayer = this.roundPlayer;
-        if (videoPlayer == null || this.entry == null) {
+        long currentPosition;
+        boolean isPlaying;
+        if (this.roundPlayer == null || this.entry == null) {
             return;
         }
-        VideoPlayer videoPlayer2 = this.videoPlayer;
         boolean z2 = false;
-        if (videoPlayer2 == null) {
-            videoPlayer.setPlayWhenReady(this.pauseLinks.isEmpty());
+        if (this.videoPlayer == null && !isCollage()) {
+            this.roundPlayer.setPlayWhenReady(this.pauseLinks.isEmpty());
             this.roundPlayer.setLooping(true);
             RoundView roundView = this.roundView;
             if (roundView != null) {
                 roundView.setShown(true, false);
             }
-            long currentPosition = this.roundPlayer.getCurrentPosition();
+            long currentPosition2 = this.roundPlayer.getCurrentPosition();
             if (!z || this.roundPlayer.getDuration() == -9223372036854775807L) {
                 return;
             }
-            float duration = ((float) currentPosition) / ((float) this.roundPlayer.getDuration());
+            float duration = ((float) currentPosition2) / ((float) this.roundPlayer.getDuration());
             StoryEntry storyEntry = this.entry;
             if ((duration < storyEntry.roundLeft || duration > storyEntry.roundRight) && System.currentTimeMillis() - this.seekedLastTime > 500) {
                 this.seekedLastTime = System.currentTimeMillis();
@@ -1158,15 +1208,23 @@ public abstract class PreviewView extends FrameLayout {
             }
             return;
         }
-        long currentPosition2 = videoPlayer2.getCurrentPosition();
+        if (isCollage()) {
+            currentPosition = this.collage.getPosition();
+            isPlaying = this.collage.isPlaying();
+        } else {
+            currentPosition = this.videoPlayer.getCurrentPosition();
+            isPlaying = this.videoPlayer.isPlaying();
+        }
         StoryEntry storyEntry2 = this.entry;
-        long j = (storyEntry2.roundRight - storyEntry2.roundLeft) * ((float) storyEntry2.roundDuration);
+        float f = storyEntry2.roundRight;
+        float f2 = storyEntry2.roundLeft;
+        long j = (f - f2) * ((float) storyEntry2.roundDuration);
         long j2 = storyEntry2.roundOffset;
-        boolean z3 = currentPosition2 >= j2 && currentPosition2 <= j2 + j;
-        if (this.videoPlayer.isPlaying() && z3) {
+        boolean z3 = currentPosition >= j2 && currentPosition <= j + j2;
+        if (isPlaying && z3) {
             z2 = true;
         }
-        long j3 = (currentPosition2 - this.entry.roundOffset) + (r5.roundLeft * ((float) r5.roundDuration));
+        long j3 = (currentPosition - j2) + (f2 * r8);
         RoundView roundView2 = this.roundView;
         if (roundView2 != null) {
             roundView2.setShown(z3, true);
@@ -1243,6 +1301,10 @@ public abstract class PreviewView extends FrameLayout {
             }
             videoPlayer3.setVolume(f2);
         }
+        CollageLayoutView2 collageLayoutView2 = this.collage;
+        if (collageLayoutView2 != null) {
+            collageLayoutView2.setMuted(this.isMuted);
+        }
     }
 
     @Override
@@ -1271,7 +1333,7 @@ public abstract class PreviewView extends FrameLayout {
         } else {
             canvas.drawRect(0.0f, 0.0f, getWidth(), getHeight(), this.gradientPaint);
         }
-        if (this.draw && this.entry != null) {
+        if (this.draw && this.entry != null && !isCollage()) {
             float f2 = this.thumbAlpha.set(this.bitmap != null);
             if (this.thumbBitmap != null && 1.0f - f2 > 0.0f) {
                 this.matrix.set(this.entry.matrix);
@@ -1399,6 +1461,11 @@ public abstract class PreviewView extends FrameLayout {
 
     protected abstract void invalidateTextureViewHolder();
 
+    public boolean isCollage() {
+        StoryEntry storyEntry;
+        return (this.collage == null || (storyEntry = this.entry) == null || !storyEntry.isCollage()) ? false : true;
+    }
+
     public boolean isPlaying() {
         return !this.pauseLinks.contains(-9982);
     }
@@ -1490,21 +1557,8 @@ public abstract class PreviewView extends FrameLayout {
         }
     }
 
-    public void seekTo(long j, boolean z) {
-        VideoPlayer videoPlayer = this.videoPlayer;
-        if (videoPlayer != null || (videoPlayer = this.roundPlayer) != null || (videoPlayer = this.audioPlayer) != null) {
-            videoPlayer.seekTo(j, z);
-        }
-        updateAudioPlayer(true);
-        updateRoundPlayer(true);
-        if (z) {
-            if (!this.slowerSeekScheduled || Math.abs(this.finalSeekPosition - j) > 450) {
-                this.slowerSeekScheduled = true;
-                AndroidUtilities.cancelRunOnUIThread(this.slowerSeek);
-                AndroidUtilities.runOnUIThread(this.slowerSeek, 60L);
-            }
-            this.finalSeekPosition = j;
-        }
+    public void seekTo(long r6, boolean r8) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.PreviewView.seekTo(long, boolean):void");
     }
 
     public void set(StoryEntry storyEntry) {
@@ -1516,27 +1570,32 @@ public abstract class PreviewView extends FrameLayout {
         if (storyEntry == null) {
             setupVideoPlayer(null, runnable, j);
             setupImage(null);
+            setupCollage(null);
             setupWallpaper(null, false);
             this.gradientPaint.setShader(null);
             setupAudio((StoryEntry) null, false);
             setupRound(null, null, false);
             return;
         }
-        if (storyEntry.isVideo) {
-            setupImage(storyEntry);
-            setupVideoPlayer(storyEntry, runnable, j);
-            if (storyEntry.gradientTopColor == 0 && storyEntry.gradientBottomColor == 0) {
-                storyEntry.setupGradient(new PreviewView$$ExternalSyntheticLambda2(this));
-                applyMatrix();
-                setupWallpaper(storyEntry, false);
-                setupAudio(storyEntry, false);
-                setupRound(storyEntry, null, false);
-            }
+        if (storyEntry.isCollage()) {
+            setupImage(null);
+            setupVideoPlayer(null, runnable, j);
+            setupCollage(storyEntry);
         } else {
-            setupVideoPlayer(null, runnable, 0L);
-            setupImage(storyEntry);
+            if (storyEntry.isVideo) {
+                setupImage(storyEntry);
+                setupCollage(null);
+                setupVideoPlayer(storyEntry, runnable, j);
+                if (storyEntry.gradientTopColor == 0 && storyEntry.gradientBottomColor == 0) {
+                    storyEntry.setupGradient(new PreviewView$$ExternalSyntheticLambda2(this));
+                }
+            } else {
+                setupCollage(null);
+                setupVideoPlayer(null, runnable, 0L);
+                setupImage(storyEntry);
+            }
+            setupGradient();
         }
-        setupGradient();
         applyMatrix();
         setupWallpaper(storyEntry, false);
         setupAudio(storyEntry, false);
@@ -1545,6 +1604,10 @@ public abstract class PreviewView extends FrameLayout {
 
     public void setAllowCropping(boolean z) {
         this.allowCropping = z;
+    }
+
+    public void setCollageView(CollageLayoutView2 collageLayoutView2) {
+        this.collage = collageLayoutView2;
     }
 
     public void setDraw(boolean z) {
@@ -1628,14 +1691,16 @@ public abstract class PreviewView extends FrameLayout {
                 @Override
                 public void onProgressChange(long j, boolean z) {
                     VideoPlayer videoPlayer;
-                    boolean z2;
                     if (!z) {
                         PreviewView.this.seekTo(j);
                         return;
                     }
+                    boolean z2 = true;
                     if (PreviewView.this.videoPlayer != null) {
                         videoPlayer = PreviewView.this.videoPlayer;
-                        z2 = true;
+                    } else if (PreviewView.this.isCollage()) {
+                        PreviewView.this.collage.seekTo(j, true);
+                        return;
                     } else {
                         if (PreviewView.this.audioPlayer == null) {
                             return;
@@ -1648,6 +1713,9 @@ public abstract class PreviewView extends FrameLayout {
 
                 @Override
                 public void onProgressDragChange(boolean z) {
+                    if (PreviewView.this.isCollage()) {
+                        PreviewView.this.collage.forceNotRestorePosition();
+                    }
                     PreviewView.this.updatePauseReason(-4, z);
                 }
 
@@ -1716,6 +1784,22 @@ public abstract class PreviewView extends FrameLayout {
                 }
 
                 @Override
+                public void onVideoLeftChange(int i, float f) {
+                    if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                        return;
+                    }
+                    ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoLeft = f;
+                }
+
+                @Override
+                public void onVideoOffsetChange(int i, long j) {
+                    if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                        return;
+                    }
+                    ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoOffset = j;
+                }
+
+                @Override
                 public void onVideoRightChange(float f) {
                     if (PreviewView.this.entry == null) {
                         return;
@@ -1725,12 +1809,35 @@ public abstract class PreviewView extends FrameLayout {
                 }
 
                 @Override
+                public void onVideoRightChange(int i, float f) {
+                    if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                        return;
+                    }
+                    ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoRight = f;
+                }
+
+                @Override
+                public void onVideoSelected(int i) {
+                    if (PreviewView.this.collage != null) {
+                        PreviewView.this.collage.highlight(i);
+                    }
+                }
+
+                @Override
                 public void onVideoVolumeChange(float f) {
                     if (PreviewView.this.entry == null) {
                         return;
                     }
                     PreviewView.this.entry.videoVolume = f;
                     PreviewView.this.checkVolumes();
+                }
+
+                @Override
+                public void onVideoVolumeChange(int i, float f) {
+                    if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                        return;
+                    }
+                    ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoVolume = f;
                 }
             });
         }
@@ -1746,6 +1853,7 @@ public abstract class PreviewView extends FrameLayout {
 
     public void setupAudio(MessageObject messageObject, boolean z) {
         TLRPC.Message message;
+        long duration;
         StoryEntry storyEntry = this.entry;
         if (storyEntry != null) {
             storyEntry.editedMedia = true;
@@ -1785,11 +1893,15 @@ public abstract class PreviewView extends FrameLayout {
                 if (storyEntry2.isVideo) {
                     storyEntry2.audioOffset = storyEntry2.left * ((float) getDuration());
                 }
-                StoryEntry storyEntry3 = this.entry;
-                storyEntry3.audioLeft = 0.0f;
-                long min = Math.min(storyEntry3.isVideo ? getDuration() : storyEntry3.audioDuration, 120000L);
+                this.entry.audioLeft = 0.0f;
+                if (isCollage()) {
+                    duration = this.collage.getDuration();
+                } else {
+                    StoryEntry storyEntry3 = this.entry;
+                    duration = storyEntry3.isVideo ? getDuration() : storyEntry3.audioDuration;
+                }
                 StoryEntry storyEntry4 = this.entry;
-                storyEntry4.audioRight = storyEntry4.audioDuration != 0 ? Math.min(1.0f, ((float) Math.min(min, 59000L)) / ((float) this.entry.audioDuration)) : 1.0f;
+                storyEntry4.audioRight = storyEntry4.audioDuration != 0 ? Math.min(1.0f, ((float) Math.min(duration, 59000L)) / ((float) this.entry.audioDuration)) : 1.0f;
             }
         }
         setupAudio(this.entry, z);
@@ -1965,7 +2077,7 @@ public abstract class PreviewView extends FrameLayout {
 
     public void setupVideoPlayer(StoryEntry storyEntry, Runnable runnable, long j) {
         ArrayList arrayList;
-        if (storyEntry == null) {
+        if (storyEntry == null || storyEntry.isCollage()) {
             VideoPlayer videoPlayer = this.videoPlayer;
             if (videoPlayer != null) {
                 videoPlayer.pause();
@@ -2127,6 +2239,10 @@ public abstract class PreviewView extends FrameLayout {
         VideoPlayer videoPlayer = this.videoPlayer;
         if (videoPlayer != null) {
             videoPlayer.setPlayWhenReady(this.pauseLinks.isEmpty());
+        }
+        CollageLayoutView2 collageLayoutView2 = this.collage;
+        if (collageLayoutView2 != null) {
+            collageLayoutView2.setPlaying(this.pauseLinks.isEmpty());
         }
         updateAudioPlayer(true);
         updateRoundPlayer(true);

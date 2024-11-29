@@ -289,7 +289,7 @@ public class GLIconTextureView extends TextureView implements TextureView.Surfac
             }
         };
         this.type = i2;
-        this.animationsCount = i2 == 1 ? 1 : 5;
+        this.animationsCount = (i2 == 1 || i2 == 3) ? 1 : 5;
         setOpaque(false);
         setRenderer(new GLIconRenderer(context, i, i2));
         initialize(context);
@@ -453,14 +453,16 @@ public class GLIconTextureView extends TextureView implements TextureView.Surfac
     }
 
     private void pullAnimation() {
+        int i;
         int abs = Math.abs(Utilities.random.nextInt() % 4);
         this.animatorSet = new AnimatorSet();
-        if (abs != 0 || this.type == 1) {
-            int i = this.type == 1 ? 360 : 485;
+        if (abs != 0 || (i = this.type) == 1 || i == 3) {
+            int i2 = this.type;
+            int i3 = (i2 == 1 || i2 == 3) ? 360 : 485;
             if (abs == 2) {
-                i = -i;
+                i3 = -i3;
             }
-            float f = i;
+            float f = i3;
             ValueAnimator ofFloat = ValueAnimator.ofFloat(this.mRenderer.angleY, f);
             ofFloat.addUpdateListener(this.xUpdater);
             ofFloat.setDuration(3000L);

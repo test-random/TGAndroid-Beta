@@ -201,7 +201,7 @@ public abstract class StoriesViewPager extends ViewPager {
         setOverScrollMode(2);
     }
 
-    private static boolean eq(ArrayList arrayList, ArrayList arrayList2) {
+    public static boolean eq(ArrayList arrayList, ArrayList arrayList2) {
         if (arrayList == null && arrayList2 == null) {
             return true;
         }

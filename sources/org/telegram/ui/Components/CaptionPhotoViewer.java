@@ -1,8 +1,10 @@
 package org.telegram.ui.Components;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -126,6 +128,11 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
     }
 
     @Override
+    public void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+    }
+
+    @Override
     protected int getCaptionDefaultLimit() {
         return MessagesController.getInstance(this.currentAccount).captionLengthLimitDefault;
     }
@@ -138,6 +145,11 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
     @Override
     protected int getCaptionPremiumLimit() {
         return MessagesController.getInstance(this.currentAccount).captionLengthLimitPremium;
+    }
+
+    @Override
+    public int getEditTextHeight() {
+        return super.getEditTextHeight();
     }
 
     @Override
@@ -168,6 +180,11 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
         if (runnable != null) {
             runnable.run();
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        return super.onTouchEvent(motionEvent);
     }
 
     @Override

@@ -18,7 +18,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Stories.recorder.FlashViews;
 
-public class PhotoVideoSwitcherView extends View implements FlashViews.Invertable {
+public abstract class PhotoVideoSwitcherView extends View implements FlashViews.Invertable {
     private ValueAnimator animator;
     private boolean mIsScrolling;
     private boolean mIsTouch;
@@ -91,6 +91,8 @@ public class PhotoVideoSwitcherView extends View implements FlashViews.Invertabl
         }
         invalidate();
     }
+
+    protected abstract boolean allowTouch();
 
     @Override
     public void draw(Canvas canvas) {

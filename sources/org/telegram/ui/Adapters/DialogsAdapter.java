@@ -812,6 +812,9 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.DialogsAdapter.onCreateViewHolder(android.view.ViewGroup, int):androidx.recyclerview.widget.RecyclerView$ViewHolder");
     }
 
+    public void onOpenBot(TLRPC.User user) {
+    }
+
     public void onReorderStateChanged(boolean z) {
         this.isReordering = z;
     }
@@ -927,6 +930,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     @Override
     public void showChatPreview(DialogCell dialogCell) {
         this.parentFragment.showChatPreview(dialogCell);
+    }
+
+    protected boolean showOpenBotButton() {
+        return false;
     }
 
     public void sortOnlineContacts(boolean z) {

@@ -15,10 +15,8 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.Pair;
-import android.util.StateSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 import androidx.core.graphics.ColorUtils;
 import java.util.ArrayList;
@@ -52,6 +50,7 @@ public class SeekBarView extends FrameLayout {
     int lastValue;
     private float lastWidth;
     private int lineWidthDp;
+    private float minProgress;
     private Paint outerPaint1;
     private boolean pressed;
     private boolean pressedDelayed;
@@ -148,6 +147,7 @@ public class SeekBarView extends FrameLayout {
         super(context);
         this.animatedThumbX = new AnimatedFloat(this, 0L, 80L, CubicBezierInterpolator.EASE_OUT);
         this.progressToSet = -100.0f;
+        this.minProgress = -1.0f;
         this.pressedState = new int[]{16842910, 16842919};
         this.transitionProgress = 1.0f;
         this.lineWidthDp = 3;
@@ -378,6 +378,10 @@ public class SeekBarView extends FrameLayout {
         return build;
     }
 
+    private int minThumbX() {
+        return Math.max((int) (this.minProgress * (getMeasuredWidth() - this.selectorWidth)), 0);
+    }
+
     public void setSeekBarDrag(boolean z, float f) {
         SeekBarViewDelegate seekBarViewDelegate = this.delegate;
         if (seekBarViewDelegate != null) {
@@ -422,7 +426,7 @@ public class SeekBarView extends FrameLayout {
     }
 
     @Override
-    protected void onDraw(android.graphics.Canvas r16) {
+    protected void onDraw(android.graphics.Canvas r17) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.SeekBarView.onDraw(android.graphics.Canvas):void");
     }
 
@@ -441,122 +445,8 @@ public class SeekBarView extends FrameLayout {
         this.progressToSet = -100.0f;
     }
 
-    public boolean onTouch(MotionEvent motionEvent) {
-        Drawable drawable;
-        Drawable drawable2;
-        float measuredWidth;
-        Drawable drawable3;
-        if (motionEvent.getAction() == 0) {
-            this.sx = motionEvent.getX();
-            this.sy = motionEvent.getY();
-            return true;
-        }
-        if (motionEvent.getAction() == 1 || motionEvent.getAction() == 3) {
-            this.captured = false;
-            if (motionEvent.getAction() == 1) {
-                if (Math.abs(motionEvent.getY() - this.sy) < ViewConfiguration.get(getContext()).getScaledTouchSlop()) {
-                    int measuredHeight = (getMeasuredHeight() - this.thumbSize) / 2;
-                    if (this.thumbX - measuredHeight > motionEvent.getX() || motionEvent.getX() > this.thumbX + this.thumbSize + measuredHeight) {
-                        int x = ((int) motionEvent.getX()) - (this.thumbSize / 2);
-                        this.thumbX = x;
-                        if (x < 0) {
-                            this.thumbX = 0;
-                        } else if (x > getMeasuredWidth() - this.selectorWidth) {
-                            this.thumbX = getMeasuredWidth() - this.selectorWidth;
-                        }
-                    }
-                    this.thumbDX = (int) (motionEvent.getX() - this.thumbX);
-                    this.pressedDelayed = true;
-                    this.pressed = true;
-                }
-            }
-            if (this.pressed) {
-                if (motionEvent.getAction() == 1) {
-                    if (this.twoSided) {
-                        float measuredWidth2 = (getMeasuredWidth() - this.selectorWidth) / 2;
-                        float f = this.thumbX;
-                        if (f >= measuredWidth2) {
-                            setSeekBarDrag(false, (f - measuredWidth2) / measuredWidth2);
-                        } else {
-                            setSeekBarDrag(false, -Math.max(0.01f, 1.0f - ((measuredWidth2 - f) / measuredWidth2)));
-                        }
-                    } else {
-                        setSeekBarDrag(true, this.thumbX / (getMeasuredWidth() - this.selectorWidth));
-                    }
-                }
-                if (Build.VERSION.SDK_INT >= 21 && (drawable = this.hoverDrawable) != null) {
-                    drawable.setState(StateSet.NOTHING);
-                }
-                this.delegate.onSeekBarPressed(false);
-                this.pressed = false;
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    @Override
-                    public final void run() {
-                        SeekBarView.this.lambda$onTouch$0();
-                    }
-                }, 50L);
-                invalidate();
-                return true;
-            }
-        } else if (motionEvent.getAction() == 2) {
-            if (!this.captured) {
-                ViewConfiguration viewConfiguration = ViewConfiguration.get(getContext());
-                if (Math.abs(motionEvent.getY() - this.sy) <= viewConfiguration.getScaledTouchSlop() && Math.abs(motionEvent.getX() - this.sx) > viewConfiguration.getScaledTouchSlop()) {
-                    this.captured = true;
-                    getParent().requestDisallowInterceptTouchEvent(true);
-                    int measuredHeight2 = (getMeasuredHeight() - this.thumbSize) / 2;
-                    if (motionEvent.getY() >= 0.0f && motionEvent.getY() <= getMeasuredHeight()) {
-                        if (this.thumbX - measuredHeight2 > motionEvent.getX() || motionEvent.getX() > this.thumbX + this.thumbSize + measuredHeight2) {
-                            int x2 = ((int) motionEvent.getX()) - (this.thumbSize / 2);
-                            this.thumbX = x2;
-                            if (x2 < 0) {
-                                this.thumbX = 0;
-                            } else if (x2 > getMeasuredWidth() - this.selectorWidth) {
-                                this.thumbX = getMeasuredWidth() - this.selectorWidth;
-                            }
-                        }
-                        this.thumbDX = (int) (motionEvent.getX() - this.thumbX);
-                        this.pressedDelayed = true;
-                        this.pressed = true;
-                        this.delegate.onSeekBarPressed(true);
-                        if (Build.VERSION.SDK_INT >= 21 && (drawable3 = this.hoverDrawable) != null) {
-                            drawable3.setState(this.pressedState);
-                            this.hoverDrawable.setHotspot(motionEvent.getX(), motionEvent.getY());
-                        }
-                        invalidate();
-                        return true;
-                    }
-                }
-            } else if (this.pressed) {
-                int x3 = (int) (motionEvent.getX() - this.thumbDX);
-                this.thumbX = x3;
-                if (x3 < 0) {
-                    this.thumbX = 0;
-                } else if (x3 > getMeasuredWidth() - this.selectorWidth) {
-                    this.thumbX = getMeasuredWidth() - this.selectorWidth;
-                }
-                if (this.reportChanges) {
-                    if (this.twoSided) {
-                        float measuredWidth3 = (getMeasuredWidth() - this.selectorWidth) / 2;
-                        float f2 = this.thumbX;
-                        if (f2 >= measuredWidth3) {
-                            setSeekBarDrag(false, (f2 - measuredWidth3) / measuredWidth3);
-                        } else {
-                            measuredWidth = -Math.max(0.01f, 1.0f - ((measuredWidth3 - f2) / measuredWidth3));
-                        }
-                    } else {
-                        measuredWidth = this.thumbX / (getMeasuredWidth() - this.selectorWidth);
-                    }
-                    setSeekBarDrag(false, measuredWidth);
-                }
-                if (Build.VERSION.SDK_INT >= 21 && (drawable2 = this.hoverDrawable) != null) {
-                    drawable2.setHotspot(motionEvent.getX(), motionEvent.getY());
-                }
-                invalidate();
-                return true;
-            }
-        }
-        return false;
+    public boolean onTouch(android.view.MotionEvent r11) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.SeekBarView.onTouch(android.view.MotionEvent):boolean");
     }
 
     @Override
@@ -579,6 +469,16 @@ public class SeekBarView extends FrameLayout {
 
     public void setLineWidth(int i) {
         this.lineWidthDp = i;
+    }
+
+    public void setMinProgress(float f) {
+        this.minProgress = f;
+        float progress = getProgress();
+        float f2 = this.minProgress;
+        if (progress < f2) {
+            setProgress(f2, false);
+        }
+        invalidate();
     }
 
     public void setOuterColor(int i) {
@@ -618,10 +518,13 @@ public class SeekBarView extends FrameLayout {
                 this.transitionProgress = 0.0f;
             }
             this.thumbX = ceil;
-            if (ceil >= 0) {
-                measuredWidth2 = ceil > getMeasuredWidth() - this.selectorWidth ? getMeasuredWidth() - this.selectorWidth : 0;
+            if (ceil >= minThumbX()) {
+                if (this.thumbX > getMeasuredWidth() - this.selectorWidth) {
+                    measuredWidth2 = getMeasuredWidth() - this.selectorWidth;
+                }
                 invalidate();
             }
+            measuredWidth2 = minThumbX();
             this.thumbX = measuredWidth2;
             invalidate();
         }

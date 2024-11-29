@@ -21,11 +21,12 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
@@ -38,6 +39,7 @@ import org.telegram.ui.Components.BlurringShader;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.ItemOptions;
 import org.telegram.ui.Components.Scroller;
+import org.telegram.ui.Components.Text;
 import org.telegram.ui.Stories.recorder.TimelineView;
 
 public class TimelineView extends View {
@@ -67,6 +69,12 @@ public class TimelineView extends View {
     private final BlurringShader.StoryBlurDrawer audioWaveformBlur;
     private final BlurringShader.StoryBlurDrawer backgroundBlur;
     private final BlurringShader.BlurManager blurManager;
+    private final Path collageClipPath;
+    private final Paint collageFramePaint;
+    private Track collageMain;
+    private int collageSelected;
+    private final ArrayList collageTracks;
+    private final ArrayList collageWaveforms;
     private final ViewGroup container;
     private long coverEnd;
     private long coverStart;
@@ -80,16 +88,19 @@ public class TimelineView extends View {
     private boolean hadDragChange;
     private boolean hasAudio;
     private boolean hasRound;
-    private boolean hasVideo;
     private boolean isCover;
-    private boolean isMainVideoRound;
     private long lastTime;
     private float lastX;
     private final AnimatedFloat loopProgress;
     private long loopProgressFrom;
     private final Runnable onLongPress;
+    private Runnable onTimelineClick;
+    public boolean open;
+    private final AnimatedFloat openT;
     private int ph;
+    private int pressCollageIndex;
     private int pressHandle;
+    private int pressHandleCollageIndex;
     private long pressTime;
     private int pressType;
     private final View previewContainer;
@@ -118,32 +129,34 @@ public class TimelineView extends View {
     private long scroll;
     private final Scroller scroller;
     private boolean scrolling;
+    private int scrollingCollage;
     private boolean scrollingVideo;
+    private final Path selectedCollageClipPath;
     private final Path selectedVideoClipPath;
     final float[] selectedVideoRadii;
     private int sw;
-    private VideoThumbsLoader thumbs;
+    private final RectF timelineBounds;
+    private final Path timelineClipPath;
+    private final Drawable timelineIcon;
+    private final Text timelineText;
+    private final AnimatedFloat timelineWaveformLoaded;
+    private final AnimatedFloat timelineWaveformMax;
+    private final WaveformPath timelineWaveformPath;
     private VelocityTracker velocityTracker;
     private final RectF videoBounds;
     private final Path videoClipPath;
-    private long videoDuration;
     private final Paint videoFramePaint;
-    private float videoLeft;
-    private String videoPath;
-    private float videoRight;
-    private final AnimatedFloat videoSelectedT;
-    private float videoVolume;
+    private Track videoTrack;
     private int w;
     private int wasScrollX;
     private AudioWaveformLoader waveform;
     private boolean waveformIsLoaded;
-    private final AnimatedFloat waveformLoaded;
     private final AnimatedFloat waveformMax;
     private final Paint waveformPaint;
     private final WaveformPath waveformPath;
-    final float[] waveformRadii;
 
     public class AudioWaveformLoader {
+        private final AnimatedFloat animatedLoaded;
         private final int count;
         private final short[] data;
         private long duration;
@@ -156,6 +169,7 @@ public class TimelineView extends View {
         private boolean stop = false;
 
         public AudioWaveformLoader(String str, int i) {
+            this.animatedLoaded = new AnimatedFloat(TimelineView.this, 0L, 600L, CubicBezierInterpolator.EASE_OUT_QUINT);
             int i2 = 0;
             MediaExtractor mediaExtractor = new MediaExtractor();
             this.extractor = mediaExtractor;
@@ -184,14 +198,14 @@ public class TimelineView extends View {
             } catch (Exception e) {
                 FileLog.e(e);
             }
-            int round = Math.round(((((float) (this.duration * 1000)) / ((float) Math.min(TimelineView.this.hasVideo ? TimelineView.this.videoDuration : TimelineView.this.hasRound ? TimelineView.this.roundDuration : this.duration * 1000, 120000L))) * i) / Math.round(AndroidUtilities.dpf2(3.3333f)));
-            this.count = round;
-            this.data = new short[round];
+            int min = Math.min(Math.round(((((float) (this.duration * 1000)) / ((float) Math.min(TimelineView.this.videoTrack != null ? TimelineView.this.videoTrack.duration : !TimelineView.this.collageTracks.isEmpty() ? TimelineView.this.getBaseDuration() : TimelineView.this.hasRound ? TimelineView.this.roundDuration : this.duration * 1000, TimelineView.this.getMaxScrollDuration()))) * i) / Math.round(AndroidUtilities.dpf2(3.3333f))), 4000);
+            this.count = min;
+            this.data = new short[min];
             if (this.duration <= 0 || this.inputFormat == null) {
                 return;
             }
-            if ("audio/mpeg".equals(str2) || "audio/mp3".equals(str2)) {
-                this.waveformLoader = new FfmpegAudioWaveformLoader(str, round, new Utilities.Callback2() {
+            if ("audio/mpeg".equals(str2) || "audio/mp3".equals(str2) || "audio/mp4a".equals(str2) || "audio/mp4a-latm".equals(str2)) {
+                this.waveformLoader = new FfmpegAudioWaveformLoader(str, min, new Utilities.Callback2() {
                     @Override
                     public final void run(Object obj, Object obj2) {
                         TimelineView.AudioWaveformLoader.this.lambda$run$0((short[]) obj, ((Integer) obj2).intValue());
@@ -294,10 +308,25 @@ public class TimelineView extends View {
             public static void $default$onRoundVolumeChange(TimelineDelegate timelineDelegate, float f) {
             }
 
+            public static void $default$onVideoLeftChange(TimelineDelegate timelineDelegate, int i, float f) {
+            }
+
+            public static void $default$onVideoOffsetChange(TimelineDelegate timelineDelegate, int i, long j) {
+            }
+
             public static void $default$onVideoRightChange(TimelineDelegate timelineDelegate, float f) {
             }
 
+            public static void $default$onVideoRightChange(TimelineDelegate timelineDelegate, int i, float f) {
+            }
+
+            public static void $default$onVideoSelected(TimelineDelegate timelineDelegate, int i) {
+            }
+
             public static void $default$onVideoVolumeChange(TimelineDelegate timelineDelegate, float f) {
+            }
+
+            public static void $default$onVideoVolumeChange(TimelineDelegate timelineDelegate, int i, float f) {
             }
         }
 
@@ -329,25 +358,108 @@ public class TimelineView extends View {
 
         void onVideoLeftChange(float f);
 
+        void onVideoLeftChange(int i, float f);
+
+        void onVideoOffsetChange(int i, long j);
+
         void onVideoRightChange(float f);
 
+        void onVideoRightChange(int i, float f);
+
+        void onVideoSelected(int i);
+
         void onVideoVolumeChange(float f);
+
+        void onVideoVolumeChange(int i, float f);
+    }
+
+    public class Track {
+        final RectF bounds;
+        long duration;
+        int index;
+        boolean isRound;
+        float left;
+        long offset;
+        String path;
+        float right;
+        private final AnimatedFloat selectedT;
+        VideoThumbsLoader thumbs;
+        float volume;
+
+        private Track() {
+            this.bounds = new RectF();
+            this.selectedT = new AnimatedFloat(TimelineView.this, 360L, CubicBezierInterpolator.EASE_OUT_QUINT);
+        }
+
+        Track(TimelineView timelineView, AnonymousClass1 anonymousClass1) {
+            this();
+        }
+
+        public void lambda$setupThumbs$0() {
+            VideoThumbsLoader videoThumbsLoader = this.thumbs;
+            if (videoThumbsLoader == null || videoThumbsLoader.getDuration() <= 0) {
+                return;
+            }
+            this.duration = this.thumbs.getDuration();
+            TimelineView.this.sortCollage();
+        }
+
+        public void setupThumbs(boolean z) {
+            if (TimelineView.this.getMeasuredWidth() > 0) {
+                VideoThumbsLoader videoThumbsLoader = this.thumbs;
+                if (videoThumbsLoader == null || z) {
+                    if (videoThumbsLoader != null) {
+                        videoThumbsLoader.destroy();
+                        this.thumbs = null;
+                    }
+                    TimelineView timelineView = TimelineView.this;
+                    boolean z2 = this.isRound;
+                    String str = this.path;
+                    int i = (timelineView.w - TimelineView.this.px) - TimelineView.this.px;
+                    int dp = AndroidUtilities.dp(38.0f);
+                    long j = this.duration;
+                    this.thumbs = new VideoThumbsLoader(z2, str, i, dp, j > 2 ? Long.valueOf(j) : null, TimelineView.this.getMaxScrollDuration(), TimelineView.this.coverStart, TimelineView.this.coverEnd, new Runnable() {
+                        @Override
+                        public final void run() {
+                            TimelineView.Track.this.lambda$setupThumbs$0();
+                        }
+                    });
+                }
+            }
+        }
+
+        public void setupWaveform(boolean z) {
+            int i = this.index;
+            if (i < 0 || i >= TimelineView.this.collageWaveforms.size()) {
+                return;
+            }
+            AudioWaveformLoader audioWaveformLoader = (AudioWaveformLoader) TimelineView.this.collageWaveforms.get(this.index);
+            if (TimelineView.this.getMeasuredWidth() > 0) {
+                if (audioWaveformLoader == null || z) {
+                    if (audioWaveformLoader != null) {
+                        audioWaveformLoader.destroy();
+                    }
+                    TimelineView timelineView = TimelineView.this;
+                    TimelineView.this.collageWaveforms.set(this.index, new AudioWaveformLoader(this.path, (timelineView.getMeasuredWidth() - TimelineView.this.getPaddingLeft()) - TimelineView.this.getPaddingRight()));
+                }
+            }
+        }
     }
 
     public class VideoThumbsLoader {
         private Path clipPath;
-        private final int count;
+        private int count;
         private boolean destroyed;
         private long duration;
-        private final int frameHeight;
-        private final long frameIterator;
-        private final int frameWidth;
+        private volatile int frameHeight;
+        private volatile long frameIterator;
+        private volatile int frameWidth;
         private final boolean isRound;
-        private MediaMetadataRetriever metadataRetriever;
         private long nextFrame;
         private final ArrayList frames = new ArrayList();
         private boolean loading = false;
         private final Paint bitmapPaint = new Paint(3);
+        private MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
 
         public class BitmapFrame {
             private final AnimatedFloat alpha;
@@ -363,11 +475,21 @@ public class TimelineView extends View {
             }
         }
 
-        public VideoThumbsLoader(boolean r16, java.lang.String r17, int r18, int r19, java.lang.Long r20, long r21, long r23, long r25) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.VideoThumbsLoader.<init>(org.telegram.ui.Stories.recorder.TimelineView, boolean, java.lang.String, int, int, java.lang.Long, long, long, long):void");
+        public VideoThumbsLoader(boolean z, final String str, final int i, final int i2, final Long l, final long j, final long j2, final long j3, final Runnable runnable) {
+            this.isRound = z;
+            Utilities.themeQueue.postRunnable(new Runnable() {
+                @Override
+                public final void run() {
+                    TimelineView.VideoThumbsLoader.this.lambda$new$0(str, l, j2, j3, i2, j, i, runnable);
+                }
+            });
         }
 
-        public void lambda$retrieveFrame$0(Bitmap bitmap) {
+        public void lambda$new$0(java.lang.String r15, java.lang.Long r16, long r17, long r19, int r21, long r22, int r24, java.lang.Runnable r25) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.VideoThumbsLoader.lambda$new$0(java.lang.String, java.lang.Long, long, long, int, long, int, java.lang.Runnable):void");
+        }
+
+        public void lambda$retrieveFrame$1(Bitmap bitmap) {
             if (!this.loading || this.destroyed) {
                 return;
             }
@@ -395,7 +517,7 @@ public class TimelineView extends View {
                             this.clipPath = new Path();
                         }
                         this.clipPath.rewind();
-                        this.clipPath.addCircle(this.frameWidth / 2.0f, this.frameHeight / 2.0f, Math.min(r6, r9) / 2.0f, Path.Direction.CW);
+                        this.clipPath.addCircle(this.frameWidth / 2.0f, this.frameHeight / 2.0f, Math.min(this.frameWidth, this.frameHeight) / 2.0f, Path.Direction.CW);
                         canvas.clipPath(this.clipPath);
                     }
                     canvas.drawBitmap(bitmap, rect, rect2, this.bitmapPaint);
@@ -408,7 +530,7 @@ public class TimelineView extends View {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    TimelineView.VideoThumbsLoader.this.lambda$retrieveFrame$0(bitmap);
+                    TimelineView.VideoThumbsLoader.this.lambda$retrieveFrame$1(bitmap);
                 }
             });
         }
@@ -454,8 +576,7 @@ public class TimelineView extends View {
         }
     }
 
-    public class WaveformPath extends Path {
-        private float lastAnimatedLoaded;
+    public static class WaveformPath extends Path {
         private float lastAudioHeight;
         private float lastAudioSelected;
         private float lastBottom;
@@ -464,22 +585,72 @@ public class TimelineView extends View {
         private float lastRight;
         private long lastScrollDuration;
         private float lastStart;
-        private int lastWaveformCount;
+        private ArrayList lastWaveformCounts;
+        private ArrayList lastWaveformLoaded;
+        private final int ph = AndroidUtilities.dp(10.0f);
+        private final float[] waveformRadii;
 
         WaveformPath() {
+            this.waveformRadii = r0;
+            float dp = AndroidUtilities.dp(2.0f);
+            float[] fArr = {dp, dp, dp, dp, 0.0f, 0.0f, 0.0f, 0.0f};
         }
 
-        private void layout(float f, float f2, float f3, float f4, float f5, long j, float f6, float f7, float f8) {
-            TimelineView.this.waveformPath.rewind();
+        private boolean eqCount(ArrayList arrayList, ArrayList arrayList2) {
+            if (arrayList == null && arrayList2 == null) {
+                return true;
+            }
+            if (arrayList == null || arrayList2 == null || arrayList.size() != arrayList2.size()) {
+                return false;
+            }
+            for (int i = 0; i < arrayList.size(); i++) {
+                if (((Integer) arrayList.get(i)).intValue() != (arrayList2.get(i) == null ? 0 : ((AudioWaveformLoader) arrayList2.get(i)).getCount())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private boolean eqLoadedCounts(ArrayList arrayList, ArrayList arrayList2) {
+            if (arrayList == null && arrayList2 == null) {
+                return true;
+            }
+            if (arrayList == null || arrayList2 == null || arrayList.size() != arrayList2.size()) {
+                return false;
+            }
+            for (int i = 0; i < arrayList.size(); i++) {
+                if (((Float) arrayList.get(i)).floatValue() != (arrayList2.get(i) == null ? 0.0f : ((AudioWaveformLoader) arrayList2.get(i)).animatedLoaded.set(((AudioWaveformLoader) arrayList2.get(i)).getLoadedCount()))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static int getMaxBar(ArrayList arrayList) {
+            if (arrayList == null) {
+                return 0;
+            }
+            int i = 0;
+            for (int i2 = 0; i2 < arrayList.size(); i2++) {
+                if (arrayList.get(i2) != null) {
+                    i += ((AudioWaveformLoader) arrayList.get(i2)).getMaxBar();
+                }
+            }
+            return i;
+        }
+
+        private void layout(float f, float f2, float f3, float f4, float f5, float f6, float f7, float f8, AudioWaveformLoader audioWaveformLoader) {
+            rewind();
             float round = Math.round(AndroidUtilities.dpf2(3.3333f));
-            int min = Math.min(TimelineView.this.waveform.getCount() - 1, (int) Math.ceil(((TimelineView.this.ph + f3) - f) / round));
-            for (int max = Math.max(0, (int) (((f2 - TimelineView.this.ph) - f) / round)); max <= min; max++) {
+            int count = audioWaveformLoader.getCount();
+            int min = Math.min(count - 1, (int) Math.ceil(((f3 + this.ph) - f) / round));
+            for (int max = Math.max(0, (int) (((f2 - this.ph) - f) / round)); max <= min; max++) {
                 float f9 = max;
                 float dp = (f9 * round) + f + AndroidUtilities.dp(2.0f);
-                float bar = f6 <= 0.0f ? 0.0f : (TimelineView.this.waveform.getBar(max) / f6) * f7 * 0.6f;
-                if (f9 < f5 && max + 1 > f5) {
-                    bar *= f5 - f9;
-                } else if (f9 > f5) {
+                float bar = f5 <= 0.0f ? 0.0f : (audioWaveformLoader.getBar(max) / f5) * f6 * 0.6f;
+                if (f9 < f8 && max + 1 > f8) {
+                    bar *= f8 - f9;
+                } else if (f9 > f8) {
                     bar = 0.0f;
                 }
                 if (dp < f2 || dp > f3) {
@@ -489,42 +660,144 @@ public class TimelineView extends View {
                 }
                 float max2 = Math.max(bar, AndroidUtilities.lerp(AndroidUtilities.dpf2(0.66f), AndroidUtilities.dpf2(1.5f), f4));
                 RectF rectF = AndroidUtilities.rectTmp;
-                rectF.set(dp, AndroidUtilities.lerp(f8 - max2, f8 - ((f7 + max2) / 2.0f), f4), AndroidUtilities.dpf2(1.66f) + dp, AndroidUtilities.lerp(f8, f8 - ((f7 - max2) / 2.0f), f4));
-                TimelineView.this.waveformPath.addRoundRect(rectF, TimelineView.this.waveformRadii, Path.Direction.CW);
+                rectF.set(dp, AndroidUtilities.lerp(f7 - max2, f7 - ((f6 + max2) / 2.0f), f4), AndroidUtilities.dpf2(1.66f) + dp, AndroidUtilities.lerp(f7, f7 - ((f6 - max2) / 2.0f), f4));
+                addRoundRect(rectF, this.waveformRadii, Path.Direction.CW);
             }
         }
 
-        public void check(float f, float f2, float f3, float f4, float f5, long j, float f6, float f7, float f8) {
-            if (TimelineView.this.waveform == null) {
+        private void layout(float f, float f2, float f3, float f4, float f5, float f6, float f7, ArrayList arrayList, ArrayList arrayList2) {
+            rewind();
+            float round = Math.round(AndroidUtilities.dpf2(3.3333f));
+            int i = 0;
+            for (int i2 = 0; i2 < arrayList2.size(); i2++) {
+                if (arrayList2.get(i2) != null) {
+                    i = Math.max(i, ((AudioWaveformLoader) arrayList2.get(i2)).getCount());
+                }
+            }
+            int max = Math.max(0, (int) (((f2 - this.ph) - f) / round));
+            int min = Math.min(i - 1, (int) Math.ceil(((f3 + this.ph) - f) / round));
+            while (max <= min) {
+                float f8 = max;
+                float dp = f + (f8 * round) + AndroidUtilities.dp(2.0f);
+                int i3 = 0;
+                for (int i4 = 0; i4 < arrayList2.size(); i4++) {
+                    short bar = (arrayList2.get(i4) == null || max >= ((AudioWaveformLoader) arrayList2.get(i4)).getCount()) ? (short) 0 : ((AudioWaveformLoader) arrayList2.get(i4)).getBar(max);
+                    if (f8 < ((Float) arrayList.get(i4)).floatValue() && max + 1 > ((Float) arrayList.get(i4)).floatValue()) {
+                        bar = (short) (bar * (((Float) arrayList.get(i4)).floatValue() - f8));
+                    } else if (f8 > ((Float) arrayList.get(i4)).floatValue()) {
+                        bar = 0;
+                    }
+                    i3 += bar;
+                }
+                float f9 = f5 <= 0.0f ? 0.0f : (i3 / f5) * f6 * 0.6f;
+                if (dp < f2 || dp > f3) {
+                    f9 *= f4;
+                    if (f9 <= 0.0f) {
+                        max++;
+                    }
+                }
+                float max2 = Math.max(f9, AndroidUtilities.lerp(AndroidUtilities.dpf2(0.66f), AndroidUtilities.dpf2(1.5f), f4));
+                RectF rectF = AndroidUtilities.rectTmp;
+                rectF.set(dp, AndroidUtilities.lerp(f7 - max2, f7 - ((f6 + max2) / 2.0f), f4), AndroidUtilities.dpf2(1.66f) + dp, AndroidUtilities.lerp(f7, f7 - ((f6 - max2) / 2.0f), f4));
+                addRoundRect(rectF, this.waveformRadii, Path.Direction.CW);
+                max++;
+            }
+        }
+
+        public void check(float f, float f2, float f3, float f4, float f5, float f6, float f7, ArrayList arrayList) {
+            if (arrayList == null || arrayList.isEmpty()) {
                 rewind();
                 return;
             }
-            if (this.lastWaveformCount != TimelineView.this.waveform.getCount() || Math.abs(this.lastAnimatedLoaded - f5) > 0.01f || this.lastScrollDuration != j || Math.abs(this.lastAudioHeight - f6) > 1.0f || Math.abs(this.lastMaxBar - f7) > 0.01f || Math.abs(this.lastAudioSelected - f4) > 0.1f || Math.abs(this.lastBottom - f8) > 1.0f || Math.abs(this.lastStart - f) > 1.0f || Math.abs(this.lastLeft - f2) > 1.0f || Math.abs(this.lastRight - f3) > 1.0f) {
-                this.lastWaveformCount = TimelineView.this.waveform.getCount();
+            if (Math.abs(this.lastAudioHeight - f5) > 1.0f || Math.abs(this.lastMaxBar - f6) > 0.01f || Math.abs(this.lastAudioSelected - f4) > 0.1f || Math.abs(this.lastBottom - f7) > 1.0f || Math.abs(this.lastStart - f) > 1.0f || Math.abs(this.lastLeft - f2) > 1.0f || Math.abs(this.lastRight - f3) > 1.0f || eqCount(this.lastWaveformCounts, arrayList) || eqLoadedCounts(this.lastWaveformLoaded, arrayList)) {
+                ArrayList arrayList2 = this.lastWaveformCounts;
+                if (arrayList2 == null) {
+                    this.lastWaveformCounts = new ArrayList();
+                } else {
+                    arrayList2.clear();
+                }
+                for (int i = 0; i < arrayList.size(); i++) {
+                    this.lastWaveformCounts.add(Integer.valueOf(arrayList.get(i) == null ? 0 : ((AudioWaveformLoader) arrayList.get(i)).getCount()));
+                }
+                ArrayList arrayList3 = this.lastWaveformLoaded;
+                if (arrayList3 == null) {
+                    this.lastWaveformLoaded = new ArrayList();
+                } else {
+                    arrayList3.clear();
+                }
+                for (int i2 = 0; i2 < arrayList.size(); i2++) {
+                    this.lastWaveformLoaded.add(Float.valueOf(arrayList.get(i2) == null ? 0.0f : ((AudioWaveformLoader) arrayList.get(i2)).animatedLoaded.set(((AudioWaveformLoader) arrayList.get(i2)).getLoadedCount())));
+                }
                 this.lastStart = f;
                 this.lastLeft = f2;
                 this.lastRight = f3;
                 this.lastAudioSelected = f4;
-                this.lastAnimatedLoaded = f5;
-                this.lastScrollDuration = j;
-                this.lastMaxBar = f7;
-                this.lastAudioHeight = f6;
-                this.lastBottom = f8;
-                layout(f, f2, f3, f4, f5, j, f7, f6, f8);
+                this.lastMaxBar = f6;
+                this.lastAudioHeight = f5;
+                this.lastBottom = f7;
+                layout(f, f2, f3, f4, f6, f5, f7, this.lastWaveformLoaded, arrayList);
             }
+        }
+
+        public void check(float f, float f2, float f3, float f4, long j, float f5, float f6, float f7, AudioWaveformLoader audioWaveformLoader) {
+            ArrayList arrayList;
+            if (audioWaveformLoader == null) {
+                rewind();
+                return;
+            }
+            float f8 = audioWaveformLoader.animatedLoaded.set(audioWaveformLoader.getLoadedCount());
+            if (this.lastScrollDuration == j && Math.abs(this.lastAudioHeight - f5) <= 1.0f && Math.abs(this.lastMaxBar - f6) <= 0.01f && Math.abs(this.lastAudioSelected - f4) <= 0.1f && Math.abs(this.lastBottom - f7) <= 1.0f && Math.abs(this.lastStart - f) <= 1.0f && Math.abs(this.lastLeft - f2) <= 1.0f && Math.abs(this.lastRight - f3) <= 1.0f && (arrayList = this.lastWaveformCounts) != null && arrayList.size() == 1) {
+                ArrayList arrayList2 = this.lastWaveformLoaded;
+                if (Math.abs(((arrayList2 == null || arrayList2.isEmpty()) ? 0.0f : ((Float) this.lastWaveformLoaded.get(0)).floatValue()) - f8) <= 0.01f) {
+                    return;
+                }
+            }
+            ArrayList arrayList3 = this.lastWaveformCounts;
+            if (arrayList3 == null) {
+                this.lastWaveformCounts = new ArrayList();
+            } else {
+                arrayList3.clear();
+            }
+            this.lastWaveformCounts.add(Integer.valueOf(audioWaveformLoader.getCount()));
+            ArrayList arrayList4 = this.lastWaveformLoaded;
+            if (arrayList4 == null) {
+                this.lastWaveformLoaded = new ArrayList();
+            } else {
+                arrayList4.clear();
+            }
+            this.lastWaveformLoaded.add(Float.valueOf(f8));
+            this.lastStart = f;
+            this.lastLeft = f2;
+            this.lastRight = f3;
+            this.lastAudioSelected = f4;
+            this.lastMaxBar = f6;
+            this.lastAudioHeight = f5;
+            this.lastBottom = f7;
+            layout(f, f2, f3, f4, f6, f5, f7, audioWaveformLoader.animatedLoaded.set(audioWaveformLoader.getLoadedCount()), audioWaveformLoader);
         }
     }
 
     public TimelineView(Context context, final ViewGroup viewGroup, final View view, final Theme.ResourcesProvider resourcesProvider, final BlurringShader.BlurManager blurManager) {
         super(context);
+        this.collageSelected = 0;
+        this.collageWaveforms = new ArrayList();
+        this.collageTracks = new ArrayList();
+        this.collageFramePaint = new Paint(3);
+        this.collageClipPath = new Path();
+        this.selectedCollageClipPath = new Path();
         CubicBezierInterpolator cubicBezierInterpolator = CubicBezierInterpolator.EASE_OUT_QUINT;
         this.roundT = new AnimatedFloat(this, 0L, 360L, cubicBezierInterpolator);
         this.roundSelectedT = new AnimatedFloat(this, 360L, cubicBezierInterpolator);
         this.audioT = new AnimatedFloat(this, 0L, 360L, cubicBezierInterpolator);
         this.audioSelectedT = new AnimatedFloat(this, 360L, cubicBezierInterpolator);
-        this.videoSelectedT = new AnimatedFloat(this, 360L, cubicBezierInterpolator);
-        this.waveformLoaded = new AnimatedFloat(this, 0L, 600L, cubicBezierInterpolator);
         this.waveformMax = new AnimatedFloat(this, 0L, 360L, cubicBezierInterpolator);
+        this.timelineWaveformLoaded = new AnimatedFloat(this, 0L, 600L, cubicBezierInterpolator);
+        this.timelineWaveformMax = new AnimatedFloat(this, 0L, 360L, cubicBezierInterpolator);
+        this.openT = new AnimatedFloat(this, 0L, 320L, cubicBezierInterpolator);
+        this.open = true;
+        this.timelineBounds = new RectF();
+        this.timelineClipPath = new Path();
+        this.timelineWaveformPath = new WaveformPath();
         this.videoBounds = new RectF();
         this.videoFramePaint = new Paint(3);
         this.videoClipPath = new Path();
@@ -563,11 +836,13 @@ public class TimelineView extends View {
         this.loopProgress = new AnimatedFloat(0.0f, this, 0L, 340L, cubicBezierInterpolator);
         this.loopProgressFrom = -1L;
         this.pressHandle = -1;
+        this.pressHandleCollageIndex = -1;
         this.pressType = -1;
+        this.pressCollageIndex = -1;
         this.scrollingVideo = true;
+        this.scrollingCollage = -1;
         this.scrolling = false;
         this.selectedVideoRadii = new float[8];
-        this.waveformRadii = new float[8];
         this.container = viewGroup;
         this.previewContainer = view;
         this.resourcesProvider = resourcesProvider;
@@ -586,9 +861,14 @@ public class TimelineView extends View {
         paint3.setColor(-16777216);
         paint5.setColor(-1);
         paint4.setColor(637534208);
-        Drawable mutate = getContext().getResources().getDrawable(R.drawable.filled_widget_music).mutate();
-        this.audioIcon = mutate;
-        mutate.setColorFilter(new PorterDuffColorFilter(-1, PorterDuff.Mode.SRC_IN));
+        this.timelineText = new Text(LocaleController.getString(R.string.StoryTimeline), 12.0f, AndroidUtilities.bold());
+        Drawable mutate = getContext().getResources().getDrawable(R.drawable.timeline).mutate();
+        this.timelineIcon = mutate;
+        PorterDuff.Mode mode = PorterDuff.Mode.SRC_IN;
+        mutate.setColorFilter(new PorterDuffColorFilter(-1, mode));
+        Drawable mutate2 = getContext().getResources().getDrawable(R.drawable.filled_widget_music).mutate();
+        this.audioIcon = mutate2;
+        mutate2.setColorFilter(new PorterDuffColorFilter(-1, mode));
         this.blurManager = blurManager;
         this.backgroundBlur = new BlurringShader.StoryBlurDrawer(blurManager, this, 0);
         this.audioBlur = new BlurringShader.StoryBlurDrawer(blurManager, this, 3);
@@ -596,123 +876,39 @@ public class TimelineView extends View {
         this.onLongPress = new Runnable() {
             @Override
             public final void run() {
-                TimelineView.this.lambda$new$5(viewGroup, resourcesProvider, blurManager, view);
+                TimelineView.this.lambda$new$6(viewGroup, resourcesProvider, blurManager, view);
             }
         };
     }
 
-    private int detectHandle(MotionEvent motionEvent) {
-        float x = motionEvent.getX();
-        float y = motionEvent.getY();
-        float min = (float) Math.min(getBaseDuration(), 120000L);
-        float clamp = this.px + this.ph + (this.sw * (((float) ((Utilities.clamp(this.progress, getBaseDuration(), 0L) + (!this.hasVideo ? this.audioOffset : 0L)) - this.scroll)) / min));
-        boolean z = false;
-        if (!this.isCover && x >= clamp - AndroidUtilities.dp(12.0f) && x <= clamp + AndroidUtilities.dp(12.0f)) {
-            return 0;
-        }
-        boolean z2 = this.hasVideo && y > (((float) (this.h - this.py)) - getVideoHeight()) - ((float) AndroidUtilities.dp(2.0f));
-        if (this.hasRound && y > (((((this.h - this.py) - getVideoHeight()) - AndroidUtilities.dp(4.0f)) - getRoundHeight()) - AndroidUtilities.dp(4.0f)) - AndroidUtilities.dp(2.0f) && y < ((this.h - this.py) - getVideoHeight()) - AndroidUtilities.dp(2.0f)) {
-            z = true;
-        }
-        if (z2) {
-            if (this.isCover) {
-                return 4;
-            }
-            float f = this.px + this.ph;
-            float f2 = this.videoLeft;
-            float f3 = (float) this.videoDuration;
-            float f4 = (float) this.scroll;
-            float f5 = this.sw;
-            float f6 = ((((f2 * f3) - f4) / min) * f5) + f;
-            float f7 = f + ((((this.videoRight * f3) - f4) / min) * f5);
-            if (x >= f6 - AndroidUtilities.dp(15.0f) && x <= AndroidUtilities.dp(5.0f) + f6) {
-                return 2;
-            }
-            if (x >= f7 - AndroidUtilities.dp(5.0f) && x <= AndroidUtilities.dp(15.0f) + f7) {
-                return 3;
-            }
-            if (x >= f6 && x <= f7 && (this.videoLeft > 0.01f || this.videoRight < 0.99f)) {
-                return 4;
-            }
-        } else if (z) {
-            float f8 = this.px + this.ph;
-            float f9 = (float) this.roundOffset;
-            float f10 = this.roundLeft;
-            float f11 = (float) this.roundDuration;
-            float f12 = (float) this.scroll;
-            float f13 = this.sw;
-            float f14 = (((((f10 * f11) + f9) - f12) / min) * f13) + f8;
-            float f15 = f8 + ((((f9 + (this.roundRight * f11)) - f12) / min) * f13);
-            if (this.roundSelected || !this.hasVideo) {
-                if (x >= f14 - AndroidUtilities.dp(15.0f) && x <= AndroidUtilities.dp(5.0f) + f14) {
-                    return 10;
-                }
-                if (x >= f15 - AndroidUtilities.dp(5.0f) && x <= AndroidUtilities.dp(15.0f) + f15) {
-                    return 11;
-                }
-                if (x >= f14 && x <= f15) {
-                    return !this.hasVideo ? 12 : 9;
-                }
-                float f16 = this.px + this.ph;
-                long j = this.roundOffset;
-                long j2 = this.scroll;
-                float f17 = this.sw;
-                float f18 = ((((float) (j - j2)) / min) * f17) + f16;
-                f15 = f16 + ((((float) ((j + this.roundDuration) - j2)) / min) * f17);
-                f14 = f18;
-            }
-            if (x >= f14 && x <= f15) {
-                return 9;
-            }
-        } else if (this.hasAudio) {
-            float f19 = this.px + this.ph;
-            float f20 = (float) this.audioOffset;
-            float f21 = this.audioLeft;
-            float f22 = (float) this.audioDuration;
-            float f23 = (float) this.scroll;
-            float f24 = this.sw;
-            float f25 = (((((f21 * f22) + f20) - f23) / min) * f24) + f19;
-            float f26 = f19 + ((((f20 + (this.audioRight * f22)) - f23) / min) * f24);
-            if (this.audioSelected || (!this.hasVideo && !this.hasRound)) {
-                if (x >= f25 - AndroidUtilities.dp(15.0f) && x <= AndroidUtilities.dp(5.0f) + f25) {
-                    return 6;
-                }
-                if (x >= f26 - AndroidUtilities.dp(5.0f) && x <= AndroidUtilities.dp(15.0f) + f26) {
-                    return 7;
-                }
-                if (x >= f25 && x <= f26) {
-                    return !this.hasVideo ? 8 : 5;
-                }
-                float f27 = this.px + this.ph;
-                long j3 = this.audioOffset;
-                long j4 = this.scroll;
-                float f28 = this.sw;
-                float f29 = ((((float) (j3 - j4)) / min) * f28) + f27;
-                f26 = ((((float) ((j3 + this.audioDuration) - j4)) / min) * f28) + f27;
-                f25 = f29;
-            }
-            if (x >= f25 && x <= f26) {
-                return 5;
-            }
-        }
-        return (this.videoDuration <= 120000 || !z2) ? -1 : 1;
+    private int detectHandle(android.view.MotionEvent r17) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.detectHandle(android.view.MotionEvent):int");
     }
 
     private void drawProgress(Canvas canvas, float f, float f2, long j, float f3) {
+        float f4;
         if (this.isCover) {
             return;
         }
-        float clamp = this.px + this.ph + (this.sw * (((float) ((Utilities.clamp(j, getBaseDuration(), 0L) + (!this.hasVideo ? this.audioOffset : 0L)) - this.scroll)) / ((float) Math.min(getBaseDuration(), 120000L))));
-        float f4 = (((f + f2) / 2.0f) / 2.0f) * (1.0f - f3);
-        float f5 = f + f4;
-        float f6 = f2 - f4;
+        long min = Math.min(getBaseDuration(), getMaxScrollDuration());
+        float clamp = (float) Utilities.clamp(j, getBaseDuration(), 0L);
+        Track track = this.collageMain;
+        if (track != null) {
+            f4 = ((float) track.offset) + (track.left * ((float) track.duration));
+        } else {
+            f4 = (float) (this.videoTrack == null ? this.audioOffset : 0L);
+        }
+        float f5 = this.px + this.ph + (this.sw * (((clamp + f4) - ((float) this.scroll)) / ((float) min)));
+        float f6 = (((f2 - f) / 2.0f) / 2.0f) * (1.0f - f3);
+        float f7 = f + f6;
+        float f8 = f2 - f6;
         this.progressShadowPaint.setAlpha((int) (38.0f * f3));
         this.progressWhitePaint.setAlpha((int) (f3 * 255.0f));
         RectF rectF = AndroidUtilities.rectTmp;
-        rectF.set(clamp - AndroidUtilities.dpf2(1.5f), f5, AndroidUtilities.dpf2(1.5f) + clamp, f6);
+        rectF.set(f5 - AndroidUtilities.dpf2(1.5f), f7, AndroidUtilities.dpf2(1.5f) + f5, f8);
         rectF.inset(-AndroidUtilities.dpf2(0.66f), -AndroidUtilities.dpf2(0.66f));
         canvas.drawRoundRect(rectF, AndroidUtilities.dp(6.0f), AndroidUtilities.dp(6.0f), this.progressShadowPaint);
-        rectF.set(clamp - AndroidUtilities.dpf2(1.5f), f5, clamp + AndroidUtilities.dpf2(1.5f), f6);
+        rectF.set(f5 - AndroidUtilities.dpf2(1.5f), f7, f5 + AndroidUtilities.dpf2(1.5f), f8);
         canvas.drawRoundRect(rectF, AndroidUtilities.dp(6.0f), AndroidUtilities.dp(6.0f), this.progressWhitePaint);
     }
 
@@ -763,8 +959,23 @@ public class TimelineView extends View {
         return AndroidUtilities.lerp(AndroidUtilities.dp(28.0f), AndroidUtilities.dp(38.0f), this.audioSelectedT.set(this.audioSelected));
     }
 
-    private long getBaseDuration() {
-        return this.hasVideo ? this.videoDuration : this.hasRound ? this.roundDuration : this.hasAudio ? this.audioDuration : Math.max(1L, this.audioDuration);
+    public long getBaseDuration() {
+        Track track = this.videoTrack;
+        return Math.max(1L, (track == null && (track = this.collageMain) == null) ? this.hasRound ? this.roundDuration : this.audioDuration : track.duration);
+    }
+
+    private float getCollageHeight() {
+        if (this.collageTracks.isEmpty()) {
+            return 0.0f;
+        }
+        float f = 0.0f;
+        for (int i = 0; i < this.collageTracks.size(); i++) {
+            if (f > 0.0f) {
+                f += AndroidUtilities.dp(4.0f);
+            }
+            f += AndroidUtilities.lerp(AndroidUtilities.dp(28.0f), AndroidUtilities.dp(38.0f), ((Track) this.collageTracks.get(i)).selectedT.get());
+        }
+        return f;
     }
 
     private float getRoundHeight() {
@@ -775,14 +986,14 @@ public class TimelineView extends View {
     }
 
     private float getVideoHeight() {
-        if (this.hasVideo) {
-            return AndroidUtilities.lerp(AndroidUtilities.dp(28.0f), AndroidUtilities.dp(38.0f), this.videoSelectedT.set((this.audioSelected || this.roundSelected) ? false : true));
+        if (this.videoTrack == null) {
+            return 0.0f;
         }
-        return 0.0f;
+        return AndroidUtilities.lerp(AndroidUtilities.dp(28.0f), AndroidUtilities.dp(38.0f), r0.selectedT.get());
     }
 
     public static int heightDp() {
-        return 112;
+        return 388;
     }
 
     public void lambda$new$0(Float f) {
@@ -816,150 +1027,158 @@ public class TimelineView extends View {
     }
 
     public void lambda$new$4(Float f) {
-        this.videoVolume = f.floatValue();
+        this.videoTrack.volume = f.floatValue();
         TimelineDelegate timelineDelegate = this.delegate;
         if (timelineDelegate != null) {
             timelineDelegate.onVideoVolumeChange(f.floatValue());
         }
     }
 
-    public void lambda$new$5(ViewGroup viewGroup, Theme.ResourcesProvider resourcesProvider, BlurringShader.BlurManager blurManager, View view) {
-        int i;
-        int i2;
-        float min;
-        float f;
-        float f2;
-        float roundHeight;
-        ItemOptions addSpaceGap;
-        int i3;
-        String string;
-        Runnable runnable;
-        float f3;
-        float f4;
-        int i4 = this.pressType;
-        try {
-            if (i4 == 2 && this.hasAudio) {
-                SliderView onValueChange = new SliderView(getContext(), 0).setMinMax(0.0f, 1.5f).setValue(this.audioVolume).setOnValueChange(new Utilities.Callback() {
-                    @Override
-                    public final void run(Object obj) {
-                        TimelineView.this.lambda$new$0((Float) obj);
-                    }
-                });
-                long min2 = Math.min(getBaseDuration(), 120000L);
-                int i5 = this.w;
-                int i6 = this.px;
-                int i7 = this.ph;
-                min = Math.min((i5 - i6) - i7, i6 + i7 + (((((float) (this.audioOffset - this.scroll)) + (AndroidUtilities.lerp(this.audioRight, 1.0f, this.audioSelectedT.get()) * ((float) this.audioDuration))) / ((float) min2)) * this.sw));
-                float f5 = this.h - this.py;
-                if (this.hasVideo) {
-                    f3 = 4.0f;
-                    f4 = getVideoHeight() + AndroidUtilities.dp(4.0f);
-                } else {
-                    f3 = 4.0f;
-                    f4 = 0.0f;
-                }
-                roundHeight = ((f5 - f4) - (this.hasRound ? getRoundHeight() + AndroidUtilities.dp(f3) : 0.0f)) - (this.hasAudio ? getAudioHeight() + AndroidUtilities.dp(f3) : 0.0f);
-                addSpaceGap = ItemOptions.makeOptions(viewGroup, resourcesProvider, this).addView(onValueChange).addSpaceGap();
-                i3 = R.drawable.msg_delete;
-                string = LocaleController.getString(R.string.StoryAudioRemove);
-                runnable = new Runnable() {
-                    @Override
-                    public final void run() {
-                        TimelineView.this.lambda$new$1();
-                    }
-                };
-            } else {
-                if (i4 != 1 || !this.hasRound) {
-                    if (i4 == 0 && this.hasVideo) {
-                        i = 1;
-                        ItemOptions.makeOptions(viewGroup, resourcesProvider, this).addView(new SliderView(getContext(), 0).setMinMax(0.0f, 1.5f).setValue(this.videoVolume).setOnValueChange(new Utilities.Callback() {
-                            @Override
-                            public final void run(Object obj) {
-                                TimelineView.this.lambda$new$4((Float) obj);
-                            }
-                        })).setGravity(5).forceTop(true).translate(AndroidUtilities.dp(18.0f), (this.h - this.py) - (this.hasVideo ? getVideoHeight() + AndroidUtilities.dp(4.0f) : 0.0f)).show().setBlurBackground(blurManager, -view.getX(), -view.getY());
-                        i2 = 0;
-                        performHapticFeedback(i2, i);
-                        return;
-                    }
-                    return;
-                }
-                SliderView onValueChange2 = new SliderView(getContext(), 0).setMinMax(0.0f, 1.5f).setValue(this.roundVolume).setOnValueChange(new Utilities.Callback() {
-                    @Override
-                    public final void run(Object obj) {
-                        TimelineView.this.lambda$new$2((Float) obj);
-                    }
-                });
-                long min3 = Math.min(getBaseDuration(), 120000L);
-                int i8 = this.w;
-                int i9 = this.px;
-                int i10 = this.ph;
-                min = Math.min((i8 - i9) - i10, i9 + i10 + (((((float) (this.roundOffset - this.scroll)) + (AndroidUtilities.lerp(this.roundRight, 1.0f, this.roundSelectedT.get()) * ((float) this.roundDuration))) / ((float) min3)) * this.sw));
-                float f6 = this.h - this.py;
-                if (this.hasVideo) {
-                    f = 4.0f;
-                    f2 = getVideoHeight() + AndroidUtilities.dp(4.0f);
-                } else {
-                    f = 4.0f;
-                    f2 = 0.0f;
-                }
-                roundHeight = (f6 - f2) - (this.hasRound ? getRoundHeight() + AndroidUtilities.dp(f) : 0.0f);
-                addSpaceGap = ItemOptions.makeOptions(viewGroup, resourcesProvider, this).addView(onValueChange2).addSpaceGap();
-                i3 = R.drawable.msg_delete;
-                string = LocaleController.getString(R.string.StoryRoundRemove);
-                runnable = new Runnable() {
-                    @Override
-                    public final void run() {
-                        TimelineView.this.lambda$new$3();
-                    }
-                };
-            }
-            performHapticFeedback(i2, i);
-            return;
-        } catch (Exception unused) {
-            return;
+    public void lambda$new$5(Track track, Float f) {
+        track.volume = f.floatValue();
+        TimelineDelegate timelineDelegate = this.delegate;
+        if (timelineDelegate != null) {
+            timelineDelegate.onVideoVolumeChange(track.index, f.floatValue());
         }
-        addSpaceGap.add(i3, string, runnable).setGravity(5).forceTop(true).translate((-(this.w - min)) + AndroidUtilities.dp(18.0f), roundHeight).show().setBlurBackground(blurManager, -view.getX(), -view.getY());
-        i2 = 0;
-        i = 1;
     }
 
-    public void lambda$setProgressAt$6(long j) {
+    public void lambda$new$6(ViewGroup viewGroup, Theme.ResourcesProvider resourcesProvider, BlurringShader.BlurManager blurManager, View view) {
+        int i;
+        ItemOptions forceTop;
+        float dp;
+        RectF rectF;
+        int i2 = this.pressType;
+        if (i2 == 2 && this.hasAudio) {
+            SliderView onValueChange = new SliderView(getContext(), 0).setMinMax(0.0f, 1.5f).setValue(this.audioVolume).setOnValueChange(new Utilities.Callback() {
+                @Override
+                public final void run(Object obj) {
+                    TimelineView.this.lambda$new$0((Float) obj);
+                }
+            });
+            long min = Math.min(getBaseDuration(), getMaxScrollDuration());
+            int i3 = this.w;
+            int i4 = this.px;
+            int i5 = this.ph;
+            float min2 = Math.min((i3 - i4) - i5, i4 + i5 + (((((float) (this.audioOffset - this.scroll)) + (AndroidUtilities.lerp(this.audioRight, 1.0f, this.audioSelectedT.get()) * ((float) this.audioDuration))) / ((float) min)) * this.sw));
+            forceTop = ItemOptions.makeOptions(viewGroup, resourcesProvider, this).addView(onValueChange).addSpaceGap().add(R.drawable.msg_delete, LocaleController.getString(R.string.StoryAudioRemove), new Runnable() {
+                @Override
+                public final void run() {
+                    TimelineView.this.lambda$new$1();
+                }
+            }).setGravity(5).forceTop(true);
+            dp = (-(this.w - min2)) + AndroidUtilities.dp(18.0f);
+            rectF = this.audioBounds;
+        } else if (i2 == 1 && this.hasRound) {
+            SliderView onValueChange2 = new SliderView(getContext(), 0).setMinMax(0.0f, 1.5f).setValue(this.roundVolume).setOnValueChange(new Utilities.Callback() {
+                @Override
+                public final void run(Object obj) {
+                    TimelineView.this.lambda$new$2((Float) obj);
+                }
+            });
+            long min3 = Math.min(getBaseDuration(), getMaxScrollDuration());
+            int i6 = this.w;
+            int i7 = this.px;
+            int i8 = this.ph;
+            float min4 = Math.min((i6 - i7) - i8, i7 + i8 + (((((float) (this.roundOffset - this.scroll)) + (AndroidUtilities.lerp(this.roundRight, 1.0f, this.roundSelectedT.get()) * ((float) this.roundDuration))) / ((float) min3)) * this.sw));
+            forceTop = ItemOptions.makeOptions(viewGroup, resourcesProvider, this).addView(onValueChange2).addSpaceGap().add(R.drawable.msg_delete, LocaleController.getString(R.string.StoryRoundRemove), new Runnable() {
+                @Override
+                public final void run() {
+                    TimelineView.this.lambda$new$3();
+                }
+            }).setGravity(5).forceTop(true);
+            dp = (-(this.w - min4)) + AndroidUtilities.dp(18.0f);
+            rectF = this.roundBounds;
+        } else if (i2 == 0 && this.videoTrack != null) {
+            forceTop = ItemOptions.makeOptions(viewGroup, resourcesProvider, this).addView(new SliderView(getContext(), 0).setMinMax(0.0f, 1.5f).setValue(this.videoTrack.volume).setOnValueChange(new Utilities.Callback() {
+                @Override
+                public final void run(Object obj) {
+                    TimelineView.this.lambda$new$4((Float) obj);
+                }
+            })).setGravity(5).forceTop(true);
+            dp = AndroidUtilities.dp(18.0f);
+            rectF = this.videoBounds;
+        } else {
+            if (i2 != 3 || (i = this.pressCollageIndex) < 0 || i >= this.collageTracks.size()) {
+                return;
+            }
+            final Track track = (Track) this.collageTracks.get(this.pressCollageIndex);
+            forceTop = ItemOptions.makeOptions(viewGroup, resourcesProvider, this).addView(new SliderView(getContext(), 0).setMinMax(0.0f, 1.5f).setValue(track.volume).setOnValueChange(new Utilities.Callback() {
+                @Override
+                public final void run(Object obj) {
+                    TimelineView.this.lambda$new$5(track, (Float) obj);
+                }
+            })).setGravity(5).forceTop(true);
+            dp = AndroidUtilities.dp(18.0f);
+            rectF = track.bounds;
+        }
+        forceTop.translate(dp, rectF.top).show().setBlurBackground(blurManager, -view.getX(), -view.getY());
+        try {
+            performHapticFeedback(0, 1);
+        } catch (Exception unused) {
+        }
+    }
+
+    public void lambda$setProgressAt$9(long j) {
         TimelineDelegate timelineDelegate = this.delegate;
         if (timelineDelegate != null) {
             timelineDelegate.onProgressChange(j, false);
         }
     }
 
+    public void lambda$setupRoundThumbs$8() {
+        VideoThumbsLoader videoThumbsLoader = this.roundThumbs;
+        if (videoThumbsLoader == null || videoThumbsLoader.getDuration() <= 0) {
+            return;
+        }
+        this.roundDuration = this.roundThumbs.getDuration();
+    }
+
+    public static int lambda$sortCollage$7(Track track, Track track2) {
+        return (int) (track2.duration - track.duration);
+    }
+
     private long minAudioSelect() {
-        return Math.max(1000.0f, ((float) Math.min(this.hasVideo ? this.videoDuration : this.hasRound ? this.roundDuration : this.audioDuration, 59000L)) * 0.15f);
+        return Math.max(1000.0f, ((float) Math.min(getBaseDuration(), 59000L)) * 0.15f);
     }
 
     private void moveAudioOffset(float r23) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.moveAudioOffset(float):void");
     }
 
-    private void moveRoundOffset(float r18) {
+    private void moveCollageOffset(org.telegram.ui.Stories.recorder.TimelineView.Track r20, float r21) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.moveCollageOffset(org.telegram.ui.Stories.recorder.TimelineView$Track, float):void");
+    }
+
+    private void moveRoundOffset(float r19) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.moveRoundOffset(float):void");
     }
 
     private boolean setProgressAt(float f, boolean z) {
-        if (!this.hasVideo && !this.hasAudio) {
+        if (this.videoTrack == null && !this.hasAudio && this.collageTracks.isEmpty()) {
             return false;
         }
-        float min = (((f - this.px) - this.ph) / this.sw) * ((float) Math.min(getBaseDuration(), 120000L));
-        boolean z2 = this.hasVideo;
-        final long clamp = Utilities.clamp(min + ((float) (!z2 ? -this.audioOffset : 0L)) + ((float) this.scroll), (float) (z2 ? this.videoDuration : this.audioDuration), 0.0f);
-        boolean z3 = this.hasVideo;
-        if (z3) {
-            float f2 = ((float) clamp) / ((float) this.videoDuration);
-            if (f2 < this.videoLeft || f2 > this.videoRight) {
+        long min = Math.min(getBaseDuration(), getMaxScrollDuration());
+        float f2 = ((f - this.px) - this.ph) / this.sw;
+        Track track = this.collageMain;
+        long j = track != null ? ((float) track.offset) + (track.left * ((float) track.duration)) : 0L;
+        float f3 = f2 * ((float) min);
+        if (track == null) {
+            j = this.videoTrack == null ? this.audioOffset : 0L;
+        }
+        final long clamp = Utilities.clamp((f3 - ((float) j)) + ((float) this.scroll), (float) getBaseDuration(), 0.0f);
+        Track track2 = this.videoTrack;
+        if (track2 != null) {
+            float f4 = ((float) clamp) / ((float) track2.duration);
+            if (f4 < track2.left || f4 > track2.right) {
                 return false;
             }
         }
-        if (this.hasAudio && !z3) {
-            float f3 = ((float) clamp) / ((float) this.audioDuration);
-            if (f3 < this.audioLeft || f3 > this.audioRight) {
+        if (this.collageMain != null && (clamp < 0 || clamp >= (r0.right - r0.left) * ((float) r0.duration))) {
+            return false;
+        }
+        if (this.hasAudio && track2 == null && this.collageTracks.isEmpty()) {
+            float f5 = ((float) clamp) / ((float) this.audioDuration);
+            if (f5 < this.audioLeft || f5 > this.audioRight) {
                 return false;
             }
         }
@@ -980,7 +1199,7 @@ public class TimelineView extends View {
         Runnable runnable2 = new Runnable() {
             @Override
             public final void run() {
-                TimelineView.this.lambda$setProgressAt$6(clamp);
+                TimelineView.this.lambda$setProgressAt$9(clamp);
             }
         };
         this.askExactSeek = runnable2;
@@ -993,7 +1212,6 @@ public class TimelineView extends View {
             if (this.waveform == null || this.resetWaveform) {
                 this.waveform = new AudioWaveformLoader(this.audioPath, (getMeasuredWidth() - getPaddingLeft()) - getPaddingRight());
                 this.waveformIsLoaded = false;
-                this.waveformLoaded.set(0.0f, true);
                 this.waveformMax.set(1.0f, true);
             }
         }
@@ -1003,43 +1221,22 @@ public class TimelineView extends View {
         if (getMeasuredWidth() <= 0 || this.roundThumbs != null) {
             return;
         }
-        if (!this.hasVideo || this.videoDuration >= 1) {
+        Track track = this.videoTrack;
+        if (track == null || track.duration >= 1) {
             String str = this.roundPath;
             int i = this.w;
             int i2 = this.px;
             int i3 = (i - i2) - i2;
             int dp = AndroidUtilities.dp(38.0f);
             long j = this.roundDuration;
-            VideoThumbsLoader videoThumbsLoader = new VideoThumbsLoader(false, str, i3, dp, j > 2 ? Long.valueOf(j) : null, this.hasVideo ? this.videoDuration : 120000L, -1L, -1L);
-            this.roundThumbs = videoThumbsLoader;
-            if (videoThumbsLoader.getDuration() > 0) {
-                this.roundDuration = this.roundThumbs.getDuration();
-            }
-        }
-    }
-
-    private void setupVideoThumbs(boolean z) {
-        if (getMeasuredWidth() > 0) {
-            VideoThumbsLoader videoThumbsLoader = this.thumbs;
-            if (videoThumbsLoader == null || z) {
-                if (videoThumbsLoader != null) {
-                    videoThumbsLoader.destroy();
-                    this.thumbs = null;
+            Long valueOf = j > 2 ? Long.valueOf(j) : null;
+            Track track2 = this.videoTrack;
+            this.roundThumbs = new VideoThumbsLoader(false, str, i3, dp, valueOf, track2 != null ? track2.duration : getMaxScrollDuration(), -1L, -1L, new Runnable() {
+                @Override
+                public final void run() {
+                    TimelineView.this.lambda$setupRoundThumbs$8();
                 }
-                boolean z2 = this.isMainVideoRound;
-                String str = this.videoPath;
-                int i = this.w;
-                int i2 = this.px;
-                int i3 = (i - i2) - i2;
-                int dp = AndroidUtilities.dp(38.0f);
-                long j = this.videoDuration;
-                VideoThumbsLoader videoThumbsLoader2 = new VideoThumbsLoader(z2, str, i3, dp, j > 2 ? Long.valueOf(j) : null, 120000L, this.coverStart, this.coverEnd);
-                this.thumbs = videoThumbsLoader2;
-                if (videoThumbsLoader2.getDuration() > 0) {
-                    this.videoDuration = this.thumbs.getDuration();
-                }
-                setupRoundThumbs();
-            }
+            });
         }
     }
 
@@ -1058,7 +1255,7 @@ public class TimelineView extends View {
             return;
         }
         int currX = this.scroller.getCurrX();
-        long min = Math.min(getBaseDuration(), 120000L);
+        long min = Math.min(getBaseDuration(), getMaxScrollDuration());
         if (this.scrollingVideo) {
             this.scroll = Math.max(0.0f, (((currX - this.px) - this.ph) / this.sw) * ((float) min));
         } else {
@@ -1077,12 +1274,20 @@ public class TimelineView extends View {
     }
 
     @Override
-    protected void dispatchDraw(android.graphics.Canvas r42) {
+    protected void dispatchDraw(android.graphics.Canvas r51) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.dispatchDraw(android.graphics.Canvas):void");
     }
 
     public int getContentHeight() {
-        return (int) (this.py + (this.hasVideo ? getVideoHeight() + AndroidUtilities.dp(4.0f) : 0.0f) + (this.hasRound ? getRoundHeight() + AndroidUtilities.dp(4.0f) : 0.0f) + (this.hasAudio ? AndroidUtilities.dp(4.0f) + getAudioHeight() : 0.0f) + this.py);
+        return (int) (this.py + (this.videoTrack != null ? getVideoHeight() + AndroidUtilities.dp(4.0f) : 0.0f) + (this.collageTracks.isEmpty() ? 0.0f : getCollageHeight() + AndroidUtilities.dp(4.0f)) + (this.hasRound ? getRoundHeight() + AndroidUtilities.dp(4.0f) : 0.0f) + (this.hasAudio ? AndroidUtilities.dp(4.0f) + getAudioHeight() : 0.0f) + this.py);
+    }
+
+    public long getMaxScrollDuration() {
+        return this.collageTracks.isEmpty() ? 120000L : 70000L;
+    }
+
+    public int getTimelineHeight() {
+        return AndroidUtilities.lerp(this.py + AndroidUtilities.dp(28.0f) + this.py, getContentHeight(), this.openT.get());
     }
 
     public boolean isDragging() {
@@ -1094,7 +1299,7 @@ public class TimelineView extends View {
         if (this.audioSelected) {
             this.audioSelected = false;
             z = true;
-            if (this.hasRound && !this.hasVideo) {
+            if (this.hasRound && this.videoTrack == null) {
                 this.roundSelected = true;
                 TimelineDelegate timelineDelegate = this.delegate;
                 if (timelineDelegate != null) {
@@ -1109,32 +1314,32 @@ public class TimelineView extends View {
     protected void onMeasure(int i, int i2) {
         this.audioAuthorPaint.setTextSize(AndroidUtilities.dp(12.0f));
         this.audioTitlePaint.setTextSize(AndroidUtilities.dp(12.0f));
-        float[] fArr = this.waveformRadii;
-        float dp = AndroidUtilities.dp(2.0f);
-        fArr[3] = dp;
-        fArr[2] = dp;
-        fArr[1] = dp;
-        fArr[0] = dp;
-        float[] fArr2 = this.waveformRadii;
-        fArr2[7] = 0.0f;
-        fArr2[6] = 0.0f;
-        fArr2[5] = 0.0f;
-        fArr2[4] = 0.0f;
-        int dp2 = AndroidUtilities.dp(12.0f);
-        this.px = dp2;
-        int dp3 = AndroidUtilities.dp(5.0f);
-        this.py = dp3;
-        setPadding(dp2, dp3, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(5.0f));
+        int dp = AndroidUtilities.dp(12.0f);
+        this.px = dp;
+        int dp2 = AndroidUtilities.dp(5.0f);
+        this.py = dp2;
+        setPadding(dp, dp2, AndroidUtilities.dp(12.0f), AndroidUtilities.dp(5.0f));
         int size = View.MeasureSpec.getSize(i);
         this.w = size;
-        int dp4 = AndroidUtilities.dp(heightDp());
-        this.h = dp4;
-        setMeasuredDimension(size, dp4);
-        int dp5 = AndroidUtilities.dp(10.0f);
-        this.ph = dp5;
-        this.sw = (this.w - (dp5 * 2)) - (this.px * 2);
-        if (this.videoPath != null && this.thumbs == null) {
-            setupVideoThumbs(false);
+        int dp3 = AndroidUtilities.dp(heightDp());
+        this.h = dp3;
+        setMeasuredDimension(size, dp3);
+        int dp4 = AndroidUtilities.dp(10.0f);
+        this.ph = dp4;
+        this.sw = (this.w - (dp4 * 2)) - (this.px * 2);
+        Track track = this.videoTrack;
+        if (track != null && track.path != null && track.thumbs == null) {
+            track.setupThumbs(false);
+        }
+        if (!this.collageTracks.isEmpty()) {
+            Iterator it = this.collageTracks.iterator();
+            while (it.hasNext()) {
+                Track track2 = (Track) it.next();
+                if (track2.path != null && track2.thumbs == null) {
+                    track2.setupThumbs(false);
+                    track2.setupWaveform(false);
+                }
+            }
         }
         if (this.audioPath == null || this.waveform != null) {
             return;
@@ -1153,7 +1358,7 @@ public class TimelineView extends View {
             this.audioSelected = false;
         } else {
             this.roundSelected = false;
-            this.audioSelected = this.hasAudio && !this.hasVideo;
+            this.audioSelected = this.hasAudio && this.videoTrack == null;
         }
         invalidate();
     }
@@ -1167,7 +1372,6 @@ public class TimelineView extends View {
                 audioWaveformLoader.destroy();
                 this.waveform = null;
                 this.waveformIsLoaded = false;
-                this.waveformLoaded.set(0.0f, true);
             }
             this.audioPath = str;
             setupAudioWaveform();
@@ -1220,6 +1424,47 @@ public class TimelineView extends View {
         invalidate();
     }
 
+    public void setCollage(ArrayList<StoryEntry> arrayList) {
+        VideoThumbsLoader videoThumbsLoader;
+        for (int i = 0; i < this.collageTracks.size(); i++) {
+            Track track = (Track) this.collageTracks.get(i);
+            if (track != null && (videoThumbsLoader = track.thumbs) != null) {
+                videoThumbsLoader.destroy();
+            }
+        }
+        this.collageTracks.clear();
+        for (int i2 = 0; i2 < this.collageWaveforms.size(); i2++) {
+            AudioWaveformLoader audioWaveformLoader = (AudioWaveformLoader) this.collageWaveforms.get(i2);
+            if (audioWaveformLoader != null) {
+                audioWaveformLoader.destroy();
+            }
+        }
+        this.collageWaveforms.clear();
+        this.timelineWaveformMax.set(1.0f, true);
+        if (arrayList != null) {
+            for (int i3 = 0; i3 < arrayList.size(); i3++) {
+                this.collageWaveforms.add(null);
+                StoryEntry storyEntry = arrayList.get(i3);
+                if (storyEntry.isVideo) {
+                    Track track2 = new Track();
+                    track2.index = i3;
+                    track2.isRound = false;
+                    track2.path = storyEntry.file.getAbsolutePath();
+                    track2.duration = storyEntry.duration;
+                    track2.offset = storyEntry.videoOffset;
+                    track2.volume = storyEntry.videoVolume;
+                    track2.left = storyEntry.videoLeft;
+                    track2.right = storyEntry.videoRight;
+                    track2.setupThumbs(false);
+                    track2.setupWaveform(false);
+                    this.collageTracks.add(track2);
+                }
+            }
+        }
+        sortCollage();
+        this.collageSelected = 0;
+    }
+
     public void setCover() {
         this.isCover = true;
     }
@@ -1227,11 +1472,29 @@ public class TimelineView extends View {
     public void setCoverVideo(long j, long j2) {
         this.coverStart = j;
         this.coverEnd = j2;
-        setupVideoThumbs(true);
+        Track track = this.videoTrack;
+        if (track != null) {
+            track.setupThumbs(true);
+        }
     }
 
     public void setDelegate(TimelineDelegate timelineDelegate) {
         this.delegate = timelineDelegate;
+    }
+
+    public void setOnTimelineClick(Runnable runnable) {
+        this.onTimelineClick = runnable;
+    }
+
+    public void setOpen(boolean z, boolean z2) {
+        if (this.open == z && z2) {
+            return;
+        }
+        this.open = z;
+        if (!z2) {
+            this.openT.set(z, true);
+        }
+        invalidate();
     }
 
     public void setProgress(long r10) {
@@ -1256,7 +1519,7 @@ public class TimelineView extends View {
             this.roundRight = f2;
             this.roundVolume = f3;
             setupRoundThumbs();
-            if (!this.hasVideo) {
+            if (this.videoTrack == null) {
                 this.audioSelected = false;
                 this.roundSelected = true;
             }
@@ -1266,11 +1529,11 @@ public class TimelineView extends View {
             this.roundSelected = false;
         }
         this.hasRound = this.roundPath != null;
-        if (j3 != j && !this.hasVideo && this.waveform != null) {
+        if (j3 != j && this.videoTrack == null && this.waveform != null) {
             this.resetWaveform = true;
             setupAudioWaveform();
         }
-        if (this.hasAudio && this.hasRound && !this.hasVideo) {
+        if (this.hasAudio && this.hasRound && this.videoTrack == null) {
             this.audioLeft = 0.0f;
             this.audioRight = Utilities.clamp(((float) j) / ((float) this.audioDuration), 1.0f, 0.0f);
         }
@@ -1287,41 +1550,66 @@ public class TimelineView extends View {
     }
 
     public void setVideo(boolean z, String str, long j, float f) {
-        if (TextUtils.equals(this.videoPath, str)) {
+        Track track = this.videoTrack;
+        if (TextUtils.equals(track == null ? null : track.path, str)) {
             return;
         }
-        VideoThumbsLoader videoThumbsLoader = this.thumbs;
-        if (videoThumbsLoader != null) {
-            videoThumbsLoader.destroy();
-            this.thumbs = null;
+        Track track2 = this.videoTrack;
+        if (track2 != null) {
+            VideoThumbsLoader videoThumbsLoader = track2.thumbs;
+            if (videoThumbsLoader != null) {
+                videoThumbsLoader.destroy();
+                this.videoTrack.thumbs = null;
+            }
+            this.videoTrack = null;
         }
-        this.isMainVideoRound = z;
         if (str != null) {
             this.scroll = 0L;
-            this.videoPath = str;
-            this.videoDuration = j;
-            this.videoVolume = f;
-            setupVideoThumbs(false);
+            Track track3 = new Track();
+            this.videoTrack = track3;
+            track3.isRound = z;
+            track3.path = str;
+            track3.duration = j;
+            track3.volume = f;
+            track3.setupThumbs(false);
         } else {
-            this.videoPath = null;
-            this.videoDuration = 1L;
+            this.videoTrack = null;
             this.scroll = 0L;
         }
         if (!this.hasRound) {
             this.roundSelected = false;
         }
-        this.hasVideo = this.videoPath != null;
         this.progress = 0L;
         invalidate();
     }
 
     public void setVideoLeft(float f) {
-        this.videoLeft = f;
+        Track track = this.videoTrack;
+        if (track == null) {
+            return;
+        }
+        track.left = f;
         invalidate();
     }
 
     public void setVideoRight(float f) {
-        this.videoRight = f;
+        Track track = this.videoTrack;
+        if (track == null) {
+            return;
+        }
+        track.right = f;
         invalidate();
+    }
+
+    public void sortCollage() {
+        Collections.sort(this.collageTracks, new Comparator() {
+            @Override
+            public final int compare(Object obj, Object obj2) {
+                int lambda$sortCollage$7;
+                lambda$sortCollage$7 = TimelineView.lambda$sortCollage$7((TimelineView.Track) obj, (TimelineView.Track) obj2);
+                return lambda$sortCollage$7;
+            }
+        });
+        this.collageMain = this.collageTracks.isEmpty() ? null : (Track) this.collageTracks.get(0);
     }
 }

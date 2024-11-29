@@ -3293,7 +3293,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         swapAnimatedEmojiDrawable.play();
     }
 
-    public void lambda$expand$31(float f, int i) {
+    public void lambda$expand$33(float f, int i) {
         try {
             LinearSmoothScrollerCustom linearSmoothScrollerCustom = new LinearSmoothScrollerCustom(this.emojiGridView.getContext(), 0, f);
             linearSmoothScrollerCustom.setTargetPosition(i);
@@ -3331,11 +3331,11 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         return true;
     }
 
-    public void lambda$new$32() {
+    public void lambda$new$34() {
         updateRows(true, true);
     }
 
-    public void lambda$new$33() {
+    public void lambda$new$35() {
         NotificationCenter.getGlobalInstance().removeDelayed(this.updateRows);
         NotificationCenter.getGlobalInstance().doOnIdle(this.updateRows);
     }
@@ -3379,7 +3379,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         }
     }
 
-    public void lambda$onDismiss$39(ValueAnimator valueAnimator) {
+    public void lambda$onDismiss$41(ValueAnimator valueAnimator) {
         float floatValue = 1.0f - ((Float) valueAnimator.getAnimatedValue()).floatValue();
         setTranslationY(AndroidUtilities.dp(8.0f) * (1.0f - floatValue));
         View view = this.bubble1View;
@@ -3395,7 +3395,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         invalidate();
     }
 
-    public void lambda$onEmojiClick$30(View view, AnimatedEmojiSpan animatedEmojiSpan, TLRPC.Document document) {
+    public void lambda$onEmojiClick$32(View view, AnimatedEmojiSpan animatedEmojiSpan, TLRPC.Document document) {
         onEmojiSelected(view, Long.valueOf(animatedEmojiSpan.documentId), document, null);
     }
 
@@ -3409,22 +3409,8 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         setDim(0.0f, true);
     }
 
-    public void lambda$onShow$34(ValueAnimator valueAnimator) {
+    public void lambda$onShow$36(ValueAnimator valueAnimator) {
         updateShow(((Float) valueAnimator.getAnimatedValue()).floatValue());
-    }
-
-    public void lambda$onShow$35() {
-        this.showAnimator.start();
-    }
-
-    public void lambda$onShow$36() {
-        HwEmojis.enableHw();
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public final void run() {
-                SelectAnimatedEmojiDialog.this.lambda$onShow$35();
-            }
-        }, 0L);
     }
 
     public void lambda$onShow$37() {
@@ -3437,6 +3423,20 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
             @Override
             public final void run() {
                 SelectAnimatedEmojiDialog.this.lambda$onShow$37();
+            }
+        }, 0L);
+    }
+
+    public void lambda$onShow$39() {
+        this.showAnimator.start();
+    }
+
+    public void lambda$onShow$40() {
+        HwEmojis.enableHw();
+        AndroidUtilities.runOnUIThread(new Runnable() {
+            @Override
+            public final void run() {
+                SelectAnimatedEmojiDialog.this.lambda$onShow$39();
             }
         }, 0L);
     }
@@ -3646,7 +3646,29 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         });
     }
 
-    public void lambda$search$24(LinkedHashSet linkedHashSet, HashMap hashMap, ArrayList arrayList, Runnable runnable, ArrayList arrayList2, String str) {
+    public void lambda$search$24(LinkedHashSet linkedHashSet, Runnable runnable, ArrayList arrayList) {
+        AnimatedEmojiDrawable.getDocumentFetcher(this.currentAccount).putDocuments(arrayList);
+        Iterator it = arrayList.iterator();
+        while (it.hasNext()) {
+            linkedHashSet.add(Long.valueOf(((TLRPC.Document) it.next()).id));
+        }
+        runnable.run();
+    }
+
+    public void lambda$search$25(String[] strArr, String str, final LinkedHashSet linkedHashSet, final Runnable runnable) {
+        if (ConnectionsManager.getInstance(this.currentAccount).getConnectionState() != 3) {
+            runnable.run();
+        } else {
+            MediaDataController.getInstance(this.currentAccount).searchStickers(true, (strArr == null || strArr.length == 0) ? "" : strArr[0], str, new Utilities.Callback() {
+                @Override
+                public final void run(Object obj) {
+                    SelectAnimatedEmojiDialog.this.lambda$search$24(linkedHashSet, runnable, (ArrayList) obj);
+                }
+            });
+        }
+    }
+
+    public void lambda$search$26(LinkedHashSet linkedHashSet, HashMap hashMap, ArrayList arrayList, Runnable runnable, ArrayList arrayList2, String str) {
         TLRPC.TL_availableReaction tL_availableReaction;
         for (int i = 0; i < arrayList2.size(); i++) {
             try {
@@ -3664,7 +3686,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         runnable.run();
     }
 
-    public void lambda$search$25(boolean z, final LinkedHashSet linkedHashSet, String str, final HashMap hashMap, final ArrayList arrayList, final Runnable runnable) {
+    public void lambda$search$27(boolean z, final LinkedHashSet linkedHashSet, String str, final HashMap hashMap, final ArrayList arrayList, final Runnable runnable) {
         ArrayList<TLRPC.Document> arrayList2;
         ArrayList<TLRPC.Document> arrayList3;
         int i = this.currentAccount;
@@ -3672,7 +3694,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
             MediaDataController.getInstance(i).getEmojiSuggestions(lastSearchKeyboardLanguage, str, false, new MediaDataController.KeywordResultCallback() {
                 @Override
                 public final void run(ArrayList arrayList4, String str2) {
-                    SelectAnimatedEmojiDialog.this.lambda$search$24(linkedHashSet, hashMap, arrayList, runnable, arrayList4, str2);
+                    SelectAnimatedEmojiDialog.this.lambda$search$26(linkedHashSet, hashMap, arrayList, runnable, arrayList4, str2);
                 }
             }, null, true, this.type == 3, false, 30);
             return;
@@ -3704,7 +3726,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         runnable.run();
     }
 
-    public static void lambda$search$26(HashMap hashMap, HashMap hashMap2, ArrayList arrayList, Runnable runnable, ArrayList arrayList2, String str) {
+    public static void lambda$search$28(HashMap hashMap, HashMap hashMap2, ArrayList arrayList, Runnable runnable, ArrayList arrayList2, String str) {
         int size = arrayList2.size();
         for (int i = 0; i < size; i++) {
             String str2 = ((MediaDataController.KeywordResult) arrayList2.get(i)).emoji;
@@ -3717,11 +3739,11 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         runnable.run();
     }
 
-    public void lambda$search$27(java.lang.String r15, final java.util.ArrayList r16, final java.util.HashMap r17, final java.lang.Runnable r18) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.SelectAnimatedEmojiDialog.lambda$search$27(java.lang.String, java.util.ArrayList, java.util.HashMap, java.lang.Runnable):void");
+    public void lambda$search$29(java.lang.String r15, final java.util.ArrayList r16, final java.util.HashMap r17, final java.lang.Runnable r18) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.SelectAnimatedEmojiDialog.lambda$search$29(java.lang.String, java.util.ArrayList, java.util.HashMap, java.lang.Runnable):void");
     }
 
-    public void lambda$search$28(String str, ArrayList arrayList, Runnable runnable) {
+    public void lambda$search$30(String str, ArrayList arrayList, Runnable runnable) {
         TLRPC.StickerSet stickerSet;
         ArrayList<TLRPC.Document> arrayList2;
         TLRPC.StickerSet stickerSet2;
@@ -3767,7 +3789,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         runnable.run();
     }
 
-    public void lambda$search$29(final String str, final boolean z, final boolean z2) {
+    public void lambda$search$31(final String str, final boolean z, final boolean z2, final String[] strArr) {
         final LinkedHashSet linkedHashSet = new LinkedHashSet();
         final LinkedHashSet linkedHashSet2 = new LinkedHashSet();
         final HashMap<String, TLRPC.TL_availableReaction> reactionsMap = MediaDataController.getInstance(this.currentAccount).getReactionsMap();
@@ -3817,17 +3839,22 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
             }, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    SelectAnimatedEmojiDialog.this.lambda$search$25(fullyConsistsOfEmojis, linkedHashSet, str, reactionsMap, arrayList, (Runnable) obj);
+                    SelectAnimatedEmojiDialog.this.lambda$search$25(strArr, str, linkedHashSet, (Runnable) obj);
                 }
             }, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    SelectAnimatedEmojiDialog.this.lambda$search$27(str, arrayList3, hashMap, (Runnable) obj);
+                    SelectAnimatedEmojiDialog.this.lambda$search$27(fullyConsistsOfEmojis, linkedHashSet, str, reactionsMap, arrayList, (Runnable) obj);
                 }
             }, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    SelectAnimatedEmojiDialog.this.lambda$search$28(str, arrayList4, (Runnable) obj);
+                    SelectAnimatedEmojiDialog.this.lambda$search$29(str, arrayList3, hashMap, (Runnable) obj);
+                }
+            }, new Utilities.Callback() {
+                @Override
+                public final void run(Object obj) {
+                    SelectAnimatedEmojiDialog.this.lambda$search$30(str, arrayList4, (Runnable) obj);
                 }
             }, callback);
         }
@@ -3849,7 +3876,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         }
     }
 
-    public static void lambda$setEnterAnimationInProgress$40(View view) {
+    public static void lambda$setEnterAnimationInProgress$42(View view) {
         view.setScaleX(1.0f);
         view.setScaleY(1.0f);
     }
@@ -4477,7 +4504,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
             post(new Runnable() {
                 @Override
                 public final void run() {
-                    SelectAnimatedEmojiDialog.this.lambda$expand$31(f, intValue);
+                    SelectAnimatedEmojiDialog.this.lambda$expand$33(f, intValue);
                 }
             });
         }
@@ -4552,7 +4579,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
-                SelectAnimatedEmojiDialog.this.lambda$onDismiss$39(valueAnimator2);
+                SelectAnimatedEmojiDialog.this.lambda$onDismiss$41(valueAnimator2);
             }
         });
         this.hideAnimator.addListener(new AnimatorListenerAdapter() {
@@ -4597,7 +4624,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
                 animateEmojiSelect((ImageViewEmoji) view, new Runnable() {
                     @Override
                     public final void run() {
-                        SelectAnimatedEmojiDialog.this.lambda$onEmojiClick$30(view, animatedEmojiSpan, document);
+                        SelectAnimatedEmojiDialog.this.lambda$onEmojiClick$32(view, animatedEmojiSpan, document);
                     }
                 });
                 return;
@@ -4676,7 +4703,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
         ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public final void onAnimationUpdate(ValueAnimator valueAnimator3) {
-                SelectAnimatedEmojiDialog.this.lambda$onShow$34(valueAnimator3);
+                SelectAnimatedEmojiDialog.this.lambda$onShow$36(valueAnimator3);
             }
         });
         this.showAnimator.addListener(new AnimatorListenerAdapter() {
@@ -4726,7 +4753,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
             HwEmojis.prepare(new Runnable() {
                 @Override
                 public final void run() {
-                    SelectAnimatedEmojiDialog.this.lambda$onShow$38();
+                    SelectAnimatedEmojiDialog.this.lambda$onShow$40();
                 }
             }, true);
         } else {
@@ -4734,7 +4761,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
             AnimatedEmojiDrawable.getDocumentFetcher(this.currentAccount).setUiDbCallback(new Runnable() {
                 @Override
                 public final void run() {
-                    SelectAnimatedEmojiDialog.this.lambda$onShow$36();
+                    SelectAnimatedEmojiDialog.this.lambda$onShow$38();
                 }
             });
             HwEmojis.prepare(null, true);
@@ -4892,7 +4919,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
                 AndroidUtilities.runOnUIThread(runnable3, 120L);
             }
             this.lastQuery = str;
-            String[] currentKeyboardLanguage = AndroidUtilities.getCurrentKeyboardLanguage();
+            final String[] currentKeyboardLanguage = AndroidUtilities.getCurrentKeyboardLanguage();
             if (!Arrays.equals(currentKeyboardLanguage, lastSearchKeyboardLanguage)) {
                 MediaDataController.getInstance(this.currentAccount).fetchNewEmojiKeywords(currentKeyboardLanguage);
             }
@@ -4900,7 +4927,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
             Runnable runnable4 = new Runnable() {
                 @Override
                 public final void run() {
-                    SelectAnimatedEmojiDialog.this.lambda$search$29(str, z, z3);
+                    SelectAnimatedEmojiDialog.this.lambda$search$31(str, z, z3, currentKeyboardLanguage);
                 }
             };
             this.searchRunnable = runnable4;
@@ -4948,7 +4975,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
             AndroidUtilities.forEachViews((RecyclerView) this.emojiGridView, new com.google.android.exoplayer2.util.Consumer() {
                 @Override
                 public final void accept(Object obj) {
-                    SelectAnimatedEmojiDialog.lambda$setEnterAnimationInProgress$40((View) obj);
+                    SelectAnimatedEmojiDialog.lambda$setEnterAnimationInProgress$42((View) obj);
                 }
             });
             for (int i = 0; i < this.emojiTabs.contentView.getChildCount(); i++) {

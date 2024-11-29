@@ -18,6 +18,7 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +63,8 @@ public class StoryEntry {
     public Bitmap blurredVideoThumb;
     public long botId;
     public CharSequence caption;
+    public CollageLayout collage;
+    public ArrayList collageContent;
     public Bitmap coverBitmap;
     public boolean coverSet;
     public long draftDate;
@@ -130,12 +133,16 @@ public class StoryEntry {
     public Bitmap thumbPathBitmap;
     public Utilities.Callback updateDocumentRef;
     public File uploadThumbFile;
+    public long videoOffset;
     public int width;
     public final int currentAccount = UserConfig.selectedAccount;
     public double fileDuration = -1.0d;
     public float audioRight = 1.0f;
     public float audioVolume = 1.0f;
     public float videoVolume = 1.0f;
+    public boolean videoLoop = false;
+    public float videoLeft = 0.0f;
+    public float videoRight = 1.0f;
     public float right = 1.0f;
     public long cover = -1;
     public int resultWidth = 720;
@@ -174,6 +181,37 @@ public class StoryEntry {
             }
             return i == 6 ? 2 : 0;
         }
+    }
+
+    public static StoryEntry asCollage(CollageLayout collageLayout, ArrayList arrayList) {
+        int i;
+        int i2;
+        StoryEntry storyEntry = new StoryEntry();
+        storyEntry.collage = collageLayout;
+        storyEntry.collageContent = arrayList;
+        Iterator it = arrayList.iterator();
+        while (it.hasNext()) {
+            StoryEntry storyEntry2 = (StoryEntry) it.next();
+            if (storyEntry2.isVideo) {
+                storyEntry.isVideo = true;
+                storyEntry2.videoLeft = 0.0f;
+                storyEntry2.videoRight = Math.min(1.0f, 59000.0f / ((float) storyEntry2.duration));
+            }
+        }
+        if (storyEntry.isVideo) {
+            i = 720;
+            storyEntry.width = 720;
+            i2 = 1280;
+        } else {
+            i = 1080;
+            storyEntry.width = 1080;
+            i2 = 1920;
+        }
+        storyEntry.height = i2;
+        storyEntry.resultWidth = i;
+        storyEntry.resultHeight = i2;
+        storyEntry.setupMatrix();
+        return storyEntry;
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int i, int i2) {
@@ -237,6 +275,7 @@ public class StoryEntry {
     }
 
     public static StoryEntry fromPhotoEntry(MediaController.PhotoEntry photoEntry) {
+        int i;
         StoryEntry storyEntry = new StoryEntry();
         storyEntry.file = new File(photoEntry.path);
         storyEntry.orientation = photoEntry.orientation;
@@ -253,6 +292,11 @@ public class StoryEntry {
         storyEntry.gradientTopColor = photoEntry.gradientTopColor;
         storyEntry.gradientBottomColor = photoEntry.gradientBottomColor;
         storyEntry.decodeBounds(storyEntry.file.getAbsolutePath());
+        int i2 = photoEntry.width;
+        if (i2 > 0 && (i = photoEntry.height) > 0) {
+            storyEntry.width = i2;
+            storyEntry.height = i;
+        }
         storyEntry.setupMatrix();
         return storyEntry;
     }
@@ -464,19 +508,23 @@ public class StoryEntry {
         return BitmapFactory.decodeFile(file.getPath(), options);
     }
 
-    public Bitmap lambda$buildBitmap$2(BitmapFactory.Options options) {
-        return BitmapFactory.decodeFile(this.paintFile.getPath(), options);
+    public static Bitmap lambda$buildBitmap$2(File file, BitmapFactory.Options options) {
+        return BitmapFactory.decodeFile(file.getPath(), options);
     }
 
     public Bitmap lambda$buildBitmap$3(BitmapFactory.Options options) {
-        return BitmapFactory.decodeFile(this.messageFile.getPath(), options);
+        return BitmapFactory.decodeFile(this.paintFile.getPath(), options);
     }
 
     public Bitmap lambda$buildBitmap$4(BitmapFactory.Options options) {
+        return BitmapFactory.decodeFile(this.messageFile.getPath(), options);
+    }
+
+    public Bitmap lambda$buildBitmap$5(BitmapFactory.Options options) {
         return BitmapFactory.decodeFile(this.paintEntitiesFile.getPath(), options);
     }
 
-    public void lambda$checkStickers$12(TLObject tLObject) {
+    public void lambda$checkStickers$14(TLObject tLObject) {
         this.checkStickersReqId = 0;
         if (tLObject instanceof TLRPC.Vector) {
             this.editStickers = new ArrayList();
@@ -504,16 +552,16 @@ public class StoryEntry {
         }
     }
 
-    public void lambda$checkStickers$13(final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$checkStickers$15(final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StoryEntry.this.lambda$checkStickers$12(tLObject);
+                StoryEntry.this.lambda$checkStickers$14(tLObject);
             }
         });
     }
 
-    public void lambda$checkStickers$14(TL_stories.StoryItem storyItem, TLRPC.TL_messages_getAttachedStickers tL_messages_getAttachedStickers, RequestDelegate requestDelegate, TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$checkStickers$16(TL_stories.StoryItem storyItem, TLRPC.TL_messages_getAttachedStickers tL_messages_getAttachedStickers, RequestDelegate requestDelegate, TLObject tLObject, TLRPC.TL_error tL_error) {
         if (tL_error == null || !FileRefController.isFileRefError(tL_error.text) || storyItem == null) {
             requestDelegate.run(tLObject, tL_error);
         } else {
@@ -521,11 +569,11 @@ public class StoryEntry {
         }
     }
 
-    public void lambda$detectHDR$10(Utilities.Callback callback) {
+    public void lambda$detectHDR$12(Utilities.Callback callback) {
         callback.run(this.hdrInfo);
     }
 
-    public void lambda$detectHDR$11(final Utilities.Callback callback) {
+    public void lambda$detectHDR$13(final Utilities.Callback callback) {
         Runnable runnable;
         try {
             try {
@@ -554,7 +602,7 @@ public class StoryEntry {
                 runnable = new Runnable() {
                     @Override
                     public final void run() {
-                        StoryEntry.this.lambda$detectHDR$10(callback);
+                        StoryEntry.this.lambda$detectHDR$12(callback);
                     }
                 };
             } catch (Exception e) {
@@ -563,7 +611,7 @@ public class StoryEntry {
                 runnable = new Runnable() {
                     @Override
                     public final void run() {
-                        StoryEntry.this.lambda$detectHDR$10(callback);
+                        StoryEntry.this.lambda$detectHDR$12(callback);
                     }
                 };
             }
@@ -573,23 +621,33 @@ public class StoryEntry {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    StoryEntry.this.lambda$detectHDR$10(callback);
+                    StoryEntry.this.lambda$detectHDR$12(callback);
                 }
             });
             throw th;
         }
     }
 
-    public void lambda$getVideoEditedInfo$8(java.lang.String r17, int[] r18, org.telegram.messenger.Utilities.Callback r19) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.StoryEntry.lambda$getVideoEditedInfo$8(java.lang.String, int[], org.telegram.messenger.Utilities$Callback):void");
-    }
-
-    public static void lambda$getVideoEditedInfo$9(String str, int[] iArr, Runnable runnable) {
-        AnimatedFileDrawable.getVideoInfo(str, iArr);
+    public static void lambda$getVideoEditedInfo$10(String[] strArr, int[][] iArr, Runnable runnable) {
+        for (int i = 0; i < strArr.length; i++) {
+            String str = strArr[i];
+            if (str != null) {
+                AnimatedFileDrawable.getVideoInfo(str, iArr[i]);
+            }
+        }
         AndroidUtilities.runOnUIThread(runnable);
     }
 
-    public void lambda$setupGradient$6(Bitmap bitmap, Runnable runnable, int[] iArr) {
+    public static void lambda$getVideoEditedInfo$11(String str, int[][] iArr, Runnable runnable) {
+        AnimatedFileDrawable.getVideoInfo(str, iArr[0]);
+        AndroidUtilities.runOnUIThread(runnable);
+    }
+
+    public void lambda$getVideoEditedInfo$9(java.lang.String r20, int[][] r21, org.telegram.messenger.Utilities.Callback r22) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.StoryEntry.lambda$getVideoEditedInfo$9(java.lang.String, int[][], org.telegram.messenger.Utilities$Callback):void");
+    }
+
+    public void lambda$setupGradient$7(Bitmap bitmap, Runnable runnable, int[] iArr) {
         this.gradientTopColor = iArr[0];
         this.gradientBottomColor = iArr[1];
         bitmap.recycle();
@@ -598,7 +656,7 @@ public class StoryEntry {
         }
     }
 
-    public void lambda$setupGradient$7(Runnable runnable, int[] iArr) {
+    public void lambda$setupGradient$8(Runnable runnable, int[] iArr) {
         this.gradientTopColor = iArr[0];
         this.gradientBottomColor = iArr[1];
         if (runnable != null) {
@@ -606,7 +664,7 @@ public class StoryEntry {
         }
     }
 
-    public void lambda$updateFilter$5(Bitmap bitmap, boolean z, Runnable runnable) {
+    public void lambda$updateFilter$6(Bitmap bitmap, boolean z, Runnable runnable) {
         try {
             bitmap.compress(z ? Bitmap.CompressFormat.WEBP : Bitmap.CompressFormat.JPEG, 90, new FileOutputStream(this.filterFile));
         } catch (Exception e) {
@@ -850,13 +908,13 @@ public class StoryEntry {
         final RequestDelegate requestDelegate = new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                StoryEntry.this.lambda$checkStickers$13(tLObject, tL_error);
+                StoryEntry.this.lambda$checkStickers$15(tLObject, tL_error);
             }
         };
         this.checkStickersReqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_getAttachedStickers, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                StoryEntry.this.lambda$checkStickers$14(storyItem, tL_messages_getAttachedStickers, requestDelegate, tLObject, tL_error);
+                StoryEntry.this.lambda$checkStickers$16(storyItem, tL_messages_getAttachedStickers, requestDelegate, tLObject, tL_error);
             }
         });
     }
@@ -987,6 +1045,10 @@ public class StoryEntry {
         storyEntry.botLang = this.botLang;
         storyEntry.editingBotPreview = this.editingBotPreview;
         storyEntry.cover = this.cover;
+        storyEntry.collageContent = this.collageContent;
+        storyEntry.collage = this.collage;
+        storyEntry.videoLoop = this.videoLoop;
+        storyEntry.videoOffset = this.videoOffset;
         return storyEntry;
     }
 
@@ -1075,6 +1137,11 @@ public class StoryEntry {
             bitmap2.recycle();
             this.thumbPathBitmap = null;
         }
+        if (this.collageContent != null) {
+            for (int i = 0; i < this.collageContent.size(); i++) {
+                ((StoryEntry) this.collageContent.get(i)).destroy(z);
+            }
+        }
         cancelCheckStickers();
     }
 
@@ -1091,7 +1158,7 @@ public class StoryEntry {
             Utilities.globalQueue.postRunnable(new Runnable() {
                 @Override
                 public final void run() {
-                    StoryEntry.this.lambda$detectHDR$11(callback);
+                    StoryEntry.this.lambda$detectHDR$13(callback);
                 }
             });
             return;
@@ -1119,24 +1186,56 @@ public class StoryEntry {
             this.resultHeight = 1280;
         }
         File file = this.file;
-        final String absolutePath = file != null ? file.getAbsolutePath() : null;
-        final int[] iArr = new int[11];
+        final String absolutePath = file == null ? null : file.getAbsolutePath();
+        final int[][] iArr = (int[][]) Array.newInstance((Class<?>) Integer.TYPE, Math.max(1, isCollage() ? this.collageContent.size() : 0), 11);
+        iArr[0] = new int[11];
         final Runnable runnable = new Runnable() {
             @Override
             public final void run() {
-                StoryEntry.this.lambda$getVideoEditedInfo$8(absolutePath, iArr, callback);
+                StoryEntry.this.lambda$getVideoEditedInfo$9(absolutePath, iArr, callback);
             }
         };
-        if (this.file == null) {
-            runnable.run();
-        } else {
-            Utilities.globalQueue.postRunnable(new Runnable() {
-                @Override
-                public final void run() {
-                    StoryEntry.lambda$getVideoEditedInfo$9(absolutePath, iArr, runnable);
-                }
-            });
+        if (!isCollage()) {
+            if (this.file == null) {
+                runnable.run();
+                return;
+            } else {
+                Utilities.globalQueue.postRunnable(new Runnable() {
+                    @Override
+                    public final void run() {
+                        StoryEntry.lambda$getVideoEditedInfo$11(absolutePath, iArr, runnable);
+                    }
+                });
+                return;
+            }
         }
+        final String[] strArr = new String[this.collageContent.size()];
+        for (int i2 = 0; i2 < this.collageContent.size(); i2++) {
+            strArr[i2] = ((StoryEntry) this.collageContent.get(i2)).file == null ? null : ((StoryEntry) this.collageContent.get(i2)).file.getAbsolutePath();
+            iArr[i2] = new int[11];
+        }
+        Utilities.globalQueue.postRunnable(new Runnable() {
+            @Override
+            public final void run() {
+                StoryEntry.lambda$getVideoEditedInfo$10(strArr, iArr, runnable);
+            }
+        });
+    }
+
+    public boolean hasVideo() {
+        if (!isCollage()) {
+            return false;
+        }
+        for (int i = 0; i < this.collageContent.size(); i++) {
+            if (((StoryEntry) this.collageContent.get(i)).isVideo) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isCollage() {
+        return (this.collage == null || this.collageContent == null) ? false : true;
     }
 
     public void setupGradient(final Runnable runnable) {
@@ -1173,7 +1272,7 @@ public class StoryEntry {
                     callback = new Utilities.Callback() {
                         @Override
                         public final void run(Object obj) {
-                            StoryEntry.this.lambda$setupGradient$6(bitmap, runnable, (int[]) obj);
+                            StoryEntry.this.lambda$setupGradient$7(bitmap, runnable, (int[]) obj);
                         }
                     };
                 }
@@ -1185,7 +1284,7 @@ public class StoryEntry {
                     callback = new Utilities.Callback() {
                         @Override
                         public final void run(Object obj) {
-                            StoryEntry.this.lambda$setupGradient$7(runnable, (int[]) obj);
+                            StoryEntry.this.lambda$setupGradient$8(runnable, (int[]) obj);
                         }
                     };
                 }
@@ -1277,7 +1376,7 @@ public class StoryEntry {
             Utilities.themeQueue.postRunnable(new Runnable() {
                 @Override
                 public final void run() {
-                    StoryEntry.this.lambda$updateFilter$5(createBitmap, z, runnable);
+                    StoryEntry.this.lambda$updateFilter$6(createBitmap, z, runnable);
                 }
             });
             return;

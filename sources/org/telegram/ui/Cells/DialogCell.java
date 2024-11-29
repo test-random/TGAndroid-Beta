@@ -59,6 +59,7 @@ import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.AnimatedFloat;
 import org.telegram.ui.Components.AvatarDrawable;
+import org.telegram.ui.Components.ButtonBounce;
 import org.telegram.ui.Components.CanvasButton;
 import org.telegram.ui.Components.CheckBox2;
 import org.telegram.ui.Components.CubicBezierInterpolator;
@@ -67,6 +68,7 @@ import org.telegram.ui.Components.Forum.ForumBubbleDrawable;
 import org.telegram.ui.Components.Premium.PremiumGradient;
 import org.telegram.ui.Components.PullForegroundDrawable;
 import org.telegram.ui.Components.RLottieDrawable;
+import org.telegram.ui.Components.Text;
 import org.telegram.ui.Components.TimerDrawable;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
 import org.telegram.ui.DialogsActivity;
@@ -79,6 +81,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private ColorFilter[] adaptiveEmojiColorFilter;
     public int addForumHeightForTags;
     public int addHeightForTags;
+    private boolean allowBotOpenButton;
     private int animateFromStatusDrawableParams;
     private int animateToStatusDrawableParams;
     private AnimatedEmojiSpan.EmojiGroupedSpans animatedEmojiStack;
@@ -155,6 +158,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private boolean drawCount2;
     private boolean drawError;
     private boolean drawForwardIcon;
+    private boolean drawGiftIcon;
     private boolean drawMention;
     private boolean drawNameLock;
     private boolean drawPin;
@@ -241,7 +245,13 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private int nameMuteLeft;
     private int nameWidth;
     private boolean needEmoji;
+    private Utilities.Callback onOpenButtonClick;
     private float onlineProgress;
+    private boolean openBot;
+    private final Paint openButtonBackgroundPaint;
+    private final ButtonBounce openButtonBounce;
+    private final RectF openButtonRect;
+    private Text openButtonText;
     protected boolean overrideSwipeAction;
     protected int overrideSwipeActionBackgroundColorKey;
     protected RLottieDrawable overrideSwipeActionDrawable;
@@ -525,6 +535,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         this.visibleOnScreen = true;
         this.collapseOffset = 0.0f;
         this.hasUnmutedTopics = false;
+        this.openButtonBounce = new ButtonBounce(this);
+        this.openButtonBackgroundPaint = new Paint(1);
+        this.openButtonRect = new RectF();
         this.overrideSwipeAction = false;
         this.thumbImageSeen = new boolean[3];
         this.thumbImage = new ImageReceiver[3];
@@ -1009,7 +1022,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                         spanStart = 0;
                     }
                     int ceil = (int) Math.ceil(Math.min(staticLayout.getPrimaryHorizontal(spanStart), staticLayout.getPrimaryHorizontal(spanStart + 1)));
-                    if (ceil != 0 && !this.drawForwardIcon) {
+                    if (ceil != 0 && !this.drawForwardIcon && !this.drawGiftIcon) {
                         ceil += AndroidUtilities.dp(3.0f);
                     }
                     for (int i3 = 0; i3 < this.thumbsCount; i3++) {
@@ -1021,6 +1034,12 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 FileLog.e(e);
             }
         }
+    }
+
+    public DialogCell allowBotOpenButton(boolean z, Utilities.Callback callback) {
+        this.allowBotOpenButton = z;
+        this.onOpenButtonClick = callback;
+        return this;
     }
 
     @Override
@@ -1425,17 +1444,8 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent motionEvent) {
-        CanvasButton canvasButton;
-        int i;
-        if (this.rightFragmentOpenedProgress == 0.0f && !this.isTopic && this.storyParams.checkOnTouchEvent(motionEvent, this)) {
-            return true;
-        }
-        DialogCellDelegate dialogCellDelegate = this.delegate;
-        if ((dialogCellDelegate == null || dialogCellDelegate.canClickButtonInside()) && this.lastTopicMessageUnread && (canvasButton = this.canvasButton) != null && this.buttonLayout != null && (((i = this.dialogsType) == 0 || i == 7 || i == 8) && canvasButton.checkTouchEvent(motionEvent))) {
-            return true;
-        }
-        return super.onTouchEvent(motionEvent);
+    public boolean onTouchEvent(android.view.MotionEvent r6) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.DialogCell.onTouchEvent(android.view.MotionEvent):boolean");
     }
 
     @Override
@@ -1631,6 +1641,17 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
     public void setMoving(boolean z) {
         this.moving = z;
+    }
+
+    public void setOpenBotButton(boolean z) {
+        if (this.openBot == z) {
+            return;
+        }
+        if (this.openButtonText == null) {
+            this.openButtonText = new Text(LocaleController.getString(R.string.BotOpen), 14.0f, AndroidUtilities.bold());
+        }
+        this.openBot = z;
+        this.openButtonBounce.setPressed(false);
     }
 
     public void setPinForced(boolean z) {

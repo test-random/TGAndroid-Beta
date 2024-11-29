@@ -149,8 +149,8 @@ import org.telegram.ui.WrappedResourceProvider;
 
 public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements IPhotoPaintView, PaintToolsView.Delegate, EntityView.EntityViewDelegate, PaintTextOptionsView.Delegate, SizeNotifierFrameLayout.SizeNotifierFrameLayoutDelegate, StoryRecorder.Touchable {
     private float baseScale;
-    private final Bitmap bitmapToEdit;
-    private final Bitmap blurBitmapToEdit;
+    private Bitmap bitmapToEdit;
+    private Bitmap blurBitmapToEdit;
     private BlurringShader.BlurManager blurManager;
     private FrameLayout bottomLayout;
     private PaintCancelView cancelButton;
@@ -769,6 +769,8 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
 
     public PaintView(final Context context, boolean z, File file, boolean z2, boolean z3, final StoryRecorder.WindowView windowView, Activity activity, final int i, Bitmap bitmap, Bitmap bitmap2, final Bitmap bitmap3, int i2, ArrayList arrayList, StoryEntry storyEntry, int i3, int i4, MediaController.CropState cropState, final Runnable runnable, BlurringShader.BlurManager blurManager, final Theme.ResourcesProvider resourcesProvider, PreviewView.TextureViewHolder textureViewHolder, PreviewView previewView) {
         super(context, activity, true);
+        Bitmap bitmap4;
+        BlurringShader.BlurManager blurManager2;
         int i5;
         this.tabsSelectedIndex = 0;
         this.tabsNewSelectedIndex = -1;
@@ -962,7 +964,17 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         view.setVisibility(8);
         this.textDim.setBackgroundColor(1291845632);
         this.textDim.setAlpha(0.0f);
-        RenderView renderView = new RenderView(context, new Painting(getPaintingSize(), bitmap3, i2, blurManager), bitmap, bitmap2, (storyEntry == null || !storyEntry.isRepostMessage) ? blurManager : null) {
+        Painting painting = new Painting(getPaintingSize(), bitmap3, i2, blurManager);
+        Bitmap bitmap5 = this.bitmapToEdit;
+        Bitmap bitmap6 = this.blurBitmapToEdit;
+        if (storyEntry == null || !storyEntry.isRepostMessage) {
+            bitmap4 = bitmap6;
+            blurManager2 = blurManager;
+        } else {
+            bitmap4 = bitmap6;
+            blurManager2 = null;
+        }
+        RenderView renderView = new RenderView(context, painting, bitmap5, bitmap4, blurManager2) {
             @Override
             public void selectBrush(Brush brush) {
                 int indexOf = Brush.BRUSHES_LIST.indexOf(brush);
@@ -1315,7 +1327,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         frameLayout3.setPadding(AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), 0);
         this.bottomLayout.setBackground(new GradientDrawable(orientation, new int[]{0, Integer.MIN_VALUE}));
         addView(this.bottomLayout, LayoutHelper.createFrame(-1, 104, 80));
-        PaintToolsView paintToolsView = new PaintToolsView(context, (storyEntry == null || storyEntry.isRepostMessage || blurManager == null) ? false : true);
+        PaintToolsView paintToolsView = new PaintToolsView(context, (storyEntry == null || storyEntry.isCollage() || storyEntry.isRepostMessage || blurManager == null) ? false : true);
         this.paintToolsView = paintToolsView;
         paintToolsView.setPadding(AndroidUtilities.dp(16.0f), 0, AndroidUtilities.dp(16.0f), 0);
         this.paintToolsView.setDelegate(this);
@@ -3631,6 +3643,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             final Paint paint = new Paint(1);
             paint.setColor(ColorUtils.setAlphaComponent(-16777216, 120));
             this.reactionLayout.setDelegate(new ReactionsContainerLayout.ReactionsContainerDelegate() {
+                private final Path clipPath = new Path();
                 BlurringShader.StoryBlurDrawer windowBackgroundBlur;
 
                 @Override
@@ -3641,6 +3654,18 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
                 @Override
                 public void drawRoundRect(Canvas canvas, RectF rectF, float f, float f2, float f3, int i, boolean z) {
                     BlurringShader.StoryBlurDrawer storyBlurDrawer2;
+                    if (!z && PaintView.this.blurManager != null && PaintView.this.blurManager.hasRenderNode()) {
+                        BlurringShader.StoryBlurDrawer storyBlurDrawer3 = z ? this.windowBackgroundBlur : storyBlurDrawer;
+                        this.clipPath.rewind();
+                        this.clipPath.addRoundRect(rectF, f, f, Path.Direction.CW);
+                        canvas.save();
+                        canvas.clipPath(this.clipPath);
+                        storyBlurDrawer3.drawRect(canvas);
+                        paint.setAlpha((int) (i * 0.4f));
+                        canvas.drawPaint(paint);
+                        canvas.restore();
+                        return;
+                    }
                     if (z) {
                         if (this.windowBackgroundBlur == null) {
                             this.windowBackgroundBlur = new BlurringShader.StoryBlurDrawer(PaintView.this.blurManager, PaintView.this.reactionLayout.getReactionsWindow().windowView, 0);

@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
@@ -76,6 +78,7 @@ public class SuggestEmojiView extends FrameLayout implements NotificationCenter.
     private RecyclerListView listView;
     private AnimatedFloat listViewCenterAnimated;
     private AnimatedFloat listViewWidthAnimated;
+    private MediaDataController.SearchStickersKey loadingKey;
     private OvershootInterpolator overshootInterpolator;
     private Path path;
     private ContentPreviewViewer.ContentPreviewViewerDelegate previewDelegate;
@@ -824,43 +827,56 @@ public class SuggestEmojiView extends FrameLayout implements NotificationCenter.
         });
     }
 
-    public void lambda$searchKeywords$3(int i, String str, ArrayList arrayList, String str2) {
-        if (i == this.lastQueryId) {
-            this.lastQueryType = 1;
-            this.lastQuery = str;
-            if (arrayList == null || arrayList.isEmpty()) {
-                this.keywordResults = null;
-                this.clear = true;
-                forceClose();
-                return;
+    public void lambda$searchKeywords$3(int i, String str, HashSet hashSet, ArrayList arrayList, ArrayList arrayList2, String str2) {
+        if (i != this.lastQueryId) {
+            return;
+        }
+        this.lastQueryType = 1;
+        this.lastQuery = str;
+        if (arrayList2 != null) {
+            Iterator it = arrayList2.iterator();
+            while (it.hasNext()) {
+                MediaDataController.KeywordResult keywordResult = (MediaDataController.KeywordResult) it.next();
+                if (!hashSet.contains(keywordResult.emoji)) {
+                    hashSet.add(keywordResult.emoji);
+                    arrayList.add(keywordResult);
+                }
             }
-            this.clear = false;
-            this.forceClose = false;
-            createListView();
-            FrameLayout frameLayout = this.containerView;
-            if (frameLayout != null) {
-                frameLayout.setVisibility(0);
-            }
-            this.lastSpanY = AndroidUtilities.dp(10.0f);
-            this.keywordResults = arrayList;
-            this.arrowToStart = 0;
-            this.arrowToEnd = Integer.valueOf(str.length());
-            FrameLayout frameLayout2 = this.containerView;
-            if (frameLayout2 != null) {
-                frameLayout2.invalidate();
-            }
-            Adapter adapter = this.adapter;
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
+        }
+        if (arrayList.isEmpty()) {
+            this.keywordResults = null;
+            this.clear = true;
+            forceClose();
+            return;
+        }
+        this.clear = false;
+        this.forceClose = false;
+        createListView();
+        FrameLayout frameLayout = this.containerView;
+        if (frameLayout != null) {
+            frameLayout.setVisibility(0);
+        }
+        this.lastSpanY = AndroidUtilities.dp(10.0f);
+        this.keywordResults = arrayList2;
+        this.arrowToStart = 0;
+        this.arrowToEnd = Integer.valueOf(str.length());
+        FrameLayout frameLayout2 = this.containerView;
+        if (frameLayout2 != null) {
+            frameLayout2.invalidate();
+        }
+        Adapter adapter = this.adapter;
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
         }
     }
 
     public void lambda$searchKeywords$4(String[] strArr, final String str, final int i) {
+        final HashSet hashSet = new HashSet();
+        final ArrayList arrayList = new ArrayList();
         MediaDataController.getInstance(this.currentAccount).getEmojiSuggestions(strArr, str, true, new MediaDataController.KeywordResultCallback() {
             @Override
-            public final void run(ArrayList arrayList, String str2) {
-                SuggestEmojiView.this.lambda$searchKeywords$3(i, str, arrayList, str2);
+            public final void run(ArrayList arrayList2, String str2) {
+                SuggestEmojiView.this.lambda$searchKeywords$3(i, str, hashSet, arrayList, arrayList2, str2);
             }
         }, SharedConfig.suggestAnimatedEmoji && UserConfig.getInstance(this.currentAccount).isPremium());
     }
@@ -1005,6 +1021,10 @@ public class SuggestEmojiView extends FrameLayout implements NotificationCenter.
         }
         final int i = this.lastQueryId + 1;
         this.lastQueryId = i;
+        if (this.loadingKey != null) {
+            MediaDataController.getInstance(this.currentAccount).cancelSearchStickers(this.loadingKey);
+            this.loadingKey = null;
+        }
         final String[] detectKeyboardLangThrottleFirstWithDelay = detectKeyboardLangThrottleFirstWithDelay();
         String[] strArr = this.lastLang;
         if (strArr == null || !Arrays.equals(detectKeyboardLangThrottleFirstWithDelay, strArr)) {
