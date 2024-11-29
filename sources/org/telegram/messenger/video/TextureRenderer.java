@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -23,6 +24,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.view.Surface;
 import android.view.View;
 import java.io.File;
 import java.nio.Buffer;
@@ -31,8 +33,10 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.Bitmaps;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
@@ -415,8 +419,151 @@ public class TextureRenderer {
         return asFloatBuffer;
     }
 
-    private void initCollagePart(int r33, org.telegram.messenger.VideoEditedInfo.Part r34) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.video.TextureRenderer.initCollagePart(int, org.telegram.messenger.VideoEditedInfo$Part):void");
+    private void initCollagePart(int i, VideoEditedInfo.Part part) {
+        int i2;
+        int orientation;
+        AtomicInteger atomicInteger = new AtomicInteger(part.width);
+        AtomicInteger atomicInteger2 = new AtomicInteger(part.height);
+        AtomicInteger atomicInteger3 = new AtomicInteger(0);
+        if (part.isVideo) {
+            GLES20.glBindTexture(36197, this.collageTextures[i]);
+            GLES20.glTexParameteri(36197, 10241, 9728);
+            GLES20.glTexParameteri(36197, 10240, 9728);
+            GLES20.glTexParameteri(36197, 10242, 33071);
+            GLES20.glTexParameteri(36197, 10243, 33071);
+            SurfaceTexture surfaceTexture = new SurfaceTexture(this.collageTextures[i]);
+            part.surfaceTexture = surfaceTexture;
+            surfaceTexture.setDefaultBufferSize(part.width, part.height);
+            try {
+                part.player = new MediaCodecPlayer(part.path, new Surface(part.surfaceTexture));
+            } catch (Exception e) {
+                FileLog.e(e);
+                part.player = null;
+            }
+            MediaCodecPlayer mediaCodecPlayer = part.player;
+            if (mediaCodecPlayer != null) {
+                atomicInteger.set(mediaCodecPlayer.getOrientedWidth());
+                atomicInteger2.set(part.player.getOrientedHeight());
+                orientation = part.player.getOrientation();
+            } else {
+                part.surfaceTexture.release();
+                part.surfaceTexture = null;
+                GLES20.glDeleteTextures(1, this.collageTextures, i);
+                GLES20.glGenTextures(1, this.collageTextures, i);
+                GLES20.glBindTexture(3553, this.collageTextures[i]);
+                GLES20.glTexParameteri(3553, 10241, 9729);
+                GLES20.glTexParameteri(3553, 10240, 9729);
+                GLES20.glTexParameteri(3553, 10242, 33071);
+                GLES20.glTexParameteri(3553, 10243, 33071);
+                AnimatedFileDrawable animatedFileDrawable = new AnimatedFileDrawable(new File(part.path), true, 0L, 0, null, null, null, 0L, UserConfig.selectedAccount, true, 512, 512, null);
+                part.animatedFileDrawable = animatedFileDrawable;
+                if (animatedFileDrawable.decoderFailed()) {
+                    throw new RuntimeException("Failed to decode with ffmpeg software codecs");
+                }
+                part.framesPerDraw = part.animatedFileDrawable.getFps() / this.videoFps;
+                part.msPerFrame = 1000.0f / part.animatedFileDrawable.getFps();
+                part.currentFrame = 1.0f;
+                Bitmap nextFrame = part.animatedFileDrawable.getNextFrame(false);
+                if (nextFrame != null) {
+                    GLUtils.texImage2D(3553, 0, nextFrame, 0);
+                }
+                atomicInteger.set(part.animatedFileDrawable.getIntrinsicWidth());
+                atomicInteger2.set(part.animatedFileDrawable.getIntrinsicHeight());
+                orientation = part.animatedFileDrawable.getOrientation();
+            }
+            atomicInteger3.set(orientation);
+        } else {
+            GLES20.glBindTexture(3553, this.collageTextures[i]);
+            GLES20.glTexParameteri(3553, 10241, 9729);
+            GLES20.glTexParameteri(3553, 10240, 9729);
+            GLES20.glTexParameteri(3553, 10242, 33071);
+            GLES20.glTexParameteri(3553, 10243, 33071);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inMutable = true;
+            Bitmap decodeFile = BitmapFactory.decodeFile(part.path, options);
+            Pair<Integer, Integer> imageOrientation = AndroidUtilities.getImageOrientation(part.path);
+            if (((Integer) imageOrientation.first).intValue() != 0 || ((Integer) imageOrientation.second).intValue() != 0) {
+                Matrix matrix = new Matrix();
+                if (((Integer) imageOrientation.second).intValue() != 0) {
+                    matrix.postScale(((Integer) imageOrientation.second).intValue() == 1 ? -1.0f : 1.0f, ((Integer) imageOrientation.second).intValue() != 2 ? 1.0f : -1.0f);
+                }
+                if (((Integer) imageOrientation.first).intValue() != 0) {
+                    matrix.postRotate(((Integer) imageOrientation.first).intValue());
+                }
+                decodeFile = Bitmaps.createBitmap(decodeFile, 0, 0, decodeFile.getWidth(), decodeFile.getHeight(), matrix, true);
+            }
+            Bitmap bitmap = decodeFile;
+            GLUtils.texImage2D(3553, 0, bitmap, 0);
+            atomicInteger.set(bitmap.getWidth());
+            atomicInteger2.set(bitmap.getHeight());
+        }
+        float[] fArr = {part.part.l(2.0f) - 1.0f, -(part.part.t(2.0f) - 1.0f), part.part.r(2.0f) - 1.0f, -(part.part.t(2.0f) - 1.0f), part.part.l(2.0f) - 1.0f, -(part.part.b(2.0f) - 1.0f), part.part.r(2.0f) - 1.0f, -(part.part.b(2.0f) - 1.0f)};
+        float w = part.part.w(this.transformedWidth);
+        float h = part.part.h(this.transformedHeight);
+        int i3 = atomicInteger.get();
+        int i4 = atomicInteger2.get();
+        int i5 = atomicInteger3.get();
+        float f = i3;
+        float f2 = i4;
+        float max = 1.0f / Math.max(w / f, h / f2);
+        float f3 = ((w * max) / f) / 2.0f;
+        float f4 = ((h * max) / f2) / 2.0f;
+        if ((i5 / 90) % 2 == 1) {
+            i2 = 8;
+        } else {
+            i2 = 8;
+            f4 = f3;
+            f3 = f4;
+        }
+        float[] fArr2 = new float[i2];
+        float f5 = 0.5f - f4;
+        fArr2[0] = f5;
+        float f6 = 0.5f - f3;
+        fArr2[1] = f6;
+        float f7 = f4 + 0.5f;
+        fArr2[2] = f7;
+        fArr2[3] = f6;
+        char c = 4;
+        fArr2[4] = f5;
+        float f8 = f3 + 0.5f;
+        char c2 = 5;
+        fArr2[5] = f8;
+        char c3 = 6;
+        fArr2[6] = f7;
+        char c4 = 7;
+        fArr2[7] = f8;
+        while (i5 > 0) {
+            float f9 = fArr2[0];
+            float f10 = fArr2[1];
+            fArr2[0] = fArr2[c];
+            fArr2[1] = fArr2[c2];
+            fArr2[c] = fArr2[c3];
+            fArr2[c2] = fArr2[c4];
+            fArr2[c3] = fArr2[2];
+            fArr2[c4] = fArr2[3];
+            fArr2[2] = f9;
+            fArr2[3] = f10;
+            i5 -= 90;
+            c4 = 7;
+            c = 4;
+            c2 = 5;
+            c3 = 6;
+        }
+        while (i5 < 0) {
+            float f11 = fArr2[0];
+            float f12 = fArr2[1];
+            fArr2[0] = fArr2[2];
+            fArr2[1] = fArr2[3];
+            fArr2[2] = fArr2[6];
+            fArr2[3] = fArr2[7];
+            fArr2[6] = fArr2[4];
+            fArr2[7] = fArr2[5];
+            fArr2[4] = f11;
+            fArr2[5] = f12;
+            i5 += 90;
+        }
+        part.posBuffer = floats(fArr);
+        part.uvBuffer = floats(fArr2);
     }
 
     private void initLinkEntity(VideoEditedInfo.MediaEntity mediaEntity) {
@@ -733,58 +880,37 @@ public class TextureRenderer {
     }
 
     private void stepCollagePart(int i, VideoEditedInfo.Part part, long j) {
+        float f;
         Bitmap nextFrame;
-        int i2;
+        long progressMs;
         long j2 = (j / 1000000) - part.offset;
-        float f = part.right;
-        float f2 = (float) part.duration;
-        long clamp = Utilities.clamp(j2, f * f2, part.left * f2);
+        float f2 = part.right;
+        float f3 = (float) part.duration;
+        long clamp = Utilities.clamp(j2, f2 * f3, part.left * f3);
         MediaCodecPlayer mediaCodecPlayer = part.player;
         if (mediaCodecPlayer != null) {
-            if (mediaCodecPlayer.ensure(clamp)) {
-                part.surfaceTexture.updateTexImage();
-                return;
-            }
+            mediaCodecPlayer.ensure(clamp);
+            part.surfaceTexture.updateTexImage();
             return;
         }
         AnimatedFileDrawable animatedFileDrawable = part.animatedFileDrawable;
         if (animatedFileDrawable != null) {
-            long progressMs = animatedFileDrawable.getProgressMs();
-            if (clamp < progressMs || clamp > 200 + progressMs) {
+            boolean z = animatedFileDrawable.getProgressMs() <= 0;
+            if (clamp < part.animatedFileDrawable.getProgressMs() || (z && clamp > 1000)) {
                 part.animatedFileDrawable.seekToSync(clamp);
-                while (part.animatedFileDrawable.getProgressMs() + part.msPerFrame < ((float) clamp)) {
-                    long progressMs2 = part.animatedFileDrawable.getProgressMs();
-                    part.animatedFileDrawable.skipNextFrame(false);
-                    if (part.animatedFileDrawable.getProgressMs() == progressMs2) {
-                        break;
-                    }
-                }
-                nextFrame = part.animatedFileDrawable.getNextFrame(false);
-                if (nextFrame == null) {
-                    return;
-                } else {
-                    i2 = this.collageTextures[i];
-                }
-            } else {
-                if (((float) Math.abs(clamp - progressMs)) <= part.msPerFrame * 2.0f) {
-                    return;
-                }
-                while (part.animatedFileDrawable.getProgressMs() + part.msPerFrame < ((float) clamp)) {
-                    long progressMs3 = part.animatedFileDrawable.getProgressMs();
-                    part.animatedFileDrawable.skipNextFrame(false);
-                    if (part.animatedFileDrawable.getProgressMs() == progressMs3) {
-                        break;
-                    }
-                }
-                nextFrame = part.animatedFileDrawable.getNextFrame(false);
-                if (nextFrame == null) {
-                    return;
-                } else {
-                    i2 = this.collageTextures[i];
-                }
             }
-            GLES20.glBindTexture(3553, i2);
-            GLUtils.texImage2D(3553, 0, nextFrame, 0);
+            do {
+                f = (float) clamp;
+                if (part.animatedFileDrawable.getProgressMs() + (part.msPerFrame * 2.0f) >= f) {
+                    break;
+                }
+                progressMs = part.animatedFileDrawable.getProgressMs();
+                part.animatedFileDrawable.skipNextFrame(false);
+            } while (part.animatedFileDrawable.getProgressMs() != progressMs);
+            if ((z || f > part.animatedFileDrawable.getProgressMs() - (part.msPerFrame / 2.0f)) && (nextFrame = part.animatedFileDrawable.getNextFrame(false)) != null) {
+                GLES20.glBindTexture(3553, this.collageTextures[i]);
+                GLUtils.texImage2D(3553, 0, nextFrame, 0);
+            }
         }
     }
 

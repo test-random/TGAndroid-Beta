@@ -328,28 +328,37 @@ public class BotStarsActivity extends BaseFragment implements NotificationCenter
             TLRPC.TL_payments_starsRevenueStats starsRevenueStats = botStarsController.getStarsRevenueStats(this.bot_id);
             if (starsRevenueStats != null && (tL_starsRevenueStatus = starsRevenueStats.status) != null) {
                 ChannelMonetizationLayout.ProceedOverview proceedOverview = this.availableValue;
-                long j = tL_starsRevenueStatus.available_balance;
-                proceedOverview.crypto_amount = j;
+                proceedOverview.contains1 = false;
+                proceedOverview.contains2 = true;
+                TL_stars.StarsAmount starsAmount = tL_starsRevenueStatus.available_balance;
+                proceedOverview.crypto_amount2 = starsAmount;
+                proceedOverview.crypto_currency2 = "XTR";
                 proceedOverview.currency = "USD";
-                double d = j;
+                double d = starsAmount.amount;
                 double d2 = this.rate;
                 Double.isNaN(d);
-                proceedOverview.amount = (long) (d * d2 * 100.0d);
+                proceedOverview.amount2 = (long) (d * d2 * 100.0d);
                 ChannelMonetizationLayout.ProceedOverview proceedOverview2 = this.totalValue;
-                long j2 = tL_starsRevenueStatus.current_balance;
-                proceedOverview2.crypto_amount = j2;
-                proceedOverview2.currency = "USD";
-                double d3 = j2;
+                proceedOverview2.contains1 = false;
+                proceedOverview2.contains2 = true;
+                TL_stars.StarsAmount starsAmount2 = tL_starsRevenueStatus.current_balance;
+                proceedOverview2.crypto_amount2 = starsAmount2;
+                proceedOverview2.crypto_currency2 = "XTR";
+                double d3 = starsAmount2.amount;
                 Double.isNaN(d3);
-                proceedOverview2.amount = (long) (d3 * d2 * 100.0d);
+                proceedOverview2.amount2 = (long) (d3 * d2 * 100.0d);
+                proceedOverview2.currency = "USD";
                 ChannelMonetizationLayout.ProceedOverview proceedOverview3 = this.totalProceedsValue;
-                long j3 = tL_starsRevenueStatus.overall_revenue;
-                proceedOverview3.crypto_amount = j3;
-                proceedOverview3.currency = "USD";
-                double d4 = j3;
+                proceedOverview3.contains1 = false;
+                proceedOverview3.contains2 = true;
+                TL_stars.StarsAmount starsAmount3 = tL_starsRevenueStatus.overall_revenue;
+                proceedOverview3.crypto_amount2 = starsAmount3;
+                proceedOverview3.crypto_currency2 = "XTR";
+                double d4 = starsAmount3.amount;
                 Double.isNaN(d4);
-                proceedOverview3.amount = (long) (d4 * d2 * 100.0d);
-                setStarsBalance(j, tL_starsRevenueStatus.next_withdrawal_at);
+                proceedOverview3.amount2 = (long) (d4 * d2 * 100.0d);
+                proceedOverview3.currency = "USD";
+                setStarsBalance(starsAmount, tL_starsRevenueStatus.next_withdrawal_at);
                 this.balanceButtonsLayout.setVisibility(starsRevenueStats.status.withdrawal_enabled ? 0 : 8);
             }
             arrayList.add(UItem.asProceedOverview(this.availableValue));
@@ -405,27 +414,27 @@ public class BotStarsActivity extends BaseFragment implements NotificationCenter
             if (!this.proceedsAvailable && tONRevenueStats != null && (broadcastRevenueBalances = tONRevenueStats.balances) != null) {
                 double d5 = tONRevenueStats.usd_rate;
                 ChannelMonetizationLayout.ProceedOverview proceedOverview4 = this.tonAvailableValue;
-                long j4 = broadcastRevenueBalances.available_balance;
-                proceedOverview4.crypto_amount = j4;
-                double d6 = j4;
+                long j = broadcastRevenueBalances.available_balance;
+                proceedOverview4.crypto_amount = j;
+                double d6 = j;
                 Double.isNaN(d6);
-                long j5 = (long) ((d6 / 1.0E9d) * d5 * 100.0d);
-                proceedOverview4.amount = j5;
-                setBalance(j4, j5);
+                long j2 = (long) ((d6 / 1.0E9d) * d5 * 100.0d);
+                proceedOverview4.amount = j2;
+                setBalance(j, j2);
                 this.tonAvailableValue.currency = "USD";
                 ChannelMonetizationLayout.ProceedOverview proceedOverview5 = this.tonLastWithdrawalValue;
                 TLRPC.BroadcastRevenueBalances broadcastRevenueBalances2 = tONRevenueStats.balances;
-                long j6 = broadcastRevenueBalances2.current_balance;
-                proceedOverview5.crypto_amount = j6;
-                double d7 = j6;
+                long j3 = broadcastRevenueBalances2.current_balance;
+                proceedOverview5.crypto_amount = j3;
+                double d7 = j3;
                 Double.isNaN(d7);
                 proceedOverview5.amount = (long) ((d7 / 1.0E9d) * d5 * 100.0d);
                 proceedOverview5.currency = "USD";
                 ChannelMonetizationLayout.ProceedOverview proceedOverview6 = this.tonLifetimeValue;
                 proceedOverview6.contains1 = true;
-                long j7 = broadcastRevenueBalances2.overall_revenue;
-                proceedOverview6.crypto_amount = j7;
-                double d8 = j7;
+                long j4 = broadcastRevenueBalances2.overall_revenue;
+                proceedOverview6.crypto_amount = j4;
+                double d8 = j4;
                 Double.isNaN(d8);
                 proceedOverview6.amount = (long) ((d8 / 1.0E9d) * d5 * 100.0d);
                 proceedOverview6.currency = "USD";
@@ -904,27 +913,28 @@ public class BotStarsActivity extends BaseFragment implements NotificationCenter
         this.tonBalanceSubtitle.setText("≈" + BillingController.getInstance().formatCurrency(j2, "USD"));
     }
 
-    private void setStarsBalance(long j, int i) {
+    private void setStarsBalance(TL_stars.StarsAmount starsAmount, int i) {
         if (this.balanceTitle == null || this.balanceSubtitle == null) {
             return;
         }
         double d = this.rate;
-        double d2 = j;
+        double d2 = starsAmount.amount;
         Double.isNaN(d2);
-        long j2 = (long) (d * d2 * 100.0d);
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(StarsIntroActivity.replaceStarsWithPlain("XTR " + LocaleController.formatNumber(j, ' '), 1.0f));
+        long j = (long) (d * d2 * 100.0d);
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(StarsIntroActivity.replaceStarsWithPlain(TextUtils.concat("XTR ", StarsIntroActivity.formatStarsAmount(starsAmount, 0.8f, ' ')), 1.0f));
         int indexOf = TextUtils.indexOf(spannableStringBuilder, ".");
         if (indexOf >= 0) {
             spannableStringBuilder.setSpan(this.balanceTitleSizeSpan, indexOf, spannableStringBuilder.length(), 33);
         }
         this.balanceTitle.setText(spannableStringBuilder);
-        this.balanceSubtitle.setText("≈" + BillingController.getInstance().formatCurrency(j2, "USD"));
-        this.balanceEditTextContainer.setVisibility(j2 > 0 ? 0 : 8);
+        this.balanceSubtitle.setText("≈" + BillingController.getInstance().formatCurrency(j, "USD"));
+        this.balanceEditTextContainer.setVisibility(j > 0 ? 0 : 8);
         if (this.balanceEditTextAll) {
             this.balanceEditTextIgnore = true;
             EditTextBoldCursor editTextBoldCursor = this.balanceEditText;
-            this.balanceEditTextValue = j;
-            editTextBoldCursor.setText(Long.toString(j));
+            long j2 = starsAmount.amount;
+            this.balanceEditTextValue = j2;
+            editTextBoldCursor.setText(Long.toString(j2));
             EditTextBoldCursor editTextBoldCursor2 = this.balanceEditText;
             editTextBoldCursor2.setSelection(editTextBoldCursor2.getText().length());
             this.balanceEditTextIgnore = false;

@@ -38,28 +38,36 @@ public class UserNameResolver {
             return;
         }
         int i = 0;
-        if (tL_error != null) {
+        if (tL_error == null) {
+            TLRPC.TL_contacts_resolvedPeer tL_contacts_resolvedPeer = (TLRPC.TL_contacts_resolvedPeer) tLObject;
+            MessagesController.getInstance(this.currentAccount).putUsers(tL_contacts_resolvedPeer.users, false);
+            MessagesController.getInstance(this.currentAccount).putChats(tL_contacts_resolvedPeer.chats, false);
+            MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(tL_contacts_resolvedPeer.users, tL_contacts_resolvedPeer.chats, false, true);
+            long peerId = MessageObject.getPeerId(tL_contacts_resolvedPeer.peer);
+            this.resolvedCache.put(str, new CachedPeer(peerId));
             while (i < remove.size()) {
-                remove.get(i).accept(null);
+                remove.get(i).accept(Long.valueOf(peerId));
                 i++;
             }
-            String str2 = tL_error.text;
-            if (str2 == null || !str2.contains("FLOOD_WAIT") || (lastFragment = LaunchActivity.getLastFragment()) == null) {
-                return;
-            }
-            BulletinFactory.of(lastFragment).createErrorBulletin(LocaleController.getString(R.string.FloodWait)).show();
             return;
         }
-        TLRPC.TL_contacts_resolvedPeer tL_contacts_resolvedPeer = (TLRPC.TL_contacts_resolvedPeer) tLObject;
-        MessagesController.getInstance(this.currentAccount).putUsers(tL_contacts_resolvedPeer.users, false);
-        MessagesController.getInstance(this.currentAccount).putChats(tL_contacts_resolvedPeer.chats, false);
-        MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(tL_contacts_resolvedPeer.users, tL_contacts_resolvedPeer.chats, false, true);
-        long peerId = MessageObject.getPeerId(tL_contacts_resolvedPeer.peer);
-        this.resolvedCache.put(str, new CachedPeer(peerId));
+        String str2 = tL_error.text;
+        if (str2 != null && "STARREF_EXPIRED".equals(str2)) {
+            while (i < remove.size()) {
+                remove.get(i).accept(Long.MAX_VALUE);
+                i++;
+            }
+            return;
+        }
         while (i < remove.size()) {
-            remove.get(i).accept(Long.valueOf(peerId));
+            remove.get(i).accept(null);
             i++;
         }
+        String str3 = tL_error.text;
+        if (str3 == null || !str3.contains("FLOOD_WAIT") || (lastFragment = LaunchActivity.getLastFragment()) == null) {
+            return;
+        }
+        BulletinFactory.of(lastFragment).createErrorBulletin(LocaleController.getString(R.string.FloodWait)).show();
     }
 
     public void lambda$resolve$1(final String str, final TLObject tLObject, final TLRPC.TL_error tL_error) {

@@ -2182,20 +2182,26 @@ public class StarsIntroActivity extends GradientHeaderActivity implements Notifi
 
     public static CharSequence formatStarsAmount(TL_stars.StarsAmount starsAmount, float f, char c) {
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-        long abs = Math.abs(starsAmount.amount);
-        boolean z = starsAmount.amount < 0 || starsAmount.nanos < 0;
-        if (starsAmount.nanos != 0) {
+        long j = starsAmount.amount;
+        int i = starsAmount.nanos;
+        long j2 = j + ((i >= 0 || j <= 0) ? (i <= 0 || j >= 0) ? 0 : 1 : -1);
+        boolean z = j2 < 0;
+        if (i != 0) {
             StringBuilder sb = new StringBuilder();
             sb.append(z ? "-" : "");
-            sb.append(LocaleController.formatNumber(abs, c));
+            sb.append(LocaleController.formatNumber(Math.abs(j2), c));
             spannableStringBuilder.append((CharSequence) sb.toString());
             if (floatFormat == null) {
                 floatFormat = new DecimalFormat("0.################");
             }
             DecimalFormat decimalFormat = floatFormat;
-            double abs2 = Math.abs(starsAmount.nanos);
-            Double.isNaN(abs2);
-            String format = decimalFormat.format(abs2 / 1.0E9d);
+            int i2 = starsAmount.nanos;
+            double d = i2;
+            if (i2 < 0) {
+                Double.isNaN(d);
+                d += 1.0E9d;
+            }
+            String format = decimalFormat.format(d / 1.0E9d);
             int indexOf = format.indexOf(".");
             if (indexOf >= 0) {
                 int length = spannableStringBuilder.length();
@@ -2205,8 +2211,61 @@ public class StarsIntroActivity extends GradientHeaderActivity implements Notifi
         } else {
             StringBuilder sb2 = new StringBuilder();
             sb2.append(z ? "-" : "");
-            sb2.append(LocaleController.formatNumber(abs, ' '));
+            sb2.append(LocaleController.formatNumber(Math.abs(j2), ' '));
             spannableStringBuilder.append((CharSequence) sb2.toString());
+        }
+        return spannableStringBuilder;
+    }
+
+    public static CharSequence formatStarsAmountShort(TL_stars.StarsAmount starsAmount) {
+        return formatStarsAmountShort(starsAmount, 0.777f, ' ');
+    }
+
+    public static CharSequence formatStarsAmountShort(TL_stars.StarsAmount starsAmount, float f, char c) {
+        StringBuilder sb;
+        String formatWholeNumber;
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+        long j = starsAmount.amount;
+        int i = starsAmount.nanos;
+        long j2 = j + ((i >= 0 || j <= 0) ? (i <= 0 || j >= 0) ? 0 : 1 : -1);
+        boolean z = j2 < 0;
+        if (Math.abs(j2) > 1000 || starsAmount.nanos == 0) {
+            if (starsAmount.amount <= 1000) {
+                sb = new StringBuilder();
+                sb.append(z ? "-" : "");
+                formatWholeNumber = LocaleController.formatNumber(Math.abs(j2), c);
+            } else {
+                sb = new StringBuilder();
+                sb.append(z ? "-" : "");
+                formatWholeNumber = AndroidUtilities.formatWholeNumber((int) Math.abs(j2), 0);
+            }
+            sb.append(formatWholeNumber);
+            spannableStringBuilder.append((CharSequence) sb.toString());
+        } else {
+            StringBuilder sb2 = new StringBuilder();
+            sb2.append(z ? "-" : "");
+            sb2.append(LocaleController.formatNumber(Math.abs(j2), c));
+            spannableStringBuilder.append((CharSequence) sb2.toString());
+            if (floatFormat == null) {
+                floatFormat = new DecimalFormat("0.################");
+            }
+            DecimalFormat decimalFormat = floatFormat;
+            int i2 = starsAmount.nanos;
+            double d = i2;
+            if (i2 < 0) {
+                Double.isNaN(d);
+                d += 1.0E9d;
+            }
+            String format = decimalFormat.format(d / 1.0E9d);
+            int indexOf = format.indexOf(".");
+            if (indexOf >= 0) {
+                int length = spannableStringBuilder.length();
+                String substring = format.substring(indexOf);
+                if (substring.length() > 1) {
+                    spannableStringBuilder.append((CharSequence) substring.substring(0, 2));
+                    spannableStringBuilder.setSpan(new RelativeSizeSpan(f), length + 1, spannableStringBuilder.length(), 33);
+                }
+            }
         }
         return spannableStringBuilder;
     }
@@ -2217,20 +2276,25 @@ public class StarsIntroActivity extends GradientHeaderActivity implements Notifi
 
     public static CharSequence formatStarsAmountString(TL_stars.StarsAmount starsAmount, float f, char c) {
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-        long abs = Math.abs(starsAmount.amount);
         long j = starsAmount.amount;
-        boolean z = j < 0 || starsAmount.nanos < 0;
-        if (starsAmount.nanos != 0) {
+        int i = starsAmount.nanos;
+        long j2 = ((i >= 0 || j <= 0) ? (i <= 0 || j >= 0) ? 0 : 1 : -1) + j;
+        boolean z = j2 < 0;
+        if (i != 0) {
             StringBuilder sb = new StringBuilder();
             sb.append(z ? "-" : "");
-            sb.append(LocaleController.formatNumber(abs, c));
+            sb.append(LocaleController.formatNumber(Math.abs(j2), c));
             spannableStringBuilder.append((CharSequence) sb.toString());
             if (floatFormat == null) {
                 floatFormat = new DecimalFormat("0.################");
             }
             DecimalFormat decimalFormat = floatFormat;
-            double d = starsAmount.nanos;
-            Double.isNaN(d);
+            int i2 = starsAmount.nanos;
+            double d = i2;
+            if (i2 < 0) {
+                Double.isNaN(d);
+                d += 1.0E9d;
+            }
             String format = decimalFormat.format(d / 1.0E9d);
             int indexOf = format.indexOf(".");
             if (indexOf >= 0) {

@@ -216,7 +216,8 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
                 this.videoPlayer = anonymousClass3;
                 anonymousClass3.allowMultipleInstances(true);
                 this.videoPlayer.with(this.textureView);
-                this.videoPlayer.preparePlayer(Uri.fromFile(this.content.file), true, 1.0f);
+                this.videoPlayer.setVolume(0.0f);
+                this.videoPlayer.preparePlayer(Uri.fromFile(this.content.file), false, 1.0f);
                 if (!CollageLayoutView2.this.preview || CollageLayoutView2.this.playing) {
                     this.videoPlayer.play();
                 } else {
@@ -909,9 +910,22 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     }
 
     public boolean push(StoryEntry storyEntry) {
-        Part part = this.currentPart;
-        if (part != null) {
-            part.setContent(storyEntry);
+        if (storyEntry != null && storyEntry.isVideo) {
+            Iterator it = this.parts.iterator();
+            while (true) {
+                if (!it.hasNext()) {
+                    break;
+                }
+                Part part = (Part) it.next();
+                if (part.content != null && part.content.isVideo && part.content.videoVolume > 0.0f) {
+                    storyEntry.videoVolume = 0.0f;
+                    break;
+                }
+            }
+        }
+        Part part2 = this.currentPart;
+        if (part2 != null) {
+            part2.setContent(storyEntry);
         }
         updatePartsState();
         requestLayout();

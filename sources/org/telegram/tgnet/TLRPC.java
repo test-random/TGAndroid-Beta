@@ -59016,6 +59016,7 @@ public class TLRPC {
     public static class TL_messages_searchStickers extends TLObject {
         public static final int constructor = 699516522;
         public boolean emojis;
+        public String emoticon;
         public int flags;
         public long hash;
         public ArrayList<String> lang_code = new ArrayList<>();
@@ -59035,6 +59036,7 @@ public class TLRPC {
             this.flags = i;
             abstractSerializedData.writeInt32(i);
             abstractSerializedData.writeString(this.q);
+            abstractSerializedData.writeString(this.emoticon);
             abstractSerializedData.writeInt32(481674261);
             abstractSerializedData.writeInt32(this.lang_code.size());
             for (int i2 = 0; i2 < this.lang_code.size(); i2++) {
@@ -71373,16 +71375,16 @@ public class TLRPC {
     }
 
     public static class TL_starsRevenueStatus extends TLObject {
-        public static final int constructor = 2033461574;
-        public long available_balance;
-        public long current_balance;
+        public static final int constructor = -21080943;
         public int flags;
         public int next_withdrawal_at;
-        public long overall_revenue;
         public boolean withdrawal_enabled;
+        public TL_stars.StarsAmount current_balance = new TL_stars.StarsAmount();
+        public TL_stars.StarsAmount available_balance = new TL_stars.StarsAmount();
+        public TL_stars.StarsAmount overall_revenue = new TL_stars.StarsAmount();
 
         public static TL_starsRevenueStatus TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            if (2033461574 != i) {
+            if (-21080943 != i) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in TL_starsRevenueStatus", Integer.valueOf(i)));
                 }
@@ -71398,9 +71400,9 @@ public class TLRPC {
             int readInt32 = abstractSerializedData.readInt32(z);
             this.flags = readInt32;
             this.withdrawal_enabled = (readInt32 & 1) != 0;
-            this.current_balance = abstractSerializedData.readInt64(z);
-            this.available_balance = abstractSerializedData.readInt64(z);
-            this.overall_revenue = abstractSerializedData.readInt64(z);
+            this.current_balance = TL_stars.StarsAmount.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            this.available_balance = TL_stars.StarsAmount.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+            this.overall_revenue = TL_stars.StarsAmount.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
             if ((this.flags & 2) != 0) {
                 this.next_withdrawal_at = abstractSerializedData.readInt32(z);
             }
@@ -71408,13 +71410,13 @@ public class TLRPC {
 
         @Override
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(2033461574);
+            abstractSerializedData.writeInt32(-21080943);
             int i = this.withdrawal_enabled ? this.flags | 1 : this.flags & (-2);
             this.flags = i;
             abstractSerializedData.writeInt32(i);
-            abstractSerializedData.writeInt64(this.current_balance);
-            abstractSerializedData.writeInt64(this.available_balance);
-            abstractSerializedData.writeInt64(this.overall_revenue);
+            this.current_balance.serializeToStream(abstractSerializedData);
+            this.available_balance.serializeToStream(abstractSerializedData);
+            this.overall_revenue.serializeToStream(abstractSerializedData);
             if ((this.flags & 2) != 0) {
                 abstractSerializedData.writeInt32(this.next_withdrawal_at);
             }

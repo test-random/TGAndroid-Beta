@@ -320,9 +320,6 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     public interface ThemeDelegate extends Theme.ResourcesProvider {
 
         public abstract class CC {
-            public static void $default$applyServiceShaderMatrix(ThemeDelegate themeDelegate, int i, int i2, float f, float f2) {
-                Theme.applyServiceShaderMatrix(i, i2, f, f2);
-            }
         }
     }
 

@@ -471,6 +471,8 @@ public class MessagesController extends BaseController implements NotificationCe
     public int stargiftsConvertPeriodMax;
     public int stargiftsMessageLengthMax;
     public boolean starrefConnectAllowed;
+    public int starrefMaxCommissionPermille;
+    public int starrefMinCommissionPermille;
     public boolean starrefProgramAllowed;
     public Set<String> starrefStartParamPrefixes;
     public boolean starsGiftsEnabled;
@@ -2503,6 +2505,8 @@ public class MessagesController extends BaseController implements NotificationCe
         this.starrefProgramAllowed = this.mainPreferences.getBoolean("starrefProgramAllowed", false);
         this.starrefConnectAllowed = this.mainPreferences.getBoolean("starrefConnectAllowed", false);
         this.starrefStartParamPrefixes = this.mainPreferences.getStringSet("starrefStartParamPrefixes", new HashSet(Arrays.asList("_tgr_")));
+        this.starrefMinCommissionPermille = this.mainPreferences.getInt("starrefMinCommissionPermille", 1);
+        this.starrefMaxCommissionPermille = this.mainPreferences.getInt("starrefMaxCommissionPermille", 400);
         this.paidReactionsAnonymousTime = this.mainPreferences.getLong("paidReactionsAnonymousTime", 0L);
         this.paidReactionsAnonymous = (!this.mainPreferences.contains("paidReactionsAnonymous") || System.currentTimeMillis() - this.paidReactionsAnonymousTime >= 7200000) ? null : Boolean.valueOf(this.mainPreferences.getBoolean("paidReactionsAnonymous", false));
         scheduleTranscriptionUpdate();

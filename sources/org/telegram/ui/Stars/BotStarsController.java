@@ -177,7 +177,7 @@ public class BotStarsController {
         public long lastRequestTime;
         private int reqId;
         public final ArrayList bots = new ArrayList();
-        private Sort sorting = Sort.BY_DATE;
+        private Sort sorting = Sort.BY_PROFITABILITY;
         private boolean loading = false;
         private boolean error = false;
         private String lastOffset = null;
@@ -490,7 +490,7 @@ public class BotStarsController {
     public boolean botHasStars(long j) {
         TLRPC.TL_starsRevenueStatus tL_starsRevenueStatus;
         TLRPC.TL_payments_starsRevenueStats starsRevenueStats = getStarsRevenueStats(j);
-        return (starsRevenueStats == null || (tL_starsRevenueStatus = starsRevenueStats.status) == null || (tL_starsRevenueStatus.available_balance <= 0 && tL_starsRevenueStatus.overall_revenue <= 0 && tL_starsRevenueStatus.current_balance <= 0)) ? false : true;
+        return (starsRevenueStats == null || (tL_starsRevenueStatus = starsRevenueStats.status) == null || (tL_starsRevenueStatus.available_balance.amount <= 0 && tL_starsRevenueStatus.overall_revenue.amount <= 0 && tL_starsRevenueStatus.current_balance.amount <= 0)) ? false : true;
     }
 
     public boolean botHasTON(long j) {
@@ -525,15 +525,12 @@ public class BotStarsController {
         if (starsRevenueStats == null) {
             return 0L;
         }
-        return starsRevenueStats.status.available_balance;
+        return starsRevenueStats.status.available_balance.amount;
     }
 
-    public long getBotStarsBalance(long j) {
+    public TL_stars.StarsAmount getBotStarsBalance(long j) {
         TLRPC.TL_payments_starsRevenueStats starsRevenueStats = getStarsRevenueStats(j);
-        if (starsRevenueStats == null) {
-            return 0L;
-        }
-        return starsRevenueStats.status.current_balance;
+        return starsRevenueStats == null ? new TL_stars.StarsAmount(0L) : starsRevenueStats.status.current_balance;
     }
 
     public ChannelConnectedBots getChannelConnectedBots(long j) {

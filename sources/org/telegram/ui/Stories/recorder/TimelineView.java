@@ -1145,7 +1145,7 @@ public class TimelineView extends View {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.moveAudioOffset(float):void");
     }
 
-    private void moveCollageOffset(org.telegram.ui.Stories.recorder.TimelineView.Track r20, float r21) {
+    private void moveCollageOffset(org.telegram.ui.Stories.recorder.TimelineView.Track r22, float r23) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.TimelineView.moveCollageOffset(org.telegram.ui.Stories.recorder.TimelineView$Track, float):void");
     }
 

@@ -3278,7 +3278,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
     }
 
-    public void lambda$runLinkRequest$75(final int i, final Runnable runnable, final String str, final String str2, final boolean z, final String str3, final String str4, final int i2, final String str5, final String str6, final String str7, final String str8, final String str9, final String str10, final String str11, final String str12, final String str13, final String str14, final String str15, final String str16, final boolean z2, final Integer num, final Long l, final Long l2, final Integer num2, final HashMap hashMap, final String str17, final String str18, final String str19, final String str20, final TLRPC.TL_wallPaper tL_wallPaper, final String str21, final String str22, final int i3, final int i4, final String str23, final String str24, final String str25, final Browser.Progress progress, final boolean z3, final boolean z4, final String str26, final boolean z5, final boolean z6, final boolean z7, final boolean z8, final boolean z9, final String str27, final String str28, int[] iArr, final Long l3) {
+    public void lambda$runLinkRequest$75(final Runnable runnable, final int i, final String str, final String str2, final boolean z, final String str3, final String str4, final int i2, final String str5, final String str6, final String str7, final String str8, final String str9, final String str10, final String str11, final String str12, final String str13, final String str14, final String str15, final String str16, final boolean z2, final Integer num, final Long l, final Long l2, final Integer num2, final HashMap hashMap, final String str17, final String str18, final String str19, final String str20, final TLRPC.TL_wallPaper tL_wallPaper, final String str21, final String str22, final int i3, final int i4, final String str23, final String str24, final String str25, final Browser.Progress progress, final boolean z3, final boolean z4, final String str26, final boolean z5, final boolean z6, final boolean z7, final boolean z8, final boolean z9, final String str27, final String str28, int[] iArr, final Long l3) {
         BulletinFactory of;
         String string;
         long longValue;
@@ -3286,6 +3286,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         BulletinFactory of2;
         int i5;
         final TLRPC.User user;
+        if (l3 != null && l3.longValue() == Long.MAX_VALUE) {
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+            new AlertDialog.Builder(this, null).setTitle(LocaleController.getString(R.string.AffiliateLinkExpiredTitle)).setMessage(LocaleController.getString(R.string.AffiliateLinkExpiredText)).setNegativeButton(LocaleController.getString(R.string.OK), null).show();
+            return;
+        }
         if (!isFinishing()) {
             if (i == 0 || l3 == null) {
                 if (l3 == null || this.actionBarLayout == null || (!(str == null && str2 == null) && ((str == null || l3.longValue() <= 0) && ((str2 == null || l3.longValue() <= 0) && ((!z || l3.longValue() >= 0) && (str3 == null || l3.longValue() >= 0)))))) {
@@ -3304,8 +3313,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                             }
                             of.createErrorBulletin(string).show();
                         }
-                    } catch (Exception e) {
-                        FileLog.e(e);
+                    } catch (Exception e2) {
+                        FileLog.e(e2);
                     }
                 } else {
                     if (!TextUtils.isEmpty(str4) && (user = MessagesController.getInstance(i2).getUser(l3)) != null && user.bot) {
@@ -3451,8 +3460,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                 if (z8) {
                                     try {
                                         runnable.run();
-                                    } catch (Exception e2) {
-                                        FileLog.e(e2);
+                                    } catch (Exception e3) {
+                                        FileLog.e(e3);
                                     }
                                     if (isFinishing()) {
                                         return;
@@ -3505,8 +3514,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                 }
                                 BulletinFactory.of((BaseFragment) arrayList4.get(arrayList4.size() - 1)).createErrorBulletin(LocaleController.getString(R.string.BotCantJoinGroups)).show();
                                 return;
-                            } catch (Exception e3) {
-                                FileLog.e(e3);
+                            } catch (Exception e4) {
+                                FileLog.e(e4);
                                 return;
                             }
                         }
@@ -3534,8 +3543,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 try {
                     runnable.run();
                     return;
-                } catch (Exception e4) {
-                    FileLog.e(e4);
+                } catch (Exception e5) {
+                    FileLog.e(e5);
                     return;
                 }
             }

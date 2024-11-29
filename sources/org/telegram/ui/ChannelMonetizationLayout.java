@@ -126,7 +126,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
     private int shakeDp;
     private ColoredImageSpan[] starRef;
     private final ButtonWithCounterView starsAdsButton;
-    private long starsBalance;
+    private TL_stars.StarsAmount starsBalance;
     private int starsBalanceBlockedUntil;
     private final ButtonWithCounterView starsBalanceButton;
     private final LinearLayout starsBalanceButtonsLayout;
@@ -571,14 +571,14 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
     public static class ProceedOverview {
         public long amount;
         public long amount2;
-        public boolean contains1 = true;
         public boolean contains2;
         public long crypto_amount;
-        public long crypto_amount2;
         public String crypto_currency;
         public String crypto_currency2;
         public String currency;
         public CharSequence text;
+        public boolean contains1 = true;
+        public TL_stars.StarsAmount crypto_amount2 = new TL_stars.StarsAmount(0);
 
         public static ProceedOverview as(String str, CharSequence charSequence) {
             ProceedOverview proceedOverview = new ProceedOverview();
@@ -651,39 +651,38 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
 
         public void set(ProceedOverview proceedOverview) {
-            CharSequence charSequence;
+            SpannableStringBuilder spannableStringBuilder;
             int indexOf;
             LinearLayout linearLayout;
             this.titleView.setText(proceedOverview.text);
             int i = 0;
             while (i < 2) {
                 String str = i == 0 ? proceedOverview.crypto_currency : proceedOverview.crypto_currency2;
-                long j = i == 0 ? proceedOverview.crypto_amount : proceedOverview.crypto_amount2;
-                long j2 = i == 0 ? proceedOverview.amount : proceedOverview.amount2;
+                long j = i == 0 ? proceedOverview.amount : proceedOverview.amount2;
                 if (i == 0 && !proceedOverview.contains1) {
                     linearLayout = this.amountContainer[i];
                 } else if (i != 1 || proceedOverview.contains2) {
-                    String str2 = str + " ";
+                    SpannableStringBuilder spannableStringBuilder2 = new SpannableStringBuilder(str + " ");
                     if ("TON".equalsIgnoreCase(str)) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append((Object) str2);
                         DecimalFormat decimalFormat = this.formatter;
-                        double d = j;
+                        double d = proceedOverview.crypto_amount;
                         Double.isNaN(d);
-                        sb.append(decimalFormat.format(d / 1.0E9d));
-                        charSequence = ChannelMonetizationLayout.replaceTON(sb.toString(), this.cryptoAmountView[i].getPaint(), 0.87f, true);
+                        spannableStringBuilder2.append((CharSequence) decimalFormat.format(d / 1.0E9d));
+                        spannableStringBuilder = ChannelMonetizationLayout.replaceTON(spannableStringBuilder2, this.cryptoAmountView[i].getPaint(), 0.87f, true);
                     } else if ("XTR".equalsIgnoreCase(str)) {
-                        charSequence = StarsIntroActivity.replaceStarsWithPlain(((Object) str2) + LocaleController.formatNumber(j, ' '), 0.8f);
+                        spannableStringBuilder2.append(i == 0 ? LocaleController.formatNumber(proceedOverview.crypto_amount, ' ') : StarsIntroActivity.formatStarsAmount(proceedOverview.crypto_amount2, 0.8f, ' '));
+                        spannableStringBuilder = StarsIntroActivity.replaceStarsWithPlain(spannableStringBuilder2, 0.8f);
                     } else {
-                        charSequence = ((Object) str2) + Long.toString(j);
+                        spannableStringBuilder2.append((CharSequence) Long.toString(proceedOverview.crypto_amount));
+                        spannableStringBuilder = spannableStringBuilder2;
                     }
-                    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(charSequence);
-                    if ("TON".equalsIgnoreCase(str) && (indexOf = TextUtils.indexOf(spannableStringBuilder, ".")) >= 0) {
-                        spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8125f), indexOf, spannableStringBuilder.length(), 33);
+                    SpannableStringBuilder spannableStringBuilder3 = new SpannableStringBuilder(spannableStringBuilder);
+                    if ("TON".equalsIgnoreCase(str) && (indexOf = TextUtils.indexOf(spannableStringBuilder3, ".")) >= 0) {
+                        spannableStringBuilder3.setSpan(new RelativeSizeSpan(0.8125f), indexOf, spannableStringBuilder3.length(), 33);
                     }
                     this.amountContainer[i].setVisibility(0);
-                    this.cryptoAmountView[i].setText(spannableStringBuilder);
-                    this.amountView[i].setText("≈" + BillingController.getInstance().formatCurrency(j2, proceedOverview.currency));
+                    this.cryptoAmountView[i].setText(spannableStringBuilder3);
+                    this.amountView[i].setText("≈" + BillingController.getInstance().formatCurrency(j, proceedOverview.currency));
                     i++;
                 } else {
                     linearLayout = this.amountContainer[i];
@@ -816,6 +815,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
     public ChannelMonetizationLayout(final Context context, final BaseFragment baseFragment, final int i, final long j, final Theme.ResourcesProvider resourcesProvider, boolean z, boolean z2) {
         super(context);
         this.shakeDp = 4;
+        this.starsBalance = new TL_stars.StarsAmount(0L);
         this.starRef = new ColoredImageSpan[1];
         this.starsBalanceEditTextIgnore = false;
         this.starsBalanceEditTextAll = true;
@@ -996,17 +996,17 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
                 if (ChannelMonetizationLayout.this.starsBalanceEditTextIgnore) {
                     return;
                 }
-                long j2 = ChannelMonetizationLayout.this.starsBalance;
                 ChannelMonetizationLayout.this.starsBalanceEditTextValue = TextUtils.isEmpty(editable) ? 0L : Long.parseLong(editable.toString());
-                if (ChannelMonetizationLayout.this.starsBalanceEditTextValue > j2) {
-                    ChannelMonetizationLayout.this.starsBalanceEditTextValue = j2;
+                if (ChannelMonetizationLayout.this.starsBalanceEditTextValue > ChannelMonetizationLayout.this.starsBalance.amount) {
+                    ChannelMonetizationLayout channelMonetizationLayout = ChannelMonetizationLayout.this;
+                    channelMonetizationLayout.starsBalanceEditTextValue = channelMonetizationLayout.starsBalance.amount;
                     ChannelMonetizationLayout.this.starsBalanceEditTextIgnore = true;
                     ChannelMonetizationLayout.this.starsBalanceEditText.setText(Long.toString(ChannelMonetizationLayout.this.starsBalanceEditTextValue));
                     ChannelMonetizationLayout.this.starsBalanceEditText.setSelection(ChannelMonetizationLayout.this.starsBalanceEditText.getText().length());
                     ChannelMonetizationLayout.this.starsBalanceEditTextIgnore = false;
                 }
-                ChannelMonetizationLayout channelMonetizationLayout = ChannelMonetizationLayout.this;
-                channelMonetizationLayout.starsBalanceEditTextAll = channelMonetizationLayout.starsBalanceEditTextValue == j2;
+                ChannelMonetizationLayout channelMonetizationLayout2 = ChannelMonetizationLayout.this;
+                channelMonetizationLayout2.starsBalanceEditTextAll = channelMonetizationLayout2.starsBalanceEditTextValue == ChannelMonetizationLayout.this.starsBalance.amount;
                 AndroidUtilities.cancelRunOnUIThread(ChannelMonetizationLayout.this.setStarsBalanceButtonText);
                 ChannelMonetizationLayout.this.setStarsBalanceButtonText.run();
                 ChannelMonetizationLayout.this.starsBalanceEditTextAll = false;
@@ -1713,10 +1713,11 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
     }
 
     public void lambda$new$8(int i) {
+        long j;
         Bulletin.hideVisible();
-        long j = this.starsBalance;
-        if (j < MessagesController.getInstance(i).starsRevenueWithdrawalMin) {
+        if (this.starsBalance.amount < MessagesController.getInstance(i).starsRevenueWithdrawalMin) {
             this.starsBalanceEditTextAll = true;
+            j = this.starsBalance.amount;
         } else {
             this.starsBalanceEditTextAll = false;
             j = MessagesController.getInstance(i).starsRevenueWithdrawalMin;
@@ -1970,26 +1971,31 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         this.balanceSubtitle.setText("≈" + BillingController.getInstance().formatCurrency(j2, "USD"));
     }
 
-    private void setStarsBalance(long j, int i) {
+    private void setStarsBalance(TL_stars.StarsAmount starsAmount, int i) {
         if (this.balanceTitle == null || this.balanceSubtitle == null) {
             return;
         }
-        double d = this.stars_rate;
-        double d2 = j;
-        Double.isNaN(d2);
-        long j2 = (long) (d * d2 * 100.0d);
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(StarsIntroActivity.replaceStarsWithPlain("XTR " + LocaleController.formatNumber(j, ' '), 1.0f));
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(StarsIntroActivity.replaceStarsWithPlain(TextUtils.concat("XTR ", StarsIntroActivity.formatStarsAmount(starsAmount, 0.8f, ' ')), 1.0f));
         int indexOf = TextUtils.indexOf(spannableStringBuilder, ".");
         if (indexOf >= 0) {
             spannableStringBuilder.setSpan(this.balanceTitleSizeSpan, indexOf, spannableStringBuilder.length(), 33);
         }
-        this.starsBalance = j;
+        this.starsBalance = starsAmount;
         this.starsBalanceTitle.setText(spannableStringBuilder);
-        this.starsBalanceSubtitle.setText("≈" + BillingController.getInstance().formatCurrency(j2, "USD"));
-        this.starsBalanceEditTextContainer.setVisibility(j > 0 ? 0 : 8);
+        AnimatedTextView animatedTextView = this.starsBalanceSubtitle;
+        StringBuilder sb = new StringBuilder();
+        sb.append("≈");
+        BillingController billingController = BillingController.getInstance();
+        double d = this.stars_rate;
+        double d2 = starsAmount.amount;
+        Double.isNaN(d2);
+        sb.append(billingController.formatCurrency((long) (d * d2 * 100.0d), "USD"));
+        animatedTextView.setText(sb.toString());
+        this.starsBalanceEditTextContainer.setVisibility(starsAmount.amount > 0 ? 0 : 8);
         if (this.starsBalanceEditTextAll) {
             this.starsBalanceEditTextIgnore = true;
             EditTextBoldCursor editTextBoldCursor = this.starsBalanceEditText;
+            long j = starsAmount.amount;
             this.starsBalanceEditTextValue = j;
             editTextBoldCursor.setText(Long.toString(j));
             EditTextBoldCursor editTextBoldCursor2 = this.starsBalanceEditText;
@@ -1999,7 +2005,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
         ButtonWithCounterView buttonWithCounterView = this.starsAdsButton;
         if (buttonWithCounterView != null) {
-            buttonWithCounterView.setEnabled(j2 > 0);
+            buttonWithCounterView.setEnabled(starsAmount.amount > 0);
         }
         this.starsBalanceBlockedUntil = i;
         AndroidUtilities.cancelRunOnUIThread(this.setStarsBalanceButtonText);
@@ -2359,27 +2365,27 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
         ProceedOverview proceedOverview = this.availableValue;
         proceedOverview.contains2 = true;
-        long j = tL_starsRevenueStatus.available_balance;
-        proceedOverview.crypto_amount2 = j;
-        double d2 = j;
+        TL_stars.StarsAmount starsAmount = tL_starsRevenueStatus.available_balance;
+        proceedOverview.crypto_amount2 = starsAmount;
+        double d2 = starsAmount.amount;
         Double.isNaN(d2);
         proceedOverview.amount2 = (long) (d2 * d * 100.0d);
-        setStarsBalance(j, tL_starsRevenueStatus.next_withdrawal_at);
+        setStarsBalance(starsAmount, tL_starsRevenueStatus.next_withdrawal_at);
         this.availableValue.currency = "USD";
         ProceedOverview proceedOverview2 = this.lastWithdrawalValue;
         proceedOverview2.contains2 = true;
-        long j2 = tL_starsRevenueStatus.current_balance;
-        proceedOverview2.crypto_amount2 = j2;
-        double d3 = j2;
+        TL_stars.StarsAmount starsAmount2 = tL_starsRevenueStatus.current_balance;
+        proceedOverview2.crypto_amount2 = starsAmount2;
+        double d3 = starsAmount2.amount;
         double d4 = this.stars_rate;
         Double.isNaN(d3);
         proceedOverview2.amount2 = (long) (d3 * d4 * 100.0d);
         proceedOverview2.currency = "USD";
         ProceedOverview proceedOverview3 = this.lifetimeValue;
         proceedOverview3.contains2 = true;
-        long j3 = tL_starsRevenueStatus.overall_revenue;
-        proceedOverview3.crypto_amount2 = j3;
-        double d5 = j3;
+        TL_stars.StarsAmount starsAmount3 = tL_starsRevenueStatus.overall_revenue;
+        proceedOverview3.crypto_amount2 = starsAmount3;
+        double d5 = starsAmount3.amount;
         Double.isNaN(d5);
         proceedOverview3.amount2 = (long) (d5 * d4 * 100.0d);
         proceedOverview3.currency = "USD";
@@ -2390,7 +2396,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
         ButtonWithCounterView buttonWithCounterView = this.starsBalanceButton;
         if (buttonWithCounterView != null) {
-            buttonWithCounterView.setVisibility((tL_starsRevenueStatus.available_balance > 0 || BuildVars.DEBUG_PRIVATE_VERSION) ? 0 : 8);
+            buttonWithCounterView.setVisibility((tL_starsRevenueStatus.available_balance.amount > 0 || BuildVars.DEBUG_PRIVATE_VERSION) ? 0 : 8);
         }
         UniversalRecyclerView universalRecyclerView = this.listView;
         if (universalRecyclerView == null || (universalAdapter = universalRecyclerView.adapter) == null) {

@@ -705,7 +705,7 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
         arrayList.add(FeatureCell.Factory.as(R.drawable.menu_feature_links2, LocaleController.getString(R.string.BotAffiliateProgramFeature3Title), LocaleController.getString(R.string.BotAffiliateProgramFeature3)));
         arrayList.add(UItem.asShadow(1, null));
         arrayList.add(UItem.asHeader(LocaleController.getString(R.string.AffiliateProgramCommission)));
-        UItem asIntSlideView = UItem.asIntSlideView(1, 1, this.program.commission_permille, 900, new Utilities.CallbackReturn() {
+        UItem asIntSlideView = UItem.asIntSlideView(1, getMessagesController().starrefMinCommissionPermille, this.program.commission_permille, getMessagesController().starrefMaxCommissionPermille, new Utilities.CallbackReturn() {
             @Override
             public final Object run(Object obj) {
                 String lambda$fillItems$11;
@@ -770,7 +770,7 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
 
     public TL_payments.starRefProgram getDefaultProgram() {
         TL_payments.starRefProgram starrefprogram = new TL_payments.starRefProgram();
-        starrefprogram.commission_permille = 50;
+        starrefprogram.commission_permille = Utilities.clamp(50, getMessagesController().starrefMaxCommissionPermille, getMessagesController().starrefMinCommissionPermille);
         starrefprogram.duration_months = 1;
         return starrefprogram;
     }

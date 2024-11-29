@@ -5072,6 +5072,34 @@ public class MediaDataController extends BaseController {
         });
     }
 
+    public void lambda$searchStickers$249(final SearchStickersKey searchStickersKey, final SearchStickersResult searchStickersResult, final Utilities.Callback callback, ArrayList arrayList, String str) {
+        if (this.loadingSearchStickersKeys.containsKey(searchStickersKey)) {
+            StringBuilder sb = new StringBuilder();
+            Iterator it = arrayList.iterator();
+            while (it.hasNext()) {
+                KeywordResult keywordResult = (KeywordResult) it.next();
+                if (!TextUtils.isEmpty(keywordResult.emoji) && !keywordResult.emoji.startsWith("animated_")) {
+                    sb.append(keywordResult.emoji);
+                }
+            }
+            TLRPC.TL_messages_searchStickers tL_messages_searchStickers = new TLRPC.TL_messages_searchStickers();
+            tL_messages_searchStickers.emojis = searchStickersKey.emojis;
+            if (!TextUtils.isEmpty(searchStickersKey.lang_code)) {
+                tL_messages_searchStickers.lang_code.add(searchStickersKey.lang_code);
+            }
+            tL_messages_searchStickers.emoticon = sb.toString();
+            tL_messages_searchStickers.q = searchStickersKey.q;
+            tL_messages_searchStickers.limit = 50;
+            tL_messages_searchStickers.offset = searchStickersResult == null ? 0 : searchStickersResult.next_offset.intValue();
+            this.loadingSearchStickersKeys.put(searchStickersKey, Integer.valueOf(getConnectionsManager().sendRequest(tL_messages_searchStickers, new RequestDelegate() {
+                @Override
+                public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
+                    MediaDataController.this.lambda$searchStickers$248(searchStickersKey, searchStickersResult, callback, tLObject, tL_error);
+                }
+            })));
+        }
+    }
+
     public static void lambda$setPlaceholderImage$31(String str, BackupImageView backupImageView, String str2, TLRPC.TL_messages_stickerSet tL_messages_stickerSet) {
         TLRPC.Document document;
         if (tL_messages_stickerSet == null) {
@@ -6258,7 +6286,7 @@ public class MediaDataController extends BaseController {
 
     public void cancelSearchStickers(SearchStickersKey searchStickersKey) {
         Integer remove;
-        if (searchStickersKey == null || (remove = this.loadingSearchStickersKeys.remove(searchStickersKey)) == null) {
+        if (searchStickersKey == null || (remove = this.loadingSearchStickersKeys.remove(searchStickersKey)) == null || remove.intValue() == 0) {
             return;
         }
         getConnectionsManager().cancelRequest(remove.intValue(), true);
@@ -9271,20 +9299,13 @@ public class MediaDataController extends BaseController {
         final SearchStickersKey searchStickersKey = new SearchStickersKey(z, str, str2);
         final SearchStickersResult searchStickersResult = this.searchStickerResults.get(searchStickersKey);
         if ((searchStickersResult == null || (searchStickersResult.next_offset != null && z2)) && !this.loadingSearchStickersKeys.containsKey(searchStickersKey)) {
-            TLRPC.TL_messages_searchStickers tL_messages_searchStickers = new TLRPC.TL_messages_searchStickers();
-            tL_messages_searchStickers.emojis = searchStickersKey.emojis;
-            if (!TextUtils.isEmpty(searchStickersKey.lang_code)) {
-                tL_messages_searchStickers.lang_code.add(searchStickersKey.lang_code);
-            }
-            tL_messages_searchStickers.q = searchStickersKey.q;
-            tL_messages_searchStickers.limit = 50;
-            tL_messages_searchStickers.offset = searchStickersResult == null ? 0 : searchStickersResult.next_offset.intValue();
-            this.loadingSearchStickersKeys.put(searchStickersKey, Integer.valueOf(getConnectionsManager().sendRequest(tL_messages_searchStickers, new RequestDelegate() {
+            this.loadingSearchStickersKeys.put(searchStickersKey, 0);
+            getInstance(this.currentAccount).getEmojiSuggestions(new String[]{str}, str2, true, new KeywordResultCallback() {
                 @Override
-                public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    MediaDataController.this.lambda$searchStickers$248(searchStickersKey, searchStickersResult, callback, tLObject, tL_error);
+                public final void run(ArrayList arrayList, String str3) {
+                    MediaDataController.this.lambda$searchStickers$249(searchStickersKey, searchStickersResult, callback, arrayList, str3);
                 }
-            })));
+            }, false);
         } else {
             callback.run(searchStickersResult != null ? searchStickersResult.documents : new ArrayList<>());
         }
