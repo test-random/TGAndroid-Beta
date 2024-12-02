@@ -4541,6 +4541,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         this.captionContainer.addView(this.videoTimelineContainerView, LayoutHelper.createFrame(-1, TimelineView.heightDp() + 25, 87, 0.0f, 0.0f, 0.0f, 68.0f));
         this.captionContainer.addView(this.captionEdit, LayoutHelper.createFrame(-1, -1.0f, 87, 0.0f, 200.0f, 0.0f, 0.0f));
         this.collageLayoutView.setTimelineView(this.timelineView);
+        this.collageLayoutView.setPreviewView(this.previewView);
         TimelineView timelineView2 = new TimelineView(context2, this.containerView, this.previewContainer, this.resourcesProvider, this.blurManager);
         this.coverTimelineView = timelineView2;
         timelineView2.setCover();

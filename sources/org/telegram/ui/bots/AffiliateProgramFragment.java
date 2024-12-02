@@ -285,7 +285,7 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
         setMinusHeaderHeight(AndroidUtilities.dp(60.0f));
     }
 
-    private void closeToProfile(boolean r10) {
+    private void closeToProfile(boolean r11) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.bots.AffiliateProgramFragment.closeToProfile(boolean):void");
     }
 
@@ -445,7 +445,7 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
         if (userFull != null) {
             TL_payments.starRefProgram starrefprogram2 = this.program;
             starrefprogram2.flags |= 2;
-            starrefprogram2.end_date = getConnectionsManager().getCurrentTime();
+            starrefprogram2.end_date = getConnectionsManager().getCurrentTime() + (getConnectionsManager().isTestBackend() ? 300 : 86400);
             userFull.starref_program = starrefprogram;
             getMessagesStorage().updateUserInfo(userFull, false);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.userInfoDidLoad, Long.valueOf(this.bot_id), userFull);
@@ -477,14 +477,7 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
     }
 
     public void lambda$new$7() {
-        String buildCountDownTime;
-        ButtonWithCounterView buttonWithCounterView = this.button;
-        if (this.program.end_date == 0) {
-            buildCountDownTime = null;
-        } else {
-            buildCountDownTime = SelectorUserCell.buildCountDownTime(((r1 + (getConnectionsManager().isTestBackend() ? 300 : 86400)) - getConnectionsManager().getCurrentTime()) * 1000);
-        }
-        buttonWithCounterView.setSubText(buildCountDownTime, true);
+        this.button.setSubText(this.program.end_date == 0 ? null : SelectorUserCell.buildCountDownTime((r1 - getConnectionsManager().getCurrentTime()) * 1000), true);
         if (this.program.end_date == 0 || !this.attached) {
             return;
         }

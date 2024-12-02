@@ -1177,66 +1177,6 @@ public abstract class PreviewView extends FrameLayout {
         return true;
     }
 
-    public void updateAudioPlayer(boolean r13) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.PreviewView.updateAudioPlayer(boolean):void");
-    }
-
-    public void updateRoundPlayer(boolean z) {
-        long currentPosition;
-        boolean isPlaying;
-        if (this.roundPlayer == null || this.entry == null) {
-            return;
-        }
-        boolean z2 = false;
-        if (this.videoPlayer == null && !isCollage()) {
-            this.roundPlayer.setPlayWhenReady(this.pauseLinks.isEmpty());
-            this.roundPlayer.setLooping(true);
-            RoundView roundView = this.roundView;
-            if (roundView != null) {
-                roundView.setShown(true, false);
-            }
-            long currentPosition2 = this.roundPlayer.getCurrentPosition();
-            if (!z || this.roundPlayer.getDuration() == -9223372036854775807L) {
-                return;
-            }
-            float duration = ((float) currentPosition2) / ((float) this.roundPlayer.getDuration());
-            StoryEntry storyEntry = this.entry;
-            if ((duration < storyEntry.roundLeft || duration > storyEntry.roundRight) && System.currentTimeMillis() - this.seekedLastTime > 500) {
-                this.seekedLastTime = System.currentTimeMillis();
-                this.roundPlayer.seekTo(-this.entry.roundOffset);
-                return;
-            }
-            return;
-        }
-        if (isCollage()) {
-            currentPosition = this.collage.getPosition();
-            isPlaying = this.collage.isPlaying();
-        } else {
-            currentPosition = this.videoPlayer.getCurrentPosition();
-            isPlaying = this.videoPlayer.isPlaying();
-        }
-        StoryEntry storyEntry2 = this.entry;
-        float f = storyEntry2.roundRight;
-        float f2 = storyEntry2.roundLeft;
-        long j = (f - f2) * ((float) storyEntry2.roundDuration);
-        long j2 = storyEntry2.roundOffset;
-        boolean z3 = currentPosition >= j2 && currentPosition <= j + j2;
-        if (isPlaying && z3) {
-            z2 = true;
-        }
-        long j3 = (currentPosition - j2) + (f2 * r8);
-        RoundView roundView2 = this.roundView;
-        if (roundView2 != null) {
-            roundView2.setShown(z3, true);
-        }
-        if (this.roundPlayer.isPlaying() != z2) {
-            this.roundPlayer.setPlayWhenReady(z2);
-        } else if (!z || Math.abs(this.roundPlayer.getCurrentPosition() - j3) <= 120) {
-            return;
-        }
-        this.roundPlayer.seekTo(j3);
-    }
-
     public abstract boolean additionalTouchEvent(MotionEvent motionEvent);
 
     public void applyMatrix() {
@@ -2230,6 +2170,10 @@ public abstract class PreviewView extends FrameLayout {
         invalidate();
     }
 
+    public void updateAudioPlayer(boolean r13) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.PreviewView.updateAudioPlayer(boolean):void");
+    }
+
     public void updatePauseReason(int i, boolean z) {
         if (z) {
             this.pauseLinks.add(Integer.valueOf(i));
@@ -2246,6 +2190,67 @@ public abstract class PreviewView extends FrameLayout {
         }
         updateAudioPlayer(true);
         updateRoundPlayer(true);
+    }
+
+    public void updateRoundPlayer(boolean z) {
+        long currentPosition;
+        boolean isPlaying;
+        if (this.roundPlayer == null || this.entry == null) {
+            return;
+        }
+        boolean z2 = false;
+        if (this.videoPlayer == null && !isCollage()) {
+            this.roundPlayer.setPlayWhenReady(this.pauseLinks.isEmpty());
+            this.roundPlayer.setLooping(true);
+            RoundView roundView = this.roundView;
+            if (roundView != null) {
+                roundView.setShown(true, false);
+            }
+            long currentPosition2 = this.roundPlayer.getCurrentPosition();
+            if (!z || this.roundPlayer.getDuration() == -9223372036854775807L) {
+                return;
+            }
+            float duration = ((float) currentPosition2) / ((float) this.roundPlayer.getDuration());
+            StoryEntry storyEntry = this.entry;
+            if ((duration < storyEntry.roundLeft || duration > storyEntry.roundRight) && System.currentTimeMillis() - this.seekedLastTime > 500) {
+                this.seekedLastTime = System.currentTimeMillis();
+                this.roundPlayer.seekTo(-this.entry.roundOffset);
+                return;
+            }
+            return;
+        }
+        if (isCollage()) {
+            currentPosition = this.collage.getPositionWithOffset();
+            isPlaying = this.collage.isPlaying();
+        } else {
+            currentPosition = this.videoPlayer.getCurrentPosition();
+            isPlaying = this.videoPlayer.isPlaying();
+        }
+        StoryEntry storyEntry2 = this.entry;
+        float f = storyEntry2.roundRight;
+        float f2 = storyEntry2.roundLeft;
+        long j = (f - f2) * ((float) storyEntry2.roundDuration);
+        long j2 = storyEntry2.roundOffset;
+        boolean z3 = currentPosition >= j2 && currentPosition <= j + j2;
+        if (isPlaying && z3) {
+            z2 = true;
+        }
+        long j3 = (currentPosition - j2) + (f2 * r8);
+        RoundView roundView2 = this.roundView;
+        if (roundView2 != null) {
+            roundView2.setShown(z3, true);
+        }
+        if (this.roundPlayer.isPlaying() != z2) {
+            this.roundPlayer.setPlayWhenReady(z2);
+        } else {
+            if (!z) {
+                return;
+            }
+            if (Math.abs(this.roundPlayer.getCurrentPosition() - j3) <= (isCollage() ? 300 : 120)) {
+                return;
+            }
+        }
+        this.roundPlayer.seekTo(j3);
     }
 
     @Override

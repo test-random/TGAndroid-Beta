@@ -79,6 +79,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     public Part pressedPart;
     private boolean preview;
     private long previewStartTime;
+    private PreviewView previewView;
     private final float[] radii;
     private final RectF rect;
     public final ArrayList removingParts;
@@ -216,8 +217,10 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
                 this.videoPlayer = anonymousClass3;
                 anonymousClass3.allowMultipleInstances(true);
                 this.videoPlayer.with(this.textureView);
-                this.videoPlayer.setVolume(0.0f);
                 this.videoPlayer.preparePlayer(Uri.fromFile(this.content.file), false, 1.0f);
+                VideoPlayerHolderBase videoPlayerHolderBase = this.videoPlayer;
+                CollageLayoutView2 collageLayoutView2 = CollageLayoutView2.this;
+                videoPlayerHolderBase.setVolume((collageLayoutView2.isMuted || this.content.muted || !collageLayoutView2.preview) ? 0.0f : this.content.videoVolume);
                 if (!CollageLayoutView2.this.preview || CollageLayoutView2.this.playing) {
                     this.videoPlayer.play();
                 } else {
@@ -325,7 +328,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         this.syncRunnable = new Runnable() {
             @Override
             public final void run() {
-                CollageLayoutView2.this.lambda$new$6();
+                CollageLayoutView2.this.lambda$new$7();
             }
         };
         this.blurManager = blurManager;
@@ -390,12 +393,17 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         }
     }
 
-    public void lambda$new$6() {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.CollageLayoutView2.lambda$new$6():void");
+    public void lambda$new$7() {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.CollageLayoutView2.lambda$new$7():void");
     }
 
     public void lambda$onLongPress$1(Float f) {
         this.longPressedPart.content.videoVolume = f.floatValue();
+        Part part = this.longPressedPart;
+        VideoPlayerHolderBase videoPlayerHolderBase = part.videoPlayer;
+        if (videoPlayerHolderBase != null) {
+            videoPlayerHolderBase.setVolume(part.content.videoVolume);
+        }
     }
 
     public void lambda$onLongPress$2() {
@@ -407,6 +415,15 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     }
 
     public static void lambda$onLongPress$4() {
+    }
+
+    public void lambda$onLongPress$5() {
+        VideoPlayerHolderBase videoPlayerHolderBase;
+        Part part = this.longPressedPart;
+        if (part == null || (videoPlayerHolderBase = part.videoPlayer) == null) {
+            return;
+        }
+        videoPlayerHolderBase.setVolume(0.0f);
     }
 
     public void layout(RectF rectF, CollageLayout.Part part) {
@@ -461,17 +478,27 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     }
 
     public void onLongPress() {
+        VideoPlayerHolderBase videoPlayerHolderBase;
         if (this.reorderingTouch || this.preview) {
             return;
         }
-        Part part = this.pressedPart;
-        this.longPressedPart = part;
-        if (part == null || part.content == null) {
+        Part part = this.longPressedPart;
+        if (part != null && (videoPlayerHolderBase = part.videoPlayer) != null) {
+            videoPlayerHolderBase.setVolume(0.0f);
+        }
+        Part part2 = this.pressedPart;
+        this.longPressedPart = part2;
+        if (part2 == null || part2.content == null) {
             return;
         }
         Runnable runnable = this.cancelGestures;
         if (runnable != null) {
             runnable.run();
+        }
+        Part part3 = this.longPressedPart;
+        VideoPlayerHolderBase videoPlayerHolderBase2 = part3.videoPlayer;
+        if (videoPlayerHolderBase2 != null) {
+            videoPlayerHolderBase2.setVolume(part3.content.videoVolume);
         }
         FrameLayout frameLayout = new FrameLayout(getContext());
         ImageView imageView = new ImageView(getContext());
@@ -510,7 +537,12 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
             public final void run() {
                 CollageLayoutView2.lambda$onLongPress$4();
             }
-        }).setGravity(1).allowCenter(true).setBlur(true).setRoundRadius(AndroidUtilities.dp(12.0f), AndroidUtilities.dp(10.0f)).show();
+        }).setGravity(1).allowCenter(true).setBlur(true).setRoundRadius(AndroidUtilities.dp(12.0f), AndroidUtilities.dp(10.0f)).setOnDismiss(new Runnable() {
+            @Override
+            public final void run() {
+                CollageLayoutView2.this.lambda$onLongPress$5();
+            }
+        }).show();
         performHapticFeedback(0, 1);
     }
 
@@ -800,6 +832,15 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
             this.previewStartTime = currentTimeMillis - (j % getDuration());
         }
         return j;
+    }
+
+    public long getPositionWithOffset() {
+        if (!this.preview) {
+            return 0L;
+        }
+        getPosition();
+        Part mainPart = getMainPart();
+        return getPosition() + (mainPart != null ? mainPart.content.videoOffset + (mainPart.content.videoLeft * ((float) mainPart.content.duration)) : 0L);
     }
 
     public boolean hasContent() {
@@ -1113,6 +1154,10 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
             this.previewStartTime = System.currentTimeMillis();
             AndroidUtilities.runOnUIThread(this.syncRunnable, 1000.0f / AndroidUtilities.screenRefreshRate);
         }
+    }
+
+    public void setPreviewView(PreviewView previewView) {
+        this.previewView = previewView;
     }
 
     public void setResetState(Runnable runnable) {
