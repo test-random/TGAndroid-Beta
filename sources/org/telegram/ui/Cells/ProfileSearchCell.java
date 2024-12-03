@@ -429,7 +429,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
             this.nameTop = AndroidUtilities.dp(9.0f);
             this.nameLockTop -= AndroidUtilities.dp(10.0f);
         }
-        this.avatarStoryParams.originalAvatarRect.set(LocaleController.isRTL ? (getMeasuredWidth() - AndroidUtilities.dp(57.0f)) - getPaddingRight() : AndroidUtilities.dp(11.0f) + getPaddingLeft(), AndroidUtilities.dp(7.0f), r2 + AndroidUtilities.dp(this.rectangularAvatar ? 42.0f : 46.0f), AndroidUtilities.dp(7.0f) + AndroidUtilities.dp(46.0f));
+        this.avatarStoryParams.originalAvatarRect.set(LocaleController.isRTL ? (getMeasuredWidth() - AndroidUtilities.dp(57.0f)) - getPaddingRight() : AndroidUtilities.dp(11.0f) + getPaddingLeft(), AndroidUtilities.dp(this.rectangularAvatar ? 15.0f : 7.0f), r2 + AndroidUtilities.dp(this.rectangularAvatar ? 42.0f : 46.0f), AndroidUtilities.dp(7.0f) + AndroidUtilities.dp(46.0f));
         if (LocaleController.isRTL) {
             if (this.nameLayout.getLineCount() > 0 && this.nameLayout.getLineLeft(0) == 0.0f) {
                 double ceil = Math.ceil(this.nameLayout.getLineWidth(0));

@@ -1200,6 +1200,12 @@ public class AndroidUtilities {
         return byteArray;
     }
 
+    public static float distance(float f, float f2, float f3, float f4) {
+        float f5 = f3 - f;
+        float f6 = f4 - f2;
+        return (float) Math.sqrt((f5 * f5) + (f6 * f6));
+    }
+
     public static float distanceInfluenceForSnapDuration(float f) {
         return (float) Math.sin((f - 0.5f) * 0.47123894f);
     }

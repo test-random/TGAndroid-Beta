@@ -71,6 +71,7 @@ public class SizeNotifierFrameLayout extends FrameLayout {
     int count2;
     BlurBitmap currentBitmap;
     protected SizeNotifierFrameLayoutDelegate delegate;
+    protected final ArrayList delegates;
     private float drawnBottomOffset;
     private int emojiHeight;
     private float emojiOffset;
@@ -316,6 +317,7 @@ public class SizeNotifierFrameLayout extends FrameLayout {
     public SizeNotifierFrameLayout(Context context, INavigationLayout iNavigationLayout) {
         super(context);
         this.rect = new android.graphics.Rect();
+        this.delegates = new ArrayList();
         this.occupyStatusBar = true;
         this.parallaxScale = 1.0f;
         this.paused = true;
@@ -445,6 +447,9 @@ public class SizeNotifierFrameLayout extends FrameLayout {
         if (sizeNotifierFrameLayoutDelegate != null) {
             sizeNotifierFrameLayoutDelegate.onSizeChanged(this.keyboardHeight, z);
         }
+        for (int i = 0; i < this.delegates.size(); i++) {
+            ((SizeNotifierFrameLayoutDelegate) this.delegates.get(i)).onSizeChanged(this.keyboardHeight, z);
+        }
     }
 
     private void updateBlurShaderPosition(float r6, boolean r7) {
@@ -453,6 +458,10 @@ public class SizeNotifierFrameLayout extends FrameLayout {
 
     public boolean DRAW_USING_RENDERNODE() {
         return Build.VERSION.SDK_INT >= 31 && SharedConfig.useNewBlur;
+    }
+
+    public void addDelegate(SizeNotifierFrameLayoutDelegate sizeNotifierFrameLayoutDelegate) {
+        this.delegates.add(sizeNotifierFrameLayoutDelegate);
     }
 
     public boolean blurWasDrawn() {
@@ -730,17 +739,18 @@ public class SizeNotifierFrameLayout extends FrameLayout {
         if (wallpaperParallaxEffect != null) {
             this.parallaxScale = wallpaperParallaxEffect.getScale(getMeasuredWidth(), getMeasuredHeight());
         }
-        if (this.delegate != null) {
-            this.keyboardHeight = measureKeyboardHeight();
-            android.graphics.Point point = AndroidUtilities.displaySize;
-            final boolean z = point.x > point.y;
-            post(new Runnable() {
-                @Override
-                public final void run() {
-                    SizeNotifierFrameLayout.this.lambda$notifyHeightChanged$1(z);
-                }
-            });
+        if (this.delegate == null && this.delegates.isEmpty()) {
+            return;
         }
+        this.keyboardHeight = measureKeyboardHeight();
+        android.graphics.Point point = AndroidUtilities.displaySize;
+        final boolean z = point.x > point.y;
+        post(new Runnable() {
+            @Override
+            public final void run() {
+                SizeNotifierFrameLayout.this.lambda$notifyHeightChanged$1(z);
+            }
+        });
     }
 
     @Override
@@ -815,6 +825,10 @@ public class SizeNotifierFrameLayout extends FrameLayout {
             wallpaperParallaxEffect.setEnabled(true);
         }
         this.paused = false;
+    }
+
+    public void removeDelegate(SizeNotifierFrameLayoutDelegate sizeNotifierFrameLayoutDelegate) {
+        this.delegates.remove(sizeNotifierFrameLayoutDelegate);
     }
 
     public void setBackgroundImage(Drawable drawable, boolean z) {

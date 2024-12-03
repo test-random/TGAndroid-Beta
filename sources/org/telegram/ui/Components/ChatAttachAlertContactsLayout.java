@@ -1097,7 +1097,7 @@ public class ChatAttachAlertContactsLayout extends ChatAttachAlert.AttachAlertLa
         while (it.hasNext()) {
             arrayList.add(prepareContact(this.selectedContacts.get((ListItemID) it.next())));
         }
-        this.delegate.didSelectContacts(arrayList, this.parentAlert.commentTextView.getText().toString(), z, i, j, z2);
+        this.delegate.didSelectContacts(arrayList, this.parentAlert.getCommentView().getText().toString(), z, i, j, z2);
     }
 
     public void setDelegate(PhonebookShareAlertDelegate phonebookShareAlertDelegate) {

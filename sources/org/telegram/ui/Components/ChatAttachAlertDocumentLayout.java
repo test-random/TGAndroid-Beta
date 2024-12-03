@@ -2565,7 +2565,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
         while (it.hasNext()) {
             arrayList.add((MessageObject) this.selectedMessages.get((FilteredSearchView.MessageHashId) it.next()));
         }
-        this.delegate.didSelectFiles(new ArrayList(this.selectedFilesOrder), this.parentAlert.commentTextView.getText().toString(), arrayList, z, i, j, z2);
+        this.delegate.didSelectFiles(new ArrayList(this.selectedFilesOrder), this.parentAlert.getCommentView().getText().toString(), arrayList, z, i, j, z2);
         this.parentAlert.dismiss(true);
     }
 

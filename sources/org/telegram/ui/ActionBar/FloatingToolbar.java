@@ -1384,7 +1384,72 @@ public final class FloatingToolbar {
     }
 
     public static PopupWindow createPopupWindow(ViewGroup viewGroup) {
-        LinearLayout linearLayout = new LinearLayout(viewGroup.getContext());
+        LinearLayout linearLayout = new LinearLayout(viewGroup.getContext()) {
+            private final int[] p = new int[2];
+            private View downRootView = null;
+
+            private boolean isParent(View view, View view2) {
+                if (view == view2) {
+                    return true;
+                }
+                if (view.getParent() == null) {
+                    return false;
+                }
+                return view.getParent() instanceof View ? isParent((View) view.getParent(), view2) : view.getParent() == view2 || view.getRootView() == view2;
+            }
+
+            @Override
+            public boolean dispatchTouchEvent(MotionEvent motionEvent) {
+                boolean dispatchTouchEvent = super.dispatchTouchEvent(motionEvent);
+                if (!dispatchTouchEvent) {
+                    getLocationOnScreen(this.p);
+                    int[] iArr = this.p;
+                    motionEvent.offsetLocation(iArr[0], iArr[1]);
+                    if (motionEvent.getAction() == 0) {
+                        List<View> allGlobalViews = AndroidUtilities.allGlobalViews();
+                        if (allGlobalViews != null && allGlobalViews.size() > 1) {
+                            for (int size = allGlobalViews.size() - 2; size >= 0; size--) {
+                                View view = allGlobalViews.get(size);
+                                if (!isParent(this, view)) {
+                                    view.getLocationOnScreen(this.p);
+                                    int[] iArr2 = this.p;
+                                    motionEvent.offsetLocation(-iArr2[0], -iArr2[1]);
+                                    dispatchTouchEvent = view.dispatchTouchEvent(motionEvent);
+                                    if (dispatchTouchEvent) {
+                                        this.downRootView = view;
+                                        return true;
+                                    }
+                                    int[] iArr3 = this.p;
+                                    motionEvent.offsetLocation(iArr3[0], iArr3[1]);
+                                }
+                            }
+                        }
+                    } else {
+                        View view2 = this.downRootView;
+                        if (view2 != null) {
+                            view2.getLocationOnScreen(this.p);
+                            int[] iArr4 = this.p;
+                            motionEvent.offsetLocation(-iArr4[0], -iArr4[1]);
+                            dispatchTouchEvent = view2.dispatchTouchEvent(motionEvent);
+                        }
+                    }
+                }
+                if (motionEvent.getAction() == 1 || motionEvent.getAction() == 3) {
+                    this.downRootView = null;
+                }
+                return dispatchTouchEvent;
+            }
+
+            @Override
+            public boolean onInterceptTouchEvent(MotionEvent motionEvent) {
+                return super.onInterceptTouchEvent(motionEvent);
+            }
+
+            @Override
+            public boolean onTouchEvent(MotionEvent motionEvent) {
+                return super.onTouchEvent(motionEvent);
+            }
+        };
         PopupWindow popupWindow = new PopupWindow(linearLayout);
         popupWindow.setClippingEnabled(false);
         popupWindow.setAnimationStyle(0);

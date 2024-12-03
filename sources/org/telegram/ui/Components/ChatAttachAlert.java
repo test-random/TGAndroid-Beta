@@ -1475,10 +1475,12 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
     }
 
     public class AnonymousClass23 extends AnimatorListenerAdapter {
+        final boolean val$above;
         final boolean val$show;
 
-        AnonymousClass23(boolean z) {
+        AnonymousClass23(boolean z, boolean z2) {
             r2 = z;
+            r3 = z2;
         }
 
         @Override
@@ -1507,8 +1509,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                     }
                 }
                 ChatAttachAlert chatAttachAlert3 = ChatAttachAlert.this;
-                if (chatAttachAlert3.captionAbove) {
-                    chatAttachAlert3.updatedTopCaptionHeight();
+                chatAttachAlert3.moveCaptionButton.setTranslationY((chatAttachAlert3.bottomPannelTranslation - ChatAttachAlert.this.commentTextView.getHeight()) + ChatAttachAlert.this.captionContainer.getTranslationY());
+                if (r3) {
+                    ChatAttachAlert.this.updatedTopCaptionHeight();
                     ChatAttachAlert.this.topCommentContainer.setVisibility(r2 ? 0 : 8);
                 }
                 ChatAttachAlert.this.commentsAnimator = null;
@@ -4010,7 +4013,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         this.commentTextView.setClipChildren(false);
         this.topCommentContainer.setPadding(AndroidUtilities.dp(10.0f), AndroidUtilities.dp(2.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(10.0f));
         this.topCommentContainer.setWillNotDraw(false);
-        AnonymousClass15 anonymousClass15 = new EditTextEmoji(context2, this.sizeNotifierFrameLayout, null, 1, false, resourcesProvider2) {
+        AnonymousClass15 anonymousClass15 = new EditTextEmoji(context2, this.sizeNotifierFrameLayout, null, 1, true, resourcesProvider2) {
             AnonymousClass15(final Context context2, SizeNotifierFrameLayout sizeNotifierFrameLayout2, BaseFragment baseFragment2, int i11, boolean z5, final Theme.ResourcesProvider resourcesProvider2) {
                 super(context2, sizeNotifierFrameLayout2, baseFragment2, i11, z5, resourcesProvider2);
             }
@@ -4989,8 +4992,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         updatedTopCaptionHeight();
     }
 
-    public void lambda$setCaptionAbove$52() {
-        if (!this.captionAbove) {
+    public void lambda$setCaptionAbove$52(boolean z, boolean z2) {
+        if (!z || !z2) {
             this.topCommentContainer.setVisibility(8);
         }
         updatedTopCaptionHeight();
@@ -5005,8 +5008,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         this.frameLayout2.invalidate();
     }
 
-    public void lambda$setCaptionAbove$54() {
-        if (this.captionAbove || this.frameLayout2.getTag() == null) {
+    public void lambda$setCaptionAbove$54(boolean z, boolean z2) {
+        if (z || !z2) {
             this.captionContainer.setVisibility(8);
             FrameLayout frameLayout = this.moveCaptionButton;
             if (frameLayout != null) {
@@ -5044,6 +5047,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         this.nextAttachLayout = null;
         int[] iArr = this.scrollOffsetY;
         iArr[0] = iArr[1];
+        setCaptionAbove(this.captionAbove, false);
     }
 
     public void lambda$showLayout$34(float f, float f2, boolean z, DynamicAnimation dynamicAnimation, float f3, float f4) {
@@ -5784,7 +5788,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
     }
 
     public EditTextEmoji getCommentView() {
-        return this.captionAbove ? this.topCommentTextView : this.commentTextView;
+        AttachAlertLayout attachAlertLayout;
+        return (this.captionAbove && ((attachAlertLayout = this.currentAttachLayout) == this.photoLayout || attachAlertLayout == this.photoPreviewLayout)) ? this.topCommentTextView : this.commentTextView;
     }
 
     public AttachAlertLayout getCurrentAttachLayout() {
@@ -6057,6 +6062,10 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         if (editTextEmoji != null) {
             editTextEmoji.onDestroy();
         }
+        EditTextEmoji editTextEmoji2 = this.topCommentTextView;
+        if (editTextEmoji2 != null) {
+            editTextEmoji2.onDestroy();
+        }
     }
 
     @Override
@@ -6263,9 +6272,12 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         EditTextEmoji commentView = getCommentView();
         this.captionAbove = z;
         EditTextEmoji commentView2 = getCommentView();
+        final boolean z3 = this.frameLayout2.getTag() != null;
+        AttachAlertLayout attachAlertLayout = this.currentAttachLayout;
+        final boolean z4 = this.captionAbove && (attachAlertLayout == this.photoLayout || attachAlertLayout == this.photoPreviewLayout);
         if (z2) {
-            this.topCommentContainer.setVisibility(this.frameLayout2.getTag() != null ? 0 : 8);
-            ViewPropertyAnimator duration = this.topCommentContainer.animate().alpha((!this.captionAbove || this.frameLayout2.getTag() == null) ? 0.0f : 1.0f).setDuration(320L);
+            this.topCommentContainer.setVisibility(z3 ? 0 : 8);
+            ViewPropertyAnimator duration = this.topCommentContainer.animate().alpha((z4 && z3) ? 1.0f : 0.0f).setDuration(320L);
             CubicBezierInterpolator cubicBezierInterpolator = CubicBezierInterpolator.EASE_OUT_QUINT;
             duration.setInterpolator(cubicBezierInterpolator).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -6275,7 +6287,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             }).withEndAction(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatAttachAlert.this.lambda$setCaptionAbove$52();
+                    ChatAttachAlert.this.lambda$setCaptionAbove$52(z4, z3);
                 }
             }).start();
             this.captionContainer.setVisibility(0);
@@ -6283,7 +6295,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             if (frameLayout != null) {
                 frameLayout.setVisibility(0);
             }
-            this.captionContainer.animate().translationY((this.captionAbove || this.frameLayout2.getTag() == null) ? this.captionContainer.getMeasuredHeight() : 0.0f).alpha((this.captionAbove || this.frameLayout2.getTag() == null) ? 0.0f : 1.0f).setDuration(320L).setInterpolator(cubicBezierInterpolator).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            this.captionContainer.animate().translationY((z4 || !z3) ? this.captionContainer.getMeasuredHeight() : 0.0f).alpha((z4 || !z3) ? 0.0f : 1.0f).setDuration(320L).setInterpolator(cubicBezierInterpolator).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator) {
                     ChatAttachAlert.this.lambda$setCaptionAbove$53(valueAnimator);
@@ -6291,26 +6303,22 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             }).withEndAction(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatAttachAlert.this.lambda$setCaptionAbove$54();
+                    ChatAttachAlert.this.lambda$setCaptionAbove$54(z4, z3);
                 }
             }).start();
         } else {
-            this.topCommentContainer.setVisibility((!this.captionAbove || this.frameLayout2.getTag() == null) ? 8 : 0);
-            this.topCommentContainer.setAlpha((!this.captionAbove || this.frameLayout2.getTag() == null) ? 0.0f : 1.0f);
+            this.topCommentContainer.setVisibility((z4 && z3) ? 0 : 8);
+            this.topCommentContainer.setAlpha((z4 && z3) ? 1.0f : 0.0f);
             updatedTopCaptionHeight();
-            this.captionContainer.setAlpha((this.captionAbove || this.frameLayout2.getTag() == null) ? 0.0f : 1.0f);
-            this.captionContainer.setTranslationY((this.captionAbove || this.frameLayout2.getTag() == null) ? this.captionContainer.getMeasuredHeight() : 0.0f);
-            this.captionContainer.setVisibility((this.captionAbove || this.frameLayout2.getTag() == null) ? 8 : 0);
-            this.moveCaptionButton.setAlpha((this.captionAbove || this.frameLayout2.getTag() == null) ? 0.0f : 1.0f);
-            FrameLayout frameLayout2 = this.moveCaptionButton;
-            if (!this.captionAbove && this.frameLayout2.getTag() != null) {
-                r1 = 0;
-            }
-            frameLayout2.setVisibility(r1);
+            this.captionContainer.setAlpha((z4 || !z3) ? 0.0f : 1.0f);
+            this.captionContainer.setTranslationY((z4 || !z3) ? r13.getMeasuredHeight() : 0.0f);
+            this.captionContainer.setVisibility((z4 || !z3) ? 8 : 0);
+            this.moveCaptionButton.setAlpha((z4 || !z3) ? 0.0f : 1.0f);
+            this.moveCaptionButton.setVisibility((z4 || !z3) ? 8 : 0);
         }
         if (commentView != commentView2) {
             commentView.hidePopup(true);
-            commentView2.setText(commentView.getText());
+            commentView2.setText(AnimatedEmojiSpan.cloneSpans(commentView.getText()));
             commentView2.getEditText().setAllowTextEntitiesIntersection(commentView.getEditText().getAllowTextEntitiesIntersection());
             if (commentView.getEditText().isFocused()) {
                 commentView2.getEditText().requestFocus();
@@ -6502,7 +6510,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
     public void updateCommentTextViewPosition() {
         this.commentTextView.getLocationOnScreen(this.commentTextViewLocation);
         if (this.mentionContainer != null) {
-            float y = this.captionAbove ? (this.topCommentContainer.getY() - this.mentionContainer.getTop()) + (this.topCommentContainer.getMeasuredHeight() * this.topCommentContainer.getAlpha()) : -this.commentTextView.getHeight();
+            AttachAlertLayout attachAlertLayout = this.currentAttachLayout;
+            float y = ((attachAlertLayout == this.photoLayout || attachAlertLayout == this.photoPreviewLayout) && this.captionAbove) ? (this.topCommentContainer.getY() - this.mentionContainer.getTop()) + (this.topCommentContainer.getMeasuredHeight() * this.topCommentContainer.getAlpha()) : -this.commentTextView.getHeight();
             if (Math.abs(this.mentionContainer.getTranslationY() - y) > 0.5f) {
                 this.mentionContainer.setTranslationY(y);
                 this.mentionContainer.invalidate();

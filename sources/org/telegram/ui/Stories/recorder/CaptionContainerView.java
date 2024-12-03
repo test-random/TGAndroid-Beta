@@ -133,7 +133,7 @@ public abstract class CaptionContainerView extends FrameLayout {
     private int shiftDp;
     private final SizeNotifierFrameLayout sizeNotifierFrameLayout;
     private final Runnable textChangeRunnable;
-    private boolean toKeyboardShow;
+    public boolean toKeyboardShow;
     private Runnable updateShowKeyboard;
     boolean waitingForScrollYChange;
 

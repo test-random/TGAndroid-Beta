@@ -866,7 +866,7 @@ public class ChatAttachAlertAudioLayout extends ChatAttachAlert.AttachAlertLayou
         for (int i2 = 0; i2 < this.selectedAudiosOrder.size(); i2++) {
             arrayList.add(((MediaController.AudioEntry) this.selectedAudiosOrder.get(i2)).messageObject);
         }
-        this.delegate.didSelectAudio(arrayList, this.parentAlert.commentTextView.getText(), z, i, j, z2);
+        this.delegate.didSelectAudio(arrayList, this.parentAlert.getCommentView().getText(), z, i, j, z2);
     }
 
     public void setDelegate(AudioSelectDelegate audioSelectDelegate) {

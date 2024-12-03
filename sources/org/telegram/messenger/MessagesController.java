@@ -13792,6 +13792,10 @@ public class MessagesController extends BaseController implements NotificationCe
         removePromoDialog();
     }
 
+    public void incrementMoveCaptionHint() {
+        getMainSettings().edit().putInt("movecaptionhint", getMainSettings().getInt("movecaptionhint", 0) + 1).apply();
+    }
+
     public void installTheme(Theme.ThemeInfo themeInfo, Theme.ThemeAccent themeAccent, boolean z) {
         TLRPC.TL_theme tL_theme = themeAccent != null ? themeAccent.info : themeInfo.info;
         String str = themeAccent != null ? themeAccent.patternSlug : themeInfo.slug;
@@ -16589,6 +16593,10 @@ public class MessagesController extends BaseController implements NotificationCe
             };
         }
         messagesController.addUserToChat(j2, user2, i, str3, baseFragment2, z4, runnable2, errorDelegate);
+    }
+
+    public boolean shouldShowMoveCaptionHint() {
+        return getMainSettings().getInt("movecaptionhint", 0) < 24 || BuildVars.DEBUG_PRIVATE_VERSION;
     }
 
     public boolean showSensitiveContent() {

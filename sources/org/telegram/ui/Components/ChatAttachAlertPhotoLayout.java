@@ -304,7 +304,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                 }
                 MessageObject.addEntitiesToText(charSequence2, arrayList2, false, false, false, false);
             }
-            ChatAttachAlertPhotoLayout.this.parentAlert.commentTextView.setText(AnimatedEmojiSpan.cloneSpans(charSequence2, 3));
+            ChatAttachAlertPhotoLayout.this.parentAlert.getCommentView().setText(AnimatedEmojiSpan.cloneSpans(charSequence2, 3));
         }
 
         @Override
@@ -346,7 +346,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                 ChatAttachAlertPhotoLayout.this.addToSelectedPhotos(photoEntryAtPosition, -1);
             }
             ChatAttachAlert chatAttachAlert = ChatAttachAlertPhotoLayout.this.parentAlert;
-            if (chatAttachAlert.checkCaption(chatAttachAlert.commentTextView.getText())) {
+            if (chatAttachAlert.checkCaption(chatAttachAlert.getCommentView().getText())) {
                 return;
             }
             ChatAttachAlertPhotoLayout.this.parentAlert.applyCaption();
@@ -2310,8 +2310,8 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             this.counterTextView.setVisibility(0);
             this.cameraPhotoRecyclerView.setVisibility(0);
         }
-        if (this.parentAlert.commentTextView.isKeyboardVisible() && isFocusable()) {
-            this.parentAlert.commentTextView.closeKeyboard();
+        if (this.parentAlert.getCommentView().isKeyboardVisible() && isFocusable()) {
+            this.parentAlert.getCommentView().closeKeyboard();
         }
         this.zoomControlView.setVisibility(0);
         this.zoomControlView.setAlpha(0.0f);

@@ -25,6 +25,9 @@ public abstract class SizeNotifierFrameLayoutPhoto extends SizeNotifierFrameLayo
         if (sizeNotifierFrameLayoutDelegate != null) {
             sizeNotifierFrameLayoutDelegate.onSizeChanged(this.keyboardHeight, z);
         }
+        for (int i = 0; i < this.delegates.size(); i++) {
+            ((SizeNotifierFrameLayout.SizeNotifierFrameLayoutDelegate) this.delegates.get(i)).onSizeChanged(this.keyboardHeight, z);
+        }
     }
 
     @Override
@@ -50,17 +53,18 @@ public abstract class SizeNotifierFrameLayoutPhoto extends SizeNotifierFrameLayo
 
     @Override
     public void notifyHeightChanged() {
-        if (this.delegate != null) {
-            this.keyboardHeight = measureKeyboardHeight();
-            android.graphics.Point point = AndroidUtilities.displaySize;
-            final boolean z = point.x > point.y;
-            post(new Runnable() {
-                @Override
-                public final void run() {
-                    SizeNotifierFrameLayoutPhoto.this.lambda$notifyHeightChanged$0(z);
-                }
-            });
+        if (this.delegate == null && this.delegates.isEmpty()) {
+            return;
         }
+        this.keyboardHeight = measureKeyboardHeight();
+        android.graphics.Point point = AndroidUtilities.displaySize;
+        final boolean z = point.x > point.y;
+        post(new Runnable() {
+            @Override
+            public final void run() {
+                SizeNotifierFrameLayoutPhoto.this.lambda$notifyHeightChanged$0(z);
+            }
+        });
     }
 
     @Override
