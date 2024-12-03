@@ -485,6 +485,10 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
             return this.allowSwipes;
         }
 
+        public boolean isFullSize() {
+            return this.fullsize;
+        }
+
         public boolean isSwipeInProgress() {
             return this.isScrolling;
         }

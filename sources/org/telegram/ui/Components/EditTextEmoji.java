@@ -924,7 +924,7 @@ public class EditTextEmoji extends FrameLayout implements NotificationCenter.Not
     protected void onEmojiKeyboardUpdate() {
     }
 
-    protected void onLineCountChanged(int i, int i2) {
+    public void onLineCountChanged(int i, int i2) {
     }
 
     public void onPause() {

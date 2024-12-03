@@ -939,7 +939,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public boolean addFragmentToStack(BaseFragment baseFragment) {
-        return INavigationLayout.CC.$default$addFragmentToStack(this, baseFragment);
+        return addFragmentToStack(baseFragment, -1);
     }
 
     @Override
@@ -1139,7 +1139,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public void closeLastFragment() {
-        INavigationLayout.CC.$default$closeLastFragment(this);
+        closeLastFragment(true);
     }
 
     @Override
@@ -1377,7 +1377,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public void drawHeaderShadow(Canvas canvas, int i) {
-        INavigationLayout.CC.$default$drawHeaderShadow(this, canvas, i);
+        drawHeaderShadow(canvas, 255, i);
     }
 
     @Override
@@ -2286,7 +2286,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public void removeFragmentFromStack(BaseFragment baseFragment) {
-        INavigationLayout.CC.$default$removeFragmentFromStack(this, baseFragment);
+        removeFragmentFromStack(baseFragment, false);
     }
 
     @Override

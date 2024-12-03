@@ -727,21 +727,25 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         ?? r3;
         String formatPluralString;
         View view;
-        BackupImageView backupImageView;
+        final BackupImageView backupImageView;
         final TextView textView;
         if (starrefprogram == null || context == null) {
             return;
         }
         BottomSheet.Builder builder = new BottomSheet.Builder(context, false, resourcesProvider);
         final long[] jArr = {j};
+        final TLRPC.User user = MessagesController.getInstance(i).getUser(Long.valueOf(starrefprogram.bot_id));
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(1);
         linearLayout.setPadding(AndroidUtilities.dp(16.0f), AndroidUtilities.dp(20.0f), AndroidUtilities.dp(16.0f), AndroidUtilities.dp(8.0f));
         linearLayout.setClipChildren(false);
         linearLayout.setClipToPadding(false);
         FrameLayout frameLayout = new FrameLayout(context);
-        final BackupImageView backupImageView2 = new BackupImageView(context);
+        BackupImageView backupImageView2 = new BackupImageView(context);
         backupImageView2.setRoundRadius(AndroidUtilities.dp(30.0f));
+        AvatarDrawable avatarDrawable = new AvatarDrawable();
+        avatarDrawable.setInfo(user);
+        backupImageView2.setForUserOrChat(user, avatarDrawable);
         frameLayout.addView(backupImageView2, LayoutHelper.createFrame(60, 60.0f, 19, 0.0f, 0.0f, 0.0f, 0.0f));
         ImageView imageView = new ImageView(context);
         imageView.setImageResource(R.drawable.msg_arrow_avatar);
@@ -752,12 +756,8 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         PorterDuff.Mode mode = PorterDuff.Mode.SRC_IN;
         imageView.setColorFilter(new PorterDuffColorFilter(color, mode));
         frameLayout.addView(imageView, LayoutHelper.createFrame(36, 60.0f, 17, 60.0f, 0.0f, 60.0f, 0.0f));
-        BackupImageView backupImageView3 = new BackupImageView(context);
+        final BackupImageView backupImageView3 = new BackupImageView(context);
         backupImageView3.setRoundRadius(AndroidUtilities.dp(30.0f));
-        final TLRPC.User user = MessagesController.getInstance(i).getUser(Long.valueOf(starrefprogram.bot_id));
-        AvatarDrawable avatarDrawable = new AvatarDrawable();
-        avatarDrawable.setInfo(user);
-        backupImageView3.setForUserOrChat(user, avatarDrawable);
         frameLayout.addView(backupImageView3, LayoutHelper.createFrame(60, 60.0f, 21, 0.0f, 0.0f, 5.66f, 0.0f));
         View view2 = new View(context);
         int dp = AndroidUtilities.dp(13.66f);
@@ -867,11 +867,10 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         linearLayout.addView(linksTextView, LayoutHelper.createLinear(-1, -2, 49, 14, 14, 14, 6));
         builder.setCustomView(linearLayout);
         final BottomSheet create = builder.create();
-        final View view4 = view;
         buttonWithCounterView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public final void onClick(View view5) {
-                ChannelAffiliateProgramsFragment.lambda$showConnectAffiliateAlert$12(ButtonWithCounterView.this, jArr, i, starrefprogram, create, j, z, context, resourcesProvider, user, view5);
+            public final void onClick(View view4) {
+                ChannelAffiliateProgramsFragment.lambda$showConnectAffiliateAlert$12(ButtonWithCounterView.this, jArr, i, starrefprogram, create, j, z, context, resourcesProvider, user, view4);
             }
         });
         create.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -880,17 +879,17 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
                 ChannelAffiliateProgramsFragment.lambda$showConnectAffiliateAlert$13(dialogInterface);
             }
         });
-        final BackupImageView backupImageView5 = backupImageView;
         final Runnable runnable = new Runnable() {
             @Override
             public final void run() {
-                ChannelAffiliateProgramsFragment.lambda$showConnectAffiliateAlert$14(jArr, i, backupImageView2, backupImageView5, textView);
+                ChannelAffiliateProgramsFragment.lambda$showConnectAffiliateAlert$14(jArr, i, backupImageView3, backupImageView, textView);
             }
         };
         runnable.run();
-        if (view4 != null) {
+        if (view != null) {
             BotStarsController.getInstance(i).loadAdmined();
-            view4.setOnClickListener(new View.OnClickListener() {
+            final View view4 = view;
+            view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view5) {
                     ChannelAffiliateProgramsFragment.lambda$showConnectAffiliateAlert$16(i, create, resourcesProvider, view4, jArr, runnable, view5);

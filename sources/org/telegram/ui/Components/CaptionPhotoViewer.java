@@ -1,20 +1,26 @@
 package org.telegram.ui.Components;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.AnimatedTextView;
 import org.telegram.ui.Components.BlurringShader;
 import org.telegram.ui.Stories.recorder.CaptionContainerView;
 import org.telegram.ui.Stories.recorder.HintView2;
@@ -26,6 +32,12 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
     private final Runnable applyCaption;
     private final HintView2 hint;
     private boolean isVideo;
+    private final AnimatedFloat moveButtonAnimated;
+    private final ButtonBounce moveButtonBounce;
+    private final RectF moveButtonBounds;
+    private Drawable moveButtonIcon;
+    private final AnimatedTextView.AnimatedTextDrawable moveButtonText;
+    private boolean moveButtonVisible;
     private Utilities.Callback onTTLChange;
     private int timer;
     private final ImageView timerButton;
@@ -36,10 +48,30 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
 
     public CaptionPhotoViewer(Context context, final FrameLayout frameLayout, SizeNotifierFrameLayout sizeNotifierFrameLayout, FrameLayout frameLayout2, Theme.ResourcesProvider resourcesProvider, BlurringShader.BlurManager blurManager, Runnable runnable) {
         super(context, frameLayout, sizeNotifierFrameLayout, frameLayout2, resourcesProvider, blurManager);
+        Resources resources;
+        int i;
         this.timer = 0;
         this.SHOW_ONCE = Integer.MAX_VALUE;
         this.values = new int[]{Integer.MAX_VALUE, 3, 10, 30, 0};
+        this.moveButtonBounds = new RectF();
+        AnimatedTextView.AnimatedTextDrawable animatedTextDrawable = new AnimatedTextView.AnimatedTextDrawable();
+        this.moveButtonText = animatedTextDrawable;
+        this.moveButtonBounce = new ButtonBounce(this);
+        this.moveButtonAnimated = new AnimatedFloat(this, 0L, 350L, CubicBezierInterpolator.EASE_OUT_QUINT);
         this.applyCaption = runnable;
+        animatedTextDrawable.setTextSize(AndroidUtilities.dp(14.0f));
+        animatedTextDrawable.setOverrideFullWidth(AndroidUtilities.displaySize.x);
+        animatedTextDrawable.setTextColor(-1);
+        if (isAtTop()) {
+            animatedTextDrawable.setText(LocaleController.getString(R.string.MoveCaptionDown));
+            resources = context.getResources();
+            i = R.drawable.menu_link_below;
+        } else {
+            animatedTextDrawable.setText(LocaleController.getString(R.string.MoveCaptionUp));
+            resources = context.getResources();
+            i = R.drawable.menu_link_above;
+        }
+        this.moveButtonIcon = resources.getDrawable(i);
         ImageView imageView = new ImageView(context);
         this.addPhotoButton = imageView;
         imageView.setImageResource(R.drawable.filled_add_photo);
@@ -129,7 +161,78 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
+        Paint paint;
+        int i;
         super.dispatchDraw(canvas);
+        float f = this.moveButtonAnimated.set(this.moveButtonVisible, !showMoveButton());
+        if (f > 0.0f) {
+            float scale = this.moveButtonBounce.getScale(0.03f);
+            if (isAtTop()) {
+                this.moveButtonBounds.set(AndroidUtilities.dp(10.0f), this.bounds.bottom + AndroidUtilities.dp(10.0f), AndroidUtilities.dp(44.0f) + ((this.moveButtonText.getCurrentWidth() + AndroidUtilities.dp(11.0f)) * this.keyboardT), this.bounds.bottom + AndroidUtilities.dp(42.0f));
+            } else {
+                this.moveButtonBounds.set(AndroidUtilities.dp(10.0f), this.bounds.top - AndroidUtilities.dp(42.0f), AndroidUtilities.dp(44.0f) + ((this.moveButtonText.getCurrentWidth() + AndroidUtilities.dp(11.0f)) * this.keyboardT), this.bounds.top - AndroidUtilities.dp(10.0f));
+            }
+            if (f < 1.0f) {
+                canvas.saveLayerAlpha(this.moveButtonBounds, (int) (f * 255.0f), 31);
+            } else {
+                canvas.save();
+            }
+            canvas.scale(scale, scale, this.moveButtonBounds.centerX(), this.moveButtonBounds.centerY());
+            canvas.clipRect(this.moveButtonBounds);
+            float dpf2 = AndroidUtilities.dpf2(8.33f);
+            if (customBlur()) {
+                drawBlur(this.backgroundBlur, canvas, this.moveButtonBounds, dpf2, false, 0.0f, 0.0f, true, 1.0f);
+                paint = this.backgroundPaint;
+                i = 64;
+            } else {
+                Paint[] paints = this.backgroundBlur.getPaints(f, 0.0f, 0.0f);
+                if (paints == null || paints[1] == null) {
+                    paint = this.backgroundPaint;
+                    i = 128;
+                } else {
+                    Paint paint2 = paints[0];
+                    if (paint2 != null) {
+                        canvas.drawRoundRect(this.moveButtonBounds, dpf2, dpf2, paint2);
+                    }
+                    Paint paint3 = paints[1];
+                    if (paint3 != null) {
+                        canvas.drawRoundRect(this.moveButtonBounds, dpf2, dpf2, paint3);
+                    }
+                    paint = this.backgroundPaint;
+                    i = 51;
+                }
+            }
+            paint.setAlpha(AndroidUtilities.lerp(0, i, f));
+            canvas.drawRoundRect(this.moveButtonBounds, dpf2, dpf2, this.backgroundPaint);
+            this.moveButtonIcon.setBounds((int) (this.moveButtonBounds.left + AndroidUtilities.dp(9.0f)), (int) (this.moveButtonBounds.centerY() - AndroidUtilities.dp(9.0f)), (int) (this.moveButtonBounds.left + AndroidUtilities.dp(27.0f)), (int) (this.moveButtonBounds.centerY() + AndroidUtilities.dp(9.0f)));
+            this.moveButtonIcon.draw(canvas);
+            AnimatedTextView.AnimatedTextDrawable animatedTextDrawable = this.moveButtonText;
+            float dp = this.moveButtonBounds.left + AndroidUtilities.dp(34.0f);
+            RectF rectF = this.moveButtonBounds;
+            animatedTextDrawable.setBounds(dp, rectF.top, rectF.right, rectF.bottom);
+            this.moveButtonText.setAlpha((int) (this.keyboardT * 255.0f));
+            this.moveButtonText.draw(canvas);
+            canvas.restore();
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent motionEvent) {
+        if (motionEvent.getAction() == 0) {
+            this.moveButtonBounce.setPressed(this.moveButtonBounds.contains(motionEvent.getX(), motionEvent.getY()));
+        } else if (motionEvent.getAction() == 2) {
+            if (this.moveButtonBounce.isPressed() && !this.moveButtonBounds.contains(motionEvent.getX(), motionEvent.getY())) {
+                this.moveButtonBounce.setPressed(false);
+            }
+        } else if ((motionEvent.getAction() == 1 || motionEvent.getAction() == 3) && this.moveButtonBounce.isPressed()) {
+            if (motionEvent.getAction() == 1) {
+                onMoveButtonClick();
+                this.moveButtonText.setText(LocaleController.getString(isAtTop() ? R.string.MoveCaptionDown : R.string.MoveCaptionUp), true);
+            }
+            this.moveButtonBounce.setPressed(false);
+            return true;
+        }
+        return this.moveButtonBounce.isPressed() || super.dispatchTouchEvent(motionEvent);
     }
 
     @Override
@@ -174,17 +277,14 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
         this.hint.setTranslationY((-Math.min(AndroidUtilities.dp(34.0f), i)) - AndroidUtilities.dp(10.0f));
     }
 
+    protected abstract void onMoveButtonClick();
+
     @Override
     public void lambda$new$1() {
         Runnable runnable = this.applyCaption;
         if (runnable != null) {
             runnable.run();
         }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent motionEvent) {
-        return super.onTouchEvent(motionEvent);
     }
 
     @Override
@@ -232,6 +332,17 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
         this.onTTLChange = callback;
     }
 
+    public void setShowMoveButtonVisible(boolean z, boolean z2) {
+        if (this.moveButtonVisible == z && z2) {
+            return;
+        }
+        this.moveButtonVisible = z;
+        if (!z2) {
+            this.moveButtonAnimated.set(z, true);
+        }
+        invalidate();
+    }
+
     public void setTimer(int i) {
         this.timer = i;
         this.timerDrawable.setValue(i == Integer.MAX_VALUE ? 1 : Math.max(1, i), this.timer > 0, true);
@@ -265,6 +376,8 @@ public abstract class CaptionPhotoViewer extends CaptionContainerView {
         marginLayoutParams.rightMargin = AndroidUtilities.dp(12 + i);
         this.editText.setLayoutParams(marginLayoutParams);
     }
+
+    protected abstract boolean showMoveButton();
 
     @Override
     public void updateColors(Theme.ResourcesProvider resourcesProvider) {

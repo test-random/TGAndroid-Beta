@@ -211,6 +211,12 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         }
 
         @Override
+        public boolean canMoveCaptionAbove() {
+            ChatAttachAlert chatAttachAlert = ChatAttachAlertPhotoLayout.this.parentAlert;
+            return chatAttachAlert != null && (chatAttachAlert.baseFragment instanceof ChatActivity);
+        }
+
+        @Override
         public boolean cancelButtonPressed() {
             return false;
         }
@@ -252,6 +258,22 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                 return cellForIndex.getImageView().getImageReceiver().getBitmapSafe();
             }
             return null;
+        }
+
+        @Override
+        public boolean isCaptionAbove() {
+            ChatAttachAlert chatAttachAlert = ChatAttachAlertPhotoLayout.this.parentAlert;
+            return chatAttachAlert != null && chatAttachAlert.captionAbove;
+        }
+
+        @Override
+        public void moveCaptionAbove(boolean z) {
+            ChatAttachAlert chatAttachAlert = ChatAttachAlertPhotoLayout.this.parentAlert;
+            if (chatAttachAlert == null || chatAttachAlert.captionAbove == z) {
+                return;
+            }
+            chatAttachAlert.setCaptionAbove(z);
+            ChatAttachAlertPhotoLayout.this.captionItem.setState(!r3.parentAlert.captionAbove, true);
         }
 
         @Override
@@ -1373,7 +1395,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                     ActionBarMenuItem actionBarMenuItem2 = ChatAttachAlertPhotoLayout.this.parentAlert.selectedMenuItem;
                     int dp3 = dp2 + (actionBarMenuItem2 != null ? AndroidUtilities.dp(actionBarMenuItem2.getAlpha() * 26.0f) : 0);
                     int backgroundPaddingTop = ChatAttachAlertPhotoLayout.this.parentAlert.getBackgroundPaddingTop();
-                    if (((ChatAttachAlertPhotoLayout.this.parentAlert.scrollOffsetY[0] - backgroundPaddingTop) - dp3) + backgroundPaddingTop >= ActionBar.getCurrentActionBarHeight() || (holder = (RecyclerListView.Holder) ChatAttachAlertPhotoLayout.this.gridView.findViewHolderForAdapterPosition(0)) == null || holder.itemView.getTop() <= AndroidUtilities.dp(7.0f)) {
+                    if (((ChatAttachAlertPhotoLayout.this.parentAlert.scrollOffsetY[0] - backgroundPaddingTop) - dp3) + backgroundPaddingTop >= ActionBar.getCurrentActionBarHeight() + (ChatAttachAlertPhotoLayout.this.parentAlert.topCommentContainer.getMeasuredHeight() * ChatAttachAlertPhotoLayout.this.parentAlert.topCommentContainer.getAlpha()) || (holder = (RecyclerListView.Holder) ChatAttachAlertPhotoLayout.this.gridView.findViewHolderForAdapterPosition(0)) == null || holder.itemView.getTop() <= AndroidUtilities.dp(7.0f)) {
                         return;
                     }
                     ChatAttachAlertPhotoLayout.this.gridView.smoothScrollBy(0, holder.itemView.getTop() - AndroidUtilities.dp(7.0f));
@@ -1898,7 +1920,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             PhotoViewer.getInstance().enableStickerMode(null, false, this.parentAlert.customStickerHandler);
         }
         if (captionForAllMedia()) {
-            PhotoViewer.getInstance().setCaption(this.parentAlert.getCommentTextView().getText());
+            PhotoViewer.getInstance().setCaption(this.parentAlert.getCommentView().getText());
         }
     }
 
@@ -2017,10 +2039,10 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             if (selectedPhotos.size() > 0 && selectedPhotosOrder.size() > 0) {
                 Object obj = selectedPhotos.get(selectedPhotosOrder.get(0));
                 if (obj instanceof MediaController.PhotoEntry) {
-                    ((MediaController.PhotoEntry) obj).caption = this.parentAlert.getCommentTextView().getText();
+                    ((MediaController.PhotoEntry) obj).caption = this.parentAlert.getCommentView().getText();
                 }
                 if (obj instanceof MediaController.SearchImage) {
-                    ((MediaController.SearchImage) obj).caption = this.parentAlert.getCommentTextView().getText();
+                    ((MediaController.SearchImage) obj).caption = this.parentAlert.getCommentView().getText();
                 }
             }
             if (this.parentAlert.getAvatarFor() != null) {
@@ -2864,7 +2886,11 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                             systemWindowInsetLeft = rootWindowInsets.getSystemWindowInsetLeft();
                             x -= systemWindowInsetLeft;
                         }
-                        float currentActionBarHeight = ((i3 < 21 || this.parentAlert.inBubbleMode) ? 0 : AndroidUtilities.statusBarHeight) + ActionBar.getCurrentActionBarHeight();
+                        float currentActionBarHeight = ((i3 < 21 || this.parentAlert.inBubbleMode) ? 0 : AndroidUtilities.statusBarHeight) + ActionBar.getCurrentActionBarHeight() + (this.parentAlert.topCommentContainer.getMeasuredHeight() * this.parentAlert.topCommentContainer.getAlpha());
+                        MentionsContainerView mentionsContainerView = this.parentAlert.mentionContainer;
+                        if (mentionsContainerView != null && mentionsContainerView.isReversed()) {
+                            currentActionBarHeight = Math.max(currentActionBarHeight, (this.parentAlert.mentionContainer.getY() + this.parentAlert.mentionContainer.clipTop()) - this.parentAlert.currentPanTranslationY);
+                        }
                         float f = y < currentActionBarHeight ? currentActionBarHeight - y : 0.0f;
                         if (f != this.cameraViewOffsetY) {
                             this.cameraViewOffsetY = f;
@@ -2882,9 +2908,9 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                             }
                         }
                         float measuredHeight = (int) ((this.parentAlert.getSheetContainer().getMeasuredHeight() - this.parentAlert.buttonsRecyclerView.getMeasuredHeight()) + this.parentAlert.buttonsRecyclerView.getTranslationY());
-                        MentionsContainerView mentionsContainerView = this.parentAlert.mentionContainer;
-                        if (mentionsContainerView != null) {
-                            measuredHeight -= mentionsContainerView.clipBottom() - AndroidUtilities.dp(6.0f);
+                        MentionsContainerView mentionsContainerView2 = this.parentAlert.mentionContainer;
+                        if (mentionsContainerView2 != null) {
+                            measuredHeight -= mentionsContainerView2.clipBottom() - AndroidUtilities.dp(6.0f);
                         }
                         if (childAt.getMeasuredHeight() + y > measuredHeight) {
                             this.cameraViewOffsetBottomY = Math.min(-AndroidUtilities.dp(5.0f), y - measuredHeight) + childAt.getMeasuredHeight();
@@ -3585,10 +3611,8 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         long dialogId;
         AlertsCreator.ScheduleDatePickerDelegate scheduleDatePickerDelegate;
         if (i == 7) {
-            ChatAttachAlert chatAttachAlert = this.parentAlert;
-            boolean z5 = chatAttachAlert.captionAbove;
-            chatAttachAlert.captionAbove = !z5;
-            this.captionItem.setState(z5, true);
+            this.parentAlert.setCaptionAbove(!r10.captionAbove);
+            this.captionItem.setState(!this.parentAlert.captionAbove, true);
             return;
         }
         if ((i == 0 || i == 1) && this.parentAlert.maxSelectedPhotos > 0 && selectedPhotosOrder.size() > 1 && (chat = this.parentAlert.getChat()) != null && !ChatObject.hasAdminRights(chat) && chat.slowmode_enabled) {
@@ -3596,16 +3620,16 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             return;
         }
         if (i == 0) {
-            ChatAttachAlert chatAttachAlert2 = this.parentAlert;
-            if (chatAttachAlert2.editingMessageObject == null) {
-                BaseFragment baseFragment = chatAttachAlert2.baseFragment;
+            ChatAttachAlert chatAttachAlert = this.parentAlert;
+            if (chatAttachAlert.editingMessageObject == null) {
+                BaseFragment baseFragment = chatAttachAlert.baseFragment;
                 if ((baseFragment instanceof ChatActivity) && ((ChatActivity) baseFragment).isInScheduleMode()) {
                     context = getContext();
                     dialogId = ((ChatActivity) this.parentAlert.baseFragment).getDialogId();
                     scheduleDatePickerDelegate = new AlertsCreator.ScheduleDatePickerDelegate() {
                         @Override
-                        public final void didSelectDate(boolean z6, int i3) {
-                            ChatAttachAlertPhotoLayout.this.lambda$onMenuItemClick$19(z6, i3);
+                        public final void didSelectDate(boolean z5, int i3) {
+                            ChatAttachAlertPhotoLayout.this.lambda$onMenuItemClick$19(z5, i3);
                         }
                     };
                     AlertsCreator.createScheduleDatePickerDialog(context, dialogId, scheduleDatePickerDelegate, this.resourcesProvider);
@@ -3622,16 +3646,16 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             return;
         }
         if (i == 1) {
-            ChatAttachAlert chatAttachAlert3 = this.parentAlert;
-            if (chatAttachAlert3.editingMessageObject == null) {
-                BaseFragment baseFragment2 = chatAttachAlert3.baseFragment;
+            ChatAttachAlert chatAttachAlert2 = this.parentAlert;
+            if (chatAttachAlert2.editingMessageObject == null) {
+                BaseFragment baseFragment2 = chatAttachAlert2.baseFragment;
                 if ((baseFragment2 instanceof ChatActivity) && ((ChatActivity) baseFragment2).isInScheduleMode()) {
                     context = getContext();
                     dialogId = ((ChatActivity) this.parentAlert.baseFragment).getDialogId();
                     scheduleDatePickerDelegate = new AlertsCreator.ScheduleDatePickerDelegate() {
                         @Override
-                        public final void didSelectDate(boolean z6, int i3) {
-                            ChatAttachAlertPhotoLayout.this.lambda$onMenuItemClick$20(z6, i3);
+                        public final void didSelectDate(boolean z5, int i3) {
+                            ChatAttachAlertPhotoLayout.this.lambda$onMenuItemClick$20(z5, i3);
                         }
                     };
                     AlertsCreator.createScheduleDatePickerDialog(context, dialogId, scheduleDatePickerDelegate, this.resourcesProvider);
@@ -3663,18 +3687,18 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                     break;
                 }
             }
-            final boolean z6 = !z;
+            final boolean z5 = !z;
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatAttachAlertPhotoLayout.this.lambda$onMenuItemClick$21(z6);
+                    ChatAttachAlertPhotoLayout.this.lambda$onMenuItemClick$21(z5);
                 }
             }, 200L);
             final ArrayList arrayList = new ArrayList();
             for (Map.Entry entry : selectedPhotos.entrySet()) {
                 if (entry.getValue() instanceof MediaController.PhotoEntry) {
                     MediaController.PhotoEntry photoEntry = (MediaController.PhotoEntry) entry.getValue();
-                    photoEntry.hasSpoiler = z6;
+                    photoEntry.hasSpoiler = z5;
                     photoEntry.isChatPreviewSpoilerRevealed = false;
                     photoEntry.isAttachSpoilerRevealed = false;
                     arrayList.add(Integer.valueOf(photoEntry.imageId));
@@ -3683,7 +3707,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             this.gridView.forAllChild(new Consumer() {
                 @Override
                 public final void accept(Object obj) {
-                    ChatAttachAlertPhotoLayout.lambda$onMenuItemClick$22(arrayList, z6, (View) obj);
+                    ChatAttachAlertPhotoLayout.lambda$onMenuItemClick$22(arrayList, z5, (View) obj);
                 }
             });
             if (this.parentAlert.getCurrentAttachLayout() != this) {
@@ -3697,8 +3721,8 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         }
         if (i != 3) {
             if (i == 6) {
-                ChatAttachAlert chatAttachAlert4 = this.parentAlert;
-                chatAttachAlert4.updatePhotoPreview(chatAttachAlert4.getCurrentAttachLayout() != this.parentAlert.getPhotoPreviewLayout());
+                ChatAttachAlert chatAttachAlert3 = this.parentAlert;
+                chatAttachAlert3.updatePhotoPreview(chatAttachAlert3.getCurrentAttachLayout() != this.parentAlert.getPhotoPreviewLayout());
                 return;
             }
             if (i == 8) {
@@ -3726,15 +3750,15 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             return;
         }
         try {
-            ChatAttachAlert chatAttachAlert5 = this.parentAlert;
-            if (!(chatAttachAlert5.baseFragment instanceof ChatActivity) && chatAttachAlert5.avatarPicker != 2) {
+            ChatAttachAlert chatAttachAlert4 = this.parentAlert;
+            if (!(chatAttachAlert4.baseFragment instanceof ChatActivity) && chatAttachAlert4.avatarPicker != 2) {
                 Intent intent = new Intent("android.intent.action.PICK");
                 intent.setType("image/*");
-                ChatAttachAlert chatAttachAlert6 = this.parentAlert;
-                if (chatAttachAlert6.avatarPicker != 0) {
-                    chatAttachAlert6.baseFragment.startActivityForResult(intent, 14);
+                ChatAttachAlert chatAttachAlert5 = this.parentAlert;
+                if (chatAttachAlert5.avatarPicker != 0) {
+                    chatAttachAlert5.baseFragment.startActivityForResult(intent, 14);
                 } else {
-                    chatAttachAlert6.baseFragment.startActivityForResult(intent, 1);
+                    chatAttachAlert5.baseFragment.startActivityForResult(intent, 1);
                 }
                 this.parentAlert.dismiss(true);
             }
@@ -3746,11 +3770,11 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             intent3.setType("image/*");
             Intent createChooser = Intent.createChooser(intent3, null);
             createChooser.putExtra("android.intent.extra.INITIAL_INTENTS", new Intent[]{intent2});
-            ChatAttachAlert chatAttachAlert7 = this.parentAlert;
-            if (chatAttachAlert7.avatarPicker != 0) {
-                chatAttachAlert7.baseFragment.startActivityForResult(createChooser, 14);
+            ChatAttachAlert chatAttachAlert6 = this.parentAlert;
+            if (chatAttachAlert6.avatarPicker != 0) {
+                chatAttachAlert6.baseFragment.startActivityForResult(createChooser, 14);
             } else {
-                chatAttachAlert7.baseFragment.startActivityForResult(createChooser, 1);
+                chatAttachAlert6.baseFragment.startActivityForResult(createChooser, 1);
             }
             this.parentAlert.dismiss(true);
         } catch (Exception e) {

@@ -90,6 +90,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
     private final AnimatedFloat premiumBlockedT;
     private PremiumGradient.PremiumGradientTools premiumGradient;
     private RectF rect;
+    private boolean rectangularAvatar;
     private Theme.ResourcesProvider resourcesProvider;
     private boolean savedMessages;
     private boolean showPremiumBlocked;
@@ -428,7 +429,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
             this.nameTop = AndroidUtilities.dp(9.0f);
             this.nameLockTop -= AndroidUtilities.dp(10.0f);
         }
-        this.avatarStoryParams.originalAvatarRect.set(LocaleController.isRTL ? (getMeasuredWidth() - AndroidUtilities.dp(57.0f)) - getPaddingRight() : AndroidUtilities.dp(11.0f) + getPaddingLeft(), AndroidUtilities.dp(7.0f), r2 + AndroidUtilities.dp(46.0f), AndroidUtilities.dp(7.0f) + AndroidUtilities.dp(46.0f));
+        this.avatarStoryParams.originalAvatarRect.set(LocaleController.isRTL ? (getMeasuredWidth() - AndroidUtilities.dp(57.0f)) - getPaddingRight() : AndroidUtilities.dp(11.0f) + getPaddingLeft(), AndroidUtilities.dp(7.0f), r2 + AndroidUtilities.dp(this.rectangularAvatar ? 42.0f : 46.0f), AndroidUtilities.dp(7.0f) + AndroidUtilities.dp(46.0f));
         if (LocaleController.isRTL) {
             if (this.nameLayout.getLineCount() > 0 && this.nameLayout.getLineLeft(0) == 0.0f) {
                 double ceil = Math.ceil(this.nameLayout.getLineWidth(0));
@@ -660,6 +661,10 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
         this.openButtonBounce.setPressed(false);
     }
 
+    public void setRectangularAvatar(boolean z) {
+        this.rectangularAvatar = z;
+    }
+
     public void setSublabelOffset(int i, int i2) {
         this.sublabelOffsetX = i;
         this.sublabelOffsetY = i2;
@@ -672,6 +677,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
 
     public void update(int i) {
         Drawable drawable;
+        float f;
         String str;
         TLRPC.Dialog dialog;
         String str2;
@@ -731,8 +737,13 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
             }
         }
         ImageReceiver imageReceiver = this.avatarImage;
-        TLRPC.Chat chat2 = this.chat;
-        imageReceiver.setRoundRadius(AndroidUtilities.dp((chat2 == null || !chat2.forum) ? 23.0f : 16.0f));
+        if (this.rectangularAvatar) {
+            f = 10.0f;
+        } else {
+            TLRPC.Chat chat2 = this.chat;
+            f = (chat2 == null || !chat2.forum) ? 23.0f : 16.0f;
+        }
+        imageReceiver.setRoundRadius(AndroidUtilities.dp(f));
         if (i != 0) {
             boolean z = !(((MessagesController.UPDATE_MASK_AVATAR & i) == 0 || this.user == null) && ((MessagesController.UPDATE_MASK_CHAT_AVATAR & i) == 0 || this.chat == null)) && (((fileLocation = this.lastAvatar) != null && fileLocation2 == null) || ((fileLocation == null && fileLocation2 != null) || !(fileLocation == null || (fileLocation.volume_id == fileLocation2.volume_id && fileLocation.local_id == fileLocation2.local_id))));
             if (!z && (MessagesController.UPDATE_MASK_STATUS & i) != 0 && (user2 = this.user) != null) {

@@ -671,7 +671,10 @@ public class UniversalAdapter extends AdapterWithDiffUtils {
                 } else if (obj8 instanceof TLRPC.User) {
                     str2 = UserObject.getUserName((TLRPC.User) obj8);
                 }
-                profileSearchCell.setData(obj8, null, str2, charSequence, false, false);
+                CharSequence charSequence3 = charSequence;
+                String str3 = str2;
+                profileSearchCell.setRectangularAvatar(item.red);
+                profileSearchCell.setData(obj8, null, str3, charSequence3, false, false);
                 profileSearchCell.useSeparator = hasDivider;
                 return;
             case 33:

@@ -20,10 +20,6 @@ import org.telegram.ui.ActionBar.Theme;
 public interface INavigationLayout {
 
     public abstract class CC {
-        public static boolean $default$addFragmentToStack(INavigationLayout iNavigationLayout, BaseFragment baseFragment) {
-            return iNavigationLayout.addFragmentToStack(baseFragment, -1);
-        }
-
         public static void $default$animateThemedValues(INavigationLayout iNavigationLayout, Theme.ThemeInfo themeInfo, int i, boolean z, boolean z2) {
             iNavigationLayout.animateThemedValues(new ThemeAnimationSettings(themeInfo, i, z, z2), null);
         }
@@ -32,20 +28,12 @@ public interface INavigationLayout {
             iNavigationLayout.animateThemedValues(new ThemeAnimationSettings(themeInfo, i, z, z2), runnable);
         }
 
-        public static void $default$closeLastFragment(INavigationLayout iNavigationLayout) {
-            iNavigationLayout.closeLastFragment(true);
-        }
-
         public static void $default$dismissDialogs(INavigationLayout iNavigationLayout) {
             List fragmentStack = iNavigationLayout.getFragmentStack();
             if (fragmentStack.isEmpty()) {
                 return;
             }
             ((BaseFragment) fragmentStack.get(fragmentStack.size() - 1)).dismissCurrentDialog();
-        }
-
-        public static void $default$drawHeaderShadow(INavigationLayout iNavigationLayout, Canvas canvas, int i) {
-            iNavigationLayout.drawHeaderShadow(canvas, 255, i);
         }
 
         public static BaseFragment $default$getBackgroundFragment(INavigationLayout iNavigationLayout) {
@@ -133,10 +121,6 @@ public interface INavigationLayout {
                 return;
             }
             iNavigationLayout.removeFragmentFromStack((BaseFragment) iNavigationLayout.getFragmentStack().get(i));
-        }
-
-        public static void $default$removeFragmentFromStack(INavigationLayout iNavigationLayout, BaseFragment baseFragment) {
-            iNavigationLayout.removeFragmentFromStack(baseFragment, false);
         }
 
         public static INavigationLayout newLayout(Context context, boolean z) {

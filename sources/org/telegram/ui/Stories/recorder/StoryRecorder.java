@@ -462,12 +462,12 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         }
 
         @Override
-        protected boolean customBlur() {
+        public boolean customBlur() {
             return StoryRecorder.this.blurManager.hasRenderNode();
         }
 
         @Override
-        protected void drawBlur(BlurringShader.StoryBlurDrawer storyBlurDrawer, Canvas canvas, RectF rectF, float f, boolean z, float f2, float f3, boolean z2, float f4) {
+        public void drawBlur(BlurringShader.StoryBlurDrawer storyBlurDrawer, Canvas canvas, RectF rectF, float f, boolean z, float f2, float f3, boolean z2, float f4) {
             if (canvas.isHardwareAccelerated()) {
                 canvas.save();
                 this.path.rewind();

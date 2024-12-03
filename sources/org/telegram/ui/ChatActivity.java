@@ -23857,7 +23857,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 chatAttachAlert.setMaxSelectedPhotos(i, true);
                 this.chatAttachAlert.enableDefaultMode();
                 this.chatAttachAlert.init();
-                this.chatAttachAlert.getCommentTextView().setText(this.chatActivityEnterView.getFieldText());
+                this.chatAttachAlert.getCommentView().setText(this.chatActivityEnterView.getFieldText());
                 ChatAttachAlert chatAttachAlert2 = this.chatAttachAlert;
                 chatAttachAlert2.parentThemeDelegate = this.themeDelegate;
                 showDialog(chatAttachAlert2);

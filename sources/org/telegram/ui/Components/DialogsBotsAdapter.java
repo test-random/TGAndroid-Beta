@@ -541,7 +541,7 @@ public class DialogsBotsAdapter extends UniversalAdapter {
                     TLRPC.User user3 = (TLRPC.User) this.popular.bots.get(i);
                     if (!hashSet.contains(Long.valueOf(user3.id))) {
                         hashSet.add(Long.valueOf(user3.id));
-                        arrayList.add(UItem.asProfileCell(user3).accent());
+                        arrayList.add(UItem.asProfileCell(user3).accent().red());
                         i4 = 1;
                     }
                     i++;

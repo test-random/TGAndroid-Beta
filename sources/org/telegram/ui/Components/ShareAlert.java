@@ -421,7 +421,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
         }
 
         @Override
-        protected void onLineCountChanged(int i, int i2) {
+        public void onLineCountChanged(int i, int i2) {
             if (TextUtils.isEmpty(getEditText().getText())) {
                 getEditText().animate().cancel();
                 getEditText().setOffsetY(0.0f);
