@@ -41,18 +41,32 @@ public class SlideIntChooseView extends FrameLayout {
         public int max;
         public int min;
         public int style;
-        public Utilities.CallbackReturn toString;
+        public Utilities.Callback2Return toString;
 
-        public static String lambda$make$0(String str, Integer num) {
-            return LocaleController.formatPluralString(str, num.intValue(), new Object[0]);
+        public static String lambda$make$0(Utilities.CallbackReturn callbackReturn, Integer num, Integer num2) {
+            return (String) callbackReturn.run(num2);
         }
 
-        public static Options make(int i, int i2, int i3, Utilities.CallbackReturn callbackReturn) {
+        public static String lambda$make$1(String str, Integer num, Integer num2) {
+            if (num.intValue() == 0) {
+                return LocaleController.formatPluralString(str, num2.intValue(), new Object[0]);
+            }
+            return "" + num2;
+        }
+
+        public static Options make(int i, int i2, int i3, final Utilities.CallbackReturn callbackReturn) {
             Options options = new Options();
             options.style = i;
             options.min = i2;
             options.max = i3;
-            options.toString = callbackReturn;
+            options.toString = new Utilities.Callback2Return() {
+                @Override
+                public final Object run(Object obj, Object obj2) {
+                    String lambda$make$0;
+                    lambda$make$0 = SlideIntChooseView.Options.lambda$make$0(Utilities.CallbackReturn.this, (Integer) obj, (Integer) obj2);
+                    return lambda$make$0;
+                }
+            };
             return options;
         }
 
@@ -61,12 +75,12 @@ public class SlideIntChooseView extends FrameLayout {
             options.style = i;
             options.min = i2;
             options.max = i3;
-            options.toString = new Utilities.CallbackReturn() {
+            options.toString = new Utilities.Callback2Return() {
                 @Override
-                public final Object run(Object obj) {
-                    String lambda$make$0;
-                    lambda$make$0 = SlideIntChooseView.Options.lambda$make$0(str, (Integer) obj);
-                    return lambda$make$0;
+                public final Object run(Object obj, Object obj2) {
+                    String lambda$make$1;
+                    lambda$make$1 = SlideIntChooseView.Options.lambda$make$1(str, (Integer) obj, (Integer) obj2);
+                    return lambda$make$1;
                 }
             };
             return options;
@@ -243,13 +257,9 @@ public class SlideIntChooseView extends FrameLayout {
         this.minText.cancelAnimation();
         this.maxText.cancelAnimation();
         this.valueText.cancelAnimation();
-        this.valueText.setText((CharSequence) this.options.toString.run(Integer.valueOf(i)), z);
-        AnimatedTextView animatedTextView = this.minText;
-        Options options = this.options;
-        animatedTextView.setText((CharSequence) options.toString.run(Integer.valueOf(options.min)), z);
-        AnimatedTextView animatedTextView2 = this.maxText;
-        Options options2 = this.options;
-        animatedTextView2.setText((CharSequence) options2.toString.run(Integer.valueOf(options2.max)), z);
+        this.valueText.setText((CharSequence) this.options.toString.run(0, Integer.valueOf(i)), z);
+        this.minText.setText((CharSequence) this.options.toString.run(-1, Integer.valueOf(this.options.min)), z);
+        this.maxText.setText((CharSequence) this.options.toString.run(1, Integer.valueOf(this.options.max)), z);
         this.maxText.setTextColor(Theme.getColor(i >= this.options.max ? Theme.key_windowBackgroundWhiteValueText : Theme.key_windowBackgroundWhiteGrayText, this.resourcesProvider), z);
         setMaxTextEmojiSaturation(i >= this.options.max ? 1.0f : 0.0f, z);
     }
