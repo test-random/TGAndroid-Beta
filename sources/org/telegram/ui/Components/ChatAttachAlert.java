@@ -4411,11 +4411,6 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         return AndroidUtilities.lerp(iArr[0], iArr[1], this.translationProgress);
     }
 
-    private boolean isCaptionAbove() {
-        AttachAlertLayout attachAlertLayout;
-        return this.captionAbove && ((attachAlertLayout = this.currentAttachLayout) == this.photoLayout || attachAlertLayout == this.photoPreviewLayout);
-    }
-
     private boolean isLightStatusBar() {
         return ColorUtils.calculateLuminance(getThemedColor(this.forceDarkTheme ? Theme.key_voipgroup_listViewBackground : Theme.key_dialogBackground)) > 0.699999988079071d;
     }
@@ -5874,6 +5869,11 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
 
     public void init() {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ChatAttachAlert.init():void");
+    }
+
+    public boolean isCaptionAbove() {
+        AttachAlertLayout attachAlertLayout;
+        return this.captionAbove && ((attachAlertLayout = this.currentAttachLayout) == this.photoLayout || attachAlertLayout == this.photoPreviewLayout);
     }
 
     public void makeFocusable(final EditTextBoldCursor editTextBoldCursor, final boolean z) {
