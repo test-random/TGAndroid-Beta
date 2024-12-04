@@ -1650,7 +1650,6 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             StoryRecorder.this.dualButton.setValue(isDual());
             StoryRecorder storyRecorder = StoryRecorder.this;
             storyRecorder.setCameraFlashModeIcon(storyRecorder.getCurrentFlashMode(), true);
-            StoryRecorder.this.collageButton.animate().alpha(isDual() ? 0.0f : 1.0f).start();
         }
     }
 
@@ -4931,12 +4930,12 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             currentFlashMode = null;
         }
         setCameraFlashModeIcon(this.currentPage == 0 ? currentFlashMode : null, true);
-        this.collageButton.animate().alpha(this.cameraView.isDual() ? 0.0f : 1.0f).start();
         ZoomControlView zoomControlView = this.zoomControlView;
         if (zoomControlView != null) {
             this.cameraZoom = 0.0f;
             zoomControlView.setZoom(0.0f, false);
         }
+        updateActionBarButtons(true);
     }
 
     public Bitmap lambda$createFilterPhotoView$63(BitmapFactory.Options options) {
@@ -5144,14 +5143,18 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         if (this.currentPage != 0 || this.animatedRecording) {
             return;
         }
+        DualCameraView dualCameraView = this.cameraView;
+        if (dualCameraView != null && dualCameraView.isDual()) {
+            this.cameraView.toggleDual();
+        }
         if (!this.collageListView.isVisible() && !this.collageLayoutView.hasLayout()) {
             this.collageLayoutView.setLayout(this.lastCollageLayout, true);
             this.collageListView.setSelected(this.lastCollageLayout);
             this.collageButton.setIcon((Drawable) new CollageLayoutButton.CollageLayoutDrawable(this.lastCollageLayout), true);
             this.collageButton.setSelected(true);
-            DualCameraView dualCameraView = this.cameraView;
-            if (dualCameraView != null) {
-                dualCameraView.recordHevc = !this.collageLayoutView.hasLayout();
+            DualCameraView dualCameraView2 = this.cameraView;
+            if (dualCameraView2 != null) {
+                dualCameraView2.recordHevc = !this.collageLayoutView.hasLayout();
             }
         }
         this.collageListView.setVisible(!r4.isVisible(), true);
@@ -5887,7 +5890,6 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         }
         if (i == 0) {
             setCameraFlashModeIcon(null, true);
-            this.collageButton.animate().alpha(0.0f).start();
             saveLastCameraBitmap(new Runnable() {
                 @Override
                 public final void run() {

@@ -1118,7 +1118,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 PersistColorPalette.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).cleanup();
                 SharedPreferences mainSettings = ProfileActivity.this.getMessagesController().getMainSettings();
                 SharedPreferences.Editor edit = mainSettings.edit();
-                edit.remove("peerColors").remove("profilePeerColors").remove("boostingappearance").remove("bizbothint");
+                edit.remove("peerColors").remove("profilePeerColors").remove("boostingappearance").remove("bizbothint").remove("movecaptionhint");
                 for (String str3 : mainSettings.getAll().keySet()) {
                     if (str3.contains("show_gift_for_") || str3.contains("bdayhint_") || str3.contains("bdayanim_")) {
                         edit.remove(str3);

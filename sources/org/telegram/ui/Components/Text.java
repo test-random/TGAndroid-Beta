@@ -33,7 +33,7 @@ public class Text {
     }
 
     public Text(CharSequence charSequence, float f, Typeface typeface) {
-        this.maxWidth = 999999.0f;
+        this.maxWidth = 9999.0f;
         this.ellipsizeWidth = -1.0f;
         TextPaint textPaint = new TextPaint(1);
         this.paint = textPaint;
@@ -43,7 +43,7 @@ public class Text {
     }
 
     public Text(CharSequence charSequence, TextPaint textPaint) {
-        this.maxWidth = 999999.0f;
+        this.maxWidth = 9999.0f;
         this.ellipsizeWidth = -1.0f;
         this.paint = textPaint;
         setText(charSequence);
@@ -59,11 +59,14 @@ public class Text {
                 canvas.saveLayerAlpha(0.0f, -this.vertPad, f - 1.0f, r0.getHeight() + this.vertPad, 255, 31);
             }
         }
+        canvas.save();
+        canvas.translate(-this.left, 0.0f);
         if (this.hackClipBounds) {
             canvas.drawText(this.layout.getText().toString(), 0.0f, -this.paint.getFontMetricsInt().ascent, this.paint);
         } else {
             this.layout.draw(canvas);
         }
+        canvas.restore();
         if (this.doNotSave) {
             return;
         }
@@ -81,9 +84,9 @@ public class Text {
         }
         canvas.save();
         this.ellipsizeMatrix.reset();
-        this.ellipsizeMatrix.postTranslate((this.ellipsizeWidth - this.left) - AndroidUtilities.dp(8.0f), 0.0f);
+        this.ellipsizeMatrix.postTranslate(this.ellipsizeWidth - AndroidUtilities.dp(8.0f), 0.0f);
         this.ellipsizeGradient.setLocalMatrix(this.ellipsizeMatrix);
-        canvas.drawRect((this.ellipsizeWidth - this.left) - AndroidUtilities.dp(8.0f), 0.0f, this.ellipsizeWidth - this.left, this.layout.getHeight(), this.ellipsizePaint);
+        canvas.drawRect(this.ellipsizeWidth - AndroidUtilities.dp(8.0f), 0.0f, this.ellipsizeWidth, this.layout.getHeight(), this.ellipsizePaint);
         canvas.restore();
         canvas.restore();
     }
@@ -95,7 +98,7 @@ public class Text {
         if (!this.doNotSave) {
             canvas.save();
         }
-        canvas.translate(f - this.left, f2 - (this.layout.getHeight() / 2.0f));
+        canvas.translate(f, f2 - (this.layout.getHeight() / 2.0f));
         draw(canvas);
         if (this.doNotSave) {
             return;
@@ -115,7 +118,7 @@ public class Text {
         if (!this.doNotSave) {
             canvas.save();
         }
-        canvas.translate(f - this.left, f2 - (this.layout.getHeight() / 2.0f));
+        canvas.translate(f, f2 - (this.layout.getHeight() / 2.0f));
         draw(canvas);
         if (!this.doNotSave) {
             canvas.restore();
@@ -181,10 +184,10 @@ public class Text {
     public void setText(CharSequence charSequence) {
         this.layout = new StaticLayout(AndroidUtilities.replaceNewLines(charSequence), this.paint, (int) Math.max(this.maxWidth, 1.0f), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
         this.width = 0.0f;
-        this.left = 0.0f;
+        this.left = r8.getWidth();
         for (int i = 0; i < this.layout.getLineCount(); i++) {
             this.width = Math.max(this.width, this.layout.getLineWidth(i));
-            this.left = Math.max(this.left, this.layout.getLineLeft(i));
+            this.left = Math.min(this.left, this.layout.getLineLeft(i));
         }
     }
 

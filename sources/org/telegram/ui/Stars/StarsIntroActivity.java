@@ -2262,7 +2262,7 @@ public class StarsIntroActivity extends GradientHeaderActivity implements Notifi
                 int length = spannableStringBuilder.length();
                 String substring = format.substring(indexOf);
                 if (substring.length() > 1) {
-                    spannableStringBuilder.append((CharSequence) substring.substring(0, 2));
+                    spannableStringBuilder.append((CharSequence) substring.substring(0, Math.min(substring.length(), 3)));
                     spannableStringBuilder.setSpan(new RelativeSizeSpan(f), length + 1, spannableStringBuilder.length(), 33);
                 }
             }

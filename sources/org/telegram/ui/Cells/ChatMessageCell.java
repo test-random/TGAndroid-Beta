@@ -4203,7 +4203,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
             canvas.restore();
             canvas.save();
-            botButton2.title.ellipsize(Math.max(1, ((int) (botButton2.width * f5)) - AndroidUtilities.dp(10.0f))).draw(canvas, (botButton2.x * f5) + f6 + (((botButton2.width * f5) - botButton2.title.getWidth()) / 2.0f), (AndroidUtilities.dp(44.0f) / 2.0f) + dp3);
+            botButton2.title.ellipsize(Math.max(1, ((int) (botButton2.width * f5)) - AndroidUtilities.dp(15.0f)));
+            botButton2.title.draw(canvas, (botButton2.x * f5) + f6 + (((botButton2.width * f5) - botButton2.title.getWidth()) / 2.0f), (AndroidUtilities.dp(44.0f) / 2.0f) + dp3);
             canvas.restore();
             if (!(botButton2.button instanceof TLRPC.TL_keyboardButtonWebView)) {
                 if (botButton2.button instanceof TLRPC.TL_keyboardButtonUrl) {
