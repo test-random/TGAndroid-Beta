@@ -190,6 +190,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
         public boolean isScrolling;
         private boolean isSwipeDisallowed;
         private boolean isSwipeOffsetAnimationDisallowed;
+        private final float minscroll;
         public float offsetY;
         private SpringAnimation offsetYAnimator;
         public boolean opened;
@@ -202,10 +203,12 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
         private SpringAnimation scrollAnimator;
         private Runnable scrollEndListener;
         private Runnable scrollListener;
+        private boolean scrolledOut;
         public boolean shouldWaitWebViewScroll;
         public boolean stickToEdges;
         private float swipeOffsetY;
         private int swipeStickyRange;
+        private float sy;
         public float topActionBarOffsetY;
         private BotWebViewContainer.MyWebView webView;
 
@@ -228,6 +231,9 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
                 }
             };
             this.allowSwipes = true;
+            this.sy = 0.0f;
+            this.scrolledOut = false;
+            this.minscroll = AndroidUtilities.dp(60.0f);
             this.stickToEdges = true;
             final int scaledTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
             this.gestureDetector = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener() {
@@ -238,7 +244,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
                     if (!WebViewSwipeContainer.this.isSwipeDisallowed && WebViewSwipeContainer.this.allowSwipes && (!WebViewSwipeContainer.this.fullsize || WebViewSwipeContainer.this.allowFullSizeSwipe)) {
                         WebViewSwipeContainer webViewSwipeContainer2 = WebViewSwipeContainer.this;
                         if (!webViewSwipeContainer2.shouldWaitWebViewScroll || webViewSwipeContainer2.allowingScroll(false)) {
-                            if (f2 >= AndroidUtilities.dp(650.0f) && ((AndroidUtilities.distance(motionEvent.getX(), motionEvent.getY(), motionEvent2.getX(), motionEvent2.getY()) > AndroidUtilities.dp(120.0f) || motionEvent2.getEventTime() - motionEvent.getEventTime() > 140) && (WebViewSwipeContainer.this.webView == null || WebViewSwipeContainer.this.webView.getScrollY() == 0))) {
+                            if (f2 >= AndroidUtilities.dp(650.0f) && ((AndroidUtilities.distance(motionEvent.getX(), motionEvent.getY(), motionEvent2.getX(), motionEvent2.getY()) > AndroidUtilities.dp(200.0f) || motionEvent2.getEventTime() - motionEvent.getEventTime() > 250) && (WebViewSwipeContainer.this.webView == null || WebViewSwipeContainer.this.webView.getScrollY() == 0))) {
                                 WebViewSwipeContainer.this.flingInProgress = true;
                                 if (WebViewSwipeContainer.this.swipeOffsetY >= WebViewSwipeContainer.this.swipeStickyRange || WebViewSwipeContainer.this.fullsize) {
                                     if (WebViewSwipeContainer.this.fullsize && WebViewSwipeContainer.this.allowFullSizeSwipe) {
@@ -286,6 +292,22 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
             float f2 = webViewSwipeContainer.swipeOffsetY - f;
             webViewSwipeContainer.swipeOffsetY = f2;
             return f2;
+        }
+
+        public float cap(float f) {
+            if (this.scrolledOut) {
+                return f;
+            }
+            float f2 = this.sy + f;
+            this.sy = f2;
+            float abs = Math.abs(f2);
+            float f3 = this.minscroll;
+            if (abs <= f3) {
+                return 0.0f;
+            }
+            this.scrolledOut = true;
+            float f4 = this.sy;
+            return f4 > 0.0f ? f4 - f3 : f4 + f3;
         }
 
         public static Boolean lambda$new$0(Void r0) {
