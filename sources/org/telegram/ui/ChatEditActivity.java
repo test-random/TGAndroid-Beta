@@ -1317,6 +1317,7 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
         String format;
         EditTextBoldCursor editTextBoldCursor;
         boolean z = true;
+        int i3 = 0;
         if (i == NotificationCenter.chatInfoDidLoad) {
             TLRPC.ChatFull chatFull = (TLRPC.ChatFull) objArr[0];
             if (chatFull.id == this.chatId) {
@@ -1387,6 +1388,7 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
                 if (textCell != null) {
                     textCell.setNeedDivider(botStarsController.botHasStars(this.userId) || botStarsController.botHasTON(this.userId));
                 }
+                this.balanceContainer.setVisibility((this.starsBalanceCell.getVisibility() == 0 || this.tonBalanceCell.getVisibility() == 0) ? 0 : 8);
             }
             if (this.tonBalanceCell != null) {
                 BotStarsController botStarsController2 = BotStarsController.getInstance(this.currentAccount);
@@ -1420,6 +1422,11 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
                     }
                     textCell2.setNeedDivider(z);
                 }
+                LinearLayout linearLayout = this.balanceContainer;
+                if (this.starsBalanceCell.getVisibility() != 0 && this.tonBalanceCell.getVisibility() != 0) {
+                    i3 = 8;
+                }
+                linearLayout.setVisibility(i3);
             }
         }
     }

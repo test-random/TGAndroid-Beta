@@ -73,7 +73,7 @@ public class AnimatedEmojiEffect {
             for (int i = 0; i < 20; i++) {
                 float randX2 = randX();
                 float randY2 = randY();
-                float f2 = 2.14748365E9f;
+                float f2 = 2.1474836E9f;
                 for (int i2 = 0; i2 < AnimatedEmojiEffect.this.particles.size(); i2++) {
                     float f3 = ((Particle) AnimatedEmojiEffect.this.particles.get(i2)).toX - randX2;
                     float f4 = ((Particle) AnimatedEmojiEffect.this.particles.get(i2)).toY1 - randY2;

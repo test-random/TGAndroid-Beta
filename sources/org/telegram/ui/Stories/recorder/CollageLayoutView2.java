@@ -199,16 +199,16 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
             if (storyEntry2 == null) {
                 this.imageReceiver.clearImage();
             } else if (storyEntry2.isVideo) {
-                Bitmap bitmap = storyEntry2.thumbBitmap;
-                if (bitmap != null) {
-                    this.imageReceiver.setImageBitmap(bitmap);
-                } else {
+                Bitmap bitmap = storyEntry2.blurredVideoThumb;
+                if (bitmap == null && (bitmap = storyEntry2.thumbBitmap) == null) {
                     String str = storyEntry2.thumbPath;
                     if (str != null) {
                         this.imageReceiver.setImage(str, sb2, null, null, 0L);
                     } else {
                         this.imageReceiver.clearImage();
                     }
+                } else {
+                    this.imageReceiver.setImageBitmap(bitmap);
                 }
                 TextureView textureView = new TextureView(CollageLayoutView2.this.getContext());
                 this.textureView = textureView;
@@ -742,16 +742,18 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         return Math.max(Math.min(((float) mainPart.content.duration) * (mainPart.content.videoRight - mainPart.content.videoLeft), 59500L), 1L);
     }
 
-    public float getFilledProgress() {
+    public int getFilledCount() {
         int i = 0;
-        int i2 = 0;
-        for (int i3 = 0; i3 < this.parts.size(); i3++) {
-            if (((Part) this.parts.get(i3)).hasContent()) {
+        for (int i2 = 0; i2 < this.parts.size(); i2++) {
+            if (((Part) this.parts.get(i2)).hasContent()) {
                 i++;
             }
-            i2++;
         }
-        return i / i2;
+        return i;
+    }
+
+    public float getFilledProgress() {
+        return getFilledCount() / getTotalCount();
     }
 
     public CollageLayout getLayout() {
@@ -841,6 +843,10 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         getPosition();
         Part mainPart = getMainPart();
         return getPosition() + (mainPart != null ? mainPart.content.videoOffset + (mainPart.content.videoLeft * ((float) mainPart.content.duration)) : 0L);
+    }
+
+    public int getTotalCount() {
+        return this.parts.size();
     }
 
     public boolean hasContent() {

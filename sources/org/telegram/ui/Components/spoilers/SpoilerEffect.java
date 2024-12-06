@@ -167,7 +167,7 @@ public class SpoilerEffect extends Drawable {
             }
         }
         spoilerEffect.setRippleProgress(-1.0f);
-        spoilerEffect.setBounds((int) Math.max(f, i), (int) f2, (int) Math.min(f3, i2 <= 0 ? 2.14748365E9f : i2), (int) f4);
+        spoilerEffect.setBounds((int) Math.max(f, i), (int) f2, (int) Math.min(f3, i2 <= 0 ? 2.1474836E9f : i2), (int) f4);
         spoilerEffect.setColor(layout.getPaint().getColor());
         spoilerEffect.setRippleInterpolator(Easings.easeInQuad);
         spoilerEffect.updateMaxParticles();

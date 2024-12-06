@@ -1119,10 +1119,10 @@ public abstract class MessageEntityView extends EntityView {
         float y2;
         float f;
         float f2;
-        float f3 = 2.14748365E9f;
-        float f4 = 2.14748365E9f;
-        float f5 = -2.14748365E9f;
-        float f6 = -2.14748365E9f;
+        float f3 = 2.1474836E9f;
+        float f4 = 2.1474836E9f;
+        float f5 = -2.1474836E9f;
+        float f6 = -2.1474836E9f;
         for (int i = 0; i < this.listView.getChildCount(); i++) {
             View childAt = this.listView.getChildAt(i);
             if (childAt instanceof ChatMessageCell) {

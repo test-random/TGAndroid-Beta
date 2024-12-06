@@ -221,7 +221,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
             this.topActionBarOffsetY = ActionBar.getCurrentActionBarHeight();
             this.offsetY = 0.0f;
             this.pendingOffsetY = -1.0f;
-            this.pendingSwipeOffsetY = -2.14748365E9f;
+            this.pendingSwipeOffsetY = -2.1474836E9f;
             this.isKeyboardVisible = new GenericProvider() {
                 @Override
                 public final Object provide(Object obj) {
@@ -244,7 +244,9 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
                     if (!WebViewSwipeContainer.this.isSwipeDisallowed && WebViewSwipeContainer.this.allowSwipes && (!WebViewSwipeContainer.this.fullsize || WebViewSwipeContainer.this.allowFullSizeSwipe)) {
                         WebViewSwipeContainer webViewSwipeContainer2 = WebViewSwipeContainer.this;
                         if (!webViewSwipeContainer2.shouldWaitWebViewScroll || webViewSwipeContainer2.allowingScroll(false)) {
-                            if (f2 >= AndroidUtilities.dp(650.0f) && ((AndroidUtilities.distance(motionEvent.getX(), motionEvent.getY(), motionEvent2.getX(), motionEvent2.getY()) > AndroidUtilities.dp(200.0f) || motionEvent2.getEventTime() - motionEvent.getEventTime() > 250) && (WebViewSwipeContainer.this.webView == null || WebViewSwipeContainer.this.webView.getScrollY() == 0))) {
+                            float distance = AndroidUtilities.distance(motionEvent.getX(), motionEvent.getY(), motionEvent2.getX(), motionEvent2.getY());
+                            float eventTime = (float) (motionEvent2.getEventTime() - motionEvent.getEventTime());
+                            if (f2 >= AndroidUtilities.dp(650.0f) && ((distance > AndroidUtilities.dp(200.0f) || eventTime > 250.0f) && (WebViewSwipeContainer.this.webView == null || WebViewSwipeContainer.this.webView.getScrollY() == 0))) {
                                 WebViewSwipeContainer.this.flingInProgress = true;
                                 if (WebViewSwipeContainer.this.swipeOffsetY >= WebViewSwipeContainer.this.swipeStickyRange || WebViewSwipeContainer.this.fullsize) {
                                     if (WebViewSwipeContainer.this.fullsize && WebViewSwipeContainer.this.allowFullSizeSwipe) {
@@ -355,7 +357,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
                     this.pendingOffsetY = -1.0f;
                     this.isSwipeOffsetAnimationDisallowed = z2;
                 }
-                this.pendingSwipeOffsetY = -2.14748365E9f;
+                this.pendingSwipeOffsetY = -2.1474836E9f;
             }
         }
 
@@ -414,7 +416,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
         }
 
         @Override
-        public boolean dispatchTouchEvent(android.view.MotionEvent r10) {
+        public boolean dispatchTouchEvent(android.view.MotionEvent r11) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.bots.ChatAttachAlertBotWebViewLayout.WebViewSwipeContainer.dispatchTouchEvent(android.view.MotionEvent):boolean");
         }
 
@@ -526,7 +528,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
         }
 
         public void setOffsetY(final float f) {
-            if (this.pendingSwipeOffsetY != -2.14748365E9f) {
+            if (this.pendingSwipeOffsetY != -2.1474836E9f) {
                 this.pendingOffsetY = f;
                 return;
             }

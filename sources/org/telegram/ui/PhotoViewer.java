@@ -2021,8 +2021,17 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 visibleBulletin.updatePosition();
             }
             updateMoveCaptionButton();
+            boolean z = false;
             if (PhotoViewer.this.bottomBulletinUnderCaption != null) {
                 PhotoViewer.this.bottomBulletinUnderCaption.animate().translationY(-Math.max(0, i - PhotoViewer.this.pickerView.getHeight())).setDuration(250L).setInterpolator(AdjustPanLayoutHelper.keyboardInterpolator).start();
+            }
+            PhotoViewer.this.actionBar.animate().alpha((!PhotoViewer.this.isActionBarVisible || (PhotoViewer.this.getCaptionView() == PhotoViewer.this.topCaptionEdit && PhotoViewer.this.topCaptionEdit.keyboardNotifier.keyboardVisible())) ? 0.0f : 1.0f).start();
+            if (PhotoViewer.this.pickerView.getVisibility() == 0) {
+                PhotoViewer photoViewer = PhotoViewer.this;
+                if (photoViewer.isActionBarVisible && (PhotoViewer.this.getCaptionView() != PhotoViewer.this.topCaptionEdit || !PhotoViewer.this.topCaptionEdit.keyboardNotifier.keyboardVisible())) {
+                    z = true;
+                }
+                photoViewer.toggleOnlyCheckImageView(z);
             }
         }
 
@@ -2124,6 +2133,16 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         @Override
         protected boolean showMoveButton() {
             return PhotoViewer.this.placeProvider != null && PhotoViewer.this.placeProvider.canMoveCaptionAbove();
+        }
+
+        @Override
+        public void updateKeyboard(int i) {
+            super.updateKeyboard(i);
+            PhotoViewer.this.actionBar.animate().alpha((!PhotoViewer.this.isActionBarVisible || (PhotoViewer.this.getCaptionView() == PhotoViewer.this.topCaptionEdit && PhotoViewer.this.topCaptionEdit.keyboardNotifier.keyboardVisible())) ? 0.0f : 1.0f).start();
+            if (PhotoViewer.this.pickerView.getVisibility() == 0) {
+                PhotoViewer photoViewer = PhotoViewer.this;
+                photoViewer.toggleOnlyCheckImageView(photoViewer.isActionBarVisible && !(PhotoViewer.this.getCaptionView() == PhotoViewer.this.topCaptionEdit && PhotoViewer.this.topCaptionEdit.keyboardNotifier.keyboardVisible()));
+            }
         }
 
         @Override
@@ -15266,233 +15285,12 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         toggleActionBar(z, z2, ActionBarToggleParams.DEFAULT);
     }
 
-    public void toggleActionBar(boolean z, boolean z2, ActionBarToggleParams actionBarToggleParams) {
-        CaptionScrollView captionScrollView;
-        CaptionScrollView captionScrollView2;
-        if (this.currentEditMode == 0) {
-            int i = this.switchingToMode;
-            if (i == 0 || i == -1) {
-                AnimatorSet animatorSet = this.actionBarAnimator;
-                if (animatorSet != null) {
-                    animatorSet.cancel();
-                }
-                if (z) {
-                    this.actionBar.setVisibility(0);
-                    if (this.bottomLayout.getTag() != null) {
-                        this.bottomLayout.setVisibility(0);
-                    }
-                    if (this.captionTextViewSwitcher.getTag() != null) {
-                        this.captionTextViewSwitcher.setVisibility(0);
-                        VideoSeekPreviewImage videoSeekPreviewImage = this.videoPreviewFrame;
-                        if (videoSeekPreviewImage != null) {
-                            videoSeekPreviewImage.requestLayout();
-                        }
-                    }
-                }
-                this.isActionBarVisible = z;
-                PhotoViewerWebView photoViewerWebView = this.photoViewerWebView;
-                if (photoViewerWebView != null) {
-                    photoViewerWebView.setTouchDisabled(z);
-                }
-                if (actionBarToggleParams.enableStatusBarAnimation) {
-                    updateContainerFlags(z);
-                }
-                if (this.videoPlayerControlVisible && this.isPlaying && z) {
-                    scheduleActionBarHide();
-                } else {
-                    AndroidUtilities.cancelRunOnUIThread(this.hideActionBarRunnable);
-                }
-                if (!z) {
-                    Bulletin.hide(this.containerView);
-                }
-                float dpf2 = AndroidUtilities.dpf2(24.0f);
-                this.videoPlayerControlFrameLayout.setSeekBarTransitionEnabled(actionBarToggleParams.enableTranslationAnimation && this.playerLooping);
-                this.videoPlayerControlFrameLayout.setTranslationYAnimationEnabled(actionBarToggleParams.enableTranslationAnimation);
-                if (!z2) {
-                    this.actionBar.setAlpha(z ? 1.0f : 0.0f);
-                    if (this.fullscreenButton[0].getTranslationX() != 0.0f && this.allowShowFullscreenButton) {
-                        this.fullscreenButton[0].setAlpha(z ? 1.0f : 0.0f);
-                    }
-                    for (int i2 = 0; i2 < 3; i2++) {
-                        this.fullscreenButton[i2].setTranslationY(z ? 0.0f : dpf2);
-                    }
-                    this.actionBar.setTranslationY(z ? 0.0f : -dpf2);
-                    PhotoCountView photoCountView = this.countView;
-                    if (photoCountView != null) {
-                        photoCountView.setAlpha(z ? 1.0f : 0.0f);
-                        this.countView.setTranslationY(z ? 0.0f : -dpf2);
-                    }
-                    this.bottomLayout.setAlpha(z ? 1.0f : 0.0f);
-                    this.bottomLayout.setTranslationY(z ? 0.0f : dpf2);
-                    this.navigationBar.setAlpha(z ? 1.0f : 0.0f);
-                    this.groupedPhotosListView.setAlpha((!z || this.aboutToSwitchTo == 3) ? 0.0f : 1.0f);
-                    this.groupedPhotosListView.setTranslationY((!z || this.aboutToSwitchTo == 3) ? dpf2 : 0.0f);
-                    if (!this.needCaptionLayout && (captionScrollView = this.captionScrollView) != null) {
-                        captionScrollView.setAlpha(z ? 1.0f : 0.0f);
-                        CaptionScrollView captionScrollView3 = this.captionScrollView;
-                        if (z) {
-                            dpf2 = 0.0f;
-                        }
-                        captionScrollView3.setTranslationY(dpf2);
-                    }
-                    this.videoPlayerControlFrameLayout.setProgress(z ? 1.0f : 0.0f);
-                    if (this.muteItem.getTag() != null) {
-                        this.muteItem.setAlpha(z ? 1.0f : 0.0f);
-                    }
-                    if (this.videoPlayerControlVisible && this.isPlaying) {
-                        this.photoProgressViews[0].setIndexedAlpha(1, z ? 1.0f : 0.0f, false);
-                        return;
-                    }
-                    return;
-                }
-                ArrayList arrayList = new ArrayList();
-                ActionBar actionBar = this.actionBar;
-                Property property = View.ALPHA;
-                arrayList.add(ObjectAnimator.ofFloat(actionBar, (Property<ActionBar, Float>) property, z ? 1.0f : 0.0f));
-                if (actionBarToggleParams.enableTranslationAnimation) {
-                    arrayList.add(ObjectAnimator.ofFloat(this.actionBar, (Property<ActionBar, Float>) View.TRANSLATION_Y, z ? 0.0f : -dpf2));
-                } else {
-                    this.actionBar.setTranslationY(0.0f);
-                }
-                if (this.allowShowFullscreenButton) {
-                    arrayList.add(ObjectAnimator.ofFloat(this.fullscreenButton[0], (Property<ImageView, Float>) property, z ? 1.0f : 0.0f));
-                }
-                for (int i3 = 1; i3 < 3; i3++) {
-                    this.fullscreenButton[i3].setTranslationY(z ? 0.0f : dpf2);
-                }
-                if (actionBarToggleParams.enableTranslationAnimation) {
-                    arrayList.add(ObjectAnimator.ofFloat(this.fullscreenButton[0], (Property<ImageView, Float>) View.TRANSLATION_Y, z ? 0.0f : dpf2));
-                } else {
-                    this.fullscreenButton[0].setTranslationY(0.0f);
-                }
-                FrameLayout frameLayout = this.bottomLayout;
-                if (frameLayout != null) {
-                    arrayList.add(ObjectAnimator.ofFloat(frameLayout, (Property<FrameLayout, Float>) View.ALPHA, z ? 1.0f : 0.0f));
-                    if (actionBarToggleParams.enableTranslationAnimation) {
-                        arrayList.add(ObjectAnimator.ofFloat(this.bottomLayout, (Property<FrameLayout, Float>) View.TRANSLATION_Y, z ? 0.0f : dpf2));
-                    } else {
-                        this.bottomLayout.setTranslationY(0.0f);
-                    }
-                }
-                PhotoCountView photoCountView2 = this.countView;
-                if (photoCountView2 != null) {
-                    arrayList.add(ObjectAnimator.ofFloat(photoCountView2, (Property<PhotoCountView, Float>) View.ALPHA, z ? 1.0f : 0.0f));
-                    if (actionBarToggleParams.enableTranslationAnimation) {
-                        arrayList.add(ObjectAnimator.ofFloat(this.countView, (Property<PhotoCountView, Float>) View.TRANSLATION_Y, z ? 0.0f : -dpf2));
-                    } else {
-                        this.countView.setTranslationY(0.0f);
-                    }
-                }
-                View view = this.navigationBar;
-                if (view != null) {
-                    arrayList.add(ObjectAnimator.ofFloat(view, (Property<View, Float>) View.ALPHA, z ? 1.0f : 0.0f));
-                }
-                if (this.videoPlayerControlVisible) {
-                    arrayList.add(ObjectAnimator.ofFloat(this.videoPlayerControlFrameLayout, (Property<VideoPlayerControlFrameLayout, Float>) VPC_PROGRESS, z ? 1.0f : 0.0f));
-                } else {
-                    this.videoPlayerControlFrameLayout.setProgress(z ? 1.0f : 0.0f);
-                }
-                GroupedPhotosListView groupedPhotosListView = this.groupedPhotosListView;
-                Property property2 = View.ALPHA;
-                arrayList.add(ObjectAnimator.ofFloat(groupedPhotosListView, (Property<GroupedPhotosListView, Float>) property2, z ? 1.0f : 0.0f));
-                if (actionBarToggleParams.enableTranslationAnimation) {
-                    arrayList.add(ObjectAnimator.ofFloat(this.groupedPhotosListView, (Property<GroupedPhotosListView, Float>) View.TRANSLATION_Y, z ? 0.0f : dpf2));
-                } else {
-                    this.groupedPhotosListView.setTranslationY(0.0f);
-                }
-                if (!this.needCaptionLayout && (captionScrollView2 = this.captionScrollView) != null) {
-                    arrayList.add(ObjectAnimator.ofFloat(captionScrollView2, (Property<CaptionScrollView, Float>) property2, z ? 1.0f : 0.0f));
-                    if (actionBarToggleParams.enableTranslationAnimation) {
-                        CaptionScrollView captionScrollView4 = this.captionScrollView;
-                        Property property3 = View.TRANSLATION_Y;
-                        if (z) {
-                            dpf2 = 0.0f;
-                        }
-                        arrayList.add(ObjectAnimator.ofFloat(captionScrollView4, (Property<CaptionScrollView, Float>) property3, dpf2));
-                    } else {
-                        this.captionScrollView.setTranslationY(0.0f);
-                    }
-                }
-                if (this.videoPlayerControlVisible && this.isPlaying) {
-                    ValueAnimator ofFloat = ValueAnimator.ofFloat(this.photoProgressViews[0].animAlphas[1], z ? 1.0f : 0.0f);
-                    ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            PhotoViewer.this.lambda$toggleActionBar$95(valueAnimator);
-                        }
-                    });
-                    arrayList.add(ofFloat);
-                }
-                if (this.muteItem.getTag() != null) {
-                    arrayList.add(ObjectAnimator.ofFloat(this.muteItem, (Property<ImageView, Float>) property2, z ? 1.0f : 0.0f));
-                }
-                AnimatorSet animatorSet2 = new AnimatorSet();
-                this.actionBarAnimator = animatorSet2;
-                animatorSet2.playTogether(arrayList);
-                this.actionBarAnimator.setDuration(actionBarToggleParams.animationDuration);
-                this.actionBarAnimator.setInterpolator(actionBarToggleParams.animationInterpolator);
-                this.actionBarAnimator.addListener(new AnimatorListenerAdapter() {
-                    final boolean val$finalShow;
-
-                    AnonymousClass65(boolean z3) {
-                        r2 = z3;
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-                        if (animator.equals(PhotoViewer.this.actionBarAnimator)) {
-                            PhotoViewer.this.actionBarAnimator = null;
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        if (animator.equals(PhotoViewer.this.actionBarAnimator)) {
-                            if (!r2) {
-                                PhotoViewer.this.actionBar.setVisibility(4);
-                                if (PhotoViewer.this.bottomLayout.getTag() != null) {
-                                    PhotoViewer.this.bottomLayout.setVisibility(4);
-                                }
-                                if (PhotoViewer.this.captionTextViewSwitcher.getTag() != null) {
-                                    PhotoViewer.this.captionTextViewSwitcher.setVisibility(4);
-                                }
-                            }
-                            PhotoViewer.this.actionBarAnimator = null;
-                        }
-                    }
-                });
-                this.actionBarAnimator.start();
-            }
-        }
+    public void toggleActionBar(boolean r12, boolean r13, org.telegram.ui.PhotoViewer.ActionBarToggleParams r14) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.toggleActionBar(boolean, boolean, org.telegram.ui.PhotoViewer$ActionBarToggleParams):void");
     }
 
     public void toggleCaptionAbove() {
-        PhotoViewerProvider photoViewerProvider = this.placeProvider;
-        if (photoViewerProvider != null && photoViewerProvider.canMoveCaptionAbove()) {
-            CaptionContainerView captionView = getCaptionView();
-            this.placeProvider.moveCaptionAbove(!r1.isCaptionAbove());
-            showEditCaption(true, true);
-            CaptionContainerView captionView2 = getCaptionView();
-            boolean isCaptionAbove = this.placeProvider.isCaptionAbove();
-            if (captionView != captionView2) {
-                captionView.editText.hidePopup(true);
-                captionView2.setText(AnimatedEmojiSpan.cloneSpans(captionView.getText()));
-                captionView2.editText.getEditText().setAllowTextEntitiesIntersection(captionView.editText.getEditText().getAllowTextEntitiesIntersection());
-                if (captionView.editText.getEditText().isFocused()) {
-                    captionView2.editText.getEditText().requestFocus();
-                    captionView2.editText.getEditText().setSelection(captionView.editText.getEditText().getSelectionStart(), captionView.editText.getEditText().getSelectionEnd());
-                }
-                MentionsContainerView mentionsContainerView = captionView.mentionContainer;
-                if (mentionsContainerView != null) {
-                    AndroidUtilities.removeFromParent(mentionsContainerView);
-                    captionView.mentionContainer = null;
-                }
-            }
-            if (MessagesController.getInstance(this.currentAccount).shouldShowMoveCaptionHint()) {
-                MessagesController.getInstance(this.currentAccount).incrementMoveCaptionHint();
-                BulletinFactory.of(isCaptionAbove ? this.bottomBulletinUnderCaption : this.topBulletinUnderCaption, new DarkThemeResourceProvider()).createSimpleBulletin(isCaptionAbove ? R.raw.caption_up : R.raw.caption_down, LocaleController.getString(isCaptionAbove ? R.string.MovedCaptionUp : R.string.MovedCaptionDown), LocaleController.getString(isCaptionAbove ? R.string.MovedCaptionUpText : R.string.MovedCaptionDownText)).setImageScale(0.8f).show(!isCaptionAbove);
-            }
-        }
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.toggleCaptionAbove():void");
     }
 
     private void toggleCheckImageView(boolean z) {
@@ -15606,6 +15404,26 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
         });
         this.miniProgressAnimator.start();
+    }
+
+    public void toggleOnlyCheckImageView(boolean z) {
+        AnimatorSet animatorSet = new AnimatorSet();
+        ArrayList arrayList = new ArrayList();
+        float dpf2 = AndroidUtilities.dpf2(24.0f);
+        int i = this.sendPhotoType;
+        if (i == 0 || i == 4) {
+            CheckBox checkBox = this.checkImageView;
+            Property property = View.ALPHA;
+            arrayList.add(ObjectAnimator.ofFloat(checkBox, (Property<CheckBox, Float>) property, z ? 1.0f : 0.0f));
+            CheckBox checkBox2 = this.checkImageView;
+            Property property2 = View.TRANSLATION_Y;
+            arrayList.add(ObjectAnimator.ofFloat(checkBox2, (Property<CheckBox, Float>) property2, z ? 0.0f : -dpf2));
+            arrayList.add(ObjectAnimator.ofFloat(this.photosCounterView, (Property<CounterView, Float>) property, z ? 1.0f : 0.0f));
+            arrayList.add(ObjectAnimator.ofFloat(this.photosCounterView, (Property<CounterView, Float>) property2, z ? 0.0f : -dpf2));
+        }
+        animatorSet.playTogether(arrayList);
+        animatorSet.setDuration(200L);
+        animatorSet.start();
     }
 
     private void togglePhotosListView(boolean z, boolean z2) {
@@ -17830,8 +17648,17 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     visibleBulletin.updatePosition();
                 }
                 updateMoveCaptionButton();
+                boolean z = false;
                 if (PhotoViewer.this.bottomBulletinUnderCaption != null) {
                     PhotoViewer.this.bottomBulletinUnderCaption.animate().translationY(-Math.max(0, i10 - PhotoViewer.this.pickerView.getHeight())).setDuration(250L).setInterpolator(AdjustPanLayoutHelper.keyboardInterpolator).start();
+                }
+                PhotoViewer.this.actionBar.animate().alpha((!PhotoViewer.this.isActionBarVisible || (PhotoViewer.this.getCaptionView() == PhotoViewer.this.topCaptionEdit && PhotoViewer.this.topCaptionEdit.keyboardNotifier.keyboardVisible())) ? 0.0f : 1.0f).start();
+                if (PhotoViewer.this.pickerView.getVisibility() == 0) {
+                    PhotoViewer photoViewer = PhotoViewer.this;
+                    if (photoViewer.isActionBarVisible && (PhotoViewer.this.getCaptionView() != PhotoViewer.this.topCaptionEdit || !PhotoViewer.this.topCaptionEdit.keyboardNotifier.keyboardVisible())) {
+                        z = true;
+                    }
+                    photoViewer.toggleOnlyCheckImageView(z);
                 }
             }
 
@@ -17960,6 +17787,16 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             @Override
             protected boolean showMoveButton() {
                 return PhotoViewer.this.placeProvider != null && PhotoViewer.this.placeProvider.canMoveCaptionAbove();
+            }
+
+            @Override
+            public void updateKeyboard(int i10) {
+                super.updateKeyboard(i10);
+                PhotoViewer.this.actionBar.animate().alpha((!PhotoViewer.this.isActionBarVisible || (PhotoViewer.this.getCaptionView() == PhotoViewer.this.topCaptionEdit && PhotoViewer.this.topCaptionEdit.keyboardNotifier.keyboardVisible())) ? 0.0f : 1.0f).start();
+                if (PhotoViewer.this.pickerView.getVisibility() == 0) {
+                    PhotoViewer photoViewer = PhotoViewer.this;
+                    photoViewer.toggleOnlyCheckImageView(photoViewer.isActionBarVisible && !(PhotoViewer.this.getCaptionView() == PhotoViewer.this.topCaptionEdit && PhotoViewer.this.topCaptionEdit.keyboardNotifier.keyboardVisible()));
+                }
             }
 
             @Override

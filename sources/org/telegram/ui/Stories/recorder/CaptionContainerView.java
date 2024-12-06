@@ -1276,7 +1276,7 @@ public abstract class CaptionContainerView extends FrameLayout {
             this.editText.hidePopup(true);
             return true;
         }
-        if (!this.editText.isKeyboardVisible() || this.keyboardNotifier.ignoring) {
+        if ((!this.editText.isKeyboardVisible() && !this.keyboardNotifier.keyboardVisible()) || this.keyboardNotifier.ignoring) {
             return false;
         }
         closeKeyboard();

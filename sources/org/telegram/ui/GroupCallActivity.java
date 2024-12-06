@@ -4614,13 +4614,13 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
     public void updateLayout(boolean z) {
         boolean z2 = true;
         int childCount = this.listView.getChildCount();
-        float f = 2.14748365E9f;
+        float f = 2.1474836E9f;
         for (int i = 0; i < childCount; i++) {
             if (this.listView.getChildAdapterPosition(this.listView.getChildAt(i)) >= 0) {
                 f = Math.min(f, r8.getTop());
             }
         }
-        if (f < 0.0f || f == 2.14748365E9f) {
+        if (f < 0.0f || f == 2.1474836E9f) {
             f = childCount != 0 ? 0.0f : this.listView.getPaddingTop();
         }
         final boolean z3 = f <= ((float) (ActionBar.getCurrentActionBarHeight() - AndroidUtilities.dp(14.0f)));

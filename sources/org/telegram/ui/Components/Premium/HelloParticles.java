@@ -125,7 +125,7 @@ public abstract class HelloParticles {
                 for (int i3 = 0; i3 < 10; i3++) {
                     float abs3 = Math.abs(Utilities.fastRandom.nextInt() % f4) + f2;
                     float abs4 = Drawable.this.rect.top + Math.abs(Utilities.fastRandom.nextInt() % Drawable.this.rect.height());
-                    float f6 = 2.14748365E9f;
+                    float f6 = 2.1474836E9f;
                     for (int i4 = 0; i4 < Drawable.this.particles.size(); i4++) {
                         Particle particle = (Particle) Drawable.this.particles.get(i4);
                         if (particle.set) {

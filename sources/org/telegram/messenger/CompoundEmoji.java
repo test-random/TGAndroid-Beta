@@ -265,9 +265,9 @@ public class CompoundEmoji {
         }
         String[] split = str2.split("\u200d");
         StringBuilder sb = new StringBuilder();
-        sb.append("\u1faf1");
+        sb.append("🫱");
         sb.append(split.length >= 1 ? split[0] : "");
-        sb.append("\u200d\u1faf2");
+        sb.append("\u200d🫲");
         sb.append(split.length >= 2 ? split[1] : "");
         return sb.toString();
     }
@@ -315,7 +315,7 @@ public class CompoundEmoji {
                     i = getSkinTone(str);
                     r3 = i >= 0 ? i : -1;
                     split = str.split("\u200d");
-                    if (split.length == 2 || !split[0].startsWith("\u1faf1") || !split[1].startsWith("\u1faf2")) {
+                    if (split.length == 2 || !split[0].startsWith("🫱") || !split[1].startsWith("🫲")) {
                         return null;
                     }
                     if (split[0].length() != 2 && (split[0].length() != 4 || (i = getSkinTone(split[0])) < 0)) {

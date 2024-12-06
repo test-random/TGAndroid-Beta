@@ -215,11 +215,11 @@ public class FloatingDebugView extends FrameLayout implements NotificationCenter
                 if (FloatingDebugView.this.fabXSpring.getSpring().getFinalPosition() + (f / 7.0f) >= FloatingDebugView.this.getWidth() / 2.0f) {
                     floatingDebugView = FloatingDebugView.this;
                     displayMetrics = floatingDebugView.getResources().getDisplayMetrics();
-                    f3 = 2.14748365E9f;
+                    f3 = 2.1474836E9f;
                 } else {
                     floatingDebugView = FloatingDebugView.this;
                     displayMetrics = floatingDebugView.getResources().getDisplayMetrics();
-                    f3 = -2.14748365E9f;
+                    f3 = -2.1474836E9f;
                 }
                 spring.setFinalPosition(floatingDebugView.clampX(displayMetrics, f3));
                 SpringForce spring2 = FloatingDebugView.this.fabYSpring.getSpring();
@@ -288,11 +288,11 @@ public class FloatingDebugView extends FrameLayout implements NotificationCenter
                         if (FloatingDebugView.this.fabXSpring.getSpring().getFinalPosition() >= getWidth() / 2.0f) {
                             floatingDebugView = FloatingDebugView.this;
                             displayMetrics = getResources().getDisplayMetrics();
-                            f = 2.14748365E9f;
+                            f = 2.1474836E9f;
                         } else {
                             floatingDebugView = FloatingDebugView.this;
                             displayMetrics = getResources().getDisplayMetrics();
-                            f = -2.14748365E9f;
+                            f = -2.1474836E9f;
                         }
                         spring.setFinalPosition(floatingDebugView.clampX(displayMetrics, f));
                         FloatingDebugView.this.fabYSpring.getSpring().setFinalPosition(FloatingDebugView.this.clampY(getResources().getDisplayMetrics(), FloatingDebugView.this.fabYSpring.getSpring().getFinalPosition()));
@@ -571,8 +571,8 @@ public class FloatingDebugView extends FrameLayout implements NotificationCenter
         float f = this.mPrefs.getFloat("x", -1.0f);
         float f2 = this.mPrefs.getFloat("y", -1.0f);
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        this.floatingButtonContainer.setTranslationX((f == -1.0f || f >= ((float) displayMetrics.widthPixels) / 2.0f) ? clampX(displayMetrics, 2.14748365E9f) : clampX(displayMetrics, -2.14748365E9f));
-        this.floatingButtonContainer.setTranslationY(f2 == -1.0f ? clampY(displayMetrics, 2.14748365E9f) : clampY(displayMetrics, f2));
+        this.floatingButtonContainer.setTranslationX((f == -1.0f || f >= ((float) displayMetrics.widthPixels) / 2.0f) ? clampX(displayMetrics, 2.1474836E9f) : clampX(displayMetrics, -2.1474836E9f));
+        this.floatingButtonContainer.setTranslationY(f2 == -1.0f ? clampY(displayMetrics, 2.1474836E9f) : clampY(displayMetrics, f2));
         FrameLayout frameLayout = this.floatingButtonContainer;
         this.fabXSpring = new SpringAnimation(frameLayout, DynamicAnimation.TRANSLATION_X, frameLayout.getTranslationX()).setSpring(new SpringForce(this.floatingButtonContainer.getTranslationX()).setStiffness(650.0f).setDampingRatio(0.75f));
         FrameLayout frameLayout2 = this.floatingButtonContainer;
@@ -595,7 +595,7 @@ public class FloatingDebugView extends FrameLayout implements NotificationCenter
         this.fabYSpring.cancel();
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         FrameLayout frameLayout = this.floatingButtonContainer;
-        frameLayout.setTranslationX(clampX(displayMetrics, frameLayout.getTranslationX() >= ((float) displayMetrics.widthPixels) / 2.0f ? 2.14748365E9f : -2.14748365E9f));
+        frameLayout.setTranslationX(clampX(displayMetrics, frameLayout.getTranslationX() >= ((float) displayMetrics.widthPixels) / 2.0f ? 2.1474836E9f : -2.1474836E9f));
         FrameLayout frameLayout2 = this.floatingButtonContainer;
         frameLayout2.setTranslationY(clampY(displayMetrics, frameLayout2.getTranslationY()));
         this.fabXSpring.getSpring().setFinalPosition(this.floatingButtonContainer.getTranslationX());

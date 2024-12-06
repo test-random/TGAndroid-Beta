@@ -61,6 +61,7 @@ public class Icon3D {
     int timeHandle;
     int[] trianglesCount;
     public final int type;
+    int typeHandle;
     private int whiteHandle;
     float xOffset;
     private int xOffsetHandle;
@@ -132,7 +133,8 @@ public class Icon3D {
     }
 
     private void init(Context context) {
-        int i;
+        Bitmap bitmap;
+        String str;
         GLES20.glUseProgram(this.mProgramObject);
         this.mVerticesHandle = GLES20.glGetAttribLocation(this.mProgramObject, "vPosition");
         this.mTextureCoordinateHandle = GLES20.glGetAttribLocation(this.mProgramObject, "a_TexCoordinate");
@@ -157,36 +159,37 @@ public class Icon3D {
         this.resolutionHandle = GLES20.glGetUniformLocation(this.mProgramObject, "resolution");
         this.gradientPositionHandle = GLES20.glGetUniformLocation(this.mProgramObject, "gradientPosition");
         this.modelIndexHandle = GLES20.glGetUniformLocation(this.mProgramObject, "modelIndex");
+        this.typeHandle = GLES20.glGetUniformLocation(this.mProgramObject, "type");
         this.nightHandle = GLES20.glGetUniformLocation(this.mProgramObject, "night");
         this.timeHandle = GLES20.glGetUniformLocation(this.mProgramObject, "time");
-        int i2 = this.N * 3;
-        int[] iArr = new int[i2];
+        int i = this.N * 3;
+        int[] iArr = new int[i];
         this.buffers = iArr;
-        GLES20.glGenBuffers(i2, iArr, 0);
-        for (int i3 = 0; i3 < this.N; i3++) {
-            int i4 = i3 * 3;
-            GLES20.glBindBuffer(34962, this.buffers[i4]);
-            this.mTextures[i3].position(0);
-            GLES20.glBufferData(34962, this.mTextures[i3].capacity() * 4, this.mTextures[i3], 35044);
+        GLES20.glGenBuffers(i, iArr, 0);
+        for (int i2 = 0; i2 < this.N; i2++) {
+            int i3 = i2 * 3;
+            GLES20.glBindBuffer(34962, this.buffers[i3]);
+            this.mTextures[i2].position(0);
+            GLES20.glBufferData(34962, this.mTextures[i2].capacity() * 4, this.mTextures[i2], 35044);
             GLES20.glEnableVertexAttribArray(this.mTextureCoordinateHandle);
-            this.mTextures[i3].clear();
-            GLES20.glBindBuffer(34962, this.buffers[i4 + 1]);
-            this.mNormals[i3].position(0);
-            GLES20.glBufferData(34962, this.mNormals[i3].capacity() * 4, this.mNormals[i3], 35044);
+            this.mTextures[i2].clear();
+            GLES20.glBindBuffer(34962, this.buffers[i3 + 1]);
+            this.mNormals[i2].position(0);
+            GLES20.glBufferData(34962, this.mNormals[i2].capacity() * 4, this.mNormals[i2], 35044);
             GLES20.glEnableVertexAttribArray(this.mNormalCoordinateHandle);
-            this.mNormals[i3].clear();
-            GLES20.glBindBuffer(34962, this.buffers[i4 + 2]);
-            this.mVertices[i3].position(0);
-            GLES20.glBufferData(34962, this.mVertices[i3].capacity() * 4, this.mVertices[i3], 35044);
+            this.mNormals[i2].clear();
+            GLES20.glBindBuffer(34962, this.buffers[i3 + 2]);
+            this.mVertices[i2].position(0);
+            GLES20.glBufferData(34962, this.mVertices[i2].capacity() * 4, this.mVertices[i2], 35044);
             GLES20.glEnableVertexAttribArray(this.mVerticesHandle);
-            this.mVertices[i3].clear();
+            this.mVertices[i2].clear();
         }
         GLES20.glBindBuffer(34962, 0);
         int[] iArr2 = new int[1];
         GLES20.glGenTextures(1, iArr2, 0);
-        int i5 = iArr2[0];
-        this.mTextureDataHandle = i5;
-        GLES20.glBindTexture(3553, i5);
+        int i4 = iArr2[0];
+        this.mTextureDataHandle = i4;
+        GLES20.glBindTexture(3553, i4);
         GLES20.glTexParameteri(3553, 10241, 9729);
         GLES20.glTexParameteri(3553, 10240, 9729);
         GLES20.glBindTexture(3553, this.mTextureDataHandle);
@@ -200,48 +203,40 @@ public class Icon3D {
         bitmapFromAsset.recycle();
         int[] iArr4 = new int[1];
         GLES20.glGenTextures(1, iArr4, 0);
-        int i6 = iArr4[0];
-        this.mBackgroundTextureHandle = i6;
-        GLES20.glBindTexture(3553, i6);
+        int i5 = iArr4[0];
+        this.mBackgroundTextureHandle = i5;
+        GLES20.glBindTexture(3553, i5);
         GLES20.glTexParameteri(3553, 10241, 9729);
         GLES20.glTexParameteri(3553, 10240, 9729);
         GLES20.glBindTexture(3553, this.mBackgroundTextureHandle);
-        int i7 = this.type;
-        if (i7 != 0 && i7 != 2) {
-            if (i7 == 1) {
-                Bitmap bitmapFromAsset2 = getBitmapFromAsset(context, "models/coin_border.png");
-                int[] iArr5 = new int[1];
-                GLES20.glGenTextures(1, iArr5, 0);
-                GLES20.glBindTexture(3553, iArr5[0]);
-                GLES20.glTexParameteri(3553, 10241, 9729);
-                GLES20.glTexParameteri(3553, 10240, 9729);
-                GLUtils.texImage2D(3553, 0, bitmapFromAsset2, 0);
-                bitmapFromAsset2.recycle();
-                GLES20.glActiveTexture(33984);
-                GLES20.glBindTexture(3553, iArr5[0]);
-                GLES20.glUniform1i(this.mTextureUniformHandle, 0);
-                GLES20.glActiveTexture(33985);
-                i = iArr3[0];
+        int i6 = this.type;
+        if (i6 == 0 || i6 == 2) {
+            bitmap = SvgHelper.getBitmap(R.raw.start_texture, 240, 240, -1);
+        } else {
+            if (i6 == 1) {
+                str = "models/coin_border.png";
+            } else if (i6 == 3) {
+                str = "models/deal_border.png";
+            } else {
+                bitmap = null;
             }
-            GLES20.glActiveTexture(33986);
-            GLES20.glBindTexture(3553, iArr4[0]);
-            GLES20.glUniform1i(this.mBackgroundTextureUniformHandle, 2);
+            bitmap = getBitmapFromAsset(context, str);
         }
-        Bitmap bitmap = SvgHelper.getBitmap(R.raw.start_texture, 240, 240, -1);
-        int[] iArr6 = new int[1];
-        GLES20.glGenTextures(1, iArr6, 0);
-        GLES20.glBindTexture(3553, iArr6[0]);
-        GLES20.glTexParameteri(3553, 10241, 9729);
-        GLES20.glTexParameteri(3553, 10240, 9729);
-        GLUtils.texImage2D(3553, 0, bitmap, 0);
-        bitmap.recycle();
-        GLES20.glActiveTexture(33984);
-        GLES20.glBindTexture(3553, iArr6[0]);
-        GLES20.glUniform1i(this.mTextureUniformHandle, 0);
-        GLES20.glActiveTexture(33985);
-        i = iArr3[0];
-        GLES20.glBindTexture(3553, i);
-        GLES20.glUniform1i(this.mNormalMapUniformHandle, 1);
+        if (bitmap != null) {
+            int[] iArr5 = new int[1];
+            GLES20.glGenTextures(1, iArr5, 0);
+            GLES20.glBindTexture(3553, iArr5[0]);
+            GLES20.glTexParameteri(3553, 10241, 9729);
+            GLES20.glTexParameteri(3553, 10240, 9729);
+            GLUtils.texImage2D(3553, 0, bitmap, 0);
+            bitmap.recycle();
+            GLES20.glActiveTexture(33984);
+            GLES20.glBindTexture(3553, iArr5[0]);
+            GLES20.glUniform1i(this.mTextureUniformHandle, 0);
+            GLES20.glActiveTexture(33985);
+            GLES20.glBindTexture(3553, iArr3[0]);
+            GLES20.glUniform1i(this.mNormalMapUniformHandle, 1);
+        }
         GLES20.glActiveTexture(33986);
         GLES20.glBindTexture(3553, iArr4[0]);
         GLES20.glUniform1i(this.mBackgroundTextureUniformHandle, 2);
@@ -287,6 +282,7 @@ public class Icon3D {
             GLES20.glBindBuffer(34962, this.buffers[i4 + 2]);
             GLES20.glVertexAttribPointer(this.mVerticesHandle, 3, 5126, false, 0, 0);
             GLES20.glUniform1i(this.modelIndexHandle, i3);
+            GLES20.glUniform1i(this.typeHandle, this.type);
             GLES20.glDrawArrays(4, 0, this.trianglesCount[i3] / 3);
         }
         float f9 = this.enterAlpha;

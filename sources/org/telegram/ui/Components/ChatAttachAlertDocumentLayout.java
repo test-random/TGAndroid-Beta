@@ -211,7 +211,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
         @Override
         public void dispatchDraw(Canvas canvas) {
             if (ChatAttachAlertDocumentLayout.this.currentAnimationType == 2 && getChildCount() > 0) {
-                float f = 2.14748365E9f;
+                float f = 2.1474836E9f;
                 for (int i = 0; i < getChildCount(); i++) {
                     if (getChildAt(i).getY() < f) {
                         f = getChildAt(i).getY();
@@ -242,7 +242,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
         @Override
         public void dispatchDraw(Canvas canvas) {
             if (ChatAttachAlertDocumentLayout.this.currentAnimationType == 1 && getChildCount() > 0) {
-                float f = 2.14748365E9f;
+                float f = 2.1474836E9f;
                 for (int i = 0; i < getChildCount(); i++) {
                     if (getChildAt(i).getY() < f) {
                         f = getChildAt(i).getY();
@@ -1573,7 +1573,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
             @Override
             public void dispatchDraw(Canvas canvas) {
                 if (ChatAttachAlertDocumentLayout.this.currentAnimationType == 2 && getChildCount() > 0) {
-                    float f = 2.14748365E9f;
+                    float f = 2.1474836E9f;
                     for (int i4 = 0; i4 < getChildCount(); i4++) {
                         if (getChildAt(i4).getY() < f) {
                             f = getChildAt(i4).getY();
@@ -1618,7 +1618,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
             @Override
             public void dispatchDraw(Canvas canvas) {
                 if (ChatAttachAlertDocumentLayout.this.currentAnimationType == 1 && getChildCount() > 0) {
-                    float f = 2.14748365E9f;
+                    float f = 2.1474836E9f;
                     for (int i4 = 0; i4 < getChildCount(); i4++) {
                         if (getChildAt(i4).getY() < f) {
                             f = getChildAt(i4).getY();

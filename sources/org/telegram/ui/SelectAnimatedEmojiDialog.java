@@ -268,7 +268,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
     private final Runnable updateRows;
     private final Runnable updateRowsDelayed;
     public boolean useAccentForPlus;
-    private static final List emptyViewEmojis = Arrays.asList("😖", "😫", "\u1fae0", "😨", "❓");
+    private static final List emptyViewEmojis = Arrays.asList("😖", "😫", "🫠", "😨", "❓");
     private static boolean[] preloaded = new boolean[4];
     private static boolean isFirstOpen = true;
     private static HashMap listStates = new HashMap();
