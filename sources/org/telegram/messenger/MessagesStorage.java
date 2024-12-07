@@ -5878,6 +5878,10 @@ public class MessagesStorage extends BaseController {
         return numArr[0].intValue();
     }
 
+    public int getDialogReadMaxSync(boolean r5, long r6) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesStorage.getDialogReadMaxSync(boolean, long):int");
+    }
+
     public void getDialogs(final int i, final int i2, final int i3, boolean z) {
         long[] jArr;
         LongSparseArray drafts;

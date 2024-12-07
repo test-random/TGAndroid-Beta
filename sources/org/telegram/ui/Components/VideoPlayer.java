@@ -1086,14 +1086,6 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         }
     }
 
-    public static TLRPC.Document getDocumentForThumb(int i, TLRPC.MessageMedia messageMedia) {
-        VideoUri qualityForThumb;
-        if ((messageMedia instanceof TLRPC.TL_messageMediaDocument) && (qualityForThumb = getQualityForThumb(getQualities(i, messageMedia.document, messageMedia.alt_documents, 0, true))) != null) {
-            return qualityForThumb.document;
-        }
-        return null;
-    }
-
     public static Boolean getLooping(MessageObject messageObject) {
         if (messageObject == null) {
             return null;

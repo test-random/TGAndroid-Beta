@@ -950,7 +950,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(arrayList, 40);
         TLRPC.PhotoSize closestPhotoSizeWithSize2 = FileLoader.getClosestPhotoSizeWithSize(arrayList, AndroidUtilities.getPhotoSize(), false, null, true);
         TLRPC.PhotoSize photoSize = closestPhotoSizeWithSize != closestPhotoSizeWithSize2 ? closestPhotoSizeWithSize2 : null;
-        if (photoSize == null || DownloadController.getInstance(this.currentAccount).canDownloadMedia(messageObject.messageOwner) == 0) {
+        if (photoSize == null || !DownloadController.getInstance(this.currentAccount).canDownloadMedia(1, photoSize.size)) {
             photoSize = closestPhotoSizeWithSize;
         }
         if (closestPhotoSizeWithSize != null) {

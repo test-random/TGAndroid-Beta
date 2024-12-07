@@ -2295,9 +2295,6 @@ public class MessageObject {
     public static long getMediaSize(TLRPC.MessageMedia messageMedia) {
         TLRPC.WebPage webPage;
         TLRPC.Document document = (!(messageMedia instanceof TLRPC.TL_messageMediaWebPage) || (webPage = messageMedia.webpage) == null) ? messageMedia instanceof TLRPC.TL_messageMediaGame ? messageMedia.game.document : messageMedia != null ? messageMedia.document : null : webPage.document;
-        if (messageMedia != null && !messageMedia.alt_documents.isEmpty()) {
-            document = VideoPlayer.getDocumentForThumb(UserConfig.selectedAccount, messageMedia);
-        }
         if (document != null) {
             return document.size;
         }
