@@ -2207,7 +2207,6 @@ public class TLRPC {
         public long access_hash;
         public boolean can_change_join_muted;
         public boolean can_start_video;
-        public long conference_from_call;
         public int duration;
         public int flags;
         public long id;
@@ -2227,7 +2226,7 @@ public class TLRPC {
         public int version;
 
         public static GroupCall TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            GroupCall tL_groupCallDiscarded = i != -839330845 ? i != -711498484 ? i != 2004925620 ? null : new TL_groupCallDiscarded() : new TL_groupCall_layer195() : new TL_groupCall();
+            GroupCall tL_groupCallDiscarded = i != -711498484 ? i != 2004925620 ? null : new TL_groupCallDiscarded() : new TL_groupCall();
             if (tL_groupCallDiscarded == null && z) {
                 throw new RuntimeException(String.format("can't parse magic %x in GroupCall", Integer.valueOf(i)));
             }
@@ -4698,7 +4697,6 @@ public class TLRPC {
     public static abstract class PhoneCall extends TLObject {
         public long access_hash;
         public long admin_id;
-        public TL_inputGroupCall conference_call;
         public ArrayList<PhoneConnection> connections = new ArrayList<>();
         public TL_dataJSON custom_parameters;
         public int date;
@@ -4732,13 +4730,10 @@ public class TLRPC {
                     tL_phoneCall_layer176 = new TL_phoneCallRequested();
                     break;
                 case 810769141:
-                    tL_phoneCall_layer176 = new TL_phoneCall_layer195();
+                    tL_phoneCall_layer176 = new TL_phoneCall();
                     break;
                 case 912311057:
                     tL_phoneCall_layer176 = new TL_phoneCallAccepted();
-                    break;
-                case 1000707084:
-                    tL_phoneCall_layer176 = new TL_phoneCall();
                     break;
                 case 1355435489:
                     tL_phoneCall_layer176 = new TL_phoneCallDiscarded();
@@ -33804,7 +33799,7 @@ public class TLRPC {
     }
 
     public static class TL_groupCall extends GroupCall {
-        public static final int constructor = -839330845;
+        public static final int constructor = -711498484;
 
         @Override
         public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
@@ -33838,14 +33833,11 @@ public class TLRPC {
             }
             this.unmuted_video_limit = abstractSerializedData.readInt32(z);
             this.version = abstractSerializedData.readInt32(z);
-            if ((this.flags & 16384) != 0) {
-                this.conference_from_call = abstractSerializedData.readInt64(z);
-            }
         }
 
         @Override
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-839330845);
+            abstractSerializedData.writeInt32(-711498484);
             int i = this.join_muted ? this.flags | 2 : this.flags & (-3);
             this.flags = i;
             int i2 = this.can_change_join_muted ? i | 4 : i & (-5);
@@ -33883,9 +33875,6 @@ public class TLRPC {
             }
             abstractSerializedData.writeInt32(this.unmuted_video_limit);
             abstractSerializedData.writeInt32(this.version);
-            if ((this.flags & 16384) != 0) {
-                abstractSerializedData.writeInt64(this.conference_from_call);
-            }
         }
     }
 
@@ -34184,86 +34173,6 @@ public class TLRPC {
             abstractSerializedData.writeInt32(this.channel);
             abstractSerializedData.writeInt32(this.scale);
             abstractSerializedData.writeInt64(this.last_timestamp_ms);
-        }
-    }
-
-    public static class TL_groupCall_layer195 extends TL_groupCall {
-        public static final int constructor = -711498484;
-
-        @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
-            this.flags = readInt32;
-            this.join_muted = (readInt32 & 2) != 0;
-            this.can_change_join_muted = (readInt32 & 4) != 0;
-            this.join_date_asc = (readInt32 & 64) != 0;
-            this.schedule_start_subscribed = (readInt32 & 256) != 0;
-            this.can_start_video = (readInt32 & 512) != 0;
-            this.record_video_active = (readInt32 & 2048) != 0;
-            this.rtmp_stream = (readInt32 & 4096) != 0;
-            this.listeners_hidden = (readInt32 & 8192) != 0;
-            this.id = abstractSerializedData.readInt64(z);
-            this.access_hash = abstractSerializedData.readInt64(z);
-            this.participants_count = abstractSerializedData.readInt32(z);
-            if ((this.flags & 8) != 0) {
-                this.title = abstractSerializedData.readString(z);
-            }
-            if ((this.flags & 16) != 0) {
-                this.stream_dc_id = abstractSerializedData.readInt32(z);
-            }
-            if ((this.flags & 32) != 0) {
-                this.record_start_date = abstractSerializedData.readInt32(z);
-            }
-            if ((this.flags & 128) != 0) {
-                this.schedule_date = abstractSerializedData.readInt32(z);
-            }
-            if ((this.flags & 1024) != 0) {
-                this.unmuted_video_count = abstractSerializedData.readInt32(z);
-            }
-            this.unmuted_video_limit = abstractSerializedData.readInt32(z);
-            this.version = abstractSerializedData.readInt32(z);
-        }
-
-        @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-711498484);
-            int i = this.join_muted ? this.flags | 2 : this.flags & (-3);
-            this.flags = i;
-            int i2 = this.can_change_join_muted ? i | 4 : i & (-5);
-            this.flags = i2;
-            int i3 = this.join_date_asc ? i2 | 64 : i2 & (-65);
-            this.flags = i3;
-            int i4 = this.schedule_start_subscribed ? i3 | 256 : i3 & (-257);
-            this.flags = i4;
-            int i5 = this.can_start_video ? i4 | 512 : i4 & (-513);
-            this.flags = i5;
-            int i6 = this.record_video_active ? i5 | 2048 : i5 & (-2049);
-            this.flags = i6;
-            int i7 = this.rtmp_stream ? i6 | 4096 : i6 & (-4097);
-            this.flags = i7;
-            int i8 = this.listeners_hidden ? i7 | 8192 : i7 & (-8193);
-            this.flags = i8;
-            abstractSerializedData.writeInt32(i8);
-            abstractSerializedData.writeInt64(this.id);
-            abstractSerializedData.writeInt64(this.access_hash);
-            abstractSerializedData.writeInt32(this.participants_count);
-            if ((this.flags & 8) != 0) {
-                abstractSerializedData.writeString(this.title);
-            }
-            if ((this.flags & 16) != 0) {
-                abstractSerializedData.writeInt32(this.stream_dc_id);
-            }
-            if ((this.flags & 32) != 0) {
-                abstractSerializedData.writeInt32(this.record_start_date);
-            }
-            if ((this.flags & 128) != 0) {
-                abstractSerializedData.writeInt32(this.schedule_date);
-            }
-            if ((this.flags & 1024) != 0) {
-                abstractSerializedData.writeInt32(this.unmuted_video_count);
-            }
-            abstractSerializedData.writeInt32(this.unmuted_video_limit);
-            abstractSerializedData.writeInt32(this.version);
         }
     }
 
@@ -65402,7 +65311,7 @@ public class TLRPC {
     }
 
     public static class TL_phoneCall extends PhoneCall {
-        public static final int constructor = 1000707084;
+        public static final int constructor = 810769141;
 
         @Override
         public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
@@ -65437,14 +65346,11 @@ public class TLRPC {
             if ((this.flags & 128) != 0) {
                 this.custom_parameters = TL_dataJSON.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
             }
-            if ((this.flags & 256) != 0) {
-                this.conference_call = TL_inputGroupCall.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-            }
         }
 
         @Override
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1000707084);
+            abstractSerializedData.writeInt32(810769141);
             int i = this.p2p_allowed ? this.flags | 32 : this.flags & (-33);
             this.flags = i;
             int i2 = this.video ? i | 64 : i & (-65);
@@ -65467,9 +65373,6 @@ public class TLRPC {
             abstractSerializedData.writeInt32(this.start_date);
             if ((this.flags & 128) != 0) {
                 this.custom_parameters.serializeToStream(abstractSerializedData);
-            }
-            if ((this.flags & 256) != 0) {
-                this.conference_call.serializeToStream(abstractSerializedData);
             }
         }
     }
@@ -65797,73 +65700,6 @@ public class TLRPC {
         }
     }
 
-    public static class TL_phoneCall_layer195 extends TL_phoneCall {
-        public static final int constructor = 810769141;
-
-        @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
-            this.flags = readInt32;
-            this.p2p_allowed = (readInt32 & 32) != 0;
-            this.video = (readInt32 & 64) != 0;
-            this.id = abstractSerializedData.readInt64(z);
-            this.access_hash = abstractSerializedData.readInt64(z);
-            this.date = abstractSerializedData.readInt32(z);
-            this.admin_id = abstractSerializedData.readInt64(z);
-            this.participant_id = abstractSerializedData.readInt64(z);
-            this.g_a_or_b = abstractSerializedData.readByteArray(z);
-            this.key_fingerprint = abstractSerializedData.readInt64(z);
-            this.protocol = PhoneCallProtocol.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-            int readInt322 = abstractSerializedData.readInt32(z);
-            if (readInt322 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
-                }
-                return;
-            }
-            int readInt323 = abstractSerializedData.readInt32(z);
-            for (int i = 0; i < readInt323; i++) {
-                PhoneConnection TLdeserialize = PhoneConnection.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.connections.add(TLdeserialize);
-            }
-            this.start_date = abstractSerializedData.readInt32(z);
-            if ((this.flags & 128) != 0) {
-                this.custom_parameters = TL_dataJSON.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-            }
-        }
-
-        @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(810769141);
-            int i = this.p2p_allowed ? this.flags | 32 : this.flags & (-33);
-            this.flags = i;
-            int i2 = this.video ? i | 64 : i & (-65);
-            this.flags = i2;
-            abstractSerializedData.writeInt32(i2);
-            abstractSerializedData.writeInt64(this.id);
-            abstractSerializedData.writeInt64(this.access_hash);
-            abstractSerializedData.writeInt32(this.date);
-            abstractSerializedData.writeInt64(this.admin_id);
-            abstractSerializedData.writeInt64(this.participant_id);
-            abstractSerializedData.writeByteArray(this.g_a_or_b);
-            abstractSerializedData.writeInt64(this.key_fingerprint);
-            this.protocol.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeInt32(481674261);
-            int size = this.connections.size();
-            abstractSerializedData.writeInt32(size);
-            for (int i3 = 0; i3 < size; i3++) {
-                this.connections.get(i3).serializeToStream(abstractSerializedData);
-            }
-            abstractSerializedData.writeInt32(this.start_date);
-            if ((this.flags & 128) != 0) {
-                this.custom_parameters.serializeToStream(abstractSerializedData);
-            }
-        }
-    }
-
     public static class TL_phoneConnection extends PhoneConnection {
         public static final int constructor = -1665063993;
 
@@ -65994,22 +65830,6 @@ public class TLRPC {
             abstractSerializedData.writeByteArray(this.g_a);
             abstractSerializedData.writeInt64(this.key_fingerprint);
             this.protocol.serializeToStream(abstractSerializedData);
-        }
-    }
-
-    public static class TL_phone_createConferenceCall extends TLObject {
-        public static final int constructor = -1828162221;
-        public TL_inputGroupCall peer;
-
-        @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return PhoneCall.TLdeserialize(abstractSerializedData, i, z);
-        }
-
-        @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-1828162221);
-            this.peer.serializeToStream(abstractSerializedData);
         }
     }
 
@@ -74867,28 +74687,20 @@ public class TLRPC {
     }
 
     public static class TL_updateGroupCall extends Update {
-        public static final int constructor = -1747565759;
+        public static final int constructor = 347227392;
         public GroupCall call;
         public long chat_id;
-        public int flags;
 
         @Override
         public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
-            this.flags = readInt32;
-            if ((readInt32 & 1) != 0) {
-                this.chat_id = abstractSerializedData.readInt64(z);
-            }
+            this.chat_id = abstractSerializedData.readInt64(z);
             this.call = GroupCall.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
         }
 
         @Override
         public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-1747565759);
-            abstractSerializedData.writeInt32(this.flags);
-            if ((this.flags & 1) != 0) {
-                abstractSerializedData.writeInt64(this.chat_id);
-            }
+            abstractSerializedData.writeInt32(347227392);
+            abstractSerializedData.writeInt64(this.chat_id);
             this.call.serializeToStream(abstractSerializedData);
         }
     }
@@ -85625,9 +85437,6 @@ public class TLRPC {
                 case -1821035490:
                     tL_updateTheme = new TL_updateSavedGifs();
                     break;
-                case -1747565759:
-                    tL_updateTheme = new TL_updateGroupCall();
-                    break;
                 case -1738720581:
                     tL_updateTheme = new TL_updateChannelParticipant();
                     break;
@@ -85795,6 +85604,9 @@ public class TLRPC {
                     break;
                 case 314359194:
                     tL_updateTheme = new TL_updateNewEncryptedMessage();
+                    break;
+                case 347227392:
+                    tL_updateTheme = new TL_updateGroupCall();
                     break;
                 case 347625491:
                     tL_updateTheme = new TL_bots.TL_updateBotMenuButton();

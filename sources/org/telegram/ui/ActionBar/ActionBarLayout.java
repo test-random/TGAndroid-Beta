@@ -1844,30 +1844,22 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public boolean presentFragment(BaseFragment baseFragment) {
-        boolean presentFragment;
-        presentFragment = presentFragment(new INavigationLayout.NavigationParams(baseFragment));
-        return presentFragment;
+        return INavigationLayout.CC.$default$presentFragment(this, baseFragment);
     }
 
     @Override
     public boolean presentFragment(BaseFragment baseFragment, boolean z) {
-        boolean presentFragment;
-        presentFragment = presentFragment(new INavigationLayout.NavigationParams(baseFragment).setRemoveLast(z));
-        return presentFragment;
+        return INavigationLayout.CC.$default$presentFragment(this, baseFragment, z);
     }
 
     @Override
     public boolean presentFragment(BaseFragment baseFragment, boolean z, boolean z2, boolean z3, boolean z4) {
-        boolean presentFragment;
-        presentFragment = presentFragment(new INavigationLayout.NavigationParams(baseFragment).setRemoveLast(z).setNoAnimation(z2).setCheckPresentFromDelegate(z3).setPreview(z4));
-        return presentFragment;
+        return INavigationLayout.CC.$default$presentFragment(this, baseFragment, z, z2, z3, z4);
     }
 
     @Override
     public boolean presentFragment(BaseFragment baseFragment, boolean z, boolean z2, boolean z3, boolean z4, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout) {
-        boolean presentFragment;
-        presentFragment = presentFragment(new INavigationLayout.NavigationParams(baseFragment).setRemoveLast(z).setNoAnimation(z2).setCheckPresentFromDelegate(z3).setPreview(z4).setMenuView(actionBarPopupWindowLayout));
-        return presentFragment;
+        return INavigationLayout.CC.$default$presentFragment(this, baseFragment, z, z2, z3, z4, actionBarPopupWindowLayout);
     }
 
     @Override
@@ -2215,16 +2207,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public boolean presentFragmentAsPreview(BaseFragment baseFragment) {
-        boolean presentFragment;
-        presentFragment = presentFragment(new INavigationLayout.NavigationParams(baseFragment).setPreview(true));
-        return presentFragment;
+        return INavigationLayout.CC.$default$presentFragmentAsPreview(this, baseFragment);
     }
 
     @Override
     public boolean presentFragmentAsPreviewWithMenu(BaseFragment baseFragment, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout) {
-        boolean presentFragment;
-        presentFragment = presentFragment(new INavigationLayout.NavigationParams(baseFragment).setPreview(true).setMenuView(actionBarPopupWindowLayout));
-        return presentFragment;
+        return INavigationLayout.CC.$default$presentFragmentAsPreviewWithMenu(this, baseFragment, actionBarPopupWindowLayout);
     }
 
     @Override
