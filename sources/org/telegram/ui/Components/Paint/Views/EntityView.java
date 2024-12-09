@@ -260,7 +260,10 @@ public abstract class EntityView extends FrameLayout {
     public void lambda$new$0() {
         this.recognizedLongPress = true;
         if (this.delegate != null) {
-            performHapticFeedback(0);
+            try {
+                performHapticFeedback(0);
+            } catch (Exception unused) {
+            }
             this.delegate.onEntityLongClicked(this);
         }
     }

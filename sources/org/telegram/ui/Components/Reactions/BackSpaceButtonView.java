@@ -45,7 +45,10 @@ public class BackSpaceButtonView extends FrameLayout {
                     BackSpaceButtonView.this.backspacePressed = false;
                     if (!BackSpaceButtonView.this.backspaceOnce && BackSpaceButtonView.this.onBackspace != null) {
                         BackSpaceButtonView.this.onBackspace.run(Boolean.FALSE);
-                        BackSpaceButtonView.this.backspaceButton.performHapticFeedback(3);
+                        try {
+                            BackSpaceButtonView.this.backspaceButton.performHapticFeedback(3);
+                        } catch (Exception unused) {
+                        }
                     }
                 }
                 super.onTouchEvent(motionEvent);
@@ -97,7 +100,10 @@ public class BackSpaceButtonView extends FrameLayout {
             Utilities.Callback callback = this.onBackspace;
             if (callback != null) {
                 callback.run(Boolean.valueOf(i < 300));
-                this.backspaceButton.performHapticFeedback(3);
+                try {
+                    this.backspaceButton.performHapticFeedback(3);
+                } catch (Exception unused) {
+                }
             }
             this.backspaceOnce = true;
             postBackspaceRunnable(Math.max(50, i - 100));

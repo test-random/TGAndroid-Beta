@@ -1376,8 +1376,12 @@ public abstract class FilterTabsView extends FrameLayout {
                 TabView tabView = (TabView) this.listView.getChildAt(i2);
                 if (tabView.currentTab.id == i) {
                     tabView.shakeLockIcon(1.0f, 0);
-                    tabView.performHapticFeedback(3);
-                    return;
+                    try {
+                        tabView.performHapticFeedback(3);
+                        return;
+                    } catch (Exception unused) {
+                        return;
+                    }
                 }
             }
         }

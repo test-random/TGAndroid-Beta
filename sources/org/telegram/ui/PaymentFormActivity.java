@@ -233,16 +233,21 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
 
         @Override
         public boolean onRenderProcessGone(WebView webView, RenderProcessGoneDetail renderProcessGoneDetail) {
-            if (!AndroidUtilities.isSafeToShow(PaymentFormActivity.this.getContext())) {
-                return true;
-            }
-            new AlertDialog.Builder(PaymentFormActivity.this.getContext(), PaymentFormActivity.this.resourcesProvider).setTitle(LocaleController.getString(R.string.ChromeCrashTitle)).setMessage(AndroidUtilities.replaceSingleTag(LocaleController.getString(R.string.ChromeCrashMessage), new Runnable() {
-                @Override
-                public final void run() {
-                    PaymentFormActivity.AnonymousClass18.this.lambda$onRenderProcessGone$0();
+            try {
+                if (!AndroidUtilities.isSafeToShow(PaymentFormActivity.this.getContext())) {
+                    return true;
                 }
-            })).setPositiveButton(LocaleController.getString(R.string.OK), null).show();
-            return true;
+                new AlertDialog.Builder(PaymentFormActivity.this.getContext(), PaymentFormActivity.this.resourcesProvider).setTitle(LocaleController.getString(R.string.ChromeCrashTitle)).setMessage(AndroidUtilities.replaceSingleTag(LocaleController.getString(R.string.ChromeCrashMessage), new Runnable() {
+                    @Override
+                    public final void run() {
+                        PaymentFormActivity.AnonymousClass18.this.lambda$onRenderProcessGone$0();
+                    }
+                })).setPositiveButton(LocaleController.getString(R.string.OK), null).show();
+                return true;
+            } catch (Exception e) {
+                FileLog.e(e);
+                return false;
+            }
         }
 
         @Override
@@ -338,16 +343,21 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
 
         @Override
         public boolean onRenderProcessGone(WebView webView, RenderProcessGoneDetail renderProcessGoneDetail) {
-            if (!AndroidUtilities.isSafeToShow(PaymentFormActivity.this.getContext())) {
-                return true;
-            }
-            new AlertDialog.Builder(PaymentFormActivity.this.getContext(), PaymentFormActivity.this.resourcesProvider).setTitle(LocaleController.getString(R.string.ChromeCrashTitle)).setMessage(AndroidUtilities.replaceSingleTag(LocaleController.getString(R.string.ChromeCrashMessage), new Runnable() {
-                @Override
-                public final void run() {
-                    PaymentFormActivity.AnonymousClass6.this.lambda$onRenderProcessGone$0();
+            try {
+                if (!AndroidUtilities.isSafeToShow(PaymentFormActivity.this.getContext())) {
+                    return true;
                 }
-            })).setPositiveButton(LocaleController.getString(R.string.OK), null).show();
-            return true;
+                new AlertDialog.Builder(PaymentFormActivity.this.getContext(), PaymentFormActivity.this.resourcesProvider).setTitle(LocaleController.getString(R.string.ChromeCrashTitle)).setMessage(AndroidUtilities.replaceSingleTag(LocaleController.getString(R.string.ChromeCrashMessage), new Runnable() {
+                    @Override
+                    public final void run() {
+                        PaymentFormActivity.AnonymousClass6.this.lambda$onRenderProcessGone$0();
+                    }
+                })).setPositiveButton(LocaleController.getString(R.string.OK), null).show();
+                return true;
+            } catch (Exception e) {
+                FileLog.e(e);
+                return false;
+            }
         }
 
         @Override

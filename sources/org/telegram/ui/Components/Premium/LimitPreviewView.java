@@ -607,7 +607,10 @@ public class LimitPreviewView extends LinearLayout {
         if (floatValue > 1.0f && z) {
             if (!this.wasHaptic) {
                 this.wasHaptic = true;
-                this.limitIcon.performHapticFeedback(3);
+                try {
+                    this.limitIcon.performHapticFeedback(3);
+                } catch (Exception unused) {
+                }
             }
             this.limitIcon.setRotation(this.limitIconRotation + ((floatValue - 1.0f) * 60.0f));
         } else if (!this.animatingRotation) {

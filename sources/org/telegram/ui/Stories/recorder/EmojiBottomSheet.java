@@ -3346,7 +3346,10 @@ public class EmojiBottomSheet extends BottomSheet implements NotificationCenter.
     }
 
     public void showPremiumBulletin(String str) {
-        this.container.performHapticFeedback(3);
+        try {
+            this.container.performHapticFeedback(3);
+        } catch (Exception unused) {
+        }
         BulletinFactory.of(this.container, this.resourcesProvider).createSimpleBulletin(R.raw.star_premium_2, LocaleController.getString(R.string.IncreaseLimit), premiumText(str)).show(true);
     }
 

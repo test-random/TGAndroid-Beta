@@ -1,9 +1,9 @@
 package org.telegram.ui;
 
-public final class PhotoViewer$$ExternalSyntheticLambda22 implements Runnable {
+public final class PhotoViewer$$ExternalSyntheticLambda25 implements Runnable {
     public final PhotoViewer f$0;
 
-    public PhotoViewer$$ExternalSyntheticLambda22(PhotoViewer photoViewer) {
+    public PhotoViewer$$ExternalSyntheticLambda25(PhotoViewer photoViewer) {
         this.f$0 = photoViewer;
     }
 

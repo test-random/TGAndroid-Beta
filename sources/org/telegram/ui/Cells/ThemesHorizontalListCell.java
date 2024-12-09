@@ -208,7 +208,10 @@ public abstract class ThemesHorizontalListCell extends RecyclerListView implemen
                     if (action == 0) {
                         this.pressed = true;
                     } else {
-                        performHapticFeedback(3);
+                        try {
+                            performHapticFeedback(3);
+                        } catch (Exception unused) {
+                        }
                         ThemesHorizontalListCell.this.showOptionsForTheme(this.themeInfo);
                     }
                 }

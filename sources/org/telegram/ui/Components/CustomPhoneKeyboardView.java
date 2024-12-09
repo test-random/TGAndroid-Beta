@@ -181,8 +181,11 @@ public class CustomPhoneKeyboardView extends ViewGroup {
         EditText editText = this.editText;
         if (editText != null) {
             if (editText.length() != 0 || this.dispatchBackWhenEmpty) {
-                performHapticFeedback(3, 2);
-                playSoundEffect(0);
+                try {
+                    performHapticFeedback(3, 2);
+                    playSoundEffect(0);
+                } catch (Exception unused) {
+                }
                 this.editText.dispatchKeyEvent(new KeyEvent(0, 67));
                 this.editText.dispatchKeyEvent(new KeyEvent(1, 67));
                 if (this.runningLongClick) {
@@ -203,7 +206,10 @@ public class CustomPhoneKeyboardView extends ViewGroup {
         if (this.editText == null) {
             return;
         }
-        performHapticFeedback(3, 2);
+        try {
+            performHapticFeedback(3, 2);
+        } catch (Exception unused) {
+        }
         EditText editText = this.editText;
         if (editText instanceof EditTextBoldCursor) {
             ((EditTextBoldCursor) editText).setTextWatchersSuppressed(true, false);

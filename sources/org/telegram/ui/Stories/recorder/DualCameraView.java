@@ -238,7 +238,10 @@ public abstract class DualCameraView extends CameraView {
     public void lambda$checkTap$1() {
         if (this.tapTime > 0) {
             dualToggleShape();
-            performHapticFeedback(0, 1);
+            try {
+                performHapticFeedback(0, 1);
+            } catch (Exception unused) {
+            }
         }
     }
 

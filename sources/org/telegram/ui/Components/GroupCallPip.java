@@ -122,7 +122,10 @@ public class GroupCallPip implements NotificationCenter.NotificationCenterDelega
                     TLRPC.TL_groupCallParticipant tL_groupCallParticipant = (TLRPC.TL_groupCallParticipant) sharedInstance.groupCall.participants.get(sharedInstance.getSelfId());
                     if (tL_groupCallParticipant == null || tL_groupCallParticipant.can_self_unmute || !tL_groupCallParticipant.muted || ChatObject.canManageCalls(sharedInstance.getChat())) {
                         AndroidUtilities.runOnUIThread(AnonymousClass3.this.micRunnable, 90L);
-                        AnonymousClass3.this.performHapticFeedback(3, 2);
+                        try {
+                            AnonymousClass3.this.performHapticFeedback(3, 2);
+                        } catch (Exception unused) {
+                        }
                         AnonymousClass3.this.pressed = true;
                     }
                 }
@@ -860,7 +863,10 @@ public class GroupCallPip implements NotificationCenter.NotificationCenterDelega
                 this.iconView.playAnimation();
             }
             if (z) {
-                this.button.performHapticFeedback(3, 2);
+                try {
+                    this.button.performHapticFeedback(3, 2);
+                } catch (Exception unused) {
+                }
             }
         }
         this.button.prepareToRemove(z);

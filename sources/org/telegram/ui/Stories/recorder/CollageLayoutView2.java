@@ -543,7 +543,10 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
                 CollageLayoutView2.this.lambda$onLongPress$5();
             }
         }).show();
-        performHapticFeedback(0, 1);
+        try {
+            performHapticFeedback(0, 1);
+        } catch (Exception unused) {
+        }
     }
 
     public boolean cancelTouch() {

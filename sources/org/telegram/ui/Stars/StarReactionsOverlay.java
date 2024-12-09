@@ -146,7 +146,10 @@ public class StarReactionsOverlay extends View {
         if (chatMessageCell == null) {
             return;
         }
-        chatMessageCell.performHapticFeedback(0);
+        try {
+            chatMessageCell.performHapticFeedback(0);
+        } catch (Exception unused) {
+        }
         onTouchEvent(MotionEvent.obtain(0L, 0L, 3, 0.0f, 0.0f, 0));
         MessageObject primaryMessageObject = this.cell.getPrimaryMessageObject();
         if (primaryMessageObject == null) {

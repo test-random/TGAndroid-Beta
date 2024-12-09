@@ -851,14 +851,20 @@ public class RecyclerListView extends RecyclerView {
                 View view = RecyclerListView.this.currentChildView;
                 if (RecyclerListView.this.onItemLongClickListener != null) {
                     if (RecyclerListView.this.onItemLongClickListener.onItemClick(RecyclerListView.this.currentChildView, RecyclerListView.this.currentChildPosition)) {
-                        view.performHapticFeedback(0);
+                        try {
+                            view.performHapticFeedback(0);
+                        } catch (Exception unused) {
+                        }
                         view.sendAccessibilityEvent(2);
                         return;
                     }
                     return;
                 }
                 if (RecyclerListView.this.onItemLongClickListenerExtended.onItemClick(RecyclerListView.this.currentChildView, RecyclerListView.this.currentChildPosition, motionEvent.getX() - RecyclerListView.this.currentChildView.getX(), motionEvent.getY() - RecyclerListView.this.currentChildView.getY())) {
-                    view.performHapticFeedback(0);
+                    try {
+                        view.performHapticFeedback(0);
+                    } catch (Exception unused2) {
+                    }
                     view.sendAccessibilityEvent(2);
                     RecyclerListView.this.longPressCalled = true;
                 }
@@ -1041,14 +1047,20 @@ public class RecyclerListView extends RecyclerView {
                     View view = RecyclerListView.this.currentChildView;
                     if (RecyclerListView.this.onItemLongClickListener != null) {
                         if (RecyclerListView.this.onItemLongClickListener.onItemClick(RecyclerListView.this.currentChildView, RecyclerListView.this.currentChildPosition)) {
-                            view.performHapticFeedback(0);
+                            try {
+                                view.performHapticFeedback(0);
+                            } catch (Exception unused) {
+                            }
                             view.sendAccessibilityEvent(2);
                             return;
                         }
                         return;
                     }
                     if (RecyclerListView.this.onItemLongClickListenerExtended.onItemClick(RecyclerListView.this.currentChildView, RecyclerListView.this.currentChildPosition, motionEvent.getX() - RecyclerListView.this.currentChildView.getX(), motionEvent.getY() - RecyclerListView.this.currentChildView.getY())) {
-                        view.performHapticFeedback(0);
+                        try {
+                            view.performHapticFeedback(0);
+                        } catch (Exception unused2) {
+                        }
                         view.sendAccessibilityEvent(2);
                         RecyclerListView.this.longPressCalled = true;
                     }

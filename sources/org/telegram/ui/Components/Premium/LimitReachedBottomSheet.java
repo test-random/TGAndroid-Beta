@@ -1603,7 +1603,10 @@ public class LimitReachedBottomSheet extends BottomSheetWithRecyclerListView imp
     public boolean lambda$onViewCreated$6(View view, int i) {
         this.recyclerListView.getOnItemClickListener().onItemClick(view, i);
         if (this.type != 19) {
-            view.performHapticFeedback(0);
+            try {
+                view.performHapticFeedback(0);
+            } catch (Exception unused) {
+            }
         }
         return false;
     }
@@ -1795,7 +1798,10 @@ public class LimitReachedBottomSheet extends BottomSheetWithRecyclerListView imp
         this.headerView.description.setText(AndroidUtilities.replaceTags(getBoostDescriptionStringAfterBoost()));
         updateButton();
         this.fireworksOverlay.start();
-        this.fireworksOverlay.performHapticFeedback(3);
+        try {
+            this.fireworksOverlay.performHapticFeedback(3);
+        } catch (Exception unused) {
+        }
         this.headerView.boostCounterView.setCount(this.canApplyBoost.boostCount, true);
         this.recyclerListView.smoothScrollToPosition(0);
         if (this.type == 32) {

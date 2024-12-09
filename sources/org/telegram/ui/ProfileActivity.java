@@ -5777,14 +5777,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         public void lambda$onCreateSearchArray$33() {
             if (ProfileActivity.this.getUserConfig().isPremium()) {
                 ProfileActivity.this.presentFragment(new PrivacyControlActivity(8, true));
-                return;
+            } else {
+                try {
+                    ProfileActivity.this.fragmentView.performHapticFeedback(3, 2);
+                } catch (Exception unused) {
+                }
+                BulletinFactory.of(ProfileActivity.this).createRestrictVoiceMessagesPremiumBulletin().show();
             }
-            try {
-                ProfileActivity.this.fragmentView.performHapticFeedback(3, 2);
-            } catch (Exception e) {
-                FileLog.e(e);
-            }
-            BulletinFactory.of(ProfileActivity.this).createRestrictVoiceMessagesPremiumBulletin().show();
         }
 
         public void lambda$onCreateSearchArray$34() {

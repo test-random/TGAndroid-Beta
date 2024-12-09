@@ -1195,7 +1195,7 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
         if (this.shouldLimitFps && Thread.currentThread() == ApplicationLoader.applicationHandler.getLooper().getThread()) {
             DispatchQueuePoolBackground.execute(this.loadFrameTask, this.frameWaitSync != null);
         } else {
-            loadFrameRunnableQueue.execute(this.loadFrameTask);
+            loadFrameRunnableQueue.lambda$execute$0(this.loadFrameTask);
         }
         return true;
     }
@@ -1435,7 +1435,10 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
             }
             HashMap hashMap = this.vibrationPattern;
             if (hashMap != null && this.currentParentView != null && this.allowVibration && (num = (Integer) hashMap.get(Integer.valueOf(this.currentFrame - 1))) != null) {
-                this.currentParentView.performHapticFeedback(num.intValue() == 1 ? 0 : 3, 2);
+                try {
+                    this.currentParentView.performHapticFeedback(num.intValue() == 1 ? 0 : 3, 2);
+                } catch (Exception unused) {
+                }
             }
             j2 = i;
             z2 = false;

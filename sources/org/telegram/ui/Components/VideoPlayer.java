@@ -1696,6 +1696,25 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         return 0L;
     }
 
+    public TLRPC.Document getCurrentDocument() {
+        Format videoFormat;
+        ArrayList arrayList;
+        ExoPlayer exoPlayer = this.player;
+        if (exoPlayer != null && (videoFormat = exoPlayer.getVideoFormat()) != null && videoFormat.documentId != 0 && (arrayList = this.videoQualities) != null) {
+            Iterator it = arrayList.iterator();
+            while (it.hasNext()) {
+                Iterator it2 = ((Quality) it.next()).uris.iterator();
+                while (it2.hasNext()) {
+                    VideoUri videoUri = (VideoUri) it2.next();
+                    if (videoUri.docId == videoFormat.documentId) {
+                        return videoUri.document;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public long getCurrentPosition() {
         long j = this.fallbackPosition;
         if (j != -9223372036854775807L) {

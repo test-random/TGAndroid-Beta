@@ -948,8 +948,12 @@ public class ManageLinksActivity extends BaseFragment implements NotificationCen
             return false;
         }
         ((LinkCell) view).optionsView.callOnClick();
-        view.performHapticFeedback(0, 2);
-        return true;
+        try {
+            view.performHapticFeedback(0, 2);
+            return true;
+        } catch (Exception unused) {
+            return true;
+        }
     }
 
     public void lambda$createView$6(TLRPC.TL_error tL_error) {

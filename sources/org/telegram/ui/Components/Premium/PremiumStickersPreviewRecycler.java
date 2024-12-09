@@ -342,7 +342,10 @@ public abstract class PremiumStickersPreviewRecycler extends RecyclerListView im
                 if (this.oldSelectedView != this.sortedView.get(r2.size() - 1)) {
                     this.oldSelectedView = (View) this.sortedView.get(r1.size() - 1);
                     if (this.haptic) {
-                        performHapticFeedback(3);
+                        try {
+                            performHapticFeedback(3);
+                        } catch (Exception unused) {
+                        }
                     }
                 }
             }

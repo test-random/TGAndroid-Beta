@@ -20,14 +20,6 @@ import org.telegram.ui.ActionBar.Theme;
 public interface INavigationLayout {
 
     public abstract class CC {
-        public static void $default$animateThemedValues(INavigationLayout iNavigationLayout, Theme.ThemeInfo themeInfo, int i, boolean z, boolean z2) {
-            iNavigationLayout.animateThemedValues(new ThemeAnimationSettings(themeInfo, i, z, z2), null);
-        }
-
-        public static void $default$animateThemedValues(INavigationLayout iNavigationLayout, Theme.ThemeInfo themeInfo, int i, boolean z, boolean z2, Runnable runnable) {
-            iNavigationLayout.animateThemedValues(new ThemeAnimationSettings(themeInfo, i, z, z2), runnable);
-        }
-
         public static void $default$dismissDialogs(INavigationLayout iNavigationLayout) {
             List fragmentStack = iNavigationLayout.getFragmentStack();
             if (fragmentStack.isEmpty()) {
@@ -81,30 +73,6 @@ public interface INavigationLayout {
 
         public static boolean $default$isActionBarInCrossfade(INavigationLayout iNavigationLayout) {
             return false;
-        }
-
-        public static boolean $default$presentFragment(INavigationLayout iNavigationLayout, BaseFragment baseFragment) {
-            return iNavigationLayout.presentFragment(new NavigationParams(baseFragment));
-        }
-
-        public static boolean $default$presentFragment(INavigationLayout iNavigationLayout, BaseFragment baseFragment, boolean z) {
-            return iNavigationLayout.presentFragment(new NavigationParams(baseFragment).setRemoveLast(z));
-        }
-
-        public static boolean $default$presentFragment(INavigationLayout iNavigationLayout, BaseFragment baseFragment, boolean z, boolean z2, boolean z3, boolean z4) {
-            return iNavigationLayout.presentFragment(new NavigationParams(baseFragment).setRemoveLast(z).setNoAnimation(z2).setCheckPresentFromDelegate(z3).setPreview(z4));
-        }
-
-        public static boolean $default$presentFragment(INavigationLayout iNavigationLayout, BaseFragment baseFragment, boolean z, boolean z2, boolean z3, boolean z4, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout) {
-            return iNavigationLayout.presentFragment(new NavigationParams(baseFragment).setRemoveLast(z).setNoAnimation(z2).setCheckPresentFromDelegate(z3).setPreview(z4).setMenuView(actionBarPopupWindowLayout));
-        }
-
-        public static boolean $default$presentFragmentAsPreview(INavigationLayout iNavigationLayout, BaseFragment baseFragment) {
-            return iNavigationLayout.presentFragment(new NavigationParams(baseFragment).setPreview(true));
-        }
-
-        public static boolean $default$presentFragmentAsPreviewWithMenu(INavigationLayout iNavigationLayout, BaseFragment baseFragment, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout) {
-            return iNavigationLayout.presentFragment(new NavigationParams(baseFragment).setPreview(true).setMenuView(actionBarPopupWindowLayout));
         }
 
         public static void $default$rebuildFragments(INavigationLayout iNavigationLayout, int i) {

@@ -90,7 +90,10 @@ public class SharedLinkCell extends FrameLayout {
         public void run() {
             if (SharedLinkCell.this.checkingForLongPress && SharedLinkCell.this.getParent() != null && this.currentPressCount == SharedLinkCell.this.pressCount) {
                 SharedLinkCell.this.checkingForLongPress = false;
-                SharedLinkCell.this.performHapticFeedback(0);
+                try {
+                    SharedLinkCell.this.performHapticFeedback(0);
+                } catch (Exception unused) {
+                }
                 if (SharedLinkCell.this.pressedLinkIndex >= 0) {
                     SharedLinkCellDelegate sharedLinkCellDelegate = SharedLinkCell.this.delegate;
                     SharedLinkCell sharedLinkCell = SharedLinkCell.this;

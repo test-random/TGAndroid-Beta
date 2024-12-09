@@ -263,7 +263,10 @@ public class StealthModeAlert extends BottomSheet {
                 StealthModeAlert.lambda$new$2(tLObject, tL_error);
             }
         });
-        this.containerView.performHapticFeedback(3);
+        try {
+            this.containerView.performHapticFeedback(3);
+        } catch (Exception unused) {
+        }
         dismiss();
         if (i == 0) {
             showStealthModeEnabledBulletin();

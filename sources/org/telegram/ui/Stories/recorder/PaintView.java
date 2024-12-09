@@ -2393,7 +2393,10 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             return Boolean.FALSE;
         }
         if (!UserConfig.getInstance(this.currentAccount).isPremium()) {
-            emojiBottomSheet.container.performHapticFeedback(3);
+            try {
+                emojiBottomSheet.container.performHapticFeedback(3);
+            } catch (Exception unused) {
+            }
             BulletinFactory.of(emojiBottomSheet.container, this.resourcesProvider).createSimpleBulletin(R.raw.star_premium_2, AndroidUtilities.premiumText(LocaleController.getString(R.string.StoryLinkPremium), new Runnable() {
                 @Override
                 public final void run() {
@@ -2753,7 +2756,10 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
                         return false;
                     }
                     if (i2 >= MessagesController.getInstance(this.currentAccount).storiesSuggestedReactionsLimitPremium) {
-                        this.container.performHapticFeedback(3);
+                        try {
+                            this.container.performHapticFeedback(3);
+                        } catch (Exception unused) {
+                        }
                         BulletinFactory.of(this.container, this.resourcesProvider).createSimpleBulletin(R.raw.chats_infotip, LocaleController.getString("LimitReached", R.string.LimitReached), LocaleController.formatPluralString("StoryReactionsWidgetLimit2", MessagesController.getInstance(this.currentAccount).storiesSuggestedReactionsLimitPremium, new Object[0])).show(true);
                         return false;
                     }

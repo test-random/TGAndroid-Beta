@@ -988,7 +988,10 @@ public class ContentPreviewViewer {
             }
             open(document, null, MessageObject.findAnimatedEmojiEmoticon(document, null, Integer.valueOf(this.currentAccount)), null, null, i, false, null, resourcesProvider);
         }
-        this.currentPreviewCell.performHapticFeedback(0, 2);
+        try {
+            this.currentPreviewCell.performHapticFeedback(0, 2);
+        } catch (Exception unused) {
+        }
         ContentPreviewViewerDelegate contentPreviewViewerDelegate4 = this.delegate;
         if (contentPreviewViewerDelegate4 != null) {
             contentPreviewViewerDelegate4.resetTouch();

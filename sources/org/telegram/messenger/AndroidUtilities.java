@@ -459,9 +459,9 @@ public class AndroidUtilities {
         sUrlMatchFilter = new Linkify.MatchFilter() {
             @Override
             public final boolean acceptMatch(CharSequence charSequence, int i, int i2) {
-                boolean lambda$static$5;
-                lambda$static$5 = AndroidUtilities.lambda$static$5(charSequence, i, i2);
-                return lambda$static$5;
+                boolean lambda$static$6;
+                lambda$static$6 = AndroidUtilities.lambda$static$6(charSequence, i, i2);
+                return lambda$static$6;
             }
         };
         hasCallPermissions = Build.VERSION.SDK_INT >= 23;
@@ -607,9 +607,9 @@ public class AndroidUtilities {
         boolean doSafe = doSafe(new Utilities.Callback0Return() {
             @Override
             public final Object run() {
-                Boolean lambda$addLinksSafe$6;
-                lambda$addLinksSafe$6 = AndroidUtilities.lambda$addLinksSafe$6(spannableStringBuilder, i, z, z2);
-                return lambda$addLinksSafe$6;
+                Boolean lambda$addLinksSafe$7;
+                lambda$addLinksSafe$7 = AndroidUtilities.lambda$addLinksSafe$7(spannableStringBuilder, i, z, z2);
+                return lambda$addLinksSafe$7;
             }
         });
         if (doSafe) {
@@ -1234,9 +1234,9 @@ public class AndroidUtilities {
                     future = newSingleThreadExecutor.submit(new Callable() {
                         @Override
                         public final Object call() {
-                            Boolean lambda$doSafe$7;
-                            lambda$doSafe$7 = AndroidUtilities.lambda$doSafe$7(Utilities.Callback0Return.this);
-                            return lambda$doSafe$7;
+                            Boolean lambda$doSafe$8;
+                            lambda$doSafe$8 = AndroidUtilities.lambda$doSafe$8(Utilities.Callback0Return.this);
+                            return lambda$doSafe$8;
                         }
                     });
                 } catch (Exception e) {
@@ -1661,9 +1661,9 @@ public class AndroidUtilities {
         return charSequence.toString().contains("%s") ? formatSpannableSimple(charSequence, charSequenceArr) : formatSpannable(charSequence, new GenericProvider() {
             @Override
             public final Object provide(Object obj) {
-                String lambda$formatSpannable$14;
-                lambda$formatSpannable$14 = AndroidUtilities.lambda$formatSpannable$14((Integer) obj);
-                return lambda$formatSpannable$14;
+                String lambda$formatSpannable$15;
+                lambda$formatSpannable$15 = AndroidUtilities.lambda$formatSpannable$15((Integer) obj);
+                return lambda$formatSpannable$15;
             }
         }, charSequenceArr);
     }
@@ -1672,9 +1672,9 @@ public class AndroidUtilities {
         return formatSpannable(charSequence, new GenericProvider() {
             @Override
             public final Object provide(Object obj) {
-                String lambda$formatSpannableSimple$13;
-                lambda$formatSpannableSimple$13 = AndroidUtilities.lambda$formatSpannableSimple$13((Integer) obj);
-                return lambda$formatSpannableSimple$13;
+                String lambda$formatSpannableSimple$14;
+                lambda$formatSpannableSimple$14 = AndroidUtilities.lambda$formatSpannableSimple$14((Integer) obj);
+                return lambda$formatSpannableSimple$14;
             }
         }, charSequenceArr);
     }
@@ -1885,6 +1885,18 @@ public class AndroidUtilities {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void getBitmapFromSurface(SurfaceView surfaceView, Bitmap bitmap, final Runnable runnable) {
+        if (surfaceView == null || ApplicationLoader.applicationHandler == null || !surfaceView.getHolder().getSurface().isValid()) {
+            return;
+        }
+        PixelCopy.request(surfaceView, bitmap, new PixelCopy.OnPixelCopyFinishedListener() {
+            @Override
+            public final void onPixelCopyFinished(int i) {
+                runnable.run();
+            }
+        }, ApplicationLoader.applicationHandler);
     }
 
     public static Uri getBitmapShareUri(Bitmap bitmap, String str, Bitmap.CompressFormat compressFormat) {
@@ -2918,7 +2930,7 @@ public class AndroidUtilities {
             builder.setPositiveButton(LocaleController.getString(R.string.OK), new DialogInterface.OnClickListener() {
                 @Override
                 public final void onClick(DialogInterface dialogInterface, int i) {
-                    AndroidUtilities.lambda$isMapsInstalled$9(mapsAppPackageName, baseFragment, dialogInterface, i);
+                    AndroidUtilities.lambda$isMapsInstalled$10(mapsAppPackageName, baseFragment, dialogInterface, i);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -3034,11 +3046,11 @@ public class AndroidUtilities {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.AndroidUtilities.isWebAppLink(java.lang.String):boolean");
     }
 
-    public static Boolean lambda$addLinksSafe$6(SpannableStringBuilder spannableStringBuilder, int i, boolean z, boolean z2) {
+    public static Boolean lambda$addLinksSafe$7(SpannableStringBuilder spannableStringBuilder, int i, boolean z, boolean z2) {
         return Boolean.valueOf(addLinks(spannableStringBuilder, i, z, z2));
     }
 
-    public static Boolean lambda$doSafe$7(Utilities.Callback0Return callback0Return) {
+    public static Boolean lambda$doSafe$8(Utilities.Callback0Return callback0Return) {
         try {
             return (Boolean) callback0Return.run();
         } catch (Exception e) {
@@ -3047,11 +3059,11 @@ public class AndroidUtilities {
         }
     }
 
-    public static String lambda$formatSpannable$14(Integer num) {
+    public static String lambda$formatSpannable$15(Integer num) {
         return "%" + (num.intValue() + 1) + "$s";
     }
 
-    public static String lambda$formatSpannableSimple$13(Integer num) {
+    public static String lambda$formatSpannableSimple$14(Integer num) {
         return "%s";
     }
 
@@ -3080,7 +3092,7 @@ public class AndroidUtilities {
         }
     }
 
-    public static void lambda$isMapsInstalled$9(String str, BaseFragment baseFragment, DialogInterface dialogInterface, int i) {
+    public static void lambda$isMapsInstalled$10(String str, BaseFragment baseFragment, DialogInterface dialogInterface, int i) {
         try {
             baseFragment.getParentActivity().startActivityForResult(new Intent("android.intent.action.VIEW", Uri.parse("market://details?id=" + str)), 500);
         } catch (Exception e) {
@@ -3088,13 +3100,13 @@ public class AndroidUtilities {
         }
     }
 
-    public static void lambda$notifyDataSetChanged$22(RecyclerView recyclerView) {
+    public static void lambda$notifyDataSetChanged$23(RecyclerView recyclerView) {
         if (recyclerView.getAdapter() != null) {
             recyclerView.getAdapter().notifyDataSetChanged();
         }
     }
 
-    public static int lambda$pruneOverlaps$8(LinkSpec linkSpec, LinkSpec linkSpec2) {
+    public static int lambda$pruneOverlaps$9(LinkSpec linkSpec, LinkSpec linkSpec2) {
         int i;
         int i2;
         int i3 = linkSpec.start;
@@ -3131,7 +3143,7 @@ public class AndroidUtilities {
         });
     }
 
-    public static int lambda$scrollToFragmentRow$20(BaseFragment baseFragment, String str, RecyclerListView recyclerListView) {
+    public static int lambda$scrollToFragmentRow$21(BaseFragment baseFragment, String str, RecyclerListView recyclerListView) {
         try {
             Field declaredField = baseFragment.getClass().getDeclaredField(str);
             declaredField.setAccessible(true);
@@ -3149,7 +3161,7 @@ public class AndroidUtilities {
         }
     }
 
-    public static void lambda$setNavigationBarColor$19(IntColorCallback intColorCallback, Window window, ValueAnimator valueAnimator) {
+    public static void lambda$setNavigationBarColor$20(IntColorCallback intColorCallback, Window window, ValueAnimator valueAnimator) {
         int intValue = ((Integer) valueAnimator.getAnimatedValue()).intValue();
         if (intColorCallback != null) {
             intColorCallback.run(intValue);
@@ -3160,13 +3172,13 @@ public class AndroidUtilities {
         }
     }
 
-    public static void lambda$setWaitingForSms$10(Void r0) {
+    public static void lambda$setWaitingForSms$11(Void r0) {
         if (BuildVars.DEBUG_VERSION) {
             FileLog.d("sms listener registered");
         }
     }
 
-    public static void lambda$shakeView$11(View view, ValueAnimator valueAnimator) {
+    public static void lambda$shakeView$12(View view, ValueAnimator valueAnimator) {
         float floatValue = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         double d = floatValue * 4.0f * (1.0f - floatValue);
         double d2 = floatValue;
@@ -3179,7 +3191,7 @@ public class AndroidUtilities {
         view.setTranslationX((float) (d3 * dp));
     }
 
-    public static void lambda$shakeViewSpring$12(Runnable runnable, View view, float f, DynamicAnimation dynamicAnimation, boolean z, float f2, float f3) {
+    public static void lambda$shakeViewSpring$13(Runnable runnable, View view, float f, DynamicAnimation dynamicAnimation, boolean z, float f2, float f3) {
         if (runnable != null) {
             runnable.run();
         }
@@ -3188,7 +3200,7 @@ public class AndroidUtilities {
         view.setTag(R.id.spring_was_translation_x_tag, null);
     }
 
-    public static void lambda$showProxyAlert$15(long j, TextDetailSettingsCell textDetailSettingsCell) {
+    public static void lambda$showProxyAlert$16(long j, TextDetailSettingsCell textDetailSettingsCell) {
         TextView textView;
         int i;
         if (j == -1) {
@@ -3203,16 +3215,16 @@ public class AndroidUtilities {
         textView.setTextColor(Theme.getColor(i));
     }
 
-    public static void lambda$showProxyAlert$16(final TextDetailSettingsCell textDetailSettingsCell, final long j) {
+    public static void lambda$showProxyAlert$17(final TextDetailSettingsCell textDetailSettingsCell, final long j) {
         runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                AndroidUtilities.lambda$showProxyAlert$15(j, textDetailSettingsCell);
+                AndroidUtilities.lambda$showProxyAlert$16(j, textDetailSettingsCell);
             }
         });
     }
 
-    public static void lambda$showProxyAlert$18(String str, String str2, String str3, String str4, String str5, Activity activity, Runnable runnable, View view) {
+    public static void lambda$showProxyAlert$19(String str, String str2, String str3, String str4, String str5, Activity activity, Runnable runnable, View view) {
         SharedConfig.ProxyInfo proxyInfo;
         UndoView undoView;
         SharedPreferences.Editor edit = MessagesController.getGlobalMainSettings().edit();
@@ -3256,11 +3268,11 @@ public class AndroidUtilities {
         runnable.run();
     }
 
-    public static boolean lambda$static$5(CharSequence charSequence, int i, int i2) {
+    public static boolean lambda$static$6(CharSequence charSequence, int i, int i2) {
         return i == 0 || charSequence.charAt(i - 1) != '@';
     }
 
-    public static void lambda$updateImageViewImageAnimated$21(ImageView imageView, AtomicBoolean atomicBoolean, Drawable drawable, ValueAnimator valueAnimator) {
+    public static void lambda$updateImageViewImageAnimated$22(ImageView imageView, AtomicBoolean atomicBoolean, Drawable drawable, ValueAnimator valueAnimator) {
         float floatValue = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         float abs = Math.abs(floatValue - 0.5f) + 0.5f;
         imageView.setScaleX(abs);
@@ -3773,7 +3785,7 @@ public class AndroidUtilities {
             recyclerView.post(new Runnable() {
                 @Override
                 public final void run() {
-                    AndroidUtilities.lambda$notifyDataSetChanged$22(RecyclerView.this);
+                    AndroidUtilities.lambda$notifyDataSetChanged$23(RecyclerView.this);
                 }
             });
         } else {
@@ -3853,9 +3865,9 @@ public class AndroidUtilities {
         Collections.sort(arrayList, new Comparator() {
             @Override
             public final int compare(Object obj, Object obj2) {
-                int lambda$pruneOverlaps$8;
-                lambda$pruneOverlaps$8 = AndroidUtilities.lambda$pruneOverlaps$8((AndroidUtilities.LinkSpec) obj, (AndroidUtilities.LinkSpec) obj2);
-                return lambda$pruneOverlaps$8;
+                int lambda$pruneOverlaps$9;
+                lambda$pruneOverlaps$9 = AndroidUtilities.lambda$pruneOverlaps$9((AndroidUtilities.LinkSpec) obj, (AndroidUtilities.LinkSpec) obj2);
+                return lambda$pruneOverlaps$9;
             }
         });
         int size = arrayList.size();
@@ -4590,9 +4602,9 @@ public class AndroidUtilities {
             recyclerListView.highlightRow(new RecyclerListView.IntReturnCallback() {
                 @Override
                 public final int run() {
-                    int lambda$scrollToFragmentRow$20;
-                    lambda$scrollToFragmentRow$20 = AndroidUtilities.lambda$scrollToFragmentRow$20(BaseFragment.this, str, recyclerListView);
-                    return lambda$scrollToFragmentRow$20;
+                    int lambda$scrollToFragmentRow$21;
+                    lambda$scrollToFragmentRow$21 = AndroidUtilities.lambda$scrollToFragmentRow$21(BaseFragment.this, str, recyclerListView);
+                    return lambda$scrollToFragmentRow$21;
                 }
             });
             declaredField.setAccessible(false);
@@ -4710,7 +4722,7 @@ public class AndroidUtilities {
             ofArgb.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
-                    AndroidUtilities.lambda$setNavigationBarColor$19(AndroidUtilities.IntColorCallback.this, window, valueAnimator2);
+                    AndroidUtilities.lambda$setNavigationBarColor$20(AndroidUtilities.IntColorCallback.this, window, valueAnimator2);
                 }
             });
             ofArgb.addListener(new AnimatorListenerAdapter() {
@@ -4963,7 +4975,7 @@ public class AndroidUtilities {
                         SmsRetriever.getClient(ApplicationLoader.applicationContext).startSmsRetriever().addOnSuccessListener(new OnSuccessListener() {
                             @Override
                             public final void onSuccess(Object obj) {
-                                AndroidUtilities.lambda$setWaitingForSms$10((Void) obj);
+                                AndroidUtilities.lambda$setWaitingForSms$11((Void) obj);
                             }
                         });
                     } catch (Throwable th) {
@@ -4989,7 +5001,7 @@ public class AndroidUtilities {
         ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                AndroidUtilities.lambda$shakeView$11(view, valueAnimator);
+                AndroidUtilities.lambda$shakeView$12(view, valueAnimator);
             }
         });
         ofFloat.addListener(new AnimatorListenerAdapter() {
@@ -5030,7 +5042,7 @@ public class AndroidUtilities {
         SpringAnimation springAnimation = (SpringAnimation) ((SpringAnimation) new SpringAnimation(view, DynamicAnimation.TRANSLATION_X, translationX).setSpring(new SpringForce(translationX).setStiffness(600.0f)).setStartVelocity((-dp) * 100)).addEndListener(new DynamicAnimation.OnAnimationEndListener() {
             @Override
             public final void onAnimationEnd(DynamicAnimation dynamicAnimation, boolean z, float f3, float f4) {
-                AndroidUtilities.lambda$shakeViewSpring$12(runnable, view, translationX, dynamicAnimation, z, f3, f4);
+                AndroidUtilities.lambda$shakeViewSpring$13(runnable, view, translationX, dynamicAnimation, z, f3, f4);
             }
         });
         view.setTag(i, springAnimation);
@@ -5166,7 +5178,7 @@ public class AndroidUtilities {
                         ConnectionsManager.getInstance(UserConfig.selectedAccount).checkProxy(str, Integer.parseInt(str2), str3, str4, str5, new RequestTimeDelegate() {
                             @Override
                             public final void run(long j) {
-                                AndroidUtilities.lambda$showProxyAlert$16(TextDetailSettingsCell.this, j);
+                                AndroidUtilities.lambda$showProxyAlert$17(TextDetailSettingsCell.this, j);
                             }
                         });
                     } catch (NumberFormatException unused) {
@@ -5200,7 +5212,7 @@ public class AndroidUtilities {
         pickerBottomLayout.doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view2) {
-                AndroidUtilities.lambda$showProxyAlert$18(str, str2, str5, str4, str3, activity, dismissRunnable, view2);
+                AndroidUtilities.lambda$showProxyAlert$19(str, str2, str5, str4, str3, activity, dismissRunnable, view2);
             }
         });
         builder.show();
@@ -5303,7 +5315,7 @@ public class AndroidUtilities {
         duration.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                AndroidUtilities.lambda$updateImageViewImageAnimated$21(imageView, atomicBoolean, drawable, valueAnimator);
+                AndroidUtilities.lambda$updateImageViewImageAnimated$22(imageView, atomicBoolean, drawable, valueAnimator);
             }
         });
         duration.start();

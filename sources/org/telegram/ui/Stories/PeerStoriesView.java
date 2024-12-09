@@ -823,7 +823,10 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
             }
             zArr[0] = true;
             PeerStoriesView.this.drawReactionEffect = true;
-            PeerStoriesView.this.performHapticFeedback(3);
+            try {
+                PeerStoriesView.this.performHapticFeedback(3);
+            } catch (Exception unused) {
+            }
         }
 
         public void lambda$onReactionClicked$1(ReactionsLayoutInBubble.VisibleReaction visibleReaction, View view) {
@@ -912,7 +915,10 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                     if (!zArr2[0]) {
                         zArr2[0] = true;
                         PeerStoriesView.this.drawReactionEffect = true;
-                        PeerStoriesView.this.performHapticFeedback(3);
+                        try {
+                            PeerStoriesView.this.performHapticFeedback(3);
+                        } catch (Exception unused) {
+                        }
                     }
                     storiesLikeButton2.setAllowDrawReaction(true);
                     storiesLikeButton2.animateVisibleReaction();
@@ -4854,7 +4860,10 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
         } else {
             z2 = !z2;
             this.storiesLikeButton.setReaction(ReactionsLayoutInBubble.VisibleReaction.fromTL(reaction));
-            performHapticFeedback(3);
+            try {
+                performHapticFeedback(3);
+            } catch (Exception unused) {
+            }
             z = true;
         }
         if (this.isChannel && z2) {
@@ -5113,7 +5122,10 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                         createSimpleBulletin = of.createSimpleBulletin(R.raw.forward, AndroidUtilities.replaceTags(LocaleController.formatPluralString("StorySharedToManyChats", longSparseArray.size(), Integer.valueOf(longSparseArray.size()))));
                     }
                     createSimpleBulletin.hideAfterBottomSheet(false).show();
-                    PeerStoriesView.this.performHapticFeedback(3);
+                    try {
+                        PeerStoriesView.this.performHapticFeedback(3);
+                    } catch (Exception unused) {
+                    }
                 }
             }
 

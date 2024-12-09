@@ -13449,7 +13449,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 return;
             }
             ChatActivity.this.fireworksOverlay.start();
-            ChatActivity.this.fireworksOverlay.performHapticFeedback(3, 2);
+            try {
+                ChatActivity.this.fireworksOverlay.performHapticFeedback(3, 2);
+            } catch (Exception unused) {
+            }
         }
 
         @Override
@@ -19805,7 +19808,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.lambda$createView$31();
             }
         });
-        view.performHapticFeedback(0, 2);
+        try {
+            view.performHapticFeedback(0, 2);
+        } catch (Exception unused) {
+        }
         return true;
     }
 
@@ -20132,7 +20138,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.lambda$createView$43();
             }
         });
-        view.performHapticFeedback(0, 2);
+        try {
+            view.performHapticFeedback(0, 2);
+        } catch (Exception unused) {
+        }
         return false;
     }
 
@@ -22368,6 +22377,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         ((CheckBoxCell) view).setChecked(z, true);
     }
 
+    public static void lambda$processSelectedOption$298(View view) {
+        try {
+            view.performHapticFeedback(3, 2);
+        } catch (Exception unused) {
+        }
+    }
+
     public void lambda$processSelectedOption$299(int i, boolean[] zArr, DialogInterface dialogInterface, int i2) {
         getMessagesController().pinMessage(this.currentChat, this.currentUser, i, false, !zArr[1], zArr[0]);
         Bulletin createPinMessageBulletin = BulletinFactory.createPinMessageBulletin(this, this.themeDelegate);
@@ -22376,7 +22392,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         layout.postDelayed(new Runnable() {
             @Override
             public final void run() {
-                layout.performHapticFeedback(3, 2);
+                ChatActivity.lambda$processSelectedOption$298(layout);
             }
         }, 550L);
     }
@@ -27823,8 +27839,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         int i2;
         boolean z2;
         boolean z3;
-        String str;
-        String str2;
+        String lastSearchQuery;
         RecyclerListView recyclerListView = this.chatListView;
         if (recyclerListView == null) {
             return;
@@ -27872,15 +27887,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     this.highlightMessageQuoteFirstTime = j;
                     this.highlightMessageQuote = null;
                     ArrayList arrayList = this.threadMessageObjects;
-                    chatMessageCell.setCheckBoxVisible(arrayList == null || !arrayList.contains(messageObject3), true);
-                    int i5 = messageObject3.getDialogId() == this.dialog_id ? 0 : 1;
-                    if (this.selectedMessagesIds[i5].indexOfKey(messageObject3.getId()) >= 0) {
-                        setCellSelectionBackground(messageObject3, chatMessageCell, i5, true);
-                        z2 = true;
-                    } else {
+                    chatMessageCell.setCheckBoxVisible(arrayList == null || messageObject3 == null || !arrayList.contains(messageObject3), true);
+                    int i5 = (messageObject3 == null || messageObject3.getDialogId() == this.dialog_id) ? 0 : 1;
+                    if (messageObject3 == null || this.selectedMessagesIds[i5].indexOfKey(messageObject3.getId()) < 0) {
                         chatMessageCell.setDrawSelectionBackground(z4);
                         chatMessageCell.setChecked(z4, z4, true);
                         z2 = false;
+                    } else {
+                        setCellSelectionBackground(messageObject3, chatMessageCell, i5, true);
+                        z2 = true;
                     }
                     z3 = true;
                 } else {
@@ -27890,11 +27905,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     z2 = false;
                     z3 = false;
                 }
-                if ((!chatMessageCell.getMessageObject().deleted || chatMessageCell.linkedChatId != j2) && !z) {
+                if (messageObject3 != null && ((!messageObject3.deleted || chatMessageCell.linkedChatId != j2) && !z)) {
                     chatMessageCell.setIsUpdating(true);
                     TLRPC.ChatFull chatFull2 = this.chatInfo;
                     chatMessageCell.linkedChatId = chatFull2 != null ? chatFull2.linked_chat_id : 0L;
-                    chatMessageCell.setMessageObject(chatMessageCell.getMessageObject(), chatMessageCell.getCurrentMessagesGroup(), chatMessageCell.isPinnedBottom(), chatMessageCell.isPinnedTop());
+                    chatMessageCell.setMessageObject(messageObject3, chatMessageCell.getCurrentMessagesGroup(), chatMessageCell.isPinnedBottom(), chatMessageCell.isPinnedTop());
                     chatMessageCell.setIsUpdating(false);
                 }
                 if (chatMessageCell != this.scrimView) {
@@ -27904,7 +27919,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (this.highlightMessageId != Integer.MAX_VALUE) {
                     startMessageUnselect();
                 }
-                if (chatMessageCell.isHighlighted() && this.highlightMessageQuote != null) {
+                if (!chatMessageCell.isHighlighted() || this.highlightMessageQuote == null) {
+                    if (this.chatMode != 7 || this.searchingHashtag == null || (lastSearchQuery = this.searchingQuery) == null) {
+                        if (this.searchItem != null && this.searchItemVisible && messageObject3 != null) {
+                            if (getMediaDataController().isMessageFound(messageObject3.getId(), messageObject3.getDialogId() == this.mergeDialogId) && getMediaDataController().getLastSearchQuery() != null) {
+                                lastSearchQuery = getMediaDataController().getLastSearchQuery();
+                            }
+                        }
+                        chatMessageCell.setHighlightedText(null);
+                    }
+                    chatMessageCell.setHighlightedText(lastSearchQuery);
+                } else {
                     long currentTimeMillis = System.currentTimeMillis();
                     if (!chatMessageCell.setHighlightedText(this.highlightMessageQuote, true, this.highlightMessageQuoteOffset, this.highlightMessageQuoteFirst || currentTimeMillis - this.highlightMessageQuoteFirstTime < 200) && this.showNoQuoteAlert) {
                         showNoQuoteFound();
@@ -27914,17 +27939,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                     this.highlightMessageQuoteFirst = false;
                     this.showNoQuoteAlert = false;
-                } else if (this.chatMode != 7 || this.searchingHashtag == null || (str2 = this.searchingQuery) == null) {
-                    if (this.searchItem != null && this.searchItemVisible) {
-                        if (getMediaDataController().isMessageFound(messageObject3.getId(), messageObject3.getDialogId() == this.mergeDialogId) && getMediaDataController().getLastSearchQuery() != null) {
-                            str = getMediaDataController().getLastSearchQuery();
-                            chatMessageCell.setHighlightedText(str);
-                        }
-                    }
-                    str = null;
-                    chatMessageCell.setHighlightedText(str);
-                } else {
-                    chatMessageCell.setHighlightedText(str2);
                 }
                 chatMessageCell.setSpoilersSuppressed(this.chatListView.getScrollState() != 0);
             } else if (childAt2 instanceof ChatActionCell) {

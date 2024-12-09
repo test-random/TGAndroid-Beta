@@ -182,6 +182,7 @@ public class SelectorUserCell extends BaseCell {
     }
 
     public void setUser(TLRPC.User user) {
+        String formatUserStatus;
         this.optionsView.setVisibility(8);
         this.user = user;
         this.chat = null;
@@ -189,9 +190,14 @@ public class SelectorUserCell extends BaseCell {
         this.imageView.setRoundRadius(AndroidUtilities.dp(20.0f));
         this.imageView.setForUserOrChat(user, this.avatarDrawable);
         this.titleTextView.setText(UserObject.getUserName(user));
-        boolean[] zArr = this.isOnline;
-        zArr[0] = false;
-        setSubtitle(LocaleController.formatUserStatus(UserConfig.selectedAccount, user, zArr));
+        this.isOnline[0] = false;
+        if (UserObject.isBot(user)) {
+            int i = user.bot_active_users;
+            formatUserStatus = i > 0 ? LocaleController.formatPluralStringComma("BotUsers", i, ',') : LocaleController.getString(R.string.Bot);
+        } else {
+            formatUserStatus = LocaleController.formatUserStatus(UserConfig.selectedAccount, user, this.isOnline);
+        }
+        setSubtitle(formatUserStatus);
         this.subtitleTextView.setTextColor(Theme.getColor(this.isOnline[0] ? Theme.key_dialogTextBlue2 : Theme.key_dialogTextGray3, this.resourcesProvider));
         CheckBox2 checkBox2 = this.checkBox;
         if (checkBox2 != null) {

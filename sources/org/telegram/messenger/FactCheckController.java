@@ -616,7 +616,10 @@ public class FactCheckController {
                     this.ignoreTextChange = true;
                     editable.delete(i2, editable.length());
                     AndroidUtilities.shakeView(editTextCaption);
-                    editTextCaption.performHapticFeedback(3, 2);
+                    try {
+                        editTextCaption.performHapticFeedback(3, 2);
+                    } catch (Exception unused) {
+                    }
                     this.ignoreTextChange = false;
                 }
                 if (textViewArr[0] != null) {

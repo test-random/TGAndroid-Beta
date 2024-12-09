@@ -192,7 +192,10 @@ public class PasscodeView extends FrameLayout implements NotificationCenter.Noti
         }
 
         public void lambda$onGlobalLayout$0() {
-            PasscodeView.this.imageView.performHapticFeedback(3, 2);
+            try {
+                PasscodeView.this.imageView.performHapticFeedback(3, 2);
+            } catch (Exception unused) {
+            }
         }
 
         public void lambda$onGlobalLayout$1(double d, ValueAnimator valueAnimator) {

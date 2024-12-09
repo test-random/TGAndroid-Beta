@@ -149,7 +149,10 @@ public abstract class StoriesUtilities {
         }
 
         public void lambda$checkOnTouchEvent$0(View view) {
-            view.performHapticFeedback(0);
+            try {
+                view.performHapticFeedback(0);
+            } catch (Exception unused) {
+            }
             ButtonBounce buttonBounce = this.buttonBounce;
             if (buttonBounce != null) {
                 buttonBounce.setPressed(false);

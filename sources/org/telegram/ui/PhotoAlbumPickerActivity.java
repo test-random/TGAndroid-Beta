@@ -339,7 +339,10 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
             view.getLocationInWindow(iArr);
             this.sendPopupWindow.showAtLocation(view, 51, ((iArr[0] + view.getMeasuredWidth()) - this.sendPopupLayout.getMeasuredWidth()) + AndroidUtilities.dp(8.0f), (iArr[1] - this.sendPopupLayout.getMeasuredHeight()) - AndroidUtilities.dp(2.0f));
             this.sendPopupWindow.dimBehind();
-            view.performHapticFeedback(3, 2);
+            try {
+                view.performHapticFeedback(3, 2);
+            } catch (Exception unused) {
+            }
         }
         return false;
     }

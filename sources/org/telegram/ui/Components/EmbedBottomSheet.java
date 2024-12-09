@@ -121,16 +121,21 @@ public class EmbedBottomSheet extends BottomSheet {
 
         @Override
         public boolean onRenderProcessGone(WebView webView, RenderProcessGoneDetail renderProcessGoneDetail) {
-            if (!AndroidUtilities.isSafeToShow(EmbedBottomSheet.this.getContext())) {
-                return true;
-            }
-            new AlertDialog.Builder(EmbedBottomSheet.this.getContext(), ((BottomSheet) EmbedBottomSheet.this).resourcesProvider).setTitle(LocaleController.getString(R.string.ChromeCrashTitle)).setMessage(AndroidUtilities.replaceSingleTag(LocaleController.getString(R.string.ChromeCrashMessage), new Runnable() {
-                @Override
-                public final void run() {
-                    EmbedBottomSheet.AnonymousClass5.this.lambda$onRenderProcessGone$0();
+            try {
+                if (!AndroidUtilities.isSafeToShow(EmbedBottomSheet.this.getContext())) {
+                    return true;
                 }
-            })).setPositiveButton(LocaleController.getString(R.string.OK), null).show();
-            return true;
+                new AlertDialog.Builder(EmbedBottomSheet.this.getContext(), ((BottomSheet) EmbedBottomSheet.this).resourcesProvider).setTitle(LocaleController.getString(R.string.ChromeCrashTitle)).setMessage(AndroidUtilities.replaceSingleTag(LocaleController.getString(R.string.ChromeCrashMessage), new Runnable() {
+                    @Override
+                    public final void run() {
+                        EmbedBottomSheet.AnonymousClass5.this.lambda$onRenderProcessGone$0();
+                    }
+                })).setPositiveButton(LocaleController.getString(R.string.OK), null).show();
+                return true;
+            } catch (Exception e) {
+                FileLog.e(e);
+                return false;
+            }
         }
 
         @Override

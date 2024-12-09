@@ -346,7 +346,10 @@ public class CalendarActivity extends BaseFragment implements NotificationCenter
                 if (CalendarActivity.this.calendarType != 0 || AndroidUtilities.isTablet() || (dayAtCoord = getDayAtCoord(motionEvent.getX(), motionEvent.getY())) == null) {
                     return;
                 }
-                MonthView.this.performHapticFeedback(0);
+                try {
+                    MonthView.this.performHapticFeedback(0);
+                } catch (Exception unused) {
+                }
                 Bundle bundle = new Bundle();
                 long j = CalendarActivity.this.dialogId;
                 long j2 = CalendarActivity.this.dialogId;

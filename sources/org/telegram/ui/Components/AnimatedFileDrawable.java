@@ -190,13 +190,13 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         this(file, z, j, i, document, imageLocation, obj, j2, i2, z2, 0, 0, cacheOptions);
     }
 
-    static int access$1310(AnimatedFileDrawable animatedFileDrawable) {
+    static int access$1210(AnimatedFileDrawable animatedFileDrawable) {
         int i = animatedFileDrawable.pendingRemoveLoadingFramesReset;
         animatedFileDrawable.pendingRemoveLoadingFramesReset = i - 1;
         return i;
     }
 
-    static int access$3508(AnimatedFileDrawable animatedFileDrawable) {
+    static int access$3408(AnimatedFileDrawable animatedFileDrawable) {
         int i = animatedFileDrawable.decoderTryCount;
         animatedFileDrawable.decoderTryCount = i + 1;
         return i;
@@ -274,12 +274,6 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
                 return true;
             }
             i++;
-        }
-    }
-
-    public void invalidateInternal() {
-        for (int i = 0; i < this.parents.size(); i++) {
-            ((ImageReceiver) this.parents.get(i)).invalidate();
         }
     }
 
@@ -720,6 +714,12 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         return canLoadFrames() && !(this.renderingBitmap == null && this.nextRenderingBitmap == null);
     }
 
+    public void invalidateInternal() {
+        for (int i = 0; i < this.parents.size(); i++) {
+            ((ImageReceiver) this.parents.get(i)).invalidate();
+        }
+    }
+
     public boolean isLoadingStream() {
         AnimatedFileDrawableStream animatedFileDrawableStream = this.stream;
         return animatedFileDrawableStream != null && animatedFileDrawableStream.isWaitingForLoad();
@@ -850,6 +850,24 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
                 setRoundRadius(iArr);
             }
         }
+    }
+
+    public void replaceAnimatedBitmap(Bitmap bitmap) {
+        Bitmap bitmap2 = this.renderingBitmap;
+        if (bitmap2 != null) {
+            this.unusedBitmaps.add(bitmap2);
+        }
+        Bitmap bitmap3 = this.nextRenderingBitmap;
+        if (bitmap3 != null) {
+            this.unusedBitmaps.add(bitmap3);
+        }
+        Bitmap bitmap4 = this.nextRenderingBitmap2;
+        if (bitmap4 != null) {
+            this.unusedBitmaps.add(bitmap4);
+        }
+        this.renderingBitmap = bitmap;
+        this.nextRenderingBitmap = null;
+        this.nextRenderingBitmap2 = null;
     }
 
     public void resetStream(boolean z) {

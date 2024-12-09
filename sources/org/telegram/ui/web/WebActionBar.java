@@ -498,7 +498,10 @@ public abstract class WebActionBar extends FrameLayout {
         if (getParent() != null) {
             getParent().requestDisallowInterceptTouchEvent(true);
         }
-        performHapticFeedback(0, 1);
+        try {
+            performHapticFeedback(0, 1);
+        } catch (Exception unused) {
+        }
     }
 
     public static void lambda$new$2(ActionBarMenuSubItem actionBarMenuSubItem, WebInstantView.Loader loader) {

@@ -297,7 +297,10 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
                 boolean z = view instanceof ImageViewEmoji;
                 if (z && (i2 == 1 || i2 == 8)) {
                     SelectAnimatedEmojiDialog.this.incrementHintUse();
-                    SelectAnimatedEmojiDialog.this.performHapticFeedback(0);
+                    try {
+                        SelectAnimatedEmojiDialog.this.performHapticFeedback(0);
+                    } catch (Exception unused) {
+                    }
                     ImageViewEmoji imageViewEmoji = (ImageViewEmoji) view;
                     if (!imageViewEmoji.isDefaultReaction && !UserConfig.getInstance(SelectAnimatedEmojiDialog.this.currentAccount).isPremium()) {
                         TLRPC.Document document = imageViewEmoji.span.document;
@@ -372,7 +375,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
                         }.show();
                         try {
                             view.performHapticFeedback(0, 1);
-                        } catch (Exception unused) {
+                        } catch (Exception unused2) {
                         }
                         return true;
                     }

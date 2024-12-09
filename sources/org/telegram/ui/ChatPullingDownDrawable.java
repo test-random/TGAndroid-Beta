@@ -482,7 +482,10 @@ public class ChatPullingDownDrawable implements NotificationCenter.NotificationC
             long currentTimeMillis = System.currentTimeMillis();
             i = i5;
             if (currentTimeMillis - this.lastHapticTime > 100) {
-                view.performHapticFeedback(3, 2);
+                try {
+                    view.performHapticFeedback(3, 2);
+                } catch (Exception unused) {
+                }
                 this.lastHapticTime = currentTimeMillis;
             }
             this.lastProgress = f;

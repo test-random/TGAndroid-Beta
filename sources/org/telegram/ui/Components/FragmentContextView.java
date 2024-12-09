@@ -197,7 +197,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             this.pressed = true;
             FragmentContextView.this.isMuted = false;
             AndroidUtilities.runOnUIThread(this.toggleMicRunnable, 90L);
-            FragmentContextView.this.muteButton.performHapticFeedback(3, 2);
+            try {
+                FragmentContextView.this.muteButton.performHapticFeedback(3, 2);
+            } catch (Exception unused) {
+            }
         }
 
         @Override
@@ -240,7 +243,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                     FragmentContextView.this.muteButton.playAnimation();
                     if (VoIPService.getSharedInstance() != null) {
                         VoIPService.getSharedInstance().setMicMute(true, true, false);
-                        FragmentContextView.this.muteButton.performHapticFeedback(3, 2);
+                        try {
+                            FragmentContextView.this.muteButton.performHapticFeedback(3, 2);
+                        } catch (Exception unused) {
+                        }
                     }
                     this.pressed = false;
                     Theme.getFragmentContextViewWavesDrawable().updateState(true);
@@ -976,7 +982,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         }
         this.muteButton.playAnimation();
         Theme.getFragmentContextViewWavesDrawable().updateState(true);
-        this.muteButton.performHapticFeedback(3, 2);
+        try {
+            this.muteButton.performHapticFeedback(3, 2);
+        } catch (Exception unused) {
+        }
     }
 
     public void lambda$checkCreateView$5(DialogInterface dialogInterface, int i) {

@@ -2614,13 +2614,16 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         VibrationEffect createWaveform;
         long[] jArr = {0, 1};
         if (Build.VERSION.SDK_INT < 26) {
-            performHapticFeedback(3, 2);
-            return;
+            try {
+                performHapticFeedback(3, 2);
+            } catch (Exception unused) {
+            }
+        } else {
+            Vibrator vibrator = (Vibrator) getContext().getSystemService("vibrator");
+            createWaveform = VibrationEffect.createWaveform(jArr, -1);
+            vibrator.cancel();
+            vibrator.vibrate(createWaveform);
         }
-        Vibrator vibrator = (Vibrator) getContext().getSystemService("vibrator");
-        createWaveform = VibrationEffect.createWaveform(jArr, -1);
-        vibrator.cancel();
-        vibrator.vibrate(createWaveform);
     }
 
     public void setClipBottom(int i) {

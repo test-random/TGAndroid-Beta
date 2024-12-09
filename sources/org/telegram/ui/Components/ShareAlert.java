@@ -4245,7 +4245,10 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
         view.getLocationInWindow(iArr);
         this.sendPopupWindow.showAtLocation(view, 51, ((iArr[0] + view.getMeasuredWidth()) - linearLayout.getMeasuredWidth()) + AndroidUtilities.dp(8.0f), (!this.keyboardVisible || (chatActivity = this.parentFragment) == null || chatActivity.contentView.getMeasuredHeight() <= AndroidUtilities.dp(58.0f)) ? (iArr[1] - linearLayout.getMeasuredHeight()) - AndroidUtilities.dp(2.0f) : iArr[1] + view.getMeasuredHeight());
         this.sendPopupWindow.dimBehind();
-        view.performHapticFeedback(3, 2);
+        try {
+            view.performHapticFeedback(3, 2);
+        } catch (Exception unused) {
+        }
         return true;
     }
 

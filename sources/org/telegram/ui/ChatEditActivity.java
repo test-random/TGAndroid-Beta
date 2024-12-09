@@ -487,14 +487,18 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
         if (!this.canForum) {
             TLRPC.ChatFull chatFull = this.info;
             BulletinFactory.of(this).createSimpleBulletin(R.raw.topics, AndroidUtilities.replaceTags((chatFull == null || chatFull.linked_chat_id == 0) ? LocaleController.formatPluralString("ChannelTopicsForbidden", getMessagesController().forumUpgradeParticipantsMin, new Object[0]) : LocaleController.getString("ChannelTopicsDiscussionForbidden", R.string.ChannelTopicsDiscussionForbidden))).show();
-            frameLayout.performHapticFeedback(3);
-        } else {
-            boolean z = !this.forum;
-            this.forum = z;
-            this.avatarImage.animateToRoundRadius(AndroidUtilities.dp(z ? 16.0f : 32.0f));
-            ((TextCell) view).setChecked(this.forum);
-            updateFields(false, true);
+            try {
+                frameLayout.performHapticFeedback(3);
+                return;
+            } catch (Exception unused) {
+                return;
+            }
         }
+        boolean z = !this.forum;
+        this.forum = z;
+        this.avatarImage.animateToRoundRadius(AndroidUtilities.dp(z ? 16.0f : 32.0f));
+        ((TextCell) view).setChecked(this.forum);
+        updateFields(false, true);
     }
 
     public static boolean lambda$createView$2(View view, MotionEvent motionEvent) {

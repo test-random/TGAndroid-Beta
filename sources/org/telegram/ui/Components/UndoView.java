@@ -285,7 +285,10 @@ public class UndoView extends FrameLayout {
     }
 
     public void lambda$showWithAction$7() {
-        this.leftImageView.performHapticFeedback(3, 2);
+        try {
+            this.leftImageView.performHapticFeedback(3, 2);
+        } catch (Exception unused) {
+        }
     }
 
     private void updatePosition() {

@@ -25,7 +25,8 @@ import org.telegram.ui.Components.PasscodeView;
 import org.telegram.ui.Components.ThemeEditorView;
 
 public class BubbleActivity extends BasePermissionsActivity implements INavigationLayout.INavigationLayoutDelegate {
-    private INavigationLayout actionBarLayout;
+    public static BubbleActivity instance;
+    public INavigationLayout actionBarLayout;
     private long dialogId;
     protected DrawerLayoutContainer drawerLayoutContainer;
     private boolean finished;
@@ -108,6 +109,7 @@ public class BubbleActivity extends BasePermissionsActivity implements INavigati
             this.lockRunnable = null;
         }
         this.finished = true;
+        instance = null;
     }
 
     private void onPasscodePause() {
@@ -293,6 +295,7 @@ public class BubbleActivity extends BasePermissionsActivity implements INavigati
         NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.closeOtherAppActivities, this);
         this.actionBarLayout.removeAllFragments();
         handleIntent(getIntent(), false, bundle != null, false, UserConfig.selectedAccount, 0);
+        instance = this;
     }
 
     @Override
@@ -304,6 +307,7 @@ public class BubbleActivity extends BasePermissionsActivity implements INavigati
             AccountInstance.getInstance(this.currentAccount).getConnectionsManager().setAppPaused(false, false);
         }
         onFinish();
+        instance = null;
     }
 
     @Override
@@ -333,6 +337,7 @@ public class BubbleActivity extends BasePermissionsActivity implements INavigati
         if (passcodeView != null) {
             passcodeView.onPause();
         }
+        instance = null;
     }
 
     @Override
@@ -368,6 +373,7 @@ public class BubbleActivity extends BasePermissionsActivity implements INavigati
             this.actionBarLayout.dismissDialogs();
             this.passcodeView.onResume();
         }
+        instance = this;
     }
 
     @Override

@@ -789,7 +789,10 @@ public class FilterChatlistActivity extends BaseFragment {
                             this.ignoreTextChange = true;
                             editable.delete(32, editable.length());
                             AndroidUtilities.shakeView(editTextBoldCursor);
-                            editTextBoldCursor.performHapticFeedback(3, 2);
+                            try {
+                                editTextBoldCursor.performHapticFeedback(3, 2);
+                            } catch (Exception unused) {
+                            }
                             this.ignoreTextChange = false;
                         }
                     }

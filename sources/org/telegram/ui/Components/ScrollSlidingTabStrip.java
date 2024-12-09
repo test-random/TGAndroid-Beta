@@ -191,7 +191,10 @@ public abstract class ScrollSlidingTabStrip extends HorizontalScrollView {
                 scrollSlidingTabStrip3.currentDragPosition = ceil;
                 scrollSlidingTabStrip3.startDragFromPosition = ceil;
                 if (scrollSlidingTabStrip3.canSwap(ceil) && ceil >= 0 && ceil < ScrollSlidingTabStrip.this.tabsContainer.getChildCount()) {
-                    ScrollSlidingTabStrip.this.performHapticFeedback(0);
+                    try {
+                        ScrollSlidingTabStrip.this.performHapticFeedback(0);
+                    } catch (Exception unused) {
+                    }
                     ScrollSlidingTabStrip scrollSlidingTabStrip4 = ScrollSlidingTabStrip.this;
                     scrollSlidingTabStrip4.draggindViewDxOnScreen = 0.0f;
                     scrollSlidingTabStrip4.draggingViewOutProgress = 0.0f;

@@ -188,7 +188,10 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
             }
             chatActivity.restartSticker(chatMessageCell);
             if (!EmojiData.hasEmojiSupportVibration(chatMessageCell.getMessageObject().getStickerEmoji()) && !chatMessageCell.getMessageObject().isPremiumSticker() && !chatMessageCell.getMessageObject().isAnimatedAnimatedEmoji()) {
-                chatMessageCell.performHapticFeedback(3);
+                try {
+                    chatMessageCell.performHapticFeedback(3);
+                } catch (Exception unused) {
+                }
             }
             showAnimationForCell(chatMessageCell, i2, false, true);
         }
@@ -490,7 +493,10 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
         }
         boolean showAnimationForCell = showAnimationForCell(chatMessageCell, -1, z, false);
         if (z && showAnimationForCell && !EmojiData.hasEmojiSupportVibration(chatMessageCell.getMessageObject().getStickerEmoji()) && !chatMessageCell.getMessageObject().isPremiumSticker() && !chatMessageCell.getMessageObject().isAnimatedAnimatedEmoji()) {
-            chatMessageCell.performHapticFeedback(3);
+            try {
+                chatMessageCell.performHapticFeedback(3);
+            } catch (Exception unused) {
+            }
         }
         if (chatMessageCell.getMessageObject().isPremiumSticker() || chatMessageCell.getEffect() != null || (!z && chatMessageCell.getMessageObject().isAnimatedEmojiStickerSingle())) {
             chatMessageCell.getMessageObject().forcePlayEffect = false;

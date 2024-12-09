@@ -9,10 +9,10 @@ public class DispatchQueuePool {
     private int createdCount;
     private int maxCount;
     private int totalTasksCount;
-    private LinkedList<DispatchQueue> queues = new LinkedList<>();
-    private SparseIntArray busyQueuesMap = new SparseIntArray();
-    private LinkedList<DispatchQueue> busyQueues = new LinkedList<>();
-    private Runnable cleanupRunnable = new Runnable() {
+    private final LinkedList<DispatchQueue> queues = new LinkedList<>();
+    private final SparseIntArray busyQueuesMap = new SparseIntArray();
+    private final LinkedList<DispatchQueue> busyQueues = new LinkedList<>();
+    private final Runnable cleanupRunnable = new Runnable() {
         @Override
         public void run() {
             if (!DispatchQueuePool.this.queues.isEmpty()) {
@@ -51,7 +51,7 @@ public class DispatchQueuePool {
         return i;
     }
 
-    public void lambda$execute$0(DispatchQueue dispatchQueue) {
+    public void lambda$execute$1(DispatchQueue dispatchQueue) {
         this.totalTasksCount--;
         int i = this.busyQueuesMap.get(dispatchQueue.index) - 1;
         if (i != 0) {
@@ -63,17 +63,17 @@ public class DispatchQueuePool {
         this.queues.add(dispatchQueue);
     }
 
-    public void lambda$execute$1(Runnable runnable, final DispatchQueue dispatchQueue) {
+    public void lambda$execute$2(Runnable runnable, final DispatchQueue dispatchQueue) {
         runnable.run();
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                DispatchQueuePool.this.lambda$execute$0(dispatchQueue);
+                DispatchQueuePool.this.lambda$execute$1(dispatchQueue);
             }
         });
     }
 
-    public void execute(final java.lang.Runnable r8) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.DispatchQueuePool.execute(java.lang.Runnable):void");
+    public void lambda$execute$0(final java.lang.Runnable r8) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.DispatchQueuePool.lambda$execute$0(java.lang.Runnable):void");
     }
 }
