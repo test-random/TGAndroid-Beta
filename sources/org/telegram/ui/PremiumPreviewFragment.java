@@ -157,7 +157,7 @@ public class PremiumPreviewFragment extends BaseFragment implements Notification
     private String source;
     private int statusBarHeight;
     int statusRow;
-    ArrayList subscriptionTiers;
+    final ArrayList subscriptionTiers;
     PremiumGradient.PremiumGradientTools tiersGradientTools;
     int totalGradientHeight;
     float totalProgress;
@@ -1850,40 +1850,41 @@ public class PremiumPreviewFragment extends BaseFragment implements Notification
     }
 
     public void updateButtonText(boolean z) {
-        if (this.premiumButtonView != null) {
-            if (!getUserConfig().isPremium() || this.currentSubscriptionTier == null || ((SubscriptionTier) this.subscriptionTiers.get(this.selectedTierIndex)).getMonths() >= this.currentSubscriptionTier.getMonths()) {
-                if (LocaleController.isRTL) {
-                    z = false;
-                }
-                if (BuildVars.IS_BILLING_UNAVAILABLE) {
-                    this.premiumButtonView.setButton(getPremiumButtonText(this.currentAccount, (SubscriptionTier) this.subscriptionTiers.get(this.selectedTierIndex)), new View.OnClickListener() {
-                        @Override
-                        public final void onClick(View view) {
-                            PremiumPreviewFragment.this.lambda$updateButtonText$15(view);
-                        }
-                    }, z);
+        if (this.premiumButtonView == null) {
+            return;
+        }
+        if (!getUserConfig().isPremium() || this.currentSubscriptionTier == null || this.selectedTierIndex >= this.subscriptionTiers.size() || ((SubscriptionTier) this.subscriptionTiers.get(this.selectedTierIndex)).getMonths() >= this.currentSubscriptionTier.getMonths()) {
+            if (LocaleController.isRTL) {
+                z = false;
+            }
+            if (BuildVars.IS_BILLING_UNAVAILABLE && this.selectedTierIndex < this.subscriptionTiers.size()) {
+                this.premiumButtonView.setButton(getPremiumButtonText(this.currentAccount, (SubscriptionTier) this.subscriptionTiers.get(this.selectedTierIndex)), new View.OnClickListener() {
+                    @Override
+                    public final void onClick(View view) {
+                        PremiumPreviewFragment.this.lambda$updateButtonText$15(view);
+                    }
+                }, z);
+                return;
+            }
+            if (!BuildVars.useInvoiceBilling() && (!BillingController.getInstance().isReady() || this.subscriptionTiers.isEmpty() || this.selectedTierIndex >= this.subscriptionTiers.size() || ((SubscriptionTier) this.subscriptionTiers.get(this.selectedTierIndex)).googlePlayProductDetails == null)) {
+                this.premiumButtonView.setButton(LocaleController.getString(R.string.Loading), new View.OnClickListener() {
+                    @Override
+                    public final void onClick(View view) {
+                        PremiumPreviewFragment.lambda$updateButtonText$16(view);
+                    }
+                }, z);
+                this.premiumButtonView.setFlickerDisabled(true);
+            } else {
+                if (this.subscriptionTiers.isEmpty() || this.selectedTierIndex >= this.subscriptionTiers.size()) {
                     return;
                 }
-                if (!BuildVars.useInvoiceBilling() && (!BillingController.getInstance().isReady() || this.subscriptionTiers.isEmpty() || this.selectedTierIndex >= this.subscriptionTiers.size() || ((SubscriptionTier) this.subscriptionTiers.get(this.selectedTierIndex)).googlePlayProductDetails == null)) {
-                    this.premiumButtonView.setButton(LocaleController.getString(R.string.Loading), new View.OnClickListener() {
-                        @Override
-                        public final void onClick(View view) {
-                            PremiumPreviewFragment.lambda$updateButtonText$16(view);
-                        }
-                    }, z);
-                    this.premiumButtonView.setFlickerDisabled(true);
-                } else {
-                    if (this.subscriptionTiers.isEmpty()) {
-                        return;
+                this.premiumButtonView.setButton(getPremiumButtonText(this.currentAccount, (SubscriptionTier) this.subscriptionTiers.get(this.selectedTierIndex)), new View.OnClickListener() {
+                    @Override
+                    public final void onClick(View view) {
+                        PremiumPreviewFragment.this.lambda$updateButtonText$17(view);
                     }
-                    this.premiumButtonView.setButton(getPremiumButtonText(this.currentAccount, (SubscriptionTier) this.subscriptionTiers.get(this.selectedTierIndex)), new View.OnClickListener() {
-                        @Override
-                        public final void onClick(View view) {
-                            PremiumPreviewFragment.this.lambda$updateButtonText$17(view);
-                        }
-                    }, z);
-                    this.premiumButtonView.setFlickerDisabled(false);
-                }
+                }, z);
+                this.premiumButtonView.setFlickerDisabled(false);
             }
         }
     }
