@@ -36,6 +36,7 @@ import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Cells.ManageChatTextCell;
@@ -1179,7 +1180,23 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
             this.waitingForFullChat = null;
             return;
         }
-        if (i != NotificationCenter.updateInterfaces || (((Integer) objArr[0]).intValue() & MessagesController.UPDATE_MASK_CHAT) == 0 || this.currentChat == null) {
+        if (i != NotificationCenter.updateInterfaces) {
+            if (i == NotificationCenter.dialogDeleted) {
+                if ((-this.currentChatId) == ((Long) objArr[0]).longValue()) {
+                    INavigationLayout iNavigationLayout = this.parentLayout;
+                    if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
+                        removeSelfFromStack();
+                        return;
+                    } else {
+                        lambda$onBackPressed$321();
+                        return;
+                    }
+                }
+                return;
+            }
+            return;
+        }
+        if ((((Integer) objArr[0]).intValue() & MessagesController.UPDATE_MASK_CHAT) == 0 || this.currentChat == null) {
             return;
         }
         TLRPC.Chat chat4 = getMessagesController().getChat(Long.valueOf(this.currentChat.id));
@@ -1261,6 +1278,7 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
         super.onFragmentCreate();
         getNotificationCenter().addObserver(this, NotificationCenter.chatInfoDidLoad);
         getNotificationCenter().addObserver(this, NotificationCenter.updateInterfaces);
+        getNotificationCenter().addObserver(this, NotificationCenter.dialogDeleted);
         loadChats();
         return true;
     }
@@ -1270,6 +1288,7 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
         super.onFragmentDestroy();
         getNotificationCenter().removeObserver(this, NotificationCenter.chatInfoDidLoad);
         getNotificationCenter().removeObserver(this, NotificationCenter.updateInterfaces);
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogDeleted);
     }
 
     @Override

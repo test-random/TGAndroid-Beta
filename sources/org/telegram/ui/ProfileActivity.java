@@ -13343,41 +13343,54 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 return;
                             }
                             if (i != NotificationCenter.reloadDialogPhotos) {
-                                if (i != NotificationCenter.storiesUpdated && i != NotificationCenter.storiesReadUpdated) {
-                                    if (i == NotificationCenter.userIsPremiumBlockedUpadted) {
-                                        ActionBarMenuItem actionBarMenuItem = this.otherItem;
-                                        if (actionBarMenuItem != null) {
-                                            actionBarMenuItem.setSubItemShown(20, !getMessagesController().isUserPremiumBlocked(this.userId));
-                                        }
-                                    } else if (i != NotificationCenter.currentUserPremiumStatusChanged) {
-                                        if (i != NotificationCenter.starBalanceUpdated && i != NotificationCenter.botStarsUpdated && i != NotificationCenter.botStarsTransactionsLoaded) {
-                                            return;
-                                        }
+                                if (i == NotificationCenter.storiesUpdated || i == NotificationCenter.storiesReadUpdated) {
+                                    AvatarImageView avatarImageView4 = this.avatarImage;
+                                    if (avatarImageView4 != null) {
+                                        avatarImageView4.setHasStories(needInsetForStories());
+                                        updateAvatarRoundRadius();
                                     }
-                                    updateEditColorIcon();
-                                    return;
-                                }
-                                AvatarImageView avatarImageView4 = this.avatarImage;
-                                if (avatarImageView4 != null) {
-                                    avatarImageView4.setHasStories(needInsetForStories());
-                                    updateAvatarRoundRadius();
-                                }
-                                ProfileStoriesView profileStoriesView4 = this.storyView;
-                                if (profileStoriesView4 != null) {
-                                    TLRPC.UserFull userFull2 = this.userInfo;
-                                    if (userFull2 != null) {
-                                        peerStories = userFull2.stories;
-                                    } else {
-                                        TLRPC.ChatFull chatFull8 = this.chatInfo;
-                                        if (chatFull8 == null) {
-                                            return;
+                                    ProfileStoriesView profileStoriesView4 = this.storyView;
+                                    if (profileStoriesView4 != null) {
+                                        TLRPC.UserFull userFull2 = this.userInfo;
+                                        if (userFull2 != null) {
+                                            peerStories = userFull2.stories;
                                         } else {
-                                            peerStories = chatFull8.stories;
+                                            TLRPC.ChatFull chatFull8 = this.chatInfo;
+                                            if (chatFull8 == null) {
+                                                return;
+                                            } else {
+                                                peerStories = chatFull8.stories;
+                                            }
                                         }
+                                        profileStoriesView4.setStories(peerStories);
+                                        return;
                                     }
-                                    profileStoriesView4.setStories(peerStories);
                                     return;
                                 }
+                                if (i == NotificationCenter.userIsPremiumBlockedUpadted) {
+                                    ActionBarMenuItem actionBarMenuItem = this.otherItem;
+                                    if (actionBarMenuItem != null) {
+                                        actionBarMenuItem.setSubItemShown(20, !getMessagesController().isUserPremiumBlocked(this.userId));
+                                    }
+                                } else if (i != NotificationCenter.currentUserPremiumStatusChanged) {
+                                    if (i != NotificationCenter.starBalanceUpdated && i != NotificationCenter.botStarsUpdated && i != NotificationCenter.botStarsTransactionsLoaded) {
+                                        if (i == NotificationCenter.dialogDeleted) {
+                                            if (getDialogId() == ((Long) objArr[0]).longValue()) {
+                                                INavigationLayout iNavigationLayout = this.parentLayout;
+                                                if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
+                                                    removeSelfFromStack();
+                                                    return;
+                                                } else {
+                                                    lambda$onBackPressed$321();
+                                                    return;
+                                                }
+                                            }
+                                            return;
+                                        }
+                                        return;
+                                    }
+                                }
+                                updateEditColorIcon();
                                 return;
                             }
                         } else if (!this.isTopic) {
@@ -13996,6 +14009,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().addObserver(this, NotificationCenter.starBalanceUpdated);
         getNotificationCenter().addObserver(this, NotificationCenter.botStarsUpdated);
         getNotificationCenter().addObserver(this, NotificationCenter.botStarsTransactionsLoaded);
+        getNotificationCenter().addObserver(this, NotificationCenter.dialogDeleted);
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
         updateRowsIds();
         ListAdapter listAdapter = this.listAdapter;
@@ -14094,6 +14108,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().removeObserver(this, NotificationCenter.starBalanceUpdated);
         getNotificationCenter().removeObserver(this, NotificationCenter.botStarsUpdated);
         getNotificationCenter().removeObserver(this, NotificationCenter.botStarsTransactionsLoaded);
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogDeleted);
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
         ProfileGalleryView profileGalleryView = this.avatarsViewPager;
         if (profileGalleryView != null) {

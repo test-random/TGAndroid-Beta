@@ -262,6 +262,7 @@ public class AndroidUtilities {
     public static final RectF rectTmp = new RectF();
     public static final Rect rectTmp2 = new Rect();
     public static final int[] pointTmp2 = new int[2];
+    public static Pattern REMOVE_RTL = null;
     private static Pattern singleTagPatter = null;
 
     public interface IntColorCallback {
@@ -1376,6 +1377,10 @@ public class AndroidUtilities {
                 FileLog.e(th);
             }
         }
+    }
+
+    public static String escape(String str) {
+        return removeRTL(removeDiacritics(str));
     }
 
     public static void fillStatusBarHeight(Context context, boolean z) {
@@ -3991,6 +3996,17 @@ public class AndroidUtilities {
             return;
         }
         ((ViewGroup) view.getParent()).removeView(view);
+    }
+
+    public static String removeRTL(String str) {
+        if (str == null) {
+            return null;
+        }
+        if (REMOVE_RTL == null) {
+            REMOVE_RTL = Pattern.compile("[\\u200E\\u200F\\u202A-\\u202E]");
+        }
+        Matcher matcher = REMOVE_RTL.matcher(str);
+        return matcher == null ? str : matcher.replaceAll("");
     }
 
     public static CharSequence removeSpans(CharSequence charSequence, Class cls) {

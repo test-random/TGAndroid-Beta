@@ -151,11 +151,13 @@ public class BotStarsController {
                 return;
             }
             this.lastRequestTime = System.currentTimeMillis();
+            this.loading = true;
             TL_payments.getConnectedStarRefBots getconnectedstarrefbots = new TL_payments.getConnectedStarRefBots();
             getconnectedstarrefbots.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
             getconnectedstarrefbots.limit = 20;
             if (!this.bots.isEmpty()) {
-                TL_payments.connectedBotStarRef connectedbotstarref = (TL_payments.connectedBotStarRef) this.bots.get(r1.size() - 1);
+                ArrayList arrayList = this.bots;
+                TL_payments.connectedBotStarRef connectedbotstarref = (TL_payments.connectedBotStarRef) arrayList.get(arrayList.size() - 1);
                 getconnectedstarrefbots.flags |= 4;
                 getconnectedstarrefbots.offset_date = connectedbotstarref.date;
                 getconnectedstarrefbots.offset_link = connectedbotstarref.url;
@@ -259,6 +261,7 @@ public class BotStarsController {
                 return;
             }
             this.lastRequestTime = System.currentTimeMillis();
+            this.loading = true;
             TL_payments.getSuggestedStarRefBots getsuggestedstarrefbots = new TL_payments.getSuggestedStarRefBots();
             getsuggestedstarrefbots.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
             getsuggestedstarrefbots.limit = 20;

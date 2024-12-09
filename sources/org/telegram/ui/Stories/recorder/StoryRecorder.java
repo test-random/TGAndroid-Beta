@@ -4995,6 +4995,10 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                 this.lastCollageLayout = of;
                 collageLayoutView2.setLayout(of, true);
                 this.collageListView.setSelected(of);
+                int indexOf = CollageLayout.getLayouts().indexOf(of);
+                if (indexOf >= 0) {
+                    this.collageListView.listView.scrollToPosition(indexOf);
+                }
                 DualCameraView dualCameraView2 = this.cameraView;
                 if (dualCameraView2 != null) {
                     dualCameraView2.recordHevc = !this.collageLayoutView.hasLayout();

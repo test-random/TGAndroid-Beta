@@ -14,7 +14,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.util.Property;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -22,8 +21,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -76,7 +73,6 @@ import org.telegram.ui.PeerColorActivity;
 import org.telegram.ui.PhotoViewer;
 import org.telegram.ui.Stars.BotStarsActivity;
 import org.telegram.ui.Stars.BotStarsController;
-import org.telegram.ui.Stars.StarsIntroActivity;
 import org.telegram.ui.bots.AffiliateProgramFragment;
 import org.telegram.ui.bots.ChannelAffiliateProgramsFragment;
 
@@ -99,6 +95,9 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
     private boolean canForum;
     private TextCell changeBotSettingsCell;
     private TextCell channelAffiliateProgramsCell;
+    private TLRPC.TL_chatAdminRights chatAdminRights;
+    private TLRPC.TL_chatBannedRights chatBannedRights;
+    private TLRPC.TL_chatBannedRights chatDefaultBannedRights;
     private long chatId;
     private PeerColorActivity.ChangeNameColorCell colorCell;
     private boolean createAfterUpload;
@@ -1312,123 +1311,8 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
     }
 
     @Override
-    public void didReceivedNotification(int i, int i2, Object... objArr) {
-        SpannableStringBuilder append;
-        String format;
-        EditTextBoldCursor editTextBoldCursor;
-        boolean z = true;
-        int i3 = 0;
-        if (i == NotificationCenter.chatInfoDidLoad) {
-            TLRPC.ChatFull chatFull = (TLRPC.ChatFull) objArr[0];
-            if (chatFull.id == this.chatId) {
-                if (this.info == null && (editTextBoldCursor = this.descriptionTextView) != null) {
-                    editTextBoldCursor.setText(chatFull.about);
-                }
-                boolean z2 = this.info == null;
-                this.info = chatFull;
-                updateCanForum();
-                if (ChatObject.isChannel(this.currentChat) && !this.info.hidden_prehistory) {
-                    z = false;
-                }
-                this.historyHidden = z;
-                updateFields(false, false);
-                if (z2) {
-                    loadLinksCount();
-                    return;
-                }
-                return;
-            }
-            return;
-        }
-        if (i == NotificationCenter.updateInterfaces) {
-            int intValue = ((Integer) objArr[0]).intValue();
-            if ((MessagesController.UPDATE_MASK_AVATAR & intValue) != 0) {
-                setAvatar();
-            }
-            if ((intValue & MessagesController.UPDATE_MASK_NAME) != 0) {
-                updatePublicLinksCount();
-                return;
-            }
-            return;
-        }
-        if (i == NotificationCenter.chatAvailableReactionsUpdated) {
-            long longValue = ((Long) objArr[0]).longValue();
-            if (longValue == this.chatId) {
-                TLRPC.ChatFull chatFull2 = getMessagesController().getChatFull(longValue);
-                this.info = chatFull2;
-                if (chatFull2 != null) {
-                    this.availableReactions = chatFull2.available_reactions;
-                }
-                updateReactionsCell(true);
-                return;
-            }
-            return;
-        }
-        if (i != NotificationCenter.botStarsUpdated) {
-            if (i == NotificationCenter.userInfoDidLoad) {
-                if (((Long) objArr[0]).longValue() == this.userId) {
-                    setInfo(getMessagesController().getUserFull(this.userId));
-                    return;
-                }
-                return;
-            } else {
-                if (i == NotificationCenter.channelConnectedBotsUpdate) {
-                    ((Long) objArr[0]).longValue();
-                    return;
-                }
-                return;
-            }
-        }
-        if (((Long) objArr[0]).longValue() == this.userId) {
-            if (this.starsBalanceCell != null) {
-                BotStarsController botStarsController = BotStarsController.getInstance(this.currentAccount);
-                this.starsBalanceCell.setVisibility(botStarsController.botHasStars(this.userId) ? 0 : 8);
-                this.starsBalanceCell.setValue(StarsIntroActivity.replaceStarsWithPlain(TextUtils.concat("XTR", StarsIntroActivity.formatStarsAmount(botStarsController.getBotStarsBalance(this.userId), 0.8f, ' ')), 0.85f), true);
-                TextCell textCell = this.publicLinkCell;
-                if (textCell != null) {
-                    textCell.setNeedDivider(botStarsController.botHasStars(this.userId) || botStarsController.botHasTON(this.userId));
-                }
-                this.balanceContainer.setVisibility((this.starsBalanceCell.getVisibility() == 0 || this.tonBalanceCell.getVisibility() == 0) ? 0 : 8);
-            }
-            if (this.tonBalanceCell != null) {
-                BotStarsController botStarsController2 = BotStarsController.getInstance(this.currentAccount);
-                this.tonBalanceCell.setVisibility(botStarsController2.botHasTON(this.userId) ? 0 : 8);
-                long tONBalance = botStarsController2.getTONBalance(this.userId);
-                SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-                if (tONBalance > 0) {
-                    double d = tONBalance;
-                    Double.isNaN(d);
-                    double d2 = d / 1.0E9d;
-                    if (d2 > 1000.0d) {
-                        append = spannableStringBuilder.append((CharSequence) "TON ");
-                        format = AndroidUtilities.formatWholeNumber((int) d2, 0);
-                    } else {
-                        DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
-                        decimalFormatSymbols.setDecimalSeparator('.');
-                        DecimalFormat decimalFormat = new DecimalFormat("#.##", decimalFormatSymbols);
-                        decimalFormat.setMinimumFractionDigits(2);
-                        decimalFormat.setMaximumFractionDigits(3);
-                        decimalFormat.setGroupingUsed(false);
-                        append = spannableStringBuilder.append((CharSequence) "TON ");
-                        format = decimalFormat.format(d2);
-                    }
-                    append.append((CharSequence) format);
-                }
-                this.tonBalanceCell.setValue(spannableStringBuilder, true);
-                TextCell textCell2 = this.publicLinkCell;
-                if (textCell2 != null) {
-                    if (!botStarsController2.botHasStars(this.userId) && !botStarsController2.botHasTON(this.userId)) {
-                        z = false;
-                    }
-                    textCell2.setNeedDivider(z);
-                }
-                LinearLayout linearLayout = this.balanceContainer;
-                if (this.starsBalanceCell.getVisibility() != 0 && this.tonBalanceCell.getVisibility() != 0) {
-                    i3 = 8;
-                }
-                linearLayout.setVisibility(i3);
-            }
-        }
+    public void didReceivedNotification(int r10, int r11, java.lang.Object... r12) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatEditActivity.didReceivedNotification(int, int, java.lang.Object[]):void");
     }
 
     @Override

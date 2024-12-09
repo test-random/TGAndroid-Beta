@@ -134,7 +134,7 @@ public class MessagesController extends BaseController implements NotificationCe
     public int aboutLengthLimitDefault;
     public int aboutLengthLimitPremium;
     private final HashMap<Long, TLRPC.Chat> activeVoiceChatsMap;
-    protected ArrayList<TLRPC.Dialog> allDialogs;
+    protected final ArrayList<TLRPC.Dialog> allDialogs;
     public boolean androidDisableRoundCamera2;
     public float animatedEmojisZoom;
     private final CacheFetcher<Integer, TLRPC.TL_help_appConfig> appConfigFetcher;

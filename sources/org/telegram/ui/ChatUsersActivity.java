@@ -46,6 +46,7 @@ import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Adapters.SearchAdapterHelper;
@@ -2338,30 +2339,41 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
 
     @Override
     public void didReceivedNotification(int i, int i2, Object... objArr) {
-        if (i == NotificationCenter.chatInfoDidLoad) {
-            TLRPC.ChatFull chatFull = (TLRPC.ChatFull) objArr[0];
-            boolean booleanValue = ((Boolean) objArr[2]).booleanValue();
-            if (chatFull.id == this.chatId) {
-                if (booleanValue && ChatObject.isChannel(this.currentChat)) {
+        if (i != NotificationCenter.chatInfoDidLoad) {
+            if (i == NotificationCenter.dialogDeleted && ((Long) objArr[0]).longValue() == (-this.chatId)) {
+                INavigationLayout iNavigationLayout = this.parentLayout;
+                if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
+                    removeSelfFromStack();
+                    return;
+                } else {
+                    lambda$onBackPressed$321();
                     return;
                 }
-                boolean z = this.info != null;
-                this.info = chatFull;
-                if (!z) {
-                    int currentSlowmode = getCurrentSlowmode();
-                    this.initialSlowmode = currentSlowmode;
-                    this.selectedSlowmode = currentSlowmode;
-                    int i3 = this.info.boosts_unrestrict;
-                    this.isEnabledNotRestrictBoosters = i3 > 0;
-                    this.notRestrictBoosters = i3;
-                }
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    @Override
-                    public final void run() {
-                        ChatUsersActivity.this.lambda$didReceivedNotification$22();
-                    }
-                });
             }
+            return;
+        }
+        TLRPC.ChatFull chatFull = (TLRPC.ChatFull) objArr[0];
+        boolean booleanValue = ((Boolean) objArr[2]).booleanValue();
+        if (chatFull.id == this.chatId) {
+            if (booleanValue && ChatObject.isChannel(this.currentChat)) {
+                return;
+            }
+            boolean z = this.info != null;
+            this.info = chatFull;
+            if (!z) {
+                int currentSlowmode = getCurrentSlowmode();
+                this.initialSlowmode = currentSlowmode;
+                this.selectedSlowmode = currentSlowmode;
+                int i3 = this.info.boosts_unrestrict;
+                this.isEnabledNotRestrictBoosters = i3 > 0;
+                this.notRestrictBoosters = i3;
+            }
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    ChatUsersActivity.this.lambda$didReceivedNotification$22();
+                }
+            });
         }
     }
 
@@ -2463,6 +2475,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
         getNotificationCenter().addObserver(this, NotificationCenter.chatInfoDidLoad);
+        getNotificationCenter().addObserver(this, NotificationCenter.dialogDeleted);
         loadChatParticipants(0, 200);
         return true;
     }
@@ -2471,6 +2484,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
         getNotificationCenter().removeObserver(this, NotificationCenter.chatInfoDidLoad);
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogDeleted);
     }
 
     @Override

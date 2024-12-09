@@ -3840,6 +3840,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             }
             of.quick_reply_shortcut = str;
             of.quick_reply_shortcut_id = i2;
+            of.replyQuote = replyQuote;
             accountInstance.getSendMessagesHelper().sendMessage(of);
         }
         if (DialogObject.isEncryptedDialog(j)) {
@@ -3860,6 +3861,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         of = SendMessageParams.of(botInlineMessage5.message, j, messageObject, messageObject2, tL_webPagePending, !botInlineMessage5.no_webpage, botInlineMessage5.entities, botInlineMessage5.reply_markup, hashMap, z, i, null, false);
         of.quick_reply_shortcut = str;
         of.quick_reply_shortcut_id = i2;
+        of.replyQuote = replyQuote;
         accountInstance.getSendMessagesHelper().sendMessage(of);
     }
 

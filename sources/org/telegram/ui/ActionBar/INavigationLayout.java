@@ -20,6 +20,14 @@ import org.telegram.ui.ActionBar.Theme;
 public interface INavigationLayout {
 
     public abstract class CC {
+        public static void $default$animateThemedValues(INavigationLayout iNavigationLayout, Theme.ThemeInfo themeInfo, int i, boolean z, boolean z2) {
+            iNavigationLayout.animateThemedValues(new ThemeAnimationSettings(themeInfo, i, z, z2), null);
+        }
+
+        public static void $default$animateThemedValues(INavigationLayout iNavigationLayout, Theme.ThemeInfo themeInfo, int i, boolean z, boolean z2, Runnable runnable) {
+            iNavigationLayout.animateThemedValues(new ThemeAnimationSettings(themeInfo, i, z, z2), runnable);
+        }
+
         public static void $default$dismissDialogs(INavigationLayout iNavigationLayout) {
             List fragmentStack = iNavigationLayout.getFragmentStack();
             if (fragmentStack.isEmpty()) {

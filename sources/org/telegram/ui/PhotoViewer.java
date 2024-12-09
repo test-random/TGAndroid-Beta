@@ -13406,6 +13406,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.filePreparingFailed);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.fileNewChunkAvailable);
+        NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.replaceMessagesObjects);
+        NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.dialogDeleted);
         ConnectionsManager.getInstance(this.currentAccount).cancelRequestsForGuid(this.classGuid);
     }
 
@@ -14371,8 +14373,12 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         setImageIndex(i, true, false);
     }
 
-    private void setImageIndex(int r34, boolean r35, boolean r36) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.setImageIndex(int, boolean, boolean):void");
+    private void setImageIndex(int i, boolean z, boolean z2) {
+        setImageIndex(i, z, z2, false);
+    }
+
+    private void setImageIndex(int r34, boolean r35, boolean r36, boolean r37) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.setImageIndex(int, boolean, boolean, boolean):void");
     }
 
     public void setImages() {

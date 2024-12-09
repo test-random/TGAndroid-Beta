@@ -81,7 +81,6 @@ public abstract class UserSelectorBottomSheet extends BottomSheetWithRecyclerLis
     private final List hints;
     private boolean isHintSearchText;
     private final ArrayList items;
-    private int lastRequestId;
     private int listPaddingTop;
     private final ArrayList oldItems;
     private final List paymentOptions;
@@ -684,7 +683,7 @@ public abstract class UserSelectorBottomSheet extends BottomSheetWithRecyclerLis
     }
 
     public void loadData(String str) {
-        this.lastRequestId = BoostRepository.searchContacts(this.lastRequestId, str, new Utilities.Callback() {
+        BoostRepository.searchContactsLocally(str, false, new Utilities.Callback() {
             @Override
             public final void run(Object obj) {
                 UserSelectorBottomSheet.this.lambda$loadData$0((List) obj);

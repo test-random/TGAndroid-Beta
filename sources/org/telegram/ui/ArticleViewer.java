@@ -6378,23 +6378,26 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 this.lastUrl = url;
                 Uri parse = Uri.parse(BotWebViewContainer.magic2tonsite(url));
                 String uri = (parse.getScheme() == null || !(parse.getScheme().equalsIgnoreCase("http") || parse.getScheme().equalsIgnoreCase("https"))) ? parse.toString() : parse.getSchemeSpecificPart();
-                try {
-                    if (!isTonsite()) {
+                if (!isTonsite()) {
+                    try {
                         try {
                             Uri parse2 = Uri.parse(uri);
-                            String IDN_toUnicode = Browser.IDN_toUnicode(parse2.getHost());
+                            if (parse2.getHost() != null) {
+                                parse = parse2;
+                            }
+                            String IDN_toUnicode = Browser.IDN_toUnicode(parse.getHost());
                             String[] split = IDN_toUnicode.split("\\.");
                             if (split.length > 2 && ArticleViewer.this.actionBar != null && HintView2.measureCorrectly(IDN_toUnicode, ArticleViewer.this.actionBar.titlePaint) > AndroidUtilities.displaySize.x - AndroidUtilities.dp(162.0f)) {
                                 IDN_toUnicode = split[split.length - 2] + '.' + split[split.length - 1];
                             }
-                            uri = Browser.replace(parse2, null, "", IDN_toUnicode, null);
+                            uri = Browser.replace(parse, null, "", IDN_toUnicode, null);
                         } catch (Exception e) {
                             FileLog.e((Throwable) e, false);
                         }
                         uri = URLDecoder.decode(uri.replaceAll("\\+", "%2b"), "UTF-8");
+                    } catch (Exception e2) {
+                        FileLog.e(e2);
                     }
-                } catch (Exception e2) {
-                    FileLog.e(e2);
                 }
                 if (uri.startsWith("//")) {
                     uri = uri.substring(2);

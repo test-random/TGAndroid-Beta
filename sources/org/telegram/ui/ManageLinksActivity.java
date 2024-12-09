@@ -49,6 +49,7 @@ import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Cells.CreationTextCell;
@@ -77,7 +78,7 @@ import org.telegram.ui.ManageLinksActivity;
 import org.telegram.ui.Stars.StarsIntroActivity;
 import org.telegram.ui.Stories.recorder.HintView2;
 
-public class ManageLinksActivity extends BaseFragment {
+public class ManageLinksActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     private long adminId;
     private int adminsDividerRow;
     private int adminsEndRow;
@@ -1522,6 +1523,18 @@ public class ManageLinksActivity extends BaseFragment {
         });
     }
 
+    @Override
+    public void didReceivedNotification(int i, int i2, Object... objArr) {
+        if (i == NotificationCenter.dialogDeleted && ((Long) objArr[0]).longValue() == (-this.currentChatId)) {
+            INavigationLayout iNavigationLayout = this.parentLayout;
+            if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
+                removeSelfFromStack();
+            } else {
+                lambda$onBackPressed$321();
+            }
+        }
+    }
+
     public void editLink(TLRPC.TL_chatInviteExported tL_chatInviteExported) {
         LinkEditActivity linkEditActivity = new LinkEditActivity(1, this.currentChatId);
         linkEditActivity.setCallback(this.linkEditActivityCallback);
@@ -1594,6 +1607,18 @@ public class ManageLinksActivity extends BaseFragment {
     @Override
     public boolean needDelayOpenAnimation() {
         return true;
+    }
+
+    @Override
+    public boolean onFragmentCreate() {
+        getNotificationCenter().addObserver(this, NotificationCenter.dialogDeleted);
+        return super.onFragmentCreate();
+    }
+
+    @Override
+    public void onFragmentDestroy() {
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogDeleted);
+        super.onFragmentDestroy();
     }
 
     @Override

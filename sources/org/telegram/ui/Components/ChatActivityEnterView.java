@@ -87,6 +87,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -8410,7 +8411,15 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             tL_messages_sendBotRequestedPeer.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(messageObject.messageOwner.peer_id);
             tL_messages_sendBotRequestedPeer.msg_id = messageObject.getId();
             tL_messages_sendBotRequestedPeer.button_id = tL_keyboardButtonRequestPeer.button_id;
-            tL_messages_sendBotRequestedPeer.requested_peers.add(MessagesController.getInstance(this.currentAccount).getInputPeer(((MessagesStorage.TopicKey) arrayList.get(0)).dialogId));
+            HashSet hashSet = new HashSet();
+            Iterator it = arrayList.iterator();
+            while (it.hasNext()) {
+                hashSet.add(Long.valueOf(((MessagesStorage.TopicKey) it.next()).dialogId));
+            }
+            Iterator it2 = hashSet.iterator();
+            while (it2.hasNext()) {
+                tL_messages_sendBotRequestedPeer.requested_peers.add(MessagesController.getInstance(this.currentAccount).getInputPeer(((Long) it2.next()).longValue()));
+            }
             ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_sendBotRequestedPeer, null);
         }
         dialogsActivity.lambda$onBackPressed$321();
@@ -10390,7 +10399,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     TLRPC.RequestPeerType requestPeerType = tL_keyboardButtonRequestPeer.peer_type;
                     if (requestPeerType != null && messageObject22.messageOwner != null) {
                         if ((requestPeerType instanceof TLRPC.TL_requestPeerTypeUser) && (i = tL_keyboardButtonRequestPeer.max_quantity) > 1) {
-                            MultiContactsSelectorBottomSheet.open(i, new MultiContactsSelectorBottomSheet.SelectorListener() {
+                            TLRPC.TL_requestPeerTypeUser tL_requestPeerTypeUser = (TLRPC.TL_requestPeerTypeUser) requestPeerType;
+                            MultiContactsSelectorBottomSheet.open(tL_requestPeerTypeUser.bot, tL_requestPeerTypeUser.premium, i, new MultiContactsSelectorBottomSheet.SelectorListener() {
                                 @Override
                                 public final void onUserSelected(List list) {
                                     ChatActivityEnterView.this.lambda$didPressedBotButton$66(messageObject22, tL_keyboardButtonRequestPeer, list);

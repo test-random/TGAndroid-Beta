@@ -19,6 +19,7 @@ import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Cells.AvailableReactionCell;
@@ -384,10 +385,20 @@ public class ChatReactionsEditActivity extends BaseFragment implements Notificat
 
     @Override
     public void didReceivedNotification(int i, int i2, Object... objArr) {
-        if (i2 == this.currentAccount && i == NotificationCenter.reactionsDidLoad) {
+        if (i2 != this.currentAccount) {
+            return;
+        }
+        if (i == NotificationCenter.reactionsDidLoad) {
             this.availableReactions.clear();
             this.availableReactions.addAll(getMediaDataController().getEnabledReactionsList());
             this.listAdapter.notifyDataSetChanged();
+        } else if (i == NotificationCenter.dialogDeleted && ((Long) objArr[0]).longValue() == (-this.chatId)) {
+            INavigationLayout iNavigationLayout = this.parentLayout;
+            if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
+                removeSelfFromStack();
+            } else {
+                lambda$onBackPressed$321();
+            }
         }
     }
 
@@ -416,6 +427,7 @@ public class ChatReactionsEditActivity extends BaseFragment implements Notificat
         super.onFragmentDestroy();
         getMessagesController().setChatReactions(this.chatId, this.selectedType, this.chatReactions);
         getNotificationCenter().removeObserver(this, NotificationCenter.reactionsDidLoad);
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogDeleted);
     }
 
     public void setInfo(TLRPC.ChatFull chatFull) {

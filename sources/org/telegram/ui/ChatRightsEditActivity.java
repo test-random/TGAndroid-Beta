@@ -37,6 +37,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.ConnectionsManager;
@@ -48,6 +49,7 @@ import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
@@ -74,7 +76,7 @@ import org.telegram.ui.Components.Premium.LimitReachedBottomSheet;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.TwoStepVerificationActivity;
 
-public class ChatRightsEditActivity extends BaseFragment {
+public class ChatRightsEditActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     private int addAdminsRow;
     private FrameLayout addBotButton;
     private FrameLayout addBotButtonContainer;
@@ -2008,6 +2010,20 @@ public class ChatRightsEditActivity extends BaseFragment {
     }
 
     @Override
+    public void didReceivedNotification(int i, int i2, Object... objArr) {
+        if (i == NotificationCenter.dialogDeleted) {
+            if ((-this.chatId) == ((Long) objArr[0]).longValue()) {
+                INavigationLayout iNavigationLayout = this.parentLayout;
+                if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
+                    removeSelfFromStack();
+                } else {
+                    lambda$onBackPressed$321();
+                }
+            }
+        }
+    }
+
+    @Override
     public ArrayList getThemeDescriptions() {
         ArrayList arrayList = new ArrayList();
         ThemeDescription.ThemeDescriptionDelegate themeDescriptionDelegate = new ThemeDescription.ThemeDescriptionDelegate() {
@@ -2076,6 +2092,18 @@ public class ChatRightsEditActivity extends BaseFragment {
     @Override
     public boolean onBackPressed() {
         return checkDiscard();
+    }
+
+    @Override
+    public boolean onFragmentCreate() {
+        getNotificationCenter().addObserver(this, NotificationCenter.dialogDeleted);
+        return super.onFragmentCreate();
+    }
+
+    @Override
+    public void onFragmentDestroy() {
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogDeleted);
+        super.onFragmentDestroy();
     }
 
     @Override

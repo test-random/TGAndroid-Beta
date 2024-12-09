@@ -601,6 +601,10 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         if (!hasLayout() || this.preview) {
             return super.dispatchTouchEvent(motionEvent);
         }
+        if (motionEvent.getPointerCount() > 1) {
+            cancelTouch();
+            return false;
+        }
         Part partAt = getPartAt(motionEvent.getX(), motionEvent.getY());
         if (motionEvent.getAction() == 0) {
             this.tx = motionEvent.getX();
@@ -646,7 +650,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
                     swap(indexOf, partIndexAt);
                     float f = this.currentLayout.h;
                     float f2 = this.animatedColumns[this.reorderingPart.part.y].get();
-                    this.rect.set((getMeasuredWidth() / f2) * r1.x, (getMeasuredHeight() / f) * r1.y, (getMeasuredWidth() / f2) * (r1.x + 1), (getMeasuredHeight() / f) * (r1.y + 1));
+                    this.rect.set((getMeasuredWidth() / f2) * r3.x, (getMeasuredHeight() / f) * r3.y, (getMeasuredWidth() / f2) * (r3.x + 1), (getMeasuredHeight() / f) * (r3.y + 1));
                     this.ldx = this.dx;
                     this.ldy = this.dy;
                     this.tx = this.rect.centerX();

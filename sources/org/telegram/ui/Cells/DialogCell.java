@@ -1179,17 +1179,17 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         long j = this.currentDialogId;
         if (j == clientUserId) {
             if (user != null) {
-                return AndroidUtilities.removeDiacritics(UserObject.getFirstName(user).replace("\n", ""));
+                return AndroidUtilities.escape(UserObject.getFirstName(user).replace("\n", ""));
             }
             if (chat != null) {
-                return AndroidUtilities.removeDiacritics(chat.title.replace("\n", ""));
+                return AndroidUtilities.escape(chat.title.replace("\n", ""));
             }
             return null;
         }
         if (j == 489000 && (messageObject2 = this.message) != null && (message3 = messageObject2.messageOwner) != null && (messageFwdHeader2 = message3.fwd_from) != null) {
             String str3 = messageFwdHeader2.from_name;
             if (str3 != null) {
-                return AndroidUtilities.removeDiacritics(str3);
+                return AndroidUtilities.escape(str3);
             }
             long peerDialogId2 = DialogObject.getPeerDialogId(messageFwdHeader2.from_id);
             if (DialogObject.isUserDialog(peerDialogId2)) {
@@ -1202,10 +1202,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             return LocaleController.getString(R.string.FromYou);
         }
         if (!this.isSavedDialog && (messageObject = this.message) != null && (message2 = messageObject.messageOwner) != null && (message2.from_id instanceof TLRPC.TL_peerUser) && (user2 = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(this.message.messageOwner.from_id.user_id))) != null) {
-            return AndroidUtilities.removeDiacritics(UserObject.getFirstName(user2).replace("\n", ""));
+            return AndroidUtilities.escape(UserObject.getFirstName(user2).replace("\n", ""));
         }
         MessageObject messageObject4 = this.message;
-        return (messageObject4 == null || (message = messageObject4.messageOwner) == null || (messageFwdHeader = message.fwd_from) == null || (str2 = messageFwdHeader.from_name) == null) ? user != null ? (this.useForceThreeLines || SharedConfig.useThreeLinesLayout) ? UserObject.isDeleted(user) ? LocaleController.getString(R.string.HiddenName) : AndroidUtilities.removeDiacritics(ContactsController.formatName(user.first_name, user.last_name).replace("\n", "")) : AndroidUtilities.removeDiacritics(UserObject.getFirstName(user).replace("\n", "")) : (chat == null || (str = chat.title) == null) ? "DELETED" : AndroidUtilities.removeDiacritics(str.replace("\n", "")) : AndroidUtilities.removeDiacritics(str2);
+        return (messageObject4 == null || (message = messageObject4.messageOwner) == null || (messageFwdHeader = message.fwd_from) == null || (str2 = messageFwdHeader.from_name) == null) ? user != null ? (this.useForceThreeLines || SharedConfig.useThreeLinesLayout) ? UserObject.isDeleted(user) ? LocaleController.getString(R.string.HiddenName) : AndroidUtilities.escape(ContactsController.formatName(user.first_name, user.last_name).replace("\n", "")) : AndroidUtilities.escape(UserObject.getFirstName(user).replace("\n", "")) : (chat == null || (str = chat.title) == null) ? "DELETED" : AndroidUtilities.escape(str.replace("\n", "")) : AndroidUtilities.escape(str2);
     }
 
     public android.text.SpannableStringBuilder getMessageStringFormatted(int r17, java.lang.String r18, java.lang.CharSequence r19, boolean r20) {

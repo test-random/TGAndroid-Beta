@@ -1080,7 +1080,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
         windowView2.addView(webViewSwipeContainer2, createFrame);
         BotButtons botButtons = new BotButtons(getContext(), resourcesProvider) {
             @Override
-            protected void onMeasure(int i2, int i3) {
+            public void onMeasure(int i2, int i3) {
                 if (!BotWebViewSheet.this.fullscreen && AndroidUtilities.isTablet() && !AndroidUtilities.isInMultiwindow && !AndroidUtilities.isSmallTablet()) {
                     Point point = AndroidUtilities.displaySize;
                     i2 = View.MeasureSpec.makeMeasureSpec((int) (Math.min(point.x, point.y) * 0.8f), 1073741824);

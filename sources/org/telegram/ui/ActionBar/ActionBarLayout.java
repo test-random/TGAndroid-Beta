@@ -939,9 +939,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public boolean addFragmentToStack(BaseFragment baseFragment) {
-        boolean addFragmentToStack;
-        addFragmentToStack = addFragmentToStack(baseFragment, -1);
-        return addFragmentToStack;
+        return addFragmentToStack(baseFragment, -1);
     }
 
     @Override
@@ -1053,12 +1051,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public void animateThemedValues(Theme.ThemeInfo themeInfo, int i, boolean z, boolean z2) {
-        animateThemedValues(new INavigationLayout.ThemeAnimationSettings(themeInfo, i, z, z2), null);
+        INavigationLayout.CC.$default$animateThemedValues(this, themeInfo, i, z, z2);
     }
 
     @Override
     public void animateThemedValues(Theme.ThemeInfo themeInfo, int i, boolean z, boolean z2, Runnable runnable) {
-        animateThemedValues(new INavigationLayout.ThemeAnimationSettings(themeInfo, i, z, z2), runnable);
+        INavigationLayout.CC.$default$animateThemedValues(this, themeInfo, i, z, z2, runnable);
     }
 
     public void bringToFront(int i) {

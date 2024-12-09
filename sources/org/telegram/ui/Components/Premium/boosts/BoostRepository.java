@@ -58,7 +58,7 @@ public abstract class BoostRepository {
         connectionsManager.sendRequest(tL_premium_applyBoost, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BoostRepository.lambda$applyBoost$45(Utilities.Callback.this, messagesController, callback, tLObject, tL_error);
+                BoostRepository.lambda$applyBoost$48(Utilities.Callback.this, messagesController, callback, tLObject, tL_error);
             }
         }, 66);
     }
@@ -70,7 +70,7 @@ public abstract class BoostRepository {
         connectionsManager.sendRequest(tL_payments_applyGiftCode, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BoostRepository.lambda$applyGiftCode$39(Utilities.Callback.this, callback, tLObject, tL_error);
+                BoostRepository.lambda$applyGiftCode$42(Utilities.Callback.this, callback, tLObject, tL_error);
             }
         }, 2);
     }
@@ -87,7 +87,7 @@ public abstract class BoostRepository {
         connectionsManager.sendRequest(tL_payments_checkGiftCode, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BoostRepository.lambda$checkGiftCode$37(MessagesController.this, callback, callback2, tLObject, tL_error);
+                BoostRepository.lambda$checkGiftCode$40(MessagesController.this, callback, callback2, tLObject, tL_error);
             }
         });
     }
@@ -147,7 +147,7 @@ public abstract class BoostRepository {
         connectionsManager.sendRequest(tL_payments_getGiveawayInfo, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BoostRepository.lambda$getGiveawayInfo$41(Utilities.Callback.this, callback, tLObject, tL_error);
+                BoostRepository.lambda$getGiveawayInfo$44(Utilities.Callback.this, callback, tLObject, tL_error);
             }
         });
     }
@@ -158,7 +158,7 @@ public abstract class BoostRepository {
         connectionsManager.sendRequest(new TL_stories.TL_premium_getMyBoosts(), new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BoostRepository.lambda$getMyBoosts$43(Utilities.Callback.this, messagesController, callback, tLObject, tL_error);
+                BoostRepository.lambda$getMyBoosts$46(Utilities.Callback.this, messagesController, callback, tLObject, tL_error);
             }
         });
     }
@@ -213,7 +213,7 @@ public abstract class BoostRepository {
         return MessagesController.getInstance(UserConfig.selectedAccount).boostsPerSentGift > 0;
     }
 
-    public static void lambda$applyBoost$44(TLRPC.TL_error tL_error, Utilities.Callback callback, TLObject tLObject, MessagesController messagesController, Utilities.Callback callback2) {
+    public static void lambda$applyBoost$47(TLRPC.TL_error tL_error, Utilities.Callback callback, TLObject tLObject, MessagesController messagesController, Utilities.Callback callback2) {
         if (tL_error != null) {
             callback.run(tL_error);
         } else if (tLObject instanceof TL_stories.TL_premium_myBoosts) {
@@ -224,16 +224,16 @@ public abstract class BoostRepository {
         }
     }
 
-    public static void lambda$applyBoost$45(final Utilities.Callback callback, final MessagesController messagesController, final Utilities.Callback callback2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public static void lambda$applyBoost$48(final Utilities.Callback callback, final MessagesController messagesController, final Utilities.Callback callback2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BoostRepository.lambda$applyBoost$44(TLRPC.TL_error.this, callback, tLObject, messagesController, callback2);
+                BoostRepository.lambda$applyBoost$47(TLRPC.TL_error.this, callback, tLObject, messagesController, callback2);
             }
         });
     }
 
-    public static void lambda$applyGiftCode$38(TLRPC.TL_error tL_error, Utilities.Callback callback, Utilities.Callback callback2) {
+    public static void lambda$applyGiftCode$41(TLRPC.TL_error tL_error, Utilities.Callback callback, Utilities.Callback callback2) {
         if (tL_error != null) {
             callback.run(tL_error);
         } else {
@@ -241,16 +241,16 @@ public abstract class BoostRepository {
         }
     }
 
-    public static void lambda$applyGiftCode$39(final Utilities.Callback callback, final Utilities.Callback callback2, TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public static void lambda$applyGiftCode$42(final Utilities.Callback callback, final Utilities.Callback callback2, TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BoostRepository.lambda$applyGiftCode$38(TLRPC.TL_error.this, callback, callback2);
+                BoostRepository.lambda$applyGiftCode$41(TLRPC.TL_error.this, callback, callback2);
             }
         });
     }
 
-    public static void lambda$checkGiftCode$36(TLObject tLObject, MessagesController messagesController, Utilities.Callback callback, Utilities.Callback callback2, TLRPC.TL_error tL_error) {
+    public static void lambda$checkGiftCode$39(TLObject tLObject, MessagesController messagesController, Utilities.Callback callback, Utilities.Callback callback2, TLRPC.TL_error tL_error) {
         if (tLObject instanceof TLRPC.TL_payments_checkedGiftCode) {
             TLRPC.TL_payments_checkedGiftCode tL_payments_checkedGiftCode = (TLRPC.TL_payments_checkedGiftCode) tLObject;
             messagesController.putChats(tL_payments_checkedGiftCode.chats, false);
@@ -260,16 +260,16 @@ public abstract class BoostRepository {
         callback2.run(tL_error);
     }
 
-    public static void lambda$checkGiftCode$37(final MessagesController messagesController, final Utilities.Callback callback, final Utilities.Callback callback2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public static void lambda$checkGiftCode$40(final MessagesController messagesController, final Utilities.Callback callback, final Utilities.Callback callback2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BoostRepository.lambda$checkGiftCode$36(TLObject.this, messagesController, callback, callback2, tL_error);
+                BoostRepository.lambda$checkGiftCode$39(TLObject.this, messagesController, callback, callback2, tL_error);
             }
         });
     }
 
-    public static void lambda$getGiveawayInfo$40(TLRPC.TL_error tL_error, Utilities.Callback callback, TLObject tLObject, Utilities.Callback callback2) {
+    public static void lambda$getGiveawayInfo$43(TLRPC.TL_error tL_error, Utilities.Callback callback, TLObject tLObject, Utilities.Callback callback2) {
         if (tL_error != null) {
             callback.run(tL_error);
         } else if (tLObject instanceof TLRPC.payments_GiveawayInfo) {
@@ -277,16 +277,16 @@ public abstract class BoostRepository {
         }
     }
 
-    public static void lambda$getGiveawayInfo$41(final Utilities.Callback callback, final Utilities.Callback callback2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public static void lambda$getGiveawayInfo$44(final Utilities.Callback callback, final Utilities.Callback callback2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BoostRepository.lambda$getGiveawayInfo$40(TLRPC.TL_error.this, callback, tLObject, callback2);
+                BoostRepository.lambda$getGiveawayInfo$43(TLRPC.TL_error.this, callback, tLObject, callback2);
             }
         });
     }
 
-    public static void lambda$getMyBoosts$42(TLRPC.TL_error tL_error, Utilities.Callback callback, TLObject tLObject, MessagesController messagesController, Utilities.Callback callback2) {
+    public static void lambda$getMyBoosts$45(TLRPC.TL_error tL_error, Utilities.Callback callback, TLObject tLObject, MessagesController messagesController, Utilities.Callback callback2) {
         if (tL_error != null) {
             callback.run(tL_error);
         } else if (tLObject instanceof TL_stories.TL_premium_myBoosts) {
@@ -297,11 +297,11 @@ public abstract class BoostRepository {
         }
     }
 
-    public static void lambda$getMyBoosts$43(final Utilities.Callback callback, final MessagesController messagesController, final Utilities.Callback callback2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public static void lambda$getMyBoosts$46(final Utilities.Callback callback, final MessagesController messagesController, final Utilities.Callback callback2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BoostRepository.lambda$getMyBoosts$42(TLRPC.TL_error.this, callback, tLObject, messagesController, callback2);
+                BoostRepository.lambda$getMyBoosts$45(TLRPC.TL_error.this, callback, tLObject, messagesController, callback2);
             }
         });
     }
@@ -325,7 +325,7 @@ public abstract class BoostRepository {
         }
     }
 
-    public static void lambda$loadChatParticipants$34(TLObject tLObject, MessagesController messagesController, Utilities.Callback callback) {
+    public static void lambda$loadChatParticipants$37(TLObject tLObject, MessagesController messagesController, Utilities.Callback callback) {
         TLRPC.User user;
         if (tLObject instanceof TLRPC.TL_channels_channelParticipants) {
             TLRPC.TL_channels_channelParticipants tL_channels_channelParticipants = (TLRPC.TL_channels_channelParticipants) tLObject;
@@ -343,11 +343,11 @@ public abstract class BoostRepository {
         }
     }
 
-    public static void lambda$loadChatParticipants$35(final MessagesController messagesController, final Utilities.Callback callback, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public static void lambda$loadChatParticipants$38(final MessagesController messagesController, final Utilities.Callback callback, final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BoostRepository.lambda$loadChatParticipants$34(TLObject.this, messagesController, callback);
+                BoostRepository.lambda$loadChatParticipants$37(TLObject.this, messagesController, callback);
             }
         });
     }
@@ -718,7 +718,7 @@ public abstract class BoostRepository {
         });
     }
 
-    public static void lambda$searchChats$33(MessagesController messagesController, long j, final Utilities.Callback callback, TLObject tLObject, TLRPC.TL_error tL_error) {
+    public static void lambda$searchChats$36(MessagesController messagesController, long j, final Utilities.Callback callback, TLObject tLObject, TLRPC.TL_error tL_error) {
         if (tLObject instanceof TLRPC.TL_contacts_found) {
             TLRPC.TL_contacts_found tL_contacts_found = (TLRPC.TL_contacts_found) tLObject;
             messagesController.putChats(tL_contacts_found.chats, false);
@@ -728,6 +728,30 @@ public abstract class BoostRepository {
                 TLRPC.InputPeer inputPeer = MessagesController.getInputPeer(chat);
                 if (chat.id != j && ChatObject.isBoostSupported(chat)) {
                     arrayList.add(inputPeer);
+                }
+            }
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    Utilities.Callback.this.run(arrayList);
+                }
+            });
+        }
+    }
+
+    public static void lambda$searchContacts$32(Utilities.Callback callback) {
+        callback.run(Collections.emptyList());
+    }
+
+    public static void lambda$searchContacts$34(MessagesController messagesController, boolean z, final Utilities.Callback callback, TLObject tLObject, TLRPC.TL_error tL_error) {
+        if (tLObject instanceof TLRPC.TL_contacts_found) {
+            TLRPC.TL_contacts_found tL_contacts_found = (TLRPC.TL_contacts_found) tLObject;
+            messagesController.putUsers(tL_contacts_found.users, false);
+            final ArrayList arrayList = new ArrayList();
+            for (int i = 0; i < tL_contacts_found.users.size(); i++) {
+                TLRPC.User user = tL_contacts_found.users.get(i);
+                if (!user.self && !UserObject.isDeleted(user) && ((z || !user.bot) && !UserObject.isService(user.id))) {
+                    arrayList.add(user);
                 }
             }
             AndroidUtilities.runOnUIThread(new Runnable() {
@@ -829,7 +853,7 @@ public abstract class BoostRepository {
         connectionsManager.sendRequest(tL_channels_getParticipants, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BoostRepository.lambda$loadChatParticipants$35(MessagesController.this, callback, tLObject, tL_error);
+                BoostRepository.lambda$loadChatParticipants$38(MessagesController.this, callback, tLObject, tL_error);
             }
         });
     }
@@ -1072,34 +1096,57 @@ public abstract class BoostRepository {
         connectionsManager.sendRequest(tL_contacts_search, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BoostRepository.lambda$searchChats$33(MessagesController.this, j, callback, tLObject, tL_error);
+                BoostRepository.lambda$searchChats$36(MessagesController.this, j, callback, tLObject, tL_error);
             }
         });
     }
 
-    public static int searchContacts(int i, String str, Utilities.Callback callback) {
-        TLRPC.User user;
-        int i2 = UserConfig.selectedAccount;
-        ArrayList arrayList = new ArrayList();
-        ArrayList<TLRPC.TL_contact> arrayList2 = ContactsController.getInstance(i2).contacts;
-        if (arrayList2 == null || arrayList2.isEmpty()) {
-            ContactsController.getInstance(i2).loadContacts(false, 0L);
+    public static int searchContacts(String str, final boolean z, final Utilities.Callback callback) {
+        final MessagesController messagesController = MessagesController.getInstance(UserConfig.selectedAccount);
+        ConnectionsManager connectionsManager = ConnectionsManager.getInstance(UserConfig.selectedAccount);
+        if (str == null || str.isEmpty()) {
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    BoostRepository.lambda$searchContacts$32(Utilities.Callback.this);
+                }
+            });
+            return 0;
         }
-        MessagesController messagesController = MessagesController.getInstance(i2);
+        TLRPC.TL_contacts_search tL_contacts_search = new TLRPC.TL_contacts_search();
+        tL_contacts_search.q = str;
+        tL_contacts_search.limit = 50;
+        return connectionsManager.sendRequest(tL_contacts_search, new RequestDelegate() {
+            @Override
+            public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
+                BoostRepository.lambda$searchContacts$34(MessagesController.this, z, callback, tLObject, tL_error);
+            }
+        });
+    }
+
+    public static void searchContactsLocally(String str, boolean z, Utilities.Callback callback) {
+        TLRPC.User user;
+        int i = UserConfig.selectedAccount;
+        ArrayList arrayList = new ArrayList();
+        ArrayList<TLRPC.TL_contact> arrayList2 = ContactsController.getInstance(i).contacts;
+        if (arrayList2 == null || arrayList2.isEmpty()) {
+            ContactsController.getInstance(i).loadContacts(false, 0L);
+        }
+        MessagesController messagesController = MessagesController.getInstance(i);
         String lowerCase = str.toLowerCase();
         String translitSafe = AndroidUtilities.translitSafe(lowerCase);
         if (arrayList2 != null) {
-            for (int i3 = 0; i3 < arrayList2.size(); i3++) {
-                TLRPC.TL_contact tL_contact = arrayList2.get(i3);
-                if (tL_contact != null && (user = messagesController.getUser(Long.valueOf(tL_contact.user_id))) != null && !user.bot && !UserObject.isService(user.id) && !UserObject.isUserSelf(user)) {
+            for (int i2 = 0; i2 < arrayList2.size(); i2++) {
+                TLRPC.TL_contact tL_contact = arrayList2.get(i2);
+                if (tL_contact != null && (user = messagesController.getUser(Long.valueOf(tL_contact.user_id))) != null && ((z || !user.bot) && !UserObject.isService(user.id) && !UserObject.isUserSelf(user))) {
                     String lowerCase2 = UserObject.getUserName(user).toLowerCase();
                     String translitSafe2 = AndroidUtilities.translitSafe(lowerCase2);
                     if (!lowerCase2.startsWith(lowerCase)) {
                         if (!lowerCase2.contains(" " + lowerCase) && !translitSafe2.startsWith(translitSafe)) {
                             if (!translitSafe2.contains(" " + translitSafe)) {
                                 if (user.usernames != null) {
-                                    for (int i4 = 0; i4 < user.usernames.size(); i4++) {
-                                        TLRPC.TL_username tL_username = user.usernames.get(i4);
+                                    for (int i3 = 0; i3 < user.usernames.size(); i3++) {
+                                        TLRPC.TL_username tL_username = user.usernames.get(i3);
                                         if (tL_username != null && tL_username.active) {
                                             String lowerCase3 = tL_username.username.toLowerCase();
                                             if (!lowerCase3.startsWith(lowerCase)) {
@@ -1131,6 +1178,5 @@ public abstract class BoostRepository {
             }
         }
         callback.run(arrayList);
-        return -1;
     }
 }

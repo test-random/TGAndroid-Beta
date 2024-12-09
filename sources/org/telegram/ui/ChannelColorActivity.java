@@ -1976,9 +1976,12 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
         if (i == NotificationCenter.chatWasBoostedByUser) {
             if (this.dialogId == ((Long) objArr[2]).longValue()) {
                 updateBoostsAndLevels((TL_stories.TL_premium_boostsStatus) objArr[0]);
+                return;
             }
-        } else {
-            if (i != NotificationCenter.boostByChannelCreated || ((Boolean) objArr[1]).booleanValue()) {
+            return;
+        }
+        if (i == NotificationCenter.boostByChannelCreated) {
+            if (((Boolean) objArr[1]).booleanValue()) {
                 return;
             }
             getMessagesController().getBoostsController().getBoostsStats(this.dialogId, new Consumer() {
@@ -1987,6 +1990,15 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
                     ChannelColorActivity.this.updateBoostsAndLevels((TL_stories.TL_premium_boostsStatus) obj);
                 }
             });
+        } else if (i == NotificationCenter.dialogDeleted) {
+            if (this.dialogId == ((Long) objArr[0]).longValue()) {
+                INavigationLayout iNavigationLayout = this.parentLayout;
+                if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
+                    removeSelfFromStack();
+                } else {
+                    lambda$onBackPressed$321();
+                }
+            }
         }
     }
 
@@ -2117,16 +2129,18 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
     @Override
     public boolean onFragmentCreate() {
         getMediaDataController().loadRestrictedStatusEmojis();
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.boostByChannelCreated);
-        NotificationCenter.getInstance(this.currentAccount).addObserver(this, NotificationCenter.chatWasBoostedByUser);
+        getNotificationCenter().addObserver(this, NotificationCenter.boostByChannelCreated);
+        getNotificationCenter().addObserver(this, NotificationCenter.chatWasBoostedByUser);
+        getNotificationCenter().addObserver(this, NotificationCenter.dialogDeleted);
         return super.onFragmentCreate();
     }
 
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
-        NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.boostByChannelCreated);
-        NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.chatWasBoostedByUser);
+        getNotificationCenter().removeObserver(this, NotificationCenter.boostByChannelCreated);
+        getNotificationCenter().removeObserver(this, NotificationCenter.chatWasBoostedByUser);
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogDeleted);
     }
 
     protected void openBoostDialog(int i) {
