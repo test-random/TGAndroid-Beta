@@ -1086,6 +1086,23 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         }
     }
 
+    public static VideoUri getCachedQuality(ArrayList arrayList) {
+        if (arrayList == null) {
+            return null;
+        }
+        Iterator it = arrayList.iterator();
+        while (it.hasNext()) {
+            Iterator it2 = ((Quality) it.next()).uris.iterator();
+            while (it2.hasNext()) {
+                VideoUri videoUri = (VideoUri) it2.next();
+                if (videoUri.isCached()) {
+                    return videoUri;
+                }
+            }
+        }
+        return null;
+    }
+
     public static Boolean getLooping(MessageObject messageObject) {
         if (messageObject == null) {
             return null;
