@@ -11,6 +11,6 @@ public final class ChatObject$Call$$ExternalSyntheticLambda0 implements Runnable
 
     @Override
     public final void run() {
-        ChatObject.Call.m171$r8$lambda$OjvLh1Pzii0AmtSaDLjNjrsGg4(this.f$0);
+        ChatObject.Call.m170$r8$lambda$OjvLh1Pzii0AmtSaDLjNjrsGg4(this.f$0);
     }
 }

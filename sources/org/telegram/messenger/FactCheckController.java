@@ -143,9 +143,18 @@ public class FactCheckController {
         return factCheckController;
     }
 
-    public void lambda$applyFactCheck$14(TLObject tLObject, TLRPC.TL_textWithEntities tL_textWithEntities, boolean z, AlertDialog alertDialog) {
+    public void lambda$applyFactCheck$14(TLObject tLObject) {
+        MessagesController.getInstance(this.currentAccount).processUpdates((TLRPC.Updates) tLObject, false);
+    }
+
+    public void lambda$applyFactCheck$15(final TLObject tLObject, TLRPC.TL_textWithEntities tL_textWithEntities, boolean z, AlertDialog alertDialog) {
         if (tLObject instanceof TLRPC.Updates) {
-            MessagesController.getInstance(this.currentAccount).processUpdates((TLRPC.Updates) tLObject, false);
+            Utilities.stageQueue.postRunnable(new Runnable() {
+                @Override
+                public final void run() {
+                    FactCheckController.this.lambda$applyFactCheck$14(tLObject);
+                }
+            });
             BaseFragment safeLastFragment = LaunchActivity.getSafeLastFragment();
             if (safeLastFragment != null) {
                 boolean z2 = tL_textWithEntities == null || TextUtils.isEmpty(tL_textWithEntities.text);
@@ -157,11 +166,11 @@ public class FactCheckController {
         alertDialog.dismiss();
     }
 
-    public void lambda$applyFactCheck$15(final TLRPC.TL_textWithEntities tL_textWithEntities, final boolean z, final AlertDialog alertDialog, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$applyFactCheck$16(final TLRPC.TL_textWithEntities tL_textWithEntities, final boolean z, final AlertDialog alertDialog, final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                FactCheckController.this.lambda$applyFactCheck$14(tLObject, tL_textWithEntities, z, alertDialog);
+                FactCheckController.this.lambda$applyFactCheck$15(tLObject, tL_textWithEntities, z, alertDialog);
             }
         });
     }
@@ -426,7 +435,7 @@ public class FactCheckController {
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_deleteFactCheck, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                FactCheckController.this.lambda$applyFactCheck$15(tL_textWithEntities, z, alertDialog, tLObject, tL_error);
+                FactCheckController.this.lambda$applyFactCheck$16(tL_textWithEntities, z, alertDialog, tLObject, tL_error);
             }
         });
     }

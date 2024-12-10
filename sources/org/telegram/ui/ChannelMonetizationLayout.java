@@ -1521,7 +1521,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         });
     }
 
-    public static void lambda$makeLearnSheet$39(Context context, boolean z) {
+    public static void lambda$makeLearnSheet$40(Context context, boolean z) {
         Browser.openUrl(context, LocaleController.getString(z ? R.string.BotMonetizationInfoTONLink : R.string.MonetizationInfoTONLink));
     }
 
@@ -1741,7 +1741,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         this.fragment.showDialog(limitReachedBottomSheet);
     }
 
-    public void lambda$onNestedScroll$41() {
+    public void lambda$onNestedScroll$42() {
         try {
             RecyclerListView currentListView = this.transactionsLayout.getCurrentListView();
             if (currentListView == null || currentListView.getAdapter() == null) {
@@ -1752,25 +1752,30 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
     }
 
-    public void lambda$sendCpmUpdate$35(TLRPC.TL_error tL_error, TLObject tLObject) {
+    public void lambda$sendCpmUpdate$36() {
+        this.initialSwitchOffValue = this.switchOffValue;
+    }
+
+    public void lambda$sendCpmUpdate$37(TLObject tLObject, final TLRPC.TL_error tL_error) {
         if (tL_error != null) {
-            BulletinFactory.showError(tL_error);
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    BulletinFactory.showError(TLRPC.TL_error.this);
+                }
+            });
         } else if (tLObject instanceof TLRPC.Updates) {
-            this.initialSwitchOffValue = this.switchOffValue;
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    ChannelMonetizationLayout.this.lambda$sendCpmUpdate$36();
+                }
+            });
             MessagesController.getInstance(this.currentAccount).processUpdates((TLRPC.Updates) tLObject, false);
         }
     }
 
-    public void lambda$sendCpmUpdate$36(final TLObject tLObject, final TLRPC.TL_error tL_error) {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public final void run() {
-                ChannelMonetizationLayout.this.lambda$sendCpmUpdate$35(tL_error, tLObject);
-            }
-        });
-    }
-
-    public static void lambda$showTransactionSheet$37(Context context, TL_stats.TL_broadcastRevenueTransactionWithdrawal tL_broadcastRevenueTransactionWithdrawal, View view) {
+    public static void lambda$showTransactionSheet$38(Context context, TL_stats.TL_broadcastRevenueTransactionWithdrawal tL_broadcastRevenueTransactionWithdrawal, View view) {
         Browser.openUrl(context, tL_broadcastRevenueTransactionWithdrawal.transaction_url);
     }
 
@@ -1846,7 +1851,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         linksTextView.setText(AndroidUtilities.withLearnMore(AndroidUtilities.replaceTags(LocaleController.getString(z ? R.string.BotMonetizationInfoTONText : R.string.MonetizationInfoTONText)), new Runnable() {
             @Override
             public final void run() {
-                ChannelMonetizationLayout.lambda$makeLearnSheet$39(context, z);
+                ChannelMonetizationLayout.lambda$makeLearnSheet$40(context, z);
             }
         }));
         linearLayout.addView(linksTextView, LayoutHelper.createLinear(-1, -2, 28.0f, 9.0f, 28.0f, 0.0f));
@@ -1942,7 +1947,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_channels_restrictSponsoredMessages, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                ChannelMonetizationLayout.this.lambda$sendCpmUpdate$36(tLObject, tL_error);
+                ChannelMonetizationLayout.this.lambda$sendCpmUpdate$37(tLObject, tL_error);
             }
         });
     }
@@ -2162,7 +2167,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
                 buttonWithCounterView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public final void onClick(View view) {
-                        ChannelMonetizationLayout.lambda$showTransactionSheet$37(context, tL_broadcastRevenueTransactionWithdrawal2, view);
+                        ChannelMonetizationLayout.lambda$showTransactionSheet$38(context, tL_broadcastRevenueTransactionWithdrawal2, view);
                     }
                 });
                 bottomSheet = bottomSheet2;
@@ -2282,7 +2287,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChannelMonetizationLayout.this.lambda$onNestedScroll$41();
+                    ChannelMonetizationLayout.this.lambda$onNestedScroll$42();
                 }
             });
         }

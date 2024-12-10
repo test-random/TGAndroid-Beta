@@ -2409,7 +2409,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    TopicsFragment.this.lambda$hideFloatingButton$20(valueAnimator);
+                    TopicsFragment.this.lambda$hideFloatingButton$18(valueAnimator);
                 }
             });
             animatorSet.playTogether(ofFloat);
@@ -2542,7 +2542,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         this.boostsStatus = tL_premium_boostsStatus;
     }
 
-    public void lambda$getThemeDescriptions$21() {
+    public void lambda$getThemeDescriptions$19() {
         ViewGroup viewGroup;
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
@@ -2579,7 +2579,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         updateColors();
     }
 
-    public void lambda$hideFloatingButton$20(ValueAnimator valueAnimator) {
+    public void lambda$hideFloatingButton$18(ValueAnimator valueAnimator) {
         this.floatingButtonHideProgress = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         updateFloatingButtonOffset();
     }
@@ -2600,21 +2600,6 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
     }
 
     public static void lambda$onDialogAnimationFinished$8() {
-    }
-
-    public void lambda$onFragmentCreate$18(TLObject tLObject) {
-        if (tLObject instanceof TLRPC.TL_updates) {
-            getMessagesController().processUpdates((TLRPC.TL_updates) tLObject, false);
-        }
-    }
-
-    public void lambda$onFragmentCreate$19(final TLObject tLObject, TLRPC.TL_error tL_error) {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public final void run() {
-                TopicsFragment.this.lambda$onFragmentCreate$18(tLObject);
-            }
-        });
     }
 
     public void lambda$showChatPreview$10(TLRPC.TL_forumTopic tL_forumTopic, ActionBarPopupWindow.ActionBarPopupWindowLayout[] actionBarPopupWindowLayoutArr, int i, View view) {
@@ -3869,7 +3854,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         ThemeDescription.ThemeDescriptionDelegate themeDescriptionDelegate = new ThemeDescription.ThemeDescriptionDelegate() {
             @Override
             public final void didSetColor() {
-                TopicsFragment.this.lambda$getThemeDescriptions$21();
+                TopicsFragment.this.lambda$getThemeDescriptions$19();
             }
 
             @Override
@@ -3956,12 +3941,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             tL_account_getNotifyExceptions.peer = tL_inputNotifyPeer;
             tL_account_getNotifyExceptions.flags |= 1;
             tL_inputNotifyPeer.peer = getMessagesController().getInputPeer(-this.chatId);
-            getConnectionsManager().sendRequest(tL_account_getNotifyExceptions, new RequestDelegate() {
-                @Override
-                public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    TopicsFragment.this.lambda$onFragmentCreate$19(tLObject, tL_error);
-                }
-            });
+            getConnectionsManager().sendRequest(tL_account_getNotifyExceptions, null);
         }
         return true;
     }
