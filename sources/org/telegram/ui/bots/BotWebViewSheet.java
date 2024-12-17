@@ -2085,7 +2085,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
     }
 
     @Override
-    public WindowView mo1000getWindowView() {
+    public WindowView mo999getWindowView() {
         return this.windowView;
     }
 

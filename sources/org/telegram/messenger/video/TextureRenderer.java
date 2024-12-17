@@ -14,11 +14,9 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.opengl.EGLContext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.os.Build;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -95,7 +93,6 @@ public class TextureRenderer {
     private int gradientTopColor;
     private int gradientTopColorHandle;
     private FloatBuffer gradientVerticesBuffer;
-    private final Handler handler;
     private int imageHeight;
     private int imageOrientation;
     private String imagePath;
@@ -117,7 +114,6 @@ public class TextureRenderer {
     private int originalWidth;
     private String paintPath;
     private int[] paintTexture;
-    private final EGLContext parentContext;
     Path path;
     private FloatBuffer renderTextureBuffer;
     private Bitmap roundBitmap;
@@ -156,8 +152,8 @@ public class TextureRenderer {
     private final RectF roundDst = new RectF();
     private boolean firstFrame = true;
 
-    public TextureRenderer(org.telegram.messenger.MediaController.SavedFilterState r28, java.lang.String r29, java.lang.String r30, java.lang.String r31, java.util.ArrayList<org.telegram.messenger.VideoEditedInfo.MediaEntity> r32, org.telegram.messenger.MediaController.CropState r33, int r34, int r35, int r36, int r37, int r38, float r39, boolean r40, java.lang.Integer r41, java.lang.Integer r42, org.telegram.ui.Stories.recorder.StoryEntry.HDRInfo r43, org.telegram.messenger.video.MediaCodecVideoConvertor.ConvertVideoParams r44, android.os.Handler r45, android.opengl.EGLContext r46) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.video.TextureRenderer.<init>(org.telegram.messenger.MediaController$SavedFilterState, java.lang.String, java.lang.String, java.lang.String, java.util.ArrayList, org.telegram.messenger.MediaController$CropState, int, int, int, int, int, float, boolean, java.lang.Integer, java.lang.Integer, org.telegram.ui.Stories.recorder.StoryEntry$HDRInfo, org.telegram.messenger.video.MediaCodecVideoConvertor$ConvertVideoParams, android.os.Handler, android.opengl.EGLContext):void");
+    public TextureRenderer(org.telegram.messenger.MediaController.SavedFilterState r28, java.lang.String r29, java.lang.String r30, java.lang.String r31, java.util.ArrayList<org.telegram.messenger.VideoEditedInfo.MediaEntity> r32, org.telegram.messenger.MediaController.CropState r33, int r34, int r35, int r36, int r37, int r38, float r39, boolean r40, java.lang.Integer r41, java.lang.Integer r42, org.telegram.ui.Stories.recorder.StoryEntry.HDRInfo r43, org.telegram.messenger.video.MediaCodecVideoConvertor.ConvertVideoParams r44) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.video.TextureRenderer.<init>(org.telegram.messenger.MediaController$SavedFilterState, java.lang.String, java.lang.String, java.lang.String, java.util.ArrayList, org.telegram.messenger.MediaController$CropState, int, int, int, int, int, float, boolean, java.lang.Integer, java.lang.Integer, org.telegram.ui.Stories.recorder.StoryEntry$HDRInfo, org.telegram.messenger.video.MediaCodecVideoConvertor$ConvertVideoParams):void");
     }
 
     private void applyRoundRadius(VideoEditedInfo.MediaEntity mediaEntity, Bitmap bitmap, int i) {

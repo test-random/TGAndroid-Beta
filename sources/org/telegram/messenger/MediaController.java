@@ -27,8 +27,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.provider.MediaStore;
@@ -1783,40 +1781,34 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     }
 
     public static class VideoConvertRunnable implements Runnable {
-        private final VideoConvertMessage convertMessage;
-        private final Handler handler;
+        private VideoConvertMessage convertMessage;
 
-        private VideoConvertRunnable(VideoConvertMessage videoConvertMessage, Handler handler) {
+        private VideoConvertRunnable(VideoConvertMessage videoConvertMessage) {
             this.convertMessage = videoConvertMessage;
-            this.handler = handler;
         }
 
-        public static void lambda$runConversion$0(VideoConvertMessage videoConvertMessage, Handler handler, HandlerThread handlerThread) {
+        public static void lambda$runConversion$0(VideoConvertMessage videoConvertMessage) {
             try {
-                Thread thread = new Thread(new VideoConvertRunnable(videoConvertMessage, handler), "VideoConvertRunnable");
+                Thread thread = new Thread(new VideoConvertRunnable(videoConvertMessage), "VideoConvertRunnable");
                 thread.start();
                 thread.join();
-                handlerThread.join();
             } catch (Exception e) {
                 FileLog.e(e);
             }
         }
 
         public static void runConversion(final VideoConvertMessage videoConvertMessage) {
-            final HandlerThread handlerThread = new HandlerThread("VideoConvertRunnableThread");
-            handlerThread.start();
-            final Handler handler = new Handler(handlerThread.getLooper());
             new Thread(new Runnable() {
                 @Override
                 public final void run() {
-                    MediaController.VideoConvertRunnable.lambda$runConversion$0(MediaController.VideoConvertMessage.this, handler, handlerThread);
+                    MediaController.VideoConvertRunnable.lambda$runConversion$0(MediaController.VideoConvertMessage.this);
                 }
             }).start();
         }
 
         @Override
         public void run() {
-            MediaController.getInstance().convertVideo(this.convertMessage, this.handler);
+            MediaController.getInstance().convertVideo(this.convertMessage);
         }
     }
 
@@ -2063,8 +2055,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         this.playlistGlobalSearchParams = null;
     }
 
-    public boolean convertVideo(final org.telegram.messenger.MediaController.VideoConvertMessage r39, android.os.Handler r40) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaController.convertVideo(org.telegram.messenger.MediaController$VideoConvertMessage, android.os.Handler):boolean");
+    public boolean convertVideo(final org.telegram.messenger.MediaController.VideoConvertMessage r39) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MediaController.convertVideo(org.telegram.messenger.MediaController$VideoConvertMessage):boolean");
     }
 
     public static String copyFileToCache(Uri uri, String str) {

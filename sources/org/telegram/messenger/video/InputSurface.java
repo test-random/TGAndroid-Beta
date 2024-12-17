@@ -59,10 +59,6 @@ public class InputSurface {
         }
     }
 
-    public EGLContext getContext() {
-        return this.mEGLContext;
-    }
-
     public Surface getSurface() {
         return this.mSurface;
     }

@@ -1071,37 +1071,35 @@ public class AnimatedEmojiDrawable extends Drawable {
     }
 
     private void updateSize() {
+        int i;
         float abs;
         TextPaint textPaint;
-        int i;
         int i2 = this.cacheType;
         if (i2 == 0) {
-            abs = Math.abs(Theme.chat_msgTextPaint.ascent());
-            textPaint = Theme.chat_msgTextPaint;
-        } else if (i2 == 1 || i2 == 4 || i2 == 19 || i2 == 20) {
-            abs = Math.abs(Theme.chat_msgTextPaintEmoji[2].ascent());
-            textPaint = Theme.chat_msgTextPaintEmoji[2];
+            i = (int) (((Math.abs(Theme.chat_msgTextPaint.ascent()) + Math.abs(Theme.chat_msgTextPaint.descent())) * 1.15f) / AndroidUtilities.density);
         } else {
-            if (i2 != 8) {
-                if (i2 == 14 || i2 == 15 || i2 == 17) {
-                    i = 100;
-                } else if (i2 == 11 || i2 == 22) {
-                    i = 56;
-                } else if (i2 == 24) {
-                    i = 140;
-                } else {
-                    if (i2 == 23) {
-                        this.sizedp = 14;
-                        return;
-                    }
-                    i = 34;
+            TextPaint[] textPaintArr = Theme.chat_msgTextPaintEmoji;
+            if (textPaintArr != null && (i2 == 1 || i2 == 4 || i2 == 19 || i2 == 20)) {
+                abs = Math.abs(textPaintArr[2].ascent());
+                textPaint = Theme.chat_msgTextPaintEmoji[2];
+            } else if (textPaintArr != null && i2 == 8) {
+                abs = Math.abs(textPaintArr[0].ascent());
+                textPaint = Theme.chat_msgTextPaintEmoji[0];
+            } else if (i2 == 14 || i2 == 15 || i2 == 17) {
+                i = 100;
+            } else if (i2 == 11 || i2 == 22) {
+                i = 56;
+            } else if (i2 == 24) {
+                i = 140;
+            } else {
+                if (i2 == 23) {
+                    this.sizedp = 14;
+                    return;
                 }
-                this.sizedp = i;
+                i = 34;
             }
-            abs = Math.abs(Theme.chat_msgTextPaintEmoji[0].ascent());
-            textPaint = Theme.chat_msgTextPaintEmoji[0];
+            i = (int) (((abs + Math.abs(textPaint.descent())) * 1.15f) / AndroidUtilities.density);
         }
-        i = (int) (((abs + Math.abs(textPaint.descent())) * 1.15f) / AndroidUtilities.density);
         this.sizedp = i;
     }
 

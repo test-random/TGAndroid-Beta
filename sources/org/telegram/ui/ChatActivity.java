@@ -17676,6 +17676,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
+    private int findAdPlace() {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.findAdPlace():int");
+    }
+
     private Integer findClosest(ArrayList arrayList, int i, int[] iArr) {
         if (arrayList.isEmpty()) {
             return 0;
@@ -24647,7 +24651,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.processLoadedDiscussionMessage(boolean, org.telegram.tgnet.TLRPC$TL_messages_discussionMessage, boolean, org.telegram.tgnet.TLRPC$messages_Messages, int, org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$TL_messages_getDiscussionMessage, org.telegram.tgnet.TLRPC$Chat, int, org.telegram.messenger.MessageObject):void");
     }
 
-    private void processNewMessages(java.util.ArrayList r33) {
+    private void processNewMessages(java.util.ArrayList r30) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.processNewMessages(java.util.ArrayList):void");
     }
 

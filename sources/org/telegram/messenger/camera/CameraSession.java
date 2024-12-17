@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.text.TextUtils;
 import android.view.OrientationEventListener;
 import android.view.WindowManager;
 import java.util.ArrayList;
@@ -332,11 +333,15 @@ public class CameraSession {
 
     public void setTorchEnabled(boolean z) {
         try {
-            this.currentFlashMode = z ? "torch" : "off";
-            if (this.isRound) {
-                configureRoundCamera(false);
-            } else {
-                configurePhotoCamera();
+            String str = this.currentFlashMode;
+            String str2 = z ? "torch" : "off";
+            this.currentFlashMode = str2;
+            if (!TextUtils.equals(str, str2)) {
+                if (this.isRound) {
+                    configureRoundCamera(false);
+                } else {
+                    configurePhotoCamera();
+                }
             }
         } catch (Exception e) {
             FileLog.e(e);
