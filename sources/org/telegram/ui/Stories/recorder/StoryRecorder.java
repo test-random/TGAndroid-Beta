@@ -1528,13 +1528,6 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         }
 
         @Override
-        protected void onPhotoEntityCropClick(PhotoView photoView) {
-            StoryRecorder.this.createCropInlineEditor();
-            StoryRecorder.this.cropInlineEditor.set(photoView);
-            StoryRecorder.this.switchToEditMode(4, true);
-        }
-
-        @Override
         public void onSelectRound(RoundView roundView) {
             if (StoryRecorder.this.timelineView != null) {
                 StoryRecorder.this.timelineView.selectRound(true);
@@ -2266,7 +2259,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                 paintView = StoryRecorder.this.paintView;
                 findRoundView = StoryRecorder.this.paintView.findRoundView();
             }
-            paintView.lambda$createRound$62(findRoundView);
+            paintView.lambda$createRound$61(findRoundView);
         }
     }
 
@@ -4503,7 +4496,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                     paintView = StoryRecorder.this.paintView;
                     findRoundView = StoryRecorder.this.paintView.findRoundView();
                 }
-                paintView.lambda$createRound$62(findRoundView);
+                paintView.lambda$createRound$61(findRoundView);
             }
         };
         this.previewView = anonymousClass9;
