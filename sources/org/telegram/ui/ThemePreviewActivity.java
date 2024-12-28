@@ -88,6 +88,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
@@ -1959,6 +1960,11 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
                     }
 
                     @Override
+                    public void didPressReaction(ChatActionCell chatActionCell2, TLRPC.ReactionCount reactionCount, boolean z, float f, float f2) {
+                        ChatActionCell.ChatActionCellDelegate.CC.$default$didPressReaction(this, chatActionCell2, reactionCount, z, f, f2);
+                    }
+
+                    @Override
                     public void didPressReplyMessage(ChatActionCell chatActionCell2, int i2) {
                         ChatActionCell.ChatActionCellDelegate.CC.$default$didPressReplyMessage(this, chatActionCell2, i2);
                     }
@@ -3304,15 +3310,15 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
         Theme.ThemeAccent themeAccent;
         TLRPC.TL_wallPaper tL_wallPaper;
         String str;
-        if (tLObject instanceof TLRPC.TL_account_wallPapers) {
-            TLRPC.TL_account_wallPapers tL_account_wallPapers = (TLRPC.TL_account_wallPapers) tLObject;
+        if (tLObject instanceof TL_account.TL_wallPapers) {
+            TL_account.TL_wallPapers tL_wallPapers = (TL_account.TL_wallPapers) tLObject;
             this.patterns.clear();
             this.patternsDict.clear();
-            int size = tL_account_wallPapers.wallpapers.size();
+            int size = tL_wallPapers.wallpapers.size();
             boolean z = false;
             for (int i = 0; i < size; i++) {
-                if (tL_account_wallPapers.wallpapers.get(i) instanceof TLRPC.TL_wallPaper) {
-                    TLRPC.TL_wallPaper tL_wallPaper2 = (TLRPC.TL_wallPaper) tL_account_wallPapers.wallpapers.get(i);
+                if (tL_wallPapers.wallpapers.get(i) instanceof TLRPC.TL_wallPaper) {
+                    TLRPC.TL_wallPaper tL_wallPaper2 = (TLRPC.TL_wallPaper) tL_wallPapers.wallpapers.get(i);
                     if (tL_wallPaper2.pattern) {
                         TLRPC.Document document = tL_wallPaper2.document;
                         if (document != null && !this.patternsDict.containsKey(Long.valueOf(document.id))) {
@@ -3345,16 +3351,16 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
             if (patternsAdapter != null) {
                 patternsAdapter.notifyDataSetChanged();
             }
-            MessagesStorage.getInstance(this.currentAccount).putWallpapers(tL_account_wallPapers.wallpapers, 1);
+            MessagesStorage.getInstance(this.currentAccount).putWallpapers(tL_wallPapers.wallpapers, 1);
         }
         if (this.selectedPattern != null || (themeAccent = this.accent) == null || TextUtils.isEmpty(themeAccent.patternSlug)) {
             return;
         }
-        TLRPC.TL_account_getWallPaper tL_account_getWallPaper = new TLRPC.TL_account_getWallPaper();
+        TL_account.getWallPaper getwallpaper = new TL_account.getWallPaper();
         TLRPC.TL_inputWallPaperSlug tL_inputWallPaperSlug = new TLRPC.TL_inputWallPaperSlug();
         tL_inputWallPaperSlug.slug = this.accent.patternSlug;
-        tL_account_getWallPaper.wallpaper = tL_inputWallPaperSlug;
-        ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(getConnectionsManager().sendRequest(tL_account_getWallPaper, new RequestDelegate() {
+        getwallpaper.wallpaper = tL_inputWallPaperSlug;
+        ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(getConnectionsManager().sendRequest(getwallpaper, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject2, TLRPC.TL_error tL_error) {
                 ThemePreviewActivity.this.lambda$didReceivedNotification$29(tLObject2, tL_error);
@@ -4509,9 +4515,9 @@ public class ThemePreviewActivity extends BaseFragment implements DownloadContro
                 j = MediaDataController.calcHash(j, wallPaper2.id);
             }
         }
-        TLRPC.TL_account_getWallPapers tL_account_getWallPapers = new TLRPC.TL_account_getWallPapers();
-        tL_account_getWallPapers.hash = j;
-        ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_getWallPapers, new RequestDelegate() {
+        TL_account.getWallPapers getwallpapers = new TL_account.getWallPapers();
+        getwallpapers.hash = j;
+        ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(getwallpapers, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ThemePreviewActivity.this.lambda$didReceivedNotification$31(tLObject, tL_error);

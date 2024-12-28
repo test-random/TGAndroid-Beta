@@ -37,6 +37,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -321,9 +322,9 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 MessagesController.getInstance(this.currentAccount).enableJoined = z6;
                 edit4.putBoolean("EnableContactJoined", z6);
                 edit4.commit();
-                TLRPC.TL_account_setContactSignUpNotification tL_account_setContactSignUpNotification = new TLRPC.TL_account_setContactSignUpNotification();
-                tL_account_setContactSignUpNotification.silent = z3;
-                ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_setContactSignUpNotification, new RequestDelegate() {
+                TL_account.setContactSignUpNotification setcontactsignupnotification = new TL_account.setContactSignUpNotification();
+                setcontactsignupnotification.silent = z3;
+                ConnectionsManager.getInstance(this.currentAccount).sendRequest(setcontactsignupnotification, new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                         NotificationsSettingsActivity.lambda$createView$7(tLObject, tL_error);
@@ -496,7 +497,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
             return;
         }
         this.reseting = true;
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_resetNotifySettings(), new RequestDelegate() {
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.resetNotifySettings(), new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 NotificationsSettingsActivity.this.lambda$createView$5(tLObject, tL_error);

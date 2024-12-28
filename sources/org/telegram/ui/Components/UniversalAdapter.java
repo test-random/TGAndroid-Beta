@@ -11,7 +11,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
@@ -45,6 +44,7 @@ import org.telegram.ui.Cells.TextRightIconCell;
 import org.telegram.ui.Cells.UserCell;
 import org.telegram.ui.ChannelMonetizationLayout;
 import org.telegram.ui.Charts.BaseChartView;
+import org.telegram.ui.Components.LinkSpanDrawable;
 import org.telegram.ui.Components.ListView.AdapterWithDiffUtils;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.SlideChooseView;
@@ -309,7 +309,7 @@ public class UniversalAdapter extends AdapterWithDiffUtils {
         int i2;
         int i3;
         int color;
-        TextView textView;
+        LinkSpanDrawable.LinksTextView textView;
         int dp;
         View view;
         CharSequence charSequence;
@@ -436,6 +436,7 @@ public class UniversalAdapter extends AdapterWithDiffUtils {
                 if (textCheckCell.itemId == item.id) {
                     textCheckCell.setChecked(item.checked);
                 }
+                textCheckCell.setEnabled(item.enabled, null);
                 textCheckCell.setTextAndCheck(item.text, item.checked, hasDivider);
                 textCheckCell.itemId = item.id;
                 if (itemViewType == 9) {

@@ -667,7 +667,7 @@ public class ManageLinksActivity extends BaseFragment implements NotificationCen
                 textView.setText(str);
             } else {
                 SpannableStringBuilder spannableStringBuilder2 = new SpannableStringBuilder(tL_chatInviteExported.title);
-                Emoji.replaceEmoji((CharSequence) spannableStringBuilder2, this.titleView.getPaint().getFontMetricsInt(), (int) this.titleView.getPaint().getTextSize(), false);
+                Emoji.replaceEmoji(spannableStringBuilder2, this.titleView.getPaint().getFontMetricsInt(), false);
                 this.titleView.setText(spannableStringBuilder2);
             }
             int i5 = tL_chatInviteExported.usage;

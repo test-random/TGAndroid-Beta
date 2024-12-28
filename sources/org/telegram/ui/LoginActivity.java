@@ -122,6 +122,7 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -639,11 +640,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         }
 
         public void lambda$onNextPressed$18(TLObject tLObject, Bundle bundle) {
-            if ((tLObject instanceof TLRPC.TL_account_emailVerified) && LoginActivity.this.activityMode == 3) {
+            if ((tLObject instanceof TL_account.TL_emailVerified) && LoginActivity.this.activityMode == 3) {
                 LoginActivity.this.lambda$onBackPressed$321();
                 LoginActivity.this.emailChangeFinishCallback.run();
-            } else if (tLObject instanceof TLRPC.TL_account_emailVerifiedLogin) {
-                LoginActivity.this.lambda$resendCodeFromSafetyNet$19(bundle, ((TLRPC.TL_account_emailVerifiedLogin) tLObject).sent_code);
+            } else if (tLObject instanceof TL_account.TL_emailVerifiedLogin) {
+                LoginActivity.this.lambda$resendCodeFromSafetyNet$19(bundle, ((TL_account.TL_emailVerifiedLogin) tLObject).sent_code);
             } else if (tLObject instanceof TLRPC.TL_auth_authorization) {
                 LoginActivity.this.onAuthSuccess((TLRPC.TL_auth_authorization) tLObject);
             }
@@ -660,14 +661,14 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 LoginActivity.this.needShowAlert(LocaleController.getString(R.string.RestorePasswordNoEmailTitle), tL_error.text);
                 return;
             }
-            TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-            if (!TwoStepVerificationActivity.canHandleCurrentPassword(account_password, true)) {
+            TL_account.Password password = (TL_account.Password) tLObject;
+            if (!TwoStepVerificationActivity.canHandleCurrentPassword(password, true)) {
                 AlertsCreator.showUpdateAppAlert(LoginActivity.this.getParentActivity(), LocaleController.getString("UpdateAppAlert", R.string.UpdateAppAlert), true);
                 return;
             }
             final Bundle bundle = new Bundle();
-            SerializedData serializedData = new SerializedData(account_password.getObjectSize());
-            account_password.serializeToStream(serializedData);
+            SerializedData serializedData = new SerializedData(password.getObjectSize());
+            password.serializeToStream(serializedData);
             bundle.putString("password", Utilities.bytesToHex(serializedData.toByteArray()));
             bundle.putString("phoneFormated", this.requestPhone);
             bundle.putString("phoneHash", this.phoneHash);
@@ -1022,7 +1023,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         private EditTextBoldCursor[] codeField;
         private TextView confirmTextView;
         private Bundle currentParams;
-        private TLRPC.account_Password currentPassword;
+        private TL_account.Password currentPassword;
         private int currentStage;
         private String emailCode;
         private boolean isPasswordVisible;
@@ -1231,9 +1232,9 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
         public void lambda$recoverPassword$4(TLRPC.TL_error tL_error, TLObject tLObject, String str, String str2) {
             if (tL_error == null) {
-                TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-                this.currentPassword = account_password;
-                TwoStepVerificationActivity.initPasswordNewAlgo(account_password);
+                TL_account.Password password = (TL_account.Password) tLObject;
+                this.currentPassword = password;
+                TwoStepVerificationActivity.initPasswordNewAlgo(password);
                 recoverPassword(str, str2);
             }
         }
@@ -1256,7 +1257,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             String string;
             String str3;
             if (tL_error != null && ("SRP_ID_INVALID".equals(tL_error.text) || "NEW_SALT_INVALID".equals(tL_error.text))) {
-                ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+                ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject2, TLRPC.TL_error tL_error2) {
                         LoginActivity.LoginActivityNewPasswordView.this.lambda$recoverPassword$5(str, str2, tLObject2, tL_error2);
@@ -1351,11 +1352,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             tL_auth_recoverPassword.code = this.emailCode;
             if (!TextUtils.isEmpty(str)) {
                 tL_auth_recoverPassword.flags |= 1;
-                TLRPC.TL_account_passwordInputSettings tL_account_passwordInputSettings = new TLRPC.TL_account_passwordInputSettings();
-                tL_auth_recoverPassword.new_settings = tL_account_passwordInputSettings;
-                tL_account_passwordInputSettings.flags |= 1;
-                tL_account_passwordInputSettings.hint = str2 != null ? str2 : "";
-                tL_account_passwordInputSettings.new_algo = this.currentPassword.new_algo;
+                TL_account.passwordInputSettings passwordinputsettings = new TL_account.passwordInputSettings();
+                tL_auth_recoverPassword.new_settings = passwordinputsettings;
+                passwordinputsettings.flags |= 1;
+                passwordinputsettings.hint = str2 != null ? str2 : "";
+                passwordinputsettings.new_algo = this.currentPassword.new_algo;
             }
             Utilities.globalQueue.postRunnable(new Runnable() {
                 @Override
@@ -1462,7 +1463,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             this.passwordString = string;
             if (string != null) {
                 SerializedData serializedData = new SerializedData(Utilities.hexToBytes(string));
-                TLRPC.account_Password TLdeserialize = TLRPC.account_Password.TLdeserialize(serializedData, serializedData.readInt32(false), false);
+                TL_account.Password TLdeserialize = TL_account.Password.TLdeserialize(serializedData, serializedData.readInt32(false), false);
                 this.currentPassword = TLdeserialize;
                 TwoStepVerificationActivity.initPasswordNewAlgo(TLdeserialize);
             }
@@ -1496,7 +1497,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         private EditTextBoldCursor codeField;
         private TextView confirmTextView;
         private Bundle currentParams;
-        private TLRPC.account_Password currentPassword;
+        private TL_account.Password currentPassword;
         private RLottieImageView lockImageView;
         private boolean nextPressed;
         private OutlineTextContainerView outlineCodeField;
@@ -1615,7 +1616,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         public void lambda$onNextPressed$10(TLRPC.TL_error tL_error, final TLObject tLObject) {
             this.nextPressed = false;
             if (tL_error != null && "SRP_ID_INVALID".equals(tL_error.text)) {
-                ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+                ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject2, TLRPC.TL_error tL_error2) {
                         LoginActivity.LoginActivityPasswordView.this.lambda$onNextPressed$8(tLObject2, tL_error2);
@@ -1664,8 +1665,8 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 }
             };
             if (z) {
-                TLRPC.account_Password account_password = this.currentPassword;
-                TLRPC.TL_inputCheckPasswordSRP startCheck = SRPHelper.startCheck(x, account_password.srp_id, account_password.srp_B, (TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow) passwordKdfAlgo);
+                TL_account.Password password = this.currentPassword;
+                TLRPC.TL_inputCheckPasswordSRP startCheck = SRPHelper.startCheck(x, password.srp_id, password.srp_B, (TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow) passwordKdfAlgo);
                 if (startCheck == null) {
                     TLRPC.TL_error tL_error = new TLRPC.TL_error();
                     tL_error.text = "PASSWORD_HASH_INVALID";
@@ -1680,7 +1681,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
         public void lambda$onNextPressed$7(TLRPC.TL_error tL_error, TLObject tLObject) {
             if (tL_error == null) {
-                this.currentPassword = (TLRPC.account_Password) tLObject;
+                this.currentPassword = (TL_account.Password) tLObject;
                 lambda$onNextPressed$14(null);
             }
         }
@@ -1818,13 +1819,13 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             this.passwordString = string;
             if (string != null) {
                 SerializedData serializedData = new SerializedData(Utilities.hexToBytes(string));
-                this.currentPassword = TLRPC.account_Password.TLdeserialize(serializedData, serializedData.readInt32(false), false);
+                this.currentPassword = TL_account.Password.TLdeserialize(serializedData, serializedData.readInt32(false), false);
             }
             this.requestPhone = bundle.getString("phoneFormated");
             this.phoneHash = bundle.getString("phoneHash");
             this.phoneCode = bundle.getString("code");
-            TLRPC.account_Password account_password = this.currentPassword;
-            if (account_password == null || TextUtils.isEmpty(account_password.hint)) {
+            TL_account.Password password = this.currentPassword;
+            if (password == null || TextUtils.isEmpty(password.hint)) {
                 editTextBoldCursor = this.codeField;
                 str = null;
             } else {
@@ -2363,7 +2364,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                     }
                     return;
                 }
-                ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+                ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject2, TLRPC.TL_error tL_error2) {
                         LoginActivity.LoginActivityPhraseView.this.lambda$onNextPressed$10(tL_auth_signIn, tLObject2, tL_error2);
@@ -2393,14 +2394,14 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 LoginActivity.this.needShowAlert(LocaleController.getString(R.string.RestorePasswordNoEmailTitle), tL_error.text);
                 return;
             }
-            TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-            if (!TwoStepVerificationActivity.canHandleCurrentPassword(account_password, true)) {
+            TL_account.Password password = (TL_account.Password) tLObject;
+            if (!TwoStepVerificationActivity.canHandleCurrentPassword(password, true)) {
                 AlertsCreator.showUpdateAppAlert(LoginActivity.this.getParentActivity(), LocaleController.getString("UpdateAppAlert", R.string.UpdateAppAlert), true);
                 return;
             }
             Bundle bundle = new Bundle();
-            SerializedData serializedData = new SerializedData(account_password.getObjectSize());
-            account_password.serializeToStream(serializedData);
+            SerializedData serializedData = new SerializedData(password.getObjectSize());
+            password.serializeToStream(serializedData);
             bundle.putString("password", Utilities.bytesToHex(serializedData.toByteArray()));
             bundle.putString("phoneFormated", this.requestPhone);
             bundle.putString("phoneHash", this.phoneHash);
@@ -3929,9 +3930,9 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
         public void lambda$new$2(DialogInterface dialogInterface, int i) {
             LoginActivity.this.needShowProgress(0);
-            TLRPC.TL_account_deleteAccount tL_account_deleteAccount = new TLRPC.TL_account_deleteAccount();
-            tL_account_deleteAccount.reason = "Forgot password";
-            ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(tL_account_deleteAccount, new RequestDelegate() {
+            TL_account.deleteAccount deleteaccount = new TL_account.deleteAccount();
+            deleteaccount.reason = "Forgot password";
+            ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(deleteaccount, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     LoginActivity.LoginActivityResetWaitView.this.lambda$new$1(tLObject, tL_error);
@@ -4128,19 +4129,19 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             });
         }
 
-        public void lambda$onNextPressed$5(TLObject tLObject, Bundle bundle, TLRPC.TL_error tL_error, TLRPC.TL_account_verifyEmail tL_account_verifyEmail) {
+        public void lambda$onNextPressed$5(TLObject tLObject, Bundle bundle, TLRPC.TL_error tL_error, TL_account.verifyEmail verifyemail) {
             LoginActivity loginActivity;
             String string;
             int i;
-            if ((tLObject instanceof TLRPC.TL_account_emailVerified) && LoginActivity.this.activityMode == 3) {
+            if ((tLObject instanceof TL_account.TL_emailVerified) && LoginActivity.this.activityMode == 3) {
                 LoginActivity.this.lambda$onBackPressed$321();
                 LoginActivity.this.emailChangeFinishCallback.run();
                 return;
             }
-            if (tLObject instanceof TLRPC.TL_account_emailVerifiedLogin) {
-                TLRPC.TL_account_emailVerifiedLogin tL_account_emailVerifiedLogin = (TLRPC.TL_account_emailVerifiedLogin) tLObject;
-                bundle.putString("email", tL_account_emailVerifiedLogin.email);
-                LoginActivity.this.lambda$resendCodeFromSafetyNet$19(bundle, tL_account_emailVerifiedLogin.sent_code);
+            if (tLObject instanceof TL_account.TL_emailVerifiedLogin) {
+                TL_account.TL_emailVerifiedLogin tL_emailVerifiedLogin = (TL_account.TL_emailVerifiedLogin) tLObject;
+                bundle.putString("email", tL_emailVerifiedLogin.email);
+                LoginActivity.this.lambda$resendCodeFromSafetyNet$19(bundle, tL_emailVerifiedLogin.sent_code);
                 return;
             }
             if (tL_error != null) {
@@ -4150,7 +4151,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                     i = R.string.EmailNotAllowed;
                 } else if (!tL_error.text.contains("EMAIL_TOKEN_INVALID")) {
                     if (tL_error.code != -1000) {
-                        AlertsCreator.processError(((BaseFragment) LoginActivity.this).currentAccount, tL_error, LoginActivity.this, tL_account_verifyEmail, new Object[0]);
+                        AlertsCreator.processError(((BaseFragment) LoginActivity.this).currentAccount, tL_error, LoginActivity.this, verifyemail, new Object[0]);
                         return;
                     }
                     return;
@@ -4163,16 +4164,16 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             }
         }
 
-        public void lambda$onNextPressed$6(final Bundle bundle, final TLRPC.TL_account_verifyEmail tL_account_verifyEmail, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+        public void lambda$onNextPressed$6(final Bundle bundle, final TL_account.verifyEmail verifyemail, final TLObject tLObject, final TLRPC.TL_error tL_error) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    LoginActivity.LoginActivitySetupEmail.this.lambda$onNextPressed$5(tLObject, bundle, tL_error, tL_account_verifyEmail);
+                    LoginActivity.LoginActivitySetupEmail.this.lambda$onNextPressed$5(tLObject, bundle, tL_error, verifyemail);
                 }
             });
         }
 
-        public void lambda$onNextPressed$7(TLObject tLObject, Bundle bundle, TLRPC.TL_error tL_error, TLRPC.TL_account_sendVerifyEmailCode tL_account_sendVerifyEmailCode) {
+        public void lambda$onNextPressed$7(TLObject tLObject, Bundle bundle, TLRPC.TL_error tL_error, TL_account.sendVerifyEmailCode sendverifyemailcode) {
             LoginActivity loginActivity;
             String string;
             int i;
@@ -4180,8 +4181,8 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             String string2;
             LoginActivity.this.needHideProgress(false);
             this.nextPressed = false;
-            if (tLObject instanceof TLRPC.TL_account_sentEmailCode) {
-                LoginActivity.this.fillNextCodeParams(bundle, (TLRPC.TL_account_sentEmailCode) tLObject);
+            if (tLObject instanceof TL_account.sentEmailCode) {
+                LoginActivity.this.fillNextCodeParams(bundle, (TL_account.sentEmailCode) tLObject);
                 return;
             }
             String str2 = tL_error.text;
@@ -4215,7 +4216,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                             str = "CodeExpired";
                         } else if (!tL_error.text.startsWith("FLOOD_WAIT")) {
                             if (tL_error.code != -1000) {
-                                AlertsCreator.processError(((BaseFragment) LoginActivity.this).currentAccount, tL_error, LoginActivity.this, tL_account_sendVerifyEmailCode, this.requestPhone);
+                                AlertsCreator.processError(((BaseFragment) LoginActivity.this).currentAccount, tL_error, LoginActivity.this, sendverifyemailcode, this.requestPhone);
                                 return;
                             }
                             return;
@@ -4232,11 +4233,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             }
         }
 
-        public void lambda$onNextPressed$8(final Bundle bundle, final TLRPC.TL_account_sendVerifyEmailCode tL_account_sendVerifyEmailCode, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+        public void lambda$onNextPressed$8(final Bundle bundle, final TL_account.sendVerifyEmailCode sendverifyemailcode, final TLObject tLObject, final TLRPC.TL_error tL_error) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    LoginActivity.LoginActivitySetupEmail.this.lambda$onNextPressed$7(tLObject, bundle, tL_error, tL_account_sendVerifyEmailCode);
+                    LoginActivity.LoginActivitySetupEmail.this.lambda$onNextPressed$7(tLObject, bundle, tL_error, sendverifyemailcode);
                 }
             });
         }
@@ -4300,7 +4301,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             bundle.putString("email", email);
             bundle.putBoolean("setup", true);
             if (this.googleAccount != null) {
-                final TLRPC.TL_account_verifyEmail tL_account_verifyEmail = new TLRPC.TL_account_verifyEmail();
+                final TL_account.verifyEmail verifyemail = new TL_account.verifyEmail();
                 if (LoginActivity.this.activityMode == 3) {
                     emailVerifyPurpose2 = new TLRPC.TL_emailVerifyPurposeLoginChange();
                 } else {
@@ -4309,15 +4310,15 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                     tL_emailVerifyPurposeLoginSetup.phone_code_hash = this.phoneHash;
                     emailVerifyPurpose2 = tL_emailVerifyPurposeLoginSetup;
                 }
-                tL_account_verifyEmail.purpose = emailVerifyPurpose2;
+                verifyemail.purpose = emailVerifyPurpose2;
                 TLRPC.TL_emailVerificationGoogle tL_emailVerificationGoogle = new TLRPC.TL_emailVerificationGoogle();
                 tL_emailVerificationGoogle.token = this.googleAccount.getIdToken();
-                tL_account_verifyEmail.verification = tL_emailVerificationGoogle;
+                verifyemail.verification = tL_emailVerificationGoogle;
                 this.googleAccount = null;
-                ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(tL_account_verifyEmail, new RequestDelegate() {
+                ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(verifyemail, new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                        LoginActivity.LoginActivitySetupEmail.this.lambda$onNextPressed$6(bundle, tL_account_verifyEmail, tLObject, tL_error);
+                        LoginActivity.LoginActivitySetupEmail.this.lambda$onNextPressed$6(bundle, verifyemail, tLObject, tL_error);
                     }
                 }, 10);
                 return;
@@ -4328,7 +4329,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             }
             this.nextPressed = true;
             LoginActivity.this.needShowProgress(0);
-            final TLRPC.TL_account_sendVerifyEmailCode tL_account_sendVerifyEmailCode = new TLRPC.TL_account_sendVerifyEmailCode();
+            final TL_account.sendVerifyEmailCode sendverifyemailcode = new TL_account.sendVerifyEmailCode();
             if (LoginActivity.this.activityMode == 3) {
                 emailVerifyPurpose = new TLRPC.TL_emailVerifyPurposeLoginChange();
             } else {
@@ -4337,12 +4338,12 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 tL_emailVerifyPurposeLoginSetup2.phone_code_hash = this.phoneHash;
                 emailVerifyPurpose = tL_emailVerifyPurposeLoginSetup2;
             }
-            tL_account_sendVerifyEmailCode.purpose = emailVerifyPurpose;
-            tL_account_sendVerifyEmailCode.email = email;
-            ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(tL_account_sendVerifyEmailCode, new RequestDelegate() {
+            sendverifyemailcode.purpose = emailVerifyPurpose;
+            sendverifyemailcode.email = email;
+            ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(sendverifyemailcode, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    LoginActivity.LoginActivitySetupEmail.this.lambda$onNextPressed$8(bundle, tL_account_sendVerifyEmailCode, tLObject, tL_error);
+                    LoginActivity.LoginActivitySetupEmail.this.lambda$onNextPressed$8(bundle, sendverifyemailcode, tLObject, tL_error);
                 }
             }, 10);
         }
@@ -4990,15 +4991,15 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             }).show();
         }
 
-        public void lambda$onNextPressed$28(org.telegram.tgnet.TLRPC.TL_error r9, org.telegram.tgnet.TLRPC.TL_account_confirmPhone r10) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.LoginActivity.LoginActivitySmsView.lambda$onNextPressed$28(org.telegram.tgnet.TLRPC$TL_error, org.telegram.tgnet.TLRPC$TL_account_confirmPhone):void");
+        public void lambda$onNextPressed$28(org.telegram.tgnet.TLRPC.TL_error r9, org.telegram.tgnet.tl.TL_account.confirmPhone r10) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.LoginActivity.LoginActivitySmsView.lambda$onNextPressed$28(org.telegram.tgnet.TLRPC$TL_error, org.telegram.tgnet.tl.TL_account$confirmPhone):void");
         }
 
-        public void lambda$onNextPressed$29(final TLRPC.TL_account_confirmPhone tL_account_confirmPhone, TLObject tLObject, final TLRPC.TL_error tL_error) {
+        public void lambda$onNextPressed$29(final TL_account.confirmPhone confirmphone, TLObject tLObject, final TLRPC.TL_error tL_error) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    LoginActivity.LoginActivitySmsView.this.lambda$onNextPressed$28(tL_error, tL_account_confirmPhone);
+                    LoginActivity.LoginActivitySmsView.this.lambda$onNextPressed$28(tL_error, confirmphone);
                 }
             });
         }
@@ -5022,14 +5023,14 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 LoginActivity.this.needShowAlert(LocaleController.getString(R.string.RestorePasswordNoEmailTitle), tL_error.text);
                 return;
             }
-            TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-            if (!TwoStepVerificationActivity.canHandleCurrentPassword(account_password, true)) {
+            TL_account.Password password = (TL_account.Password) tLObject;
+            if (!TwoStepVerificationActivity.canHandleCurrentPassword(password, true)) {
                 AlertsCreator.showUpdateAppAlert(LoginActivity.this.getParentActivity(), LocaleController.getString("UpdateAppAlert", R.string.UpdateAppAlert), true);
                 return;
             }
             final Bundle bundle = new Bundle();
-            SerializedData serializedData = new SerializedData(account_password.getObjectSize());
-            account_password.serializeToStream(serializedData);
+            SerializedData serializedData = new SerializedData(password.getObjectSize());
+            password.serializeToStream(serializedData);
             bundle.putString("password", Utilities.bytesToHex(serializedData.toByteArray()));
             bundle.putString("phoneFormated", this.requestPhone);
             bundle.putString("phoneHash", this.phoneHash);
@@ -6893,14 +6894,14 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 LoginActivity.this.needShowAlert(LocaleController.getString(R.string.RestorePasswordNoEmailTitle), tL_error.text);
                 return;
             }
-            TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-            if (!TwoStepVerificationActivity.canHandleCurrentPassword(account_password, true)) {
+            TL_account.Password password = (TL_account.Password) tLObject;
+            if (!TwoStepVerificationActivity.canHandleCurrentPassword(password, true)) {
                 AlertsCreator.showUpdateAppAlert(LoginActivity.this.getParentActivity(), LocaleController.getString("UpdateAppAlert", R.string.UpdateAppAlert), true);
                 return;
             }
             Bundle bundle = new Bundle();
-            SerializedData serializedData = new SerializedData(account_password.getObjectSize());
-            account_password.serializeToStream(serializedData);
+            SerializedData serializedData = new SerializedData(password.getObjectSize());
+            password.serializeToStream(serializedData);
             bundle.putString("password", Utilities.bytesToHex(serializedData.toByteArray()));
             bundle.putString("phoneFormated", str);
             LoginActivity.this.setPage(6, true, bundle, false);
@@ -6925,7 +6926,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 String str3 = tL_error.text;
                 if (str3 != null) {
                     if (str3.contains("SESSION_PASSWORD_NEEDED")) {
-                        ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+                        ConnectionsManager.getInstance(((BaseFragment) LoginActivity.this).currentAccount).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                             @Override
                             public final void run(TLObject tLObject3, TLRPC.TL_error tL_error2) {
                                 LoginActivity.PhoneView.this.lambda$onNextPressed$18(str, tLObject3, tL_error2);
@@ -7084,7 +7085,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 }, languageFlag.length(), languageFlag.length() + 1, 0);
             }
             spannableStringBuilder.append((CharSequence) country.name);
-            setCountryButtonText(Emoji.replaceEmoji((CharSequence) spannableStringBuilder, this.countryButton.getCurrentView().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false));
+            setCountryButtonText(Emoji.replaceEmoji(spannableStringBuilder, this.countryButton.getCurrentView().getPaint().getFontMetricsInt(), false));
             this.countryCodeForHint = str;
             this.wasCountryHintIndex = -1;
             invalidateCountryHint();
@@ -7311,12 +7312,6 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         return simpleName.toUpperCase().replaceAll(" ", "_");
     }
 
-    public void fillNextCodeParams(Bundle bundle, TLRPC.TL_account_sentEmailCode tL_account_sentEmailCode) {
-        bundle.putString("emailPattern", tL_account_sentEmailCode.email_pattern);
-        bundle.putInt("length", tL_account_sentEmailCode.length);
-        setPage(13, true, bundle, false);
-    }
-
     public void lambda$resendCodeFromSafetyNet$19(Bundle bundle, TLRPC.auth_SentCode auth_sentcode) {
         lambda$fillNextCodeParams$27(bundle, auth_sentcode, true);
     }
@@ -7443,6 +7438,12 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             }
         }
         setPage(i, z, bundle, false);
+    }
+
+    public void fillNextCodeParams(Bundle bundle, TL_account.sentEmailCode sentemailcode) {
+        bundle.putString("emailPattern", sentemailcode.email_pattern);
+        bundle.putInt("length", sentemailcode.length);
+        setPage(13, true, bundle, false);
     }
 
     public boolean isCustomKeyboardForceDisabled() {
@@ -7862,9 +7863,9 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
     public void lambda$tryResetAccount$34(final String str, final String str2, final String str3, DialogInterface dialogInterface, int i) {
         needShowProgress(0);
-        TLRPC.TL_account_deleteAccount tL_account_deleteAccount = new TLRPC.TL_account_deleteAccount();
-        tL_account_deleteAccount.reason = "Forgot password";
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_deleteAccount, new RequestDelegate() {
+        TL_account.deleteAccount deleteaccount = new TL_account.deleteAccount();
+        deleteaccount.reason = "Forgot password";
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(deleteaccount, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 LoginActivity.this.lambda$tryResetAccount$33(str, str2, str3, tLObject, tL_error);

@@ -7621,7 +7621,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
         if (z) {
             MediaDataController.getInstance(this.currentAccount).checkStickers(5);
             MediaDataController.getInstance(this.currentAccount).checkFeaturedEmoji();
-            this.animatedEmojiTextColorFilter = new PorterDuffColorFilter(getThemedColor(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_IN);
+            this.animatedEmojiTextColorFilter = new PorterDuffColorFilter(getThemedColor(Theme.key_featuredStickers_addButton), PorterDuff.Mode.SRC_IN);
         }
         this.emojiGridView = new EmojiGridView(context2);
         DefaultItemAnimator defaultItemAnimator = new DefaultItemAnimator();
@@ -11167,7 +11167,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             this.gifSearchAdapter.progressEmptyView.textView.setTextColor(getThemedColor(i5));
             this.gifSearchAdapter.progressEmptyView.progressView.setProgressColor(getThemedColor(Theme.key_progressCircle));
         }
-        this.animatedEmojiTextColorFilter = new PorterDuffColorFilter(getThemedColor(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_IN);
+        this.animatedEmojiTextColorFilter = new PorterDuffColorFilter(getThemedColor(Theme.key_featuredStickers_addButton), PorterDuff.Mode.SRC_IN);
         int i6 = 0;
         while (true) {
             Drawable[] drawableArr = this.tabIcons;

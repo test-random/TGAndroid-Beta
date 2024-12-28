@@ -82,6 +82,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
@@ -1001,6 +1002,11 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             @Override
             public void didOpenPremiumGiftChannel(ChatActionCell chatActionCell, String str, boolean z) {
                 ChatActionCell.ChatActionCellDelegate.CC.$default$didOpenPremiumGiftChannel(this, chatActionCell, str, z);
+            }
+
+            @Override
+            public void didPressReaction(ChatActionCell chatActionCell, TLRPC.ReactionCount reactionCount, boolean z, float f, float f2) {
+                ChatActionCell.ChatActionCellDelegate.CC.$default$didPressReaction(this, chatActionCell, reactionCount, z, f, f2);
             }
 
             @Override
@@ -2084,8 +2090,8 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
     }
 
     public void lambda$loadAntispamUser$23(TLObject tLObject, TLRPC.TL_error tL_error) {
-        if (tLObject instanceof TLRPC.Vector) {
-            ArrayList<Object> arrayList = ((TLRPC.Vector) tLObject).objects;
+        if (tLObject instanceof Vector) {
+            ArrayList<T> arrayList = ((Vector) tLObject).objects;
             ArrayList<TLRPC.User> arrayList2 = new ArrayList<>();
             for (int i = 0; i < arrayList.size(); i++) {
                 if (arrayList.get(i) instanceof TLRPC.User) {

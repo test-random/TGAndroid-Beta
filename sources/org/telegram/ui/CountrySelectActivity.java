@@ -258,7 +258,7 @@ public class CountrySelectActivity extends BaseFragment {
             if (viewHolder.getItemViewType() == 0) {
                 Country country = (Country) ((ArrayList) this.countries.get(this.sortedCountries.get(i))).get(i2);
                 TextSettingsCell textSettingsCell = (TextSettingsCell) viewHolder.itemView;
-                CharSequence replaceEmoji = Emoji.replaceEmoji(CountrySelectActivity.getCountryNameWithFlag(country), textSettingsCell.getTextView().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                CharSequence replaceEmoji = Emoji.replaceEmoji(CountrySelectActivity.getCountryNameWithFlag(country), textSettingsCell.getTextView().getPaint().getFontMetricsInt(), false);
                 if (CountrySelectActivity.this.needPhoneCode) {
                     str = "+" + country.code;
                 } else {
@@ -388,7 +388,7 @@ public class CountrySelectActivity extends BaseFragment {
             String str;
             Country country = (Country) this.searchResult.get(i);
             TextSettingsCell textSettingsCell = (TextSettingsCell) viewHolder.itemView;
-            CharSequence replaceEmoji = Emoji.replaceEmoji(CountrySelectActivity.getCountryNameWithFlag(country), textSettingsCell.getTextView().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+            CharSequence replaceEmoji = Emoji.replaceEmoji(CountrySelectActivity.getCountryNameWithFlag(country), textSettingsCell.getTextView().getPaint().getFontMetricsInt(), false);
             if (CountrySelectActivity.this.needPhoneCode) {
                 str = "+" + country.code;
             } else {

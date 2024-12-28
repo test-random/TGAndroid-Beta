@@ -46,6 +46,7 @@ import org.telegram.messenger.ringtone.RingtoneUploader;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -131,9 +132,9 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
             NotificationsSoundActivity.this.getMediaDataController().ringtoneDataStore.saveTones();
             for (int i2 = 0; i2 < arrayList.size(); i2++) {
                 TLRPC.Document document2 = (TLRPC.Document) arrayList.get(i2);
-                TLRPC.TL_account_saveRingtone tL_account_saveRingtone = new TLRPC.TL_account_saveRingtone();
+                TL_account.saveRingtone saveringtone = new TL_account.saveRingtone();
                 TLRPC.TL_inputDocument tL_inputDocument = new TLRPC.TL_inputDocument();
-                tL_account_saveRingtone.id = tL_inputDocument;
+                saveringtone.id = tL_inputDocument;
                 tL_inputDocument.id = document2.id;
                 tL_inputDocument.access_hash = document2.access_hash;
                 byte[] bArr = document2.file_reference;
@@ -141,8 +142,8 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
                 if (bArr == null) {
                     tL_inputDocument.file_reference = new byte[0];
                 }
-                tL_account_saveRingtone.unsave = true;
-                NotificationsSoundActivity.this.getConnectionsManager().sendRequest(tL_account_saveRingtone, new RequestDelegate() {
+                saveringtone.unsave = true;
+                NotificationsSoundActivity.this.getConnectionsManager().sendRequest(saveringtone, new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                         NotificationsSoundActivity.AnonymousClass1.lambda$deleteSelectedMessages$2(tLObject, tL_error);

@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,6 +47,7 @@ import org.telegram.ui.Cells.RequestPeerRequirementsCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.UserCell;
+import org.telegram.ui.Components.LinkSpanDrawable;
 import org.telegram.ui.Components.ListView.AdapterWithDiffUtils;
 import org.telegram.ui.Components.PullForegroundDrawable;
 import org.telegram.ui.Components.RecyclerListView;
@@ -723,7 +723,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                     this.arrowDrawable = drawable;
                     drawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText4), PorterDuff.Mode.MULTIPLY));
                 }
-                TextView textView = textInfoPrivacyCell.getTextView();
+                LinkSpanDrawable.LinksTextView textView = textInfoPrivacyCell.getTextView();
                 textView.setCompoundDrawablePadding(AndroidUtilities.dp(4.0f));
                 DialogsActivity dialogsActivity = this.parentFragment;
                 textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, (Drawable) null, (dialogsActivity == null || !dialogsActivity.storiesEnabled) ? this.arrowDrawable : null, (Drawable) null);

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.ui.Components.BackupImageView;
 
 public class DialogObject {
@@ -64,6 +65,26 @@ public class DialogObject {
             return null;
         }
         return findUsername(str, user.usernames);
+    }
+
+    public static TL_bots.botVerification getBotVerification(TLObject tLObject) {
+        if (tLObject instanceof TLRPC.UserFull) {
+            return ((TLRPC.UserFull) tLObject).bot_verification;
+        }
+        if (tLObject instanceof TLRPC.ChatFull) {
+            return ((TLRPC.ChatFull) tLObject).bot_verification;
+        }
+        return null;
+    }
+
+    public static long getBotVerificationIcon(TLObject tLObject) {
+        if (tLObject instanceof TLRPC.User) {
+            return ((TLRPC.User) tLObject).bot_verification_icon;
+        }
+        if (tLObject instanceof TLRPC.Chat) {
+            return ((TLRPC.Chat) tLObject).bot_verification_icon;
+        }
+        return 0L;
     }
 
     public static String getDialogTitle(TLObject tLObject) {

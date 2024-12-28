@@ -160,10 +160,10 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
             textView3.setBackground(Theme.createRoundRectDrawable(AndroidUtilities.dp(4.0f), Theme.getColor(Theme.key_color_green, resourcesProvider)));
             textView3.setTextSize(1, 13.0f);
             textView3.setTypeface(AndroidUtilities.bold());
-            textView3.setPadding(AndroidUtilities.dp(5.0f), 0, AndroidUtilities.dp(4.0f), AndroidUtilities.dp(2.0f));
+            textView3.setPadding(AndroidUtilities.dp(5.0f), 0, AndroidUtilities.dp(4.0f), 0);
             textView3.setGravity(17);
             textView3.setVisibility(8);
-            addView(textView3, LayoutHelper.createFrame(-2, 17.0f, 21, 0.0f, 0.0f, 35.33f, 0.0f));
+            addView(textView3, LayoutHelper.createFrame(-2, 18.0f, 21, 0.0f, 0.0f, 35.33f, 0.0f));
         }
 
         @Override
@@ -275,6 +275,10 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
             this.imageView.setImageResource(i);
             this.titleView.setText(charSequence);
             this.textView.setText(charSequence2);
+        }
+
+        public void setText(CharSequence charSequence) {
+            this.textView.setText(charSequence);
         }
     }
 

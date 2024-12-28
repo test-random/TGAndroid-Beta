@@ -96,16 +96,17 @@ public abstract class DualCameraView extends CameraView {
                 AndroidUtilities.cancelRunOnUIThread(runnable2);
                 this.longpressRunnable = null;
             }
-            if (isAtDual(this.tapX, this.tapY)) {
-                Runnable runnable3 = new Runnable() {
-                    @Override
-                    public final void run() {
-                        DualCameraView.this.lambda$checkTap$1();
-                    }
-                };
-                this.longpressRunnable = runnable3;
-                AndroidUtilities.runOnUIThread(runnable3, ViewConfiguration.getLongPressTimeout());
+            if (!isAtDual(this.tapX, this.tapY)) {
+                return false;
             }
+            Runnable runnable3 = new Runnable() {
+                @Override
+                public final void run() {
+                    DualCameraView.this.lambda$checkTap$1();
+                }
+            };
+            this.longpressRunnable = runnable3;
+            AndroidUtilities.runOnUIThread(runnable3, ViewConfiguration.getLongPressTimeout());
             return true;
         }
         if (motionEvent.getAction() == 1) {

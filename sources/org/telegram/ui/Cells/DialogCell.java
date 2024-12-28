@@ -98,6 +98,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private AvatarDrawable avatarDrawable;
     public ImageReceiver avatarImage;
     public int avatarStart;
+    private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable botVerification;
     private int bottomClip;
     private Paint buttonBackgroundPaint;
     private boolean buttonCreated;
@@ -151,6 +152,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     public boolean drawArchive;
     public boolean drawAvatar;
     public boolean drawAvatarSelector;
+    private boolean drawBotVerified;
     private boolean drawCheck1;
     private boolean drawCheck2;
     private boolean drawClock;
@@ -174,7 +176,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private boolean drawUnmute;
     private boolean drawVerified;
     public boolean drawingForBlur;
-    private AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable emojiStatus;
+    private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable emojiStatus;
     private TLRPC.EncryptedChat encryptedChat;
     private int errorLeft;
     private int errorTop;
@@ -569,6 +571,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 this.useForceThreeLines = z2;
                 this.currentAccount = i;
                 this.emojiStatus = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(22.0f));
+                this.botVerification = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(22.0f));
                 this.avatarImage.setAllowLoadingOnAttachedOnly(true);
                 return;
             }
@@ -1299,6 +1302,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         if (swapAnimatedEmojiDrawable != null) {
             swapAnimatedEmojiDrawable.attach();
         }
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.botVerification;
+        if (swapAnimatedEmojiDrawable2 != null) {
+            swapAnimatedEmojiDrawable2.attach();
+        }
     }
 
     @Override
@@ -1335,6 +1342,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         if (swapAnimatedEmojiDrawable != null) {
             swapAnimatedEmojiDrawable.detach();
         }
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.botVerification;
+        if (swapAnimatedEmojiDrawable2 != null) {
+            swapAnimatedEmojiDrawable2.detach();
+        }
         AnimatedEmojiSpan.release(this, this.animatedEmojiStack);
         AnimatedEmojiSpan.release(this, this.animatedEmojiStack2);
         AnimatedEmojiSpan.release(this, this.animatedEmojiStack3);
@@ -1344,7 +1355,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     }
 
     @Override
-    public void onDraw(android.graphics.Canvas r58) {
+    public void onDraw(android.graphics.Canvas r56) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.DialogCell.onDraw(android.graphics.Canvas):void");
     }
 
@@ -1472,10 +1483,14 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         setTranslationX(0.0f);
         setTranslationY(0.0f);
         AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = this.emojiStatus;
-        if (swapAnimatedEmojiDrawable == null || !this.attachedToWindow) {
+        if (swapAnimatedEmojiDrawable != null && this.attachedToWindow) {
+            swapAnimatedEmojiDrawable.attach();
+        }
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.botVerification;
+        if (swapAnimatedEmojiDrawable2 == null || !this.attachedToWindow) {
             return;
         }
-        swapAnimatedEmojiDrawable.attach();
+        swapAnimatedEmojiDrawable2.attach();
     }
 
     public void setArchivedPullAnimation(PullForegroundDrawable pullForegroundDrawable) {
@@ -1562,7 +1577,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         this.dialogsType = i;
         showPremiumBlocked(i == 3);
         if (this.tags == null) {
-            this.tags = new DialogCellTags();
+            this.tags = new DialogCellTags(this);
         }
         this.folderId = i2;
         this.messageId = 0;
@@ -1781,7 +1796,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         return update(i, true);
     }
 
-    public boolean update(int r40, boolean r41) {
+    public boolean update(int r44, boolean r45) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.DialogCell.update(int, boolean):boolean");
     }
 

@@ -1122,7 +1122,7 @@ public class MessageStatisticActivity extends BaseFragment implements Notificati
                 if (charSequence2.length() > 150) {
                     charSequence2 = charSequence2.subSequence(0, 150);
                 }
-                charSequence = Emoji.replaceEmoji(charSequence2, this.avatarContainer.getSubtitlePaint().getFontMetricsInt(), AndroidUtilities.dp(17.0f), false);
+                charSequence = Emoji.replaceEmoji(charSequence2, this.avatarContainer.getSubtitlePaint().getFontMetricsInt(), false);
             }
             if (this.messageObject.isVideo() || this.messageObject.isPhoto()) {
                 this.avatarContainer.hideSubtitle();

@@ -173,7 +173,7 @@ public class ShareDialogCell extends FrameLayout implements NotificationCenter.N
         TextView textView = new TextView(context) {
             @Override
             public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-                super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(10.0f), false), bufferType);
+                super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
             }
         };
         this.nameTextView = textView;

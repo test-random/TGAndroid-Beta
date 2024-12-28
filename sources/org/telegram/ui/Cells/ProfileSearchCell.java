@@ -319,7 +319,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
         TextUtils.TruncateAt truncateAt = TextUtils.TruncateAt.END;
         CharSequence ellipsize = TextUtils.ellipsize(charSequence2, textPaint5, dp5, truncateAt);
         if (ellipsize != null) {
-            ellipsize = Emoji.replaceEmoji(ellipsize, textPaint5.getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+            ellipsize = Emoji.replaceEmoji(ellipsize, textPaint5.getFontMetricsInt(), false);
         }
         int i8 = this.nameWidth;
         Layout.Alignment alignment = Layout.Alignment.ALIGN_NORMAL;

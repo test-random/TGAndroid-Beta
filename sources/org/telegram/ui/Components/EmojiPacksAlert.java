@@ -55,6 +55,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
@@ -1306,7 +1307,7 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
 
         public void lambda$init$0(TLRPC.TL_error tL_error, TLObject tLObject) {
             TLRPC.StickerSet stickerSet;
-            if (tL_error != null || !(tLObject instanceof TLRPC.Vector)) {
+            if (tL_error != null || !(tLObject instanceof Vector)) {
                 EmojiPacksAlert.this.dismiss();
                 if (EmojiPacksAlert.this.fragment == null || EmojiPacksAlert.this.fragment.getParentActivity() == null) {
                     return;
@@ -1314,7 +1315,7 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
                 BulletinFactory.of(EmojiPacksAlert.this.fragment).createErrorBulletin(LocaleController.getString(R.string.UnknownError)).show();
                 return;
             }
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+            Vector vector = (Vector) tLObject;
             if (this.inputStickerSets == null) {
                 this.inputStickerSets = new ArrayList();
             }

@@ -51,6 +51,7 @@ import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Cells.ChatActionCell;
 import org.telegram.ui.Cells.ChatMessageCell;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedFloat;
@@ -88,7 +89,7 @@ public class StarsReactionsSheet extends BottomSheet {
     private final GLIconTextureView icon3dView;
     private ValueAnimator iconAnimator;
     private final LinearLayout layout;
-    private ChatMessageCell messageCell;
+    private View messageCell;
     private int messageId;
     private final MessageObject messageObject;
     private final ArrayList reactors;
@@ -1226,46 +1227,54 @@ public class StarsReactionsSheet extends BottomSheet {
 
     private void animate3dIcon(final Runnable runnable) {
         View view;
-        final ChatMessageCell chatMessageCell;
-        final ReactionsLayoutInBubble.ReactionButton reactionButton;
+        ReactionsLayoutInBubble reactionsLayoutInBubble;
+        MessageObject messageObject;
         if (this.messageObject == null || (view = this.chatActivity.fragmentView) == null || !view.isAttachedToWindow()) {
             return;
         }
-        ChatMessageCell chatMessageCell2 = this.messageCell;
-        MessageObject messageObject = null;
-        ReactionsLayoutInBubble.ReactionButton reactionButton2 = chatMessageCell2 != null ? chatMessageCell2.reactionsLayoutInBubble.getReactionButton(ReactionsLayoutInBubble.VisibleReaction.asStar()) : null;
-        if (reactionButton2 == null) {
+        View view2 = this.messageCell;
+        if (view2 instanceof ChatMessageCell) {
+            reactionsLayoutInBubble = ((ChatMessageCell) view2).reactionsLayoutInBubble;
+        } else if (!(view2 instanceof ChatActionCell)) {
+            return;
+        } else {
+            reactionsLayoutInBubble = ((ChatActionCell) view2).reactionsLayoutInBubble;
+        }
+        ReactionsLayoutInBubble.ReactionButton reactionButton = reactionsLayoutInBubble.getReactionButton(ReactionsLayoutInBubble.VisibleReaction.asStar());
+        if (reactionButton == null) {
             MessageObject.GroupedMessages validGroupedMessage = this.chatActivity.getValidGroupedMessage(this.messageObject);
             if (validGroupedMessage != null && !validGroupedMessage.posArray.isEmpty()) {
                 Iterator<MessageObject> it = validGroupedMessage.messages.iterator();
                 while (true) {
                     if (!it.hasNext()) {
+                        messageObject = null;
                         break;
                     }
-                    MessageObject next = it.next();
-                    MessageObject.GroupedMessagePosition position = validGroupedMessage.getPosition(next);
+                    messageObject = it.next();
+                    MessageObject.GroupedMessagePosition position = validGroupedMessage.getPosition(messageObject);
                     if (position != null) {
                         int i = position.flags;
                         if ((i & 1) != 0 && (i & 8) != 0) {
-                            messageObject = next;
                             break;
                         }
                     }
                 }
                 if (messageObject != null) {
-                    chatMessageCell2 = this.chatActivity.findMessageCell(messageObject.getId(), false);
+                    view2 = this.chatActivity.findMessageCell(messageObject.getId(), false);
                 }
             }
-            if (chatMessageCell2 == null) {
+            if (view2 == null) {
                 return;
             }
-            chatMessageCell = chatMessageCell2;
-            reactionButton = chatMessageCell2.reactionsLayoutInBubble.getReactionButton(ReactionsLayoutInBubble.VisibleReaction.asStar());
-        } else {
-            chatMessageCell = chatMessageCell2;
-            reactionButton = reactionButton2;
+            if (view2 instanceof ChatMessageCell) {
+                reactionsLayoutInBubble = ((ChatMessageCell) view2).reactionsLayoutInBubble;
+                reactionButton = reactionsLayoutInBubble.getReactionButton(ReactionsLayoutInBubble.VisibleReaction.asStar());
+            }
         }
-        if (reactionButton == null) {
+        final View view3 = view2;
+        final ReactionsLayoutInBubble reactionsLayoutInBubble2 = reactionsLayoutInBubble;
+        final ReactionsLayoutInBubble.ReactionButton reactionButton2 = reactionButton;
+        if (reactionButton2 == null) {
             return;
         }
         final int[] iArr = new int[2];
@@ -1280,13 +1289,13 @@ public class StarsReactionsSheet extends BottomSheet {
                 StarsReactionsSheet.this.lambda$animate3dIcon$9();
             }
         });
-        reactionButton.drawImage = false;
-        chatMessageCell.invalidate();
+        reactionButton2.drawImage = false;
+        view3.invalidate();
         final RectF rectF2 = new RectF();
         final Runnable runnable2 = new Runnable() {
             @Override
             public final void run() {
-                StarsReactionsSheet.lambda$animate3dIcon$10(ChatMessageCell.this, iArr, rectF2, reactionButton);
+                StarsReactionsSheet.lambda$animate3dIcon$10(view3, iArr, rectF2, reactionsLayoutInBubble2, reactionButton2);
             }
         };
         runnable2.run();
@@ -1311,17 +1320,15 @@ public class StarsReactionsSheet extends BottomSheet {
                 StarsReactionsSheet.this.lambda$animate3dIcon$11(runnable2, rectF, rectF2, rectF3, zArr, runnable, valueAnimator2);
             }
         });
-        final ReactionsLayoutInBubble.ReactionButton reactionButton3 = reactionButton;
-        final ChatMessageCell chatMessageCell3 = chatMessageCell;
         this.iconAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animator) {
                 StarsReactionsSheet.this.icon3dView.setVisibility(4);
                 StarsReactionsSheet.this.icon3dView.setPaused(true);
-                reactionButton3.drawImage = true;
-                ChatMessageCell chatMessageCell4 = chatMessageCell3;
-                if (chatMessageCell4 != null) {
-                    chatMessageCell4.invalidate();
+                reactionButton2.drawImage = true;
+                View view4 = view3;
+                if (view4 != null) {
+                    view4.invalidate();
                 }
                 StarsReactionsSheet.super.dismissInternal();
                 boolean[] zArr2 = zArr;
@@ -1381,9 +1388,9 @@ public class StarsReactionsSheet extends BottomSheet {
         }
     }
 
-    public static void lambda$animate3dIcon$10(ChatMessageCell chatMessageCell, int[] iArr, RectF rectF, ReactionsLayoutInBubble.ReactionButton reactionButton) {
-        chatMessageCell.getLocationInWindow(iArr);
-        rectF.set(iArr[0] + chatMessageCell.reactionsLayoutInBubble.x + reactionButton.x + AndroidUtilities.dp(4.0f), iArr[1] + chatMessageCell.reactionsLayoutInBubble.y + reactionButton.y + ((reactionButton.height - AndroidUtilities.dp(22.0f)) / 2.0f), iArr[0] + chatMessageCell.reactionsLayoutInBubble.x + reactionButton.x + AndroidUtilities.dp(26.0f), iArr[1] + chatMessageCell.reactionsLayoutInBubble.y + reactionButton.y + ((reactionButton.height + AndroidUtilities.dp(22.0f)) / 2.0f));
+    public static void lambda$animate3dIcon$10(View view, int[] iArr, RectF rectF, ReactionsLayoutInBubble reactionsLayoutInBubble, ReactionsLayoutInBubble.ReactionButton reactionButton) {
+        view.getLocationInWindow(iArr);
+        rectF.set(iArr[0] + reactionsLayoutInBubble.x + reactionButton.x + AndroidUtilities.dp(4.0f), iArr[1] + reactionsLayoutInBubble.y + reactionButton.y + ((reactionButton.height - AndroidUtilities.dp(22.0f)) / 2.0f), iArr[0] + reactionsLayoutInBubble.x + reactionButton.x + AndroidUtilities.dp(26.0f), iArr[1] + reactionsLayoutInBubble.y + reactionButton.y + ((reactionButton.height + AndroidUtilities.dp(22.0f)) / 2.0f));
     }
 
     public void lambda$animate3dIcon$11(Runnable runnable, RectF rectF, RectF rectF2, RectF rectF3, boolean[] zArr, Runnable runnable2, ValueAnimator valueAnimator) {
@@ -1550,10 +1557,10 @@ public class StarsReactionsSheet extends BottomSheet {
         }
     }
 
-    public void setMessageCell(ChatActivity chatActivity, int i, ChatMessageCell chatMessageCell) {
+    public void setMessageCell(ChatActivity chatActivity, int i, View view) {
         this.chatActivity = chatActivity;
         this.messageId = i;
-        this.messageCell = chatMessageCell;
+        this.messageCell = view;
     }
 
     public void updateSenders(long j) {

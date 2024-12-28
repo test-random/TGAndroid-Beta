@@ -610,12 +610,12 @@ public abstract class StoriesUtilities {
     }
 
     public static CharSequence createExpiredStoryString() {
-        return createExpiredStoryString(false, "ExpiredStory", R.string.ExpiredStory, new Object[0]);
+        return createExpiredStoryString(false, R.string.ExpiredStory, new Object[0]);
     }
 
-    public static CharSequence createExpiredStoryString(boolean z, String str, int i, Object... objArr) {
+    public static CharSequence createExpiredStoryString(boolean z, int i, Object... objArr) {
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-        spannableStringBuilder.append((CharSequence) "d ").append((CharSequence) LocaleController.formatString(str, i, objArr));
+        spannableStringBuilder.append((CharSequence) "d ").append((CharSequence) LocaleController.formatString(i, objArr));
         ColoredImageSpan coloredImageSpan = new ColoredImageSpan(R.drawable.msg_mini_bomb);
         if (z) {
             coloredImageSpan.setScale(0.8f, 0.8f);

@@ -343,7 +343,7 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
                 try {
                     try {
                         this.innerTextChange = 2;
-                        CharSequence replaceEmoji = Emoji.replaceEmoji((CharSequence) str, textPaintView.getFontMetricsInt(), (int) (textPaintView.getFontSize() * 0.8f), false);
+                        CharSequence replaceEmoji = Emoji.replaceEmoji(str, textPaintView.getFontMetricsInt(), false);
                         if ((replaceEmoji instanceof Spanned) && (emojiSpanArr = (Emoji.EmojiSpan[]) ((Spanned) replaceEmoji).getSpans(0, replaceEmoji.length(), Emoji.EmojiSpan.class)) != null) {
                             for (Emoji.EmojiSpan emojiSpan : emojiSpanArr) {
                                 emojiSpan.scale = 0.85f;
@@ -847,7 +847,7 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
                         size = size;
                     }
                     i3 = size;
-                    CharSequence replaceEmoji = Emoji.replaceEmoji((CharSequence) spannableString, createText.getFontMetricsInt(), (int) (createText.getFontSize() * 0.8f), false);
+                    CharSequence replaceEmoji = Emoji.replaceEmoji(spannableString, createText.getFontMetricsInt(), false);
                     if ((replaceEmoji instanceof Spanned) && (emojiSpanArr = (Emoji.EmojiSpan[]) ((Spanned) replaceEmoji).getSpans(0, replaceEmoji.length(), Emoji.EmojiSpan.class)) != null) {
                         for (Emoji.EmojiSpan emojiSpan : emojiSpanArr) {
                             emojiSpan.scale = 0.85f;
@@ -3168,7 +3168,6 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
             basePhotoSize.height = f;
         }
         PhotoView photoView = new PhotoView(getContext(), centerPositionForEntity(), 0.0f, 1.0f, basePhotoSize, str, ((Integer) imageOrientation.first).intValue(), ((Integer) imageOrientation.second).intValue());
-        photoView.centerImage.setLayerNum(12);
         photoView.setDelegate(this);
         this.entitiesView.addView(photoView);
         if (z) {

@@ -11,6 +11,7 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 
 public class UserConfig extends BaseController {
     private static volatile UserConfig[] Instance = new UserConfig[4];
@@ -67,7 +68,7 @@ public class UserConfig extends BaseController {
     public boolean suggestContacts;
     private final Object sync;
     public boolean syncContacts;
-    public TLRPC.TL_account_tmpPassword tmpPassword;
+    public TL_account.tmpPassword tmpPassword;
     boolean ttlIsLoading;
     public TLRPC.TL_help_termsOfService unacceptedTermsOfService;
     public boolean unreadDialogsLoaded;

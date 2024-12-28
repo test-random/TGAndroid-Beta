@@ -534,7 +534,7 @@ public class LinkEditActivity extends BaseFragment {
         setUsesVisible(!tL_chatInviteExported.request_needed);
         if (!TextUtils.isEmpty(tL_chatInviteExported.title)) {
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(tL_chatInviteExported.title);
-            Emoji.replaceEmoji((CharSequence) spannableStringBuilder, this.nameEditText.getPaint().getFontMetricsInt(), (int) this.nameEditText.getPaint().getTextSize(), false);
+            Emoji.replaceEmoji(spannableStringBuilder, this.nameEditText.getPaint().getFontMetricsInt(), false);
             this.nameEditText.setText(spannableStringBuilder);
         }
         TextCheckCell textCheckCell2 = this.subCell;

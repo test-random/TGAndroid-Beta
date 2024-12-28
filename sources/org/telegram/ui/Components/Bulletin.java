@@ -1303,7 +1303,7 @@ public class Bulletin {
 
             @Override
             public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-                super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(13.0f), false), bufferType);
+                super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
             }
         }
 
@@ -1321,7 +1321,7 @@ public class Bulletin {
 
                 @Override
                 public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-                    super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(13.0f), false), bufferType);
+                    super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
                 }
             };
             this.textView = anonymousClass1;
@@ -2206,7 +2206,7 @@ public class Bulletin {
 
             @Override
             public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-                super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(13.0f), false), bufferType);
+                super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
             }
         }
 
@@ -2217,7 +2217,7 @@ public class Bulletin {
 
             @Override
             public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-                super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(13.0f), false), bufferType);
+                super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
             }
         }
 
@@ -2240,7 +2240,7 @@ public class Bulletin {
 
                     @Override
                     public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-                        super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(13.0f), false), bufferType);
+                        super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
                     }
                 };
                 this.textView = anonymousClass2;
@@ -2272,7 +2272,7 @@ public class Bulletin {
 
                     @Override
                     public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-                        super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(13.0f), false), bufferType);
+                        super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
                     }
                 };
                 this.textView = anonymousClass1;

@@ -88,6 +88,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -3403,7 +3404,7 @@ public abstract class SelectAnimatedEmojiDialog extends FrameLayout implements N
     }
 
     public void lambda$onRecentLongClick$5(DialogInterface dialogInterface, int i) {
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_clearRecentEmojiStatuses(), null);
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.clearRecentEmojiStatuses(), null);
         MediaDataController.getInstance(this.currentAccount).clearRecentEmojiStatuses();
         updateRows(false, true);
     }

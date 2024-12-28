@@ -1,101 +1,54 @@
 package org.telegram.tgnet.tl;
 
 import java.util.ArrayList;
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1;
+import org.telegram.tgnet.TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1;
+import org.telegram.tgnet.TLRPC$TL_contacts_found$$ExternalSyntheticLambda0;
+import org.telegram.tgnet.Vector;
 
 public class TL_chatlists {
 
     public static class TL_chatlists_chatlistInvite extends chatlist_ChatlistInvite {
-        public static final int constructor = 500007837;
+        public static final int constructor = -250687953;
         public String emoticon;
         public int flags;
-        public String title;
+        public boolean title_noanimate;
+        public TLRPC.TL_textWithEntities title = new TLRPC.TL_textWithEntities();
         public ArrayList<TLRPC.Peer> peers = new ArrayList<>();
         public ArrayList<TLRPC.Chat> chats = new ArrayList<>();
         public ArrayList<TLRPC.User> users = new ArrayList<>();
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.flags = abstractSerializedData.readInt32(z);
-            this.title = abstractSerializedData.readString(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(z);
+            this.flags = readInt32;
+            this.title_noanimate = (readInt32 & 2) != 0;
+            this.title = TLRPC.TL_textWithEntities.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             if ((this.flags & 1) > 0) {
-                this.emoticon = abstractSerializedData.readString(z);
+                this.emoticon = inputSerializedData.readString(z);
             }
-            int readInt32 = abstractSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                }
-                return;
-            }
-            int readInt322 = abstractSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.peers.add(TLdeserialize);
-            }
-            int readInt323 = abstractSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = abstractSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.chats.add(TLdeserialize2);
-            }
-            int readInt325 = abstractSerializedData.readInt32(z);
-            if (readInt325 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
-                }
-                return;
-            }
-            int readInt326 = abstractSerializedData.readInt32(z);
-            for (int i3 = 0; i3 < readInt326; i3++) {
-                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-                if (TLdeserialize3 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize3);
-            }
+            this.peers = Vector.deserialize(inputSerializedData, new TLRPC$TL_contacts_found$$ExternalSyntheticLambda0(), z);
+            this.chats = Vector.deserialize(inputSerializedData, new TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1(), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(500007837);
-            abstractSerializedData.writeInt32(this.flags);
-            abstractSerializedData.writeString(this.title);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-250687953);
+            int i = this.title_noanimate ? this.flags | 2 : this.flags & (-3);
+            this.flags = i;
+            outputSerializedData.writeInt32(i);
+            this.title.serializeToStream(outputSerializedData);
             if ((this.flags & 1) > 0) {
-                abstractSerializedData.writeString(this.emoticon);
+                outputSerializedData.writeString(this.emoticon);
             }
-            abstractSerializedData.writeInt32(481674261);
-            int size = this.peers.size();
-            abstractSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.peers.get(i).serializeToStream(abstractSerializedData);
-            }
-            abstractSerializedData.writeInt32(481674261);
-            int size2 = this.chats.size();
-            abstractSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.chats.get(i2).serializeToStream(abstractSerializedData);
-            }
-            abstractSerializedData.writeInt32(481674261);
-            int size3 = this.users.size();
-            abstractSerializedData.writeInt32(size3);
-            for (int i3 = 0; i3 < size3; i3++) {
-                this.users.get(i3).serializeToStream(abstractSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.peers);
+            Vector.serialize(outputSerializedData, this.chats);
+            Vector.serialize(outputSerializedData, this.users);
         }
     }
 
@@ -108,63 +61,63 @@ public class TL_chatlists {
         public ArrayList<TLRPC.User> users = new ArrayList<>();
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.filter_id = abstractSerializedData.readInt32(z);
-            int readInt32 = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.filter_id = inputSerializedData.readInt32(z);
+            int readInt32 = inputSerializedData.readInt32(z);
             if (readInt32 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
                 }
                 return;
             }
-            int readInt322 = abstractSerializedData.readInt32(z);
+            int readInt322 = inputSerializedData.readInt32(z);
             for (int i = 0; i < readInt322; i++) {
-                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize == null) {
                     return;
                 }
                 this.missing_peers.add(TLdeserialize);
             }
-            int readInt323 = abstractSerializedData.readInt32(z);
+            int readInt323 = inputSerializedData.readInt32(z);
             if (readInt323 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
                 }
                 return;
             }
-            int readInt324 = abstractSerializedData.readInt32(z);
+            int readInt324 = inputSerializedData.readInt32(z);
             for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.Peer TLdeserialize2 = TLRPC.Peer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.Peer TLdeserialize2 = TLRPC.Peer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize2 == null) {
                     return;
                 }
                 this.already_peers.add(TLdeserialize2);
             }
-            int readInt325 = abstractSerializedData.readInt32(z);
+            int readInt325 = inputSerializedData.readInt32(z);
             if (readInt325 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
                 }
                 return;
             }
-            int readInt326 = abstractSerializedData.readInt32(z);
+            int readInt326 = inputSerializedData.readInt32(z);
             for (int i3 = 0; i3 < readInt326; i3++) {
-                TLRPC.Chat TLdeserialize3 = TLRPC.Chat.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.Chat TLdeserialize3 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize3 == null) {
                     return;
                 }
                 this.chats.add(TLdeserialize3);
             }
-            int readInt327 = abstractSerializedData.readInt32(z);
+            int readInt327 = inputSerializedData.readInt32(z);
             if (readInt327 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt327)));
                 }
                 return;
             }
-            int readInt328 = abstractSerializedData.readInt32(z);
+            int readInt328 = inputSerializedData.readInt32(z);
             for (int i4 = 0; i4 < readInt328; i4++) {
-                TLRPC.User TLdeserialize4 = TLRPC.User.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.User TLdeserialize4 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize4 == null) {
                     return;
                 }
@@ -173,26 +126,114 @@ public class TL_chatlists {
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-91752871);
-            abstractSerializedData.writeInt32(this.filter_id);
-            abstractSerializedData.writeInt32(481674261);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-91752871);
+            outputSerializedData.writeInt32(this.filter_id);
+            outputSerializedData.writeInt32(481674261);
             int size = this.missing_peers.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i = 0; i < size; i++) {
-                this.missing_peers.get(i).serializeToStream(abstractSerializedData);
+                this.missing_peers.get(i).serializeToStream(outputSerializedData);
             }
-            abstractSerializedData.writeInt32(481674261);
+            outputSerializedData.writeInt32(481674261);
             int size2 = this.chats.size();
-            abstractSerializedData.writeInt32(size2);
+            outputSerializedData.writeInt32(size2);
             for (int i2 = 0; i2 < size2; i2++) {
-                this.chats.get(i2).serializeToStream(abstractSerializedData);
+                this.chats.get(i2).serializeToStream(outputSerializedData);
             }
-            abstractSerializedData.writeInt32(481674261);
+            outputSerializedData.writeInt32(481674261);
             int size3 = this.users.size();
-            abstractSerializedData.writeInt32(size3);
+            outputSerializedData.writeInt32(size3);
             for (int i3 = 0; i3 < size3; i3++) {
-                this.users.get(i3).serializeToStream(abstractSerializedData);
+                this.users.get(i3).serializeToStream(outputSerializedData);
+            }
+        }
+    }
+
+    public static class TL_chatlists_chatlistInvite_layer195 extends TL_chatlists_chatlistInvite {
+        public static final int constructor = 500007837;
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.flags = inputSerializedData.readInt32(z);
+            TLRPC.TL_textWithEntities tL_textWithEntities = new TLRPC.TL_textWithEntities();
+            this.title = tL_textWithEntities;
+            tL_textWithEntities.text = inputSerializedData.readString(z);
+            if ((this.flags & 1) > 0) {
+                this.emoticon = inputSerializedData.readString(z);
+            }
+            int readInt32 = inputSerializedData.readInt32(z);
+            if (readInt32 != 481674261) {
+                if (z) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
+                }
+                return;
+            }
+            int readInt322 = inputSerializedData.readInt32(z);
+            for (int i = 0; i < readInt322; i++) {
+                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+                if (TLdeserialize == null) {
+                    return;
+                }
+                this.peers.add(TLdeserialize);
+            }
+            int readInt323 = inputSerializedData.readInt32(z);
+            if (readInt323 != 481674261) {
+                if (z) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
+                }
+                return;
+            }
+            int readInt324 = inputSerializedData.readInt32(z);
+            for (int i2 = 0; i2 < readInt324; i2++) {
+                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+                if (TLdeserialize2 == null) {
+                    return;
+                }
+                this.chats.add(TLdeserialize2);
+            }
+            int readInt325 = inputSerializedData.readInt32(z);
+            if (readInt325 != 481674261) {
+                if (z) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
+                }
+                return;
+            }
+            int readInt326 = inputSerializedData.readInt32(z);
+            for (int i3 = 0; i3 < readInt326; i3++) {
+                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+                if (TLdeserialize3 == null) {
+                    return;
+                }
+                this.users.add(TLdeserialize3);
+            }
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(500007837);
+            outputSerializedData.writeInt32(this.flags);
+            this.title.serializeToStream(outputSerializedData);
+            if ((this.flags & 1) > 0) {
+                outputSerializedData.writeString(this.emoticon);
+            }
+            outputSerializedData.writeInt32(481674261);
+            int size = this.peers.size();
+            outputSerializedData.writeInt32(size);
+            for (int i = 0; i < size; i++) {
+                this.peers.get(i).serializeToStream(outputSerializedData);
+            }
+            outputSerializedData.writeInt32(481674261);
+            int size2 = this.chats.size();
+            outputSerializedData.writeInt32(size2);
+            for (int i2 = 0; i2 < size2; i2++) {
+                this.chats.get(i2).serializeToStream(outputSerializedData);
+            }
+            outputSerializedData.writeInt32(481674261);
+            int size3 = this.users.size();
+            outputSerializedData.writeInt32(size3);
+            for (int i3 = 0; i3 < size3; i3++) {
+                this.users.get(i3).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -203,7 +244,7 @@ public class TL_chatlists {
         public ArrayList<TLRPC.Chat> chats = new ArrayList<>();
         public ArrayList<TLRPC.User> users = new ArrayList<>();
 
-        public static TL_chatlists_chatlistUpdates TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static TL_chatlists_chatlistUpdates TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             if (-1816295539 != i) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in TL_chatlists_chatlistUpdates", Integer.valueOf(i)));
@@ -211,52 +252,52 @@ public class TL_chatlists {
                 return null;
             }
             TL_chatlists_chatlistUpdates tL_chatlists_chatlistUpdates = new TL_chatlists_chatlistUpdates();
-            tL_chatlists_chatlistUpdates.readParams(abstractSerializedData, z);
+            tL_chatlists_chatlistUpdates.readParams(inputSerializedData, z);
             return tL_chatlists_chatlistUpdates;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(z);
             if (readInt32 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
                 }
                 return;
             }
-            int readInt322 = abstractSerializedData.readInt32(z);
+            int readInt322 = inputSerializedData.readInt32(z);
             for (int i = 0; i < readInt322; i++) {
-                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize == null) {
                     return;
                 }
                 this.missing_peers.add(TLdeserialize);
             }
-            int readInt323 = abstractSerializedData.readInt32(z);
+            int readInt323 = inputSerializedData.readInt32(z);
             if (readInt323 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
                 }
                 return;
             }
-            int readInt324 = abstractSerializedData.readInt32(z);
+            int readInt324 = inputSerializedData.readInt32(z);
             for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize2 == null) {
                     return;
                 }
                 this.chats.add(TLdeserialize2);
             }
-            int readInt325 = abstractSerializedData.readInt32(z);
+            int readInt325 = inputSerializedData.readInt32(z);
             if (readInt325 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
                 }
                 return;
             }
-            int readInt326 = abstractSerializedData.readInt32(z);
+            int readInt326 = inputSerializedData.readInt32(z);
             for (int i3 = 0; i3 < readInt326; i3++) {
-                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize3 == null) {
                     return;
                 }
@@ -265,25 +306,25 @@ public class TL_chatlists {
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-1816295539);
-            abstractSerializedData.writeInt32(481674261);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-1816295539);
+            outputSerializedData.writeInt32(481674261);
             int size = this.missing_peers.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i = 0; i < size; i++) {
-                this.missing_peers.get(i).serializeToStream(abstractSerializedData);
+                this.missing_peers.get(i).serializeToStream(outputSerializedData);
             }
-            abstractSerializedData.writeInt32(481674261);
+            outputSerializedData.writeInt32(481674261);
             int size2 = this.chats.size();
-            abstractSerializedData.writeInt32(size2);
+            outputSerializedData.writeInt32(size2);
             for (int i2 = 0; i2 < size2; i2++) {
-                this.chats.get(i2).serializeToStream(abstractSerializedData);
+                this.chats.get(i2).serializeToStream(outputSerializedData);
             }
-            abstractSerializedData.writeInt32(481674261);
+            outputSerializedData.writeInt32(481674261);
             int size3 = this.users.size();
-            abstractSerializedData.writeInt32(size3);
+            outputSerializedData.writeInt32(size3);
             for (int i3 = 0; i3 < size3; i3++) {
-                this.users.get(i3).serializeToStream(abstractSerializedData);
+                this.users.get(i3).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -293,14 +334,14 @@ public class TL_chatlists {
         public String slug;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return chatlist_ChatlistInvite.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return chatlist_ChatlistInvite.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1103171583);
-            abstractSerializedData.writeString(this.slug);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1103171583);
+            outputSerializedData.writeString(this.slug);
         }
     }
 
@@ -310,15 +351,15 @@ public class TL_chatlists {
         public String slug;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TLRPC.Bool.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TLRPC.Bool.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1906072670);
-            this.chatlist.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeString(this.slug);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1906072670);
+            this.chatlist.serializeToStream(outputSerializedData);
+            outputSerializedData.writeString(this.slug);
         }
     }
 
@@ -332,27 +373,27 @@ public class TL_chatlists {
         public String title;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TL_exportedChatlistInvite.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TL_exportedChatlistInvite.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1698543165);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1698543165);
             int i = this.revoked ? this.flags | 1 : this.flags & (-2);
             this.flags = i;
-            abstractSerializedData.writeInt32(i);
-            this.chatlist.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeString(this.slug);
+            outputSerializedData.writeInt32(i);
+            this.chatlist.serializeToStream(outputSerializedData);
+            outputSerializedData.writeString(this.slug);
             if ((this.flags & 2) != 0) {
-                abstractSerializedData.writeString(this.title);
+                outputSerializedData.writeString(this.title);
             }
             if ((this.flags & 4) != 0) {
-                abstractSerializedData.writeInt32(481674261);
+                outputSerializedData.writeInt32(481674261);
                 int size = this.peers.size();
-                abstractSerializedData.writeInt32(size);
+                outputSerializedData.writeInt32(size);
                 for (int i2 = 0; i2 < size; i2++) {
-                    this.peers.get(i2).serializeToStream(abstractSerializedData);
+                    this.peers.get(i2).serializeToStream(outputSerializedData);
                 }
             }
         }
@@ -365,20 +406,20 @@ public class TL_chatlists {
         public String title;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TL_chatlists_exportedChatlistInvite.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TL_chatlists_exportedChatlistInvite.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-2072885362);
-            this.chatlist.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeString(this.title);
-            abstractSerializedData.writeInt32(481674261);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-2072885362);
+            this.chatlist.serializeToStream(outputSerializedData);
+            outputSerializedData.writeString(this.title);
+            outputSerializedData.writeInt32(481674261);
             int size = this.peers.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i = 0; i < size; i++) {
-                this.peers.get(i).serializeToStream(abstractSerializedData);
+                this.peers.get(i).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -388,7 +429,7 @@ public class TL_chatlists {
         public TLRPC.DialogFilter filter;
         public TL_exportedChatlistInvite invite;
 
-        public static TL_chatlists_exportedChatlistInvite TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static TL_chatlists_exportedChatlistInvite TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             if (283567014 != i) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in TL_chatlists_exportedChatlistInvite", Integer.valueOf(i)));
@@ -396,21 +437,21 @@ public class TL_chatlists {
                 return null;
             }
             TL_chatlists_exportedChatlistInvite tL_chatlists_exportedChatlistInvite = new TL_chatlists_exportedChatlistInvite();
-            tL_chatlists_exportedChatlistInvite.readParams(abstractSerializedData, z);
+            tL_chatlists_exportedChatlistInvite.readParams(inputSerializedData, z);
             return tL_chatlists_exportedChatlistInvite;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.filter = TLRPC.DialogFilter.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-            this.invite = TL_exportedChatlistInvite.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.filter = TLRPC.DialogFilter.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+            this.invite = TL_exportedChatlistInvite.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(283567014);
-            this.filter.serializeToStream(abstractSerializedData);
-            this.invite.serializeToStream(abstractSerializedData);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(283567014);
+            this.filter.serializeToStream(outputSerializedData);
+            this.invite.serializeToStream(outputSerializedData);
         }
     }
 
@@ -420,7 +461,7 @@ public class TL_chatlists {
         public ArrayList<TLRPC.Chat> chats = new ArrayList<>();
         public ArrayList<TLRPC.User> users = new ArrayList<>();
 
-        public static TL_chatlists_exportedInvites TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static TL_chatlists_exportedInvites TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             if (279670215 != i) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in TL_chatlists_exportedInvites", Integer.valueOf(i)));
@@ -428,52 +469,52 @@ public class TL_chatlists {
                 return null;
             }
             TL_chatlists_exportedInvites tL_chatlists_exportedInvites = new TL_chatlists_exportedInvites();
-            tL_chatlists_exportedInvites.readParams(abstractSerializedData, z);
+            tL_chatlists_exportedInvites.readParams(inputSerializedData, z);
             return tL_chatlists_exportedInvites;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(z);
             if (readInt32 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
                 }
                 return;
             }
-            int readInt322 = abstractSerializedData.readInt32(z);
+            int readInt322 = inputSerializedData.readInt32(z);
             for (int i = 0; i < readInt322; i++) {
-                TL_exportedChatlistInvite TLdeserialize = TL_exportedChatlistInvite.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TL_exportedChatlistInvite TLdeserialize = TL_exportedChatlistInvite.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize == null) {
                     return;
                 }
                 this.invites.add(TLdeserialize);
             }
-            int readInt323 = abstractSerializedData.readInt32(z);
+            int readInt323 = inputSerializedData.readInt32(z);
             if (readInt323 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
                 }
                 return;
             }
-            int readInt324 = abstractSerializedData.readInt32(z);
+            int readInt324 = inputSerializedData.readInt32(z);
             for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize2 == null) {
                     return;
                 }
                 this.chats.add(TLdeserialize2);
             }
-            int readInt325 = abstractSerializedData.readInt32(z);
+            int readInt325 = inputSerializedData.readInt32(z);
             if (readInt325 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
                 }
                 return;
             }
-            int readInt326 = abstractSerializedData.readInt32(z);
+            int readInt326 = inputSerializedData.readInt32(z);
             for (int i3 = 0; i3 < readInt326; i3++) {
-                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize3 == null) {
                     return;
                 }
@@ -482,25 +523,25 @@ public class TL_chatlists {
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(279670215);
-            abstractSerializedData.writeInt32(481674261);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(279670215);
+            outputSerializedData.writeInt32(481674261);
             int size = this.invites.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i = 0; i < size; i++) {
-                this.invites.get(i).serializeToStream(abstractSerializedData);
+                this.invites.get(i).serializeToStream(outputSerializedData);
             }
-            abstractSerializedData.writeInt32(481674261);
+            outputSerializedData.writeInt32(481674261);
             int size2 = this.chats.size();
-            abstractSerializedData.writeInt32(size2);
+            outputSerializedData.writeInt32(size2);
             for (int i2 = 0; i2 < size2; i2++) {
-                this.chats.get(i2).serializeToStream(abstractSerializedData);
+                this.chats.get(i2).serializeToStream(outputSerializedData);
             }
-            abstractSerializedData.writeInt32(481674261);
+            outputSerializedData.writeInt32(481674261);
             int size3 = this.users.size();
-            abstractSerializedData.writeInt32(size3);
+            outputSerializedData.writeInt32(size3);
             for (int i3 = 0; i3 < size3; i3++) {
-                this.users.get(i3).serializeToStream(abstractSerializedData);
+                this.users.get(i3).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -510,14 +551,14 @@ public class TL_chatlists {
         public TL_inputChatlistDialogFilter chatlist;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TL_chatlists_chatlistUpdates.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TL_chatlists_chatlistUpdates.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-1992190687);
-            this.chatlist.serializeToStream(abstractSerializedData);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-1992190687);
+            this.chatlist.serializeToStream(outputSerializedData);
         }
     }
 
@@ -526,14 +567,14 @@ public class TL_chatlists {
         public TL_inputChatlistDialogFilter chatlist;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TL_chatlists_exportedInvites.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TL_chatlists_exportedInvites.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-838608253);
-            this.chatlist.serializeToStream(abstractSerializedData);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-838608253);
+            this.chatlist.serializeToStream(outputSerializedData);
         }
     }
 
@@ -542,23 +583,14 @@ public class TL_chatlists {
         public TL_inputChatlistDialogFilter chatlist;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            TLRPC.Vector vector = new TLRPC.Vector();
-            int readInt32 = abstractSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt32; i2++) {
-                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return vector;
-                }
-                vector.objects.add(TLdeserialize);
-            }
-            return vector;
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return Vector.TLDeserialize(inputSerializedData, i, z, new TLRPC$TL_contacts_found$$ExternalSyntheticLambda0());
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-37955820);
-            this.chatlist.serializeToStream(abstractSerializedData);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-37955820);
+            this.chatlist.serializeToStream(outputSerializedData);
         }
     }
 
@@ -567,14 +599,14 @@ public class TL_chatlists {
         public TL_inputChatlistDialogFilter chatlist;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TLRPC.Bool.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TLRPC.Bool.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1726252795);
-            this.chatlist.serializeToStream(abstractSerializedData);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1726252795);
+            this.chatlist.serializeToStream(outputSerializedData);
         }
     }
 
@@ -584,19 +616,19 @@ public class TL_chatlists {
         public String slug;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TLRPC.Updates.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TLRPC.Updates.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-1498291302);
-            abstractSerializedData.writeString(this.slug);
-            abstractSerializedData.writeInt32(481674261);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-1498291302);
+            outputSerializedData.writeString(this.slug);
+            outputSerializedData.writeInt32(481674261);
             int size = this.peers.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i = 0; i < size; i++) {
-                this.peers.get(i).serializeToStream(abstractSerializedData);
+                this.peers.get(i).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -607,19 +639,19 @@ public class TL_chatlists {
         public ArrayList<TLRPC.InputPeer> peers = new ArrayList<>();
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TLRPC.Updates.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TLRPC.Updates.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-527828747);
-            this.chatlist.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeInt32(481674261);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-527828747);
+            this.chatlist.serializeToStream(outputSerializedData);
+            outputSerializedData.writeInt32(481674261);
             int size = this.peers.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i = 0; i < size; i++) {
-                this.peers.get(i).serializeToStream(abstractSerializedData);
+                this.peers.get(i).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -630,19 +662,19 @@ public class TL_chatlists {
         public ArrayList<TLRPC.InputPeer> peers = new ArrayList<>();
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TLRPC.Updates.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TLRPC.Updates.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1962598714);
-            this.chatlist.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeInt32(481674261);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1962598714);
+            this.chatlist.serializeToStream(outputSerializedData);
+            outputSerializedData.writeInt32(481674261);
             int size = this.peers.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i = 0; i < size; i++) {
-                this.peers.get(i).serializeToStream(abstractSerializedData);
+                this.peers.get(i).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -655,7 +687,7 @@ public class TL_chatlists {
         public String title;
         public String url;
 
-        public static TL_exportedChatlistInvite TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static TL_exportedChatlistInvite TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             if (206668204 != i) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in TL_exportedChatlistInvite", Integer.valueOf(i)));
@@ -663,27 +695,27 @@ public class TL_chatlists {
                 return null;
             }
             TL_exportedChatlistInvite tL_exportedChatlistInvite = new TL_exportedChatlistInvite();
-            tL_exportedChatlistInvite.readParams(abstractSerializedData, z);
+            tL_exportedChatlistInvite.readParams(inputSerializedData, z);
             return tL_exportedChatlistInvite;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(z);
             this.flags = readInt32;
             this.revoked = (readInt32 & 1) != 0;
-            this.title = abstractSerializedData.readString(z);
-            this.url = abstractSerializedData.readString(z);
-            int readInt322 = abstractSerializedData.readInt32(z);
+            this.title = inputSerializedData.readString(z);
+            this.url = inputSerializedData.readString(z);
+            int readInt322 = inputSerializedData.readInt32(z);
             if (readInt322 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
                 }
                 return;
             }
-            int readInt323 = abstractSerializedData.readInt32(z);
+            int readInt323 = inputSerializedData.readInt32(z);
             for (int i = 0; i < readInt323; i++) {
-                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                TLRPC.Peer TLdeserialize = TLRPC.Peer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
                 if (TLdeserialize == null) {
                     return;
                 }
@@ -692,18 +724,18 @@ public class TL_chatlists {
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(206668204);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(206668204);
             int i = this.revoked ? this.flags | 1 : this.flags & (-2);
             this.flags = i;
-            abstractSerializedData.writeInt32(i);
-            abstractSerializedData.writeString(this.title);
-            abstractSerializedData.writeString(this.url);
-            abstractSerializedData.writeInt32(481674261);
+            outputSerializedData.writeInt32(i);
+            outputSerializedData.writeString(this.title);
+            outputSerializedData.writeString(this.url);
+            outputSerializedData.writeInt32(481674261);
             int size = this.peers.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i2 = 0; i2 < size; i2++) {
-                this.peers.get(i2).serializeToStream(abstractSerializedData);
+                this.peers.get(i2).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -712,7 +744,7 @@ public class TL_chatlists {
         public static final int constructor = -203367885;
         public int filter_id;
 
-        public static TL_inputChatlistDialogFilter TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static TL_inputChatlistDialogFilter TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             if (-203367885 != i) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in TL_inputChatlistDialogFilter", Integer.valueOf(i)));
@@ -720,32 +752,32 @@ public class TL_chatlists {
                 return null;
             }
             TL_inputChatlistDialogFilter tL_inputChatlistDialogFilter = new TL_inputChatlistDialogFilter();
-            tL_inputChatlistDialogFilter.readParams(abstractSerializedData, z);
+            tL_inputChatlistDialogFilter.readParams(inputSerializedData, z);
             return tL_inputChatlistDialogFilter;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.filter_id = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.filter_id = inputSerializedData.readInt32(z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-203367885);
-            abstractSerializedData.writeInt32(this.filter_id);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-203367885);
+            outputSerializedData.writeInt32(this.filter_id);
         }
     }
 
     public static abstract class chatlist_ChatlistInvite extends TLObject {
-        public static chatlist_ChatlistInvite TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            chatlist_ChatlistInvite tL_chatlists_chatlistInvite = i != -91752871 ? i != 500007837 ? null : new TL_chatlists_chatlistInvite() : new TL_chatlists_chatlistInviteAlready();
-            if (tL_chatlists_chatlistInvite == null && z) {
+        public static chatlist_ChatlistInvite TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
+            chatlist_ChatlistInvite tL_chatlists_chatlistInvite_layer195 = i != -250687953 ? i != -91752871 ? i != 500007837 ? null : new TL_chatlists_chatlistInvite_layer195() : new TL_chatlists_chatlistInviteAlready() : new TL_chatlists_chatlistInvite();
+            if (tL_chatlists_chatlistInvite_layer195 == null && z) {
                 throw new RuntimeException(String.format("can't parse magic %x in chatlist_ChatlistInvite", Integer.valueOf(i)));
             }
-            if (tL_chatlists_chatlistInvite != null) {
-                tL_chatlists_chatlistInvite.readParams(abstractSerializedData, z);
+            if (tL_chatlists_chatlistInvite_layer195 != null) {
+                tL_chatlists_chatlistInvite_layer195.readParams(inputSerializedData, z);
             }
-            return tL_chatlists_chatlistInvite;
+            return tL_chatlists_chatlistInvite_layer195;
         }
     }
 }

@@ -96,7 +96,7 @@ public class GroupCreateUserCell extends FrameLayout {
         SimpleTextView simpleTextView = new SimpleTextView(context) {
             @Override
             public boolean setText(CharSequence charSequence, boolean z4) {
-                return super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false), z4);
+                return super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), z4);
             }
         };
         this.nameTextView = simpleTextView;
@@ -392,6 +392,8 @@ public class GroupCreateUserCell extends FrameLayout {
             i = Theme.key_voipgroup_lastSeenText;
         }
         simpleTextView2.setTextColor(Theme.getColor(i, this.resourcesProvider));
+        SimpleTextView simpleTextView3 = this.statusTextView;
+        simpleTextView3.setEmojiColor(simpleTextView3.getTextColor());
         this.statusTextView.setText(LocaleController.getString(R.string.PrivacyMiniappsText));
     }
 
@@ -423,6 +425,8 @@ public class GroupCreateUserCell extends FrameLayout {
             i = Theme.key_voipgroup_lastSeenText;
         }
         simpleTextView2.setTextColor(Theme.getColor(i, this.resourcesProvider));
+        SimpleTextView simpleTextView3 = this.statusTextView;
+        simpleTextView3.setEmojiColor(simpleTextView3.getTextColor());
         this.statusTextView.setText(LocaleController.getString(R.string.PrivacyPremiumText));
     }
 
@@ -681,9 +685,13 @@ public class GroupCreateUserCell extends FrameLayout {
                         simpleTextView2 = this.statusTextView;
                         formatUserStatus = LocaleController.formatUserStatus(this.currentAccount, user);
                         simpleTextView2.setText(formatUserStatus);
+                        SimpleTextView simpleTextView9 = this.statusTextView;
+                        simpleTextView9.setEmojiColor(simpleTextView9.getTextColor());
                     }
                     formatUserStatus = LocaleController.getString(i3);
                     simpleTextView2.setText(formatUserStatus);
+                    SimpleTextView simpleTextView92 = this.statusTextView;
+                    simpleTextView92.setEmojiColor(simpleTextView92.getTextColor());
                 }
                 this.avatarImageView.setForUserOrChat(user, this.avatarDrawable);
             } else {
@@ -719,14 +727,16 @@ public class GroupCreateUserCell extends FrameLayout {
                     this.nameTextView.setText(str);
                 }
                 if (this.currentStatus == null) {
-                    SimpleTextView simpleTextView9 = this.statusTextView;
-                    int i8 = Theme.key_windowBackgroundWhiteGrayText;
-                    simpleTextView9.setTag(Integer.valueOf(i8));
                     SimpleTextView simpleTextView10 = this.statusTextView;
+                    int i8 = Theme.key_windowBackgroundWhiteGrayText;
+                    simpleTextView10.setTag(Integer.valueOf(i8));
+                    SimpleTextView simpleTextView11 = this.statusTextView;
                     if (this.forceDarkTheme) {
                         i8 = Theme.key_voipgroup_lastSeenText;
                     }
-                    simpleTextView10.setTextColor(Theme.getColor(i8));
+                    simpleTextView11.setTextColor(Theme.getColor(i8));
+                    SimpleTextView simpleTextView12 = this.statusTextView;
+                    simpleTextView12.setEmojiColor(simpleTextView12.getTextColor());
                     if (chat2.participants_count == 0) {
                         if (chat2.has_geo) {
                             simpleTextView = this.statusTextView;
@@ -764,14 +774,16 @@ public class GroupCreateUserCell extends FrameLayout {
         CharSequence charSequence4 = this.currentStatus;
         if (charSequence4 != null) {
             this.statusTextView.setText(charSequence4, true);
-            SimpleTextView simpleTextView11 = this.statusTextView;
+            SimpleTextView simpleTextView13 = this.statusTextView;
             int i9 = Theme.key_windowBackgroundWhiteGrayText;
-            simpleTextView11.setTag(Integer.valueOf(i9));
-            SimpleTextView simpleTextView12 = this.statusTextView;
+            simpleTextView13.setTag(Integer.valueOf(i9));
+            SimpleTextView simpleTextView14 = this.statusTextView;
             if (this.forceDarkTheme) {
                 i9 = Theme.key_voipgroup_lastSeenText;
             }
-            simpleTextView12.setTextColor(Theme.getColor(i9, this.resourcesProvider));
+            simpleTextView14.setTextColor(Theme.getColor(i9, this.resourcesProvider));
+            SimpleTextView simpleTextView15 = this.statusTextView;
+            simpleTextView15.setEmojiColor(simpleTextView15.getTextColor());
         }
         updatePremiumBlocked(false);
     }

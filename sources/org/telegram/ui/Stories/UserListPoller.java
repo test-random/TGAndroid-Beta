@@ -12,6 +12,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.Cells.DialogCell;
 import org.telegram.ui.Cells.UserCell;
@@ -32,8 +33,8 @@ public class UserListPoller {
         }
 
         public void lambda$run$0(TLObject tLObject, ArrayList arrayList) {
-            if (tLObject != null) {
-                TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+            if (tLObject instanceof Vector) {
+                Vector vector = (Vector) tLObject;
                 ArrayList arrayList2 = new ArrayList();
                 ArrayList arrayList3 = new ArrayList();
                 for (int i = 0; i < vector.objects.size(); i++) {
@@ -43,17 +44,17 @@ public class UserListPoller {
                     if (longValue > 0) {
                         TLRPC.User user = messagesController.getUser(l);
                         if (user != null) {
-                            int intValue = ((Integer) vector.objects.get(i)).intValue();
-                            user.stories_max_id = intValue;
-                            user.flags2 = intValue != 0 ? user.flags2 | 32 : user.flags2 & (-33);
+                            int i2 = ((Vector.Int) vector.objects.get(i)).value;
+                            user.stories_max_id = i2;
+                            user.flags2 = i2 != 0 ? user.flags2 | 32 : user.flags2 & (-33);
                             arrayList2.add(user);
                         }
                     } else {
                         TLRPC.Chat chat = messagesController.getChat(l);
                         if (chat != null) {
-                            int intValue2 = ((Integer) vector.objects.get(i)).intValue();
-                            chat.stories_max_id = intValue2;
-                            chat.flags2 = intValue2 != 0 ? chat.flags2 | 16 : chat.flags2 & (-17);
+                            int i3 = ((Vector.Int) vector.objects.get(i)).value;
+                            chat.stories_max_id = i3;
+                            chat.flags2 = i3 != 0 ? chat.flags2 | 16 : chat.flags2 & (-17);
                             arrayList3.add(chat);
                         }
                     }

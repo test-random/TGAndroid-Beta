@@ -326,7 +326,7 @@ public abstract class StickerEmojiCell extends FrameLayout implements Notificati
                     String str = documentAttribute.alt;
                     if (str != null && str.length() > 0) {
                         TextView textView = this.emojiTextView;
-                        textView.setText(Emoji.replaceEmoji((CharSequence) documentAttribute.alt, textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(16.0f), false));
+                        textView.setText(Emoji.replaceEmoji(documentAttribute.alt, textView.getPaint().getFontMetricsInt(), false));
                         string = documentAttribute.alt + " " + string;
                     }
                 } else {
@@ -368,7 +368,7 @@ public abstract class StickerEmojiCell extends FrameLayout implements Notificati
         setSticker(document, importingSticker, obj, str, z, false);
     }
 
-    public void setSticker(org.telegram.tgnet.TLRPC.Document r25, org.telegram.messenger.SendMessagesHelper.ImportingSticker r26, java.lang.Object r27, java.lang.String r28, boolean r29, boolean r30) {
+    public void setSticker(org.telegram.tgnet.TLRPC.Document r24, org.telegram.messenger.SendMessagesHelper.ImportingSticker r25, java.lang.Object r26, java.lang.String r27, boolean r28, boolean r29) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.StickerEmojiCell.setSticker(org.telegram.tgnet.TLRPC$Document, org.telegram.messenger.SendMessagesHelper$ImportingSticker, java.lang.Object, java.lang.String, boolean, boolean):void");
     }
 

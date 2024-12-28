@@ -28,6 +28,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.SimpleTextView;
@@ -214,10 +215,10 @@ public class MessagePrivateSeenView extends FrameLayout {
     public static void lambda$showSheet$7(final ButtonWithCounterView buttonWithCounterView, boolean z, int i, final BottomSheet bottomSheet, final Runnable runnable, final Context context, final Theme.ResourcesProvider resourcesProvider, View view) {
         buttonWithCounterView.setLoading(true);
         if (z) {
-            TLRPC.TL_account_setPrivacy tL_account_setPrivacy = new TLRPC.TL_account_setPrivacy();
-            tL_account_setPrivacy.key = new TLRPC.TL_inputPrivacyKeyStatusTimestamp();
-            tL_account_setPrivacy.rules.add(new TLRPC.TL_inputPrivacyValueAllowAll());
-            ConnectionsManager.getInstance(i).sendRequest(tL_account_setPrivacy, new RequestDelegate() {
+            TL_account.setPrivacy setprivacy = new TL_account.setPrivacy();
+            setprivacy.key = new TLRPC.TL_inputPrivacyKeyStatusTimestamp();
+            setprivacy.rules.add(new TLRPC.TL_inputPrivacyValueAllowAll());
+            ConnectionsManager.getInstance(i).sendRequest(setprivacy, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     MessagePrivateSeenView.lambda$showSheet$4(ButtonWithCounterView.this, bottomSheet, runnable, tLObject, tL_error);
@@ -225,14 +226,14 @@ public class MessagePrivateSeenView extends FrameLayout {
             });
             return;
         }
-        TLRPC.TL_account_setGlobalPrivacySettings tL_account_setGlobalPrivacySettings = new TLRPC.TL_account_setGlobalPrivacySettings();
+        TL_account.setGlobalPrivacySettings setglobalprivacysettings = new TL_account.setGlobalPrivacySettings();
         TLRPC.TL_globalPrivacySettings globalPrivacySettings = ContactsController.getInstance(i).getGlobalPrivacySettings();
-        tL_account_setGlobalPrivacySettings.settings = globalPrivacySettings;
+        setglobalprivacysettings.settings = globalPrivacySettings;
         if (globalPrivacySettings == null) {
-            tL_account_setGlobalPrivacySettings.settings = new TLRPC.TL_globalPrivacySettings();
+            setglobalprivacysettings.settings = new TLRPC.TL_globalPrivacySettings();
         }
-        tL_account_setGlobalPrivacySettings.settings.hide_read_marks = false;
-        ConnectionsManager.getInstance(i).sendRequest(tL_account_setGlobalPrivacySettings, new RequestDelegate() {
+        setglobalprivacysettings.settings.hide_read_marks = false;
+        ConnectionsManager.getInstance(i).sendRequest(setglobalprivacysettings, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 MessagePrivateSeenView.lambda$showSheet$6(context, resourcesProvider, buttonWithCounterView, bottomSheet, runnable, tLObject, tL_error);

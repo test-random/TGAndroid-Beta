@@ -61,8 +61,9 @@ import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.VideoEditedInfo;
 import org.telegram.messenger.audioinfo.AudioInfo;
-import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.tl.TL_stories;
@@ -864,7 +865,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         public String title;
     }
 
-    public static class CropState {
+    public static class CropState extends TLObject {
+        public static final int constructor = 1151577037;
         public float cropPx;
         public float cropPy;
         public float cropRotate;
@@ -874,6 +876,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         public float lockedAspectRatio;
         public Matrix matrix;
         public boolean mirrored;
+        public int orientation;
         public float scale;
         public float stateScale;
         public int transformHeight;
@@ -904,6 +907,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             cropState.height = this.height;
             cropState.freeform = this.freeform;
             cropState.lockedAspectRatio = this.lockedAspectRatio;
+            cropState.orientation = this.orientation;
             cropState.initied = this.initied;
             cropState.useMatrix = this.useMatrix;
             return cropState;
@@ -913,6 +917,87 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             Matrix matrix;
             Matrix matrix2 = this.matrix;
             return (matrix2 == null || matrix2.isIdentity()) && ((matrix = this.useMatrix) == null || matrix.isIdentity()) && this.cropPw == 1.0f && this.cropPh == 1.0f && this.cropScale == 1.0f && this.cropRotate == 0.0f && this.transformWidth == 0 && this.transformHeight == 0 && this.transformRotation == 0 && !this.mirrored && this.stateScale == 0.0f && this.scale == 0.0f && this.width == 0 && this.height == 0 && !this.freeform && this.lockedAspectRatio == 0.0f;
+        }
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.cropPx = inputSerializedData.readFloat(z);
+            this.cropPy = inputSerializedData.readFloat(z);
+            this.cropScale = inputSerializedData.readFloat(z);
+            this.cropRotate = inputSerializedData.readFloat(z);
+            this.cropPw = inputSerializedData.readFloat(z);
+            this.cropPh = inputSerializedData.readFloat(z);
+            this.transformWidth = inputSerializedData.readInt32(z);
+            this.transformHeight = inputSerializedData.readInt32(z);
+            this.transformRotation = inputSerializedData.readInt32(z);
+            this.mirrored = inputSerializedData.readBool(z);
+            this.stateScale = inputSerializedData.readFloat(z);
+            this.scale = inputSerializedData.readFloat(z);
+            float[] fArr = new float[9];
+            for (int i = 0; i < 9; i++) {
+                fArr[i] = inputSerializedData.readFloat(z);
+            }
+            Matrix matrix = new Matrix();
+            this.matrix = matrix;
+            matrix.setValues(fArr);
+            this.width = inputSerializedData.readInt32(z);
+            this.height = inputSerializedData.readInt32(z);
+            this.freeform = inputSerializedData.readBool(z);
+            this.lockedAspectRatio = inputSerializedData.readFloat(z);
+            if (inputSerializedData.readInt32(z) == 178403937) {
+                for (int i2 = 0; i2 < 9; i2++) {
+                    fArr[i2] = inputSerializedData.readFloat(z);
+                }
+                Matrix matrix2 = new Matrix();
+                this.useMatrix = matrix2;
+                matrix2.setValues(fArr);
+            }
+            this.initied = inputSerializedData.readBool(z);
+            this.orientation = inputSerializedData.readInt32(z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1151577037);
+            outputSerializedData.writeFloat(this.cropPx);
+            outputSerializedData.writeFloat(this.cropPy);
+            outputSerializedData.writeFloat(this.cropScale);
+            outputSerializedData.writeFloat(this.cropRotate);
+            outputSerializedData.writeFloat(this.cropPw);
+            outputSerializedData.writeFloat(this.cropPh);
+            outputSerializedData.writeInt32(this.transformWidth);
+            outputSerializedData.writeInt32(this.transformHeight);
+            outputSerializedData.writeInt32(this.transformRotation);
+            outputSerializedData.writeBool(this.mirrored);
+            outputSerializedData.writeFloat(this.stateScale);
+            outputSerializedData.writeFloat(this.scale);
+            float[] fArr = new float[9];
+            Matrix matrix = this.matrix;
+            if (matrix != null) {
+                matrix.getValues(fArr);
+            } else {
+                for (int i = 0; i < 9; i++) {
+                    fArr[i] = 0.0f;
+                }
+            }
+            for (int i2 = 0; i2 < 9; i2++) {
+                outputSerializedData.writeFloat(fArr[i2]);
+            }
+            outputSerializedData.writeInt32(this.width);
+            outputSerializedData.writeInt32(this.height);
+            outputSerializedData.writeBool(this.freeform);
+            outputSerializedData.writeFloat(this.lockedAspectRatio);
+            if (this.useMatrix == null) {
+                outputSerializedData.writeInt32(1450380236);
+            } else {
+                outputSerializedData.writeInt32(178403937);
+                this.useMatrix.getValues(fArr);
+                for (int i3 = 0; i3 < 9; i3++) {
+                    outputSerializedData.writeFloat(fArr[i3]);
+                }
+            }
+            outputSerializedData.writeBool(this.initied);
+            outputSerializedData.writeInt32(this.orientation);
         }
     }
 
@@ -1582,64 +1667,64 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             return Math.abs(this.enhanceValue) < 0.1f && Math.abs(this.softenSkinValue) < 0.1f && Math.abs(this.exposureValue) < 0.1f && Math.abs(this.contrastValue) < 0.1f && Math.abs(this.warmthValue) < 0.1f && Math.abs(this.saturationValue) < 0.1f && Math.abs(this.fadeValue) < 0.1f && this.tintShadowsColor == 0 && this.tintHighlightsColor == 0 && Math.abs(this.highlightsValue) < 0.1f && Math.abs(this.shadowsValue) < 0.1f && Math.abs(this.vignetteValue) < 0.1f && Math.abs(this.grainValue) < 0.1f && this.blurType == 0 && Math.abs(this.sharpenValue) < 0.1f;
         }
 
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.enhanceValue = abstractSerializedData.readFloat(z);
-            this.softenSkinValue = abstractSerializedData.readFloat(z);
-            this.exposureValue = abstractSerializedData.readFloat(z);
-            this.contrastValue = abstractSerializedData.readFloat(z);
-            this.warmthValue = abstractSerializedData.readFloat(z);
-            this.saturationValue = abstractSerializedData.readFloat(z);
-            this.fadeValue = abstractSerializedData.readFloat(z);
-            this.tintShadowsColor = abstractSerializedData.readInt32(z);
-            this.tintHighlightsColor = abstractSerializedData.readInt32(z);
-            this.highlightsValue = abstractSerializedData.readFloat(z);
-            this.shadowsValue = abstractSerializedData.readFloat(z);
-            this.vignetteValue = abstractSerializedData.readFloat(z);
-            this.grainValue = abstractSerializedData.readFloat(z);
-            this.blurType = abstractSerializedData.readInt32(z);
-            this.sharpenValue = abstractSerializedData.readFloat(z);
-            this.curvesToolValue.readParams(abstractSerializedData, z);
-            this.blurExcludeSize = abstractSerializedData.readFloat(z);
-            if (abstractSerializedData.readInt32(z) == 1450380236) {
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.enhanceValue = inputSerializedData.readFloat(z);
+            this.softenSkinValue = inputSerializedData.readFloat(z);
+            this.exposureValue = inputSerializedData.readFloat(z);
+            this.contrastValue = inputSerializedData.readFloat(z);
+            this.warmthValue = inputSerializedData.readFloat(z);
+            this.saturationValue = inputSerializedData.readFloat(z);
+            this.fadeValue = inputSerializedData.readFloat(z);
+            this.tintShadowsColor = inputSerializedData.readInt32(z);
+            this.tintHighlightsColor = inputSerializedData.readInt32(z);
+            this.highlightsValue = inputSerializedData.readFloat(z);
+            this.shadowsValue = inputSerializedData.readFloat(z);
+            this.vignetteValue = inputSerializedData.readFloat(z);
+            this.grainValue = inputSerializedData.readFloat(z);
+            this.blurType = inputSerializedData.readInt32(z);
+            this.sharpenValue = inputSerializedData.readFloat(z);
+            this.curvesToolValue.readParams(inputSerializedData, z);
+            this.blurExcludeSize = inputSerializedData.readFloat(z);
+            if (inputSerializedData.readInt32(z) == 1450380236) {
                 this.blurExcludePoint = null;
             } else {
                 if (this.blurExcludePoint == null) {
                     this.blurExcludePoint = new Point();
                 }
-                this.blurExcludePoint.x = abstractSerializedData.readFloat(z);
-                this.blurExcludePoint.y = abstractSerializedData.readFloat(z);
+                this.blurExcludePoint.x = inputSerializedData.readFloat(z);
+                this.blurExcludePoint.y = inputSerializedData.readFloat(z);
             }
-            this.blurExcludeBlurSize = abstractSerializedData.readFloat(z);
-            this.blurAngle = abstractSerializedData.readFloat(z);
+            this.blurExcludeBlurSize = inputSerializedData.readFloat(z);
+            this.blurAngle = inputSerializedData.readFloat(z);
         }
 
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeFloat(this.enhanceValue);
-            abstractSerializedData.writeFloat(this.softenSkinValue);
-            abstractSerializedData.writeFloat(this.exposureValue);
-            abstractSerializedData.writeFloat(this.contrastValue);
-            abstractSerializedData.writeFloat(this.warmthValue);
-            abstractSerializedData.writeFloat(this.saturationValue);
-            abstractSerializedData.writeFloat(this.fadeValue);
-            abstractSerializedData.writeInt32(this.tintShadowsColor);
-            abstractSerializedData.writeInt32(this.tintHighlightsColor);
-            abstractSerializedData.writeFloat(this.highlightsValue);
-            abstractSerializedData.writeFloat(this.shadowsValue);
-            abstractSerializedData.writeFloat(this.vignetteValue);
-            abstractSerializedData.writeFloat(this.grainValue);
-            abstractSerializedData.writeInt32(this.blurType);
-            abstractSerializedData.writeFloat(this.sharpenValue);
-            this.curvesToolValue.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeFloat(this.blurExcludeSize);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeFloat(this.enhanceValue);
+            outputSerializedData.writeFloat(this.softenSkinValue);
+            outputSerializedData.writeFloat(this.exposureValue);
+            outputSerializedData.writeFloat(this.contrastValue);
+            outputSerializedData.writeFloat(this.warmthValue);
+            outputSerializedData.writeFloat(this.saturationValue);
+            outputSerializedData.writeFloat(this.fadeValue);
+            outputSerializedData.writeInt32(this.tintShadowsColor);
+            outputSerializedData.writeInt32(this.tintHighlightsColor);
+            outputSerializedData.writeFloat(this.highlightsValue);
+            outputSerializedData.writeFloat(this.shadowsValue);
+            outputSerializedData.writeFloat(this.vignetteValue);
+            outputSerializedData.writeFloat(this.grainValue);
+            outputSerializedData.writeInt32(this.blurType);
+            outputSerializedData.writeFloat(this.sharpenValue);
+            this.curvesToolValue.serializeToStream(outputSerializedData);
+            outputSerializedData.writeFloat(this.blurExcludeSize);
             if (this.blurExcludePoint == null) {
-                abstractSerializedData.writeInt32(1450380236);
+                outputSerializedData.writeInt32(1450380236);
             } else {
-                abstractSerializedData.writeInt32(-559038737);
-                abstractSerializedData.writeFloat(this.blurExcludePoint.x);
-                abstractSerializedData.writeFloat(this.blurExcludePoint.y);
+                outputSerializedData.writeInt32(-559038737);
+                outputSerializedData.writeFloat(this.blurExcludePoint.x);
+                outputSerializedData.writeFloat(this.blurExcludePoint.y);
             }
-            abstractSerializedData.writeFloat(this.blurExcludeBlurSize);
-            abstractSerializedData.writeFloat(this.blurAngle);
+            outputSerializedData.writeFloat(this.blurExcludeBlurSize);
+            outputSerializedData.writeFloat(this.blurAngle);
         }
     }
 

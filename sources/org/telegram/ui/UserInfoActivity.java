@@ -26,6 +26,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -46,11 +47,11 @@ import org.telegram.ui.UserInfoActivity;
 public class UserInfoActivity extends UniversalFragment implements NotificationCenter.NotificationCenterDelegate {
     private EditTextCell bioEdit;
     private CharSequence bioInfo;
-    private TLRPC.TL_birthday birthday;
+    private TL_account.TL_birthday birthday;
     private CharSequence birthdayInfo;
     private TLRPC.Chat channel;
     private String currentBio;
-    private TLRPC.TL_birthday currentBirthday;
+    private TL_account.TL_birthday currentBirthday;
     private long currentChannel;
     private String currentFirstName;
     private String currentLastName;
@@ -291,7 +292,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
         }
     }
 
-    public static String birthdayString(TLRPC.TL_birthday tL_birthday) {
+    public static String birthdayString(TL_account.TL_birthday tL_birthday) {
         Calendar calendar;
         FastDateFormat formatterDayMonth;
         if (tL_birthday == null) {
@@ -312,7 +313,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
         return formatterDayMonth.format(calendar.getTimeInMillis());
     }
 
-    public static boolean birthdaysEqual(TLRPC.TL_birthday tL_birthday, TLRPC.TL_birthday tL_birthday2) {
+    public static boolean birthdaysEqual(TL_account.TL_birthday tL_birthday, TL_account.TL_birthday tL_birthday2) {
         if ((tL_birthday == null) != (tL_birthday2 != null)) {
             return tL_birthday == null || (tL_birthday.day == tL_birthday2.day && tL_birthday.month == tL_birthday2.month && tL_birthday.year == tL_birthday2.year);
         }
@@ -342,7 +343,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
         presentFragment(new PrivacyControlActivity(11));
     }
 
-    public void lambda$onClick$2(TLRPC.TL_birthday tL_birthday) {
+    public void lambda$onClick$2(TL_account.TL_birthday tL_birthday) {
         this.birthday = tL_birthday;
         UniversalRecyclerView universalRecyclerView = this.listView;
         if (universalRecyclerView != null) {
@@ -373,7 +374,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
         }
     }
 
-    public void lambda$processDone$5(TLRPC.TL_error tL_error, TLObject tLObject, TLRPC.TL_birthday tL_birthday, TLRPC.UserFull userFull, TLObject tLObject2, int[] iArr, ArrayList arrayList) {
+    public void lambda$processDone$5(TLRPC.TL_error tL_error, TLObject tLObject, TL_account.TL_birthday tL_birthday, TLRPC.UserFull userFull, TLObject tLObject2, int[] iArr, ArrayList arrayList) {
         String str;
         if (tL_error == null) {
             if (tLObject2 instanceof TLRPC.TL_boolFalse) {
@@ -391,7 +392,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
             return;
         }
         this.doneButtonDrawable.animateToProgress(0.0f);
-        boolean z = tLObject instanceof TLRPC.TL_account_updateBirthday;
+        boolean z = tLObject instanceof TL_account.updateBirthday;
         if (!z || (str = tL_error.text) == null || !str.startsWith("FLOOD_WAIT_")) {
             BulletinFactory.showError(tL_error);
         } else if (getContext() != null) {
@@ -405,7 +406,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
         }
     }
 
-    public void lambda$processDone$6(final TLObject tLObject, final TLRPC.TL_birthday tL_birthday, final TLRPC.UserFull userFull, final int[] iArr, final ArrayList arrayList, final TLObject tLObject2, final TLRPC.TL_error tL_error) {
+    public void lambda$processDone$6(final TLObject tLObject, final TL_account.TL_birthday tL_birthday, final TLRPC.UserFull userFull, final int[] iArr, final ArrayList arrayList, final TLObject tLObject2, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
@@ -434,44 +435,44 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
         }
         final ArrayList arrayList = new ArrayList();
         if (!TextUtils.isEmpty(this.firstNameEdit.getText()) && (!TextUtils.equals(this.currentFirstName, this.firstNameEdit.getText().toString()) || !TextUtils.equals(this.currentLastName, this.lastNameEdit.getText().toString()) || !TextUtils.equals(this.currentBio, this.bioEdit.getText().toString()))) {
-            TLRPC.TL_account_updateProfile tL_account_updateProfile = new TLRPC.TL_account_updateProfile();
-            tL_account_updateProfile.flags |= 1;
+            TL_account.updateProfile updateprofile = new TL_account.updateProfile();
+            updateprofile.flags |= 1;
             String charSequence = this.firstNameEdit.getText().toString();
             currentUser.first_name = charSequence;
-            tL_account_updateProfile.first_name = charSequence;
-            tL_account_updateProfile.flags |= 2;
+            updateprofile.first_name = charSequence;
+            updateprofile.flags |= 2;
             String charSequence2 = this.lastNameEdit.getText().toString();
             currentUser.last_name = charSequence2;
-            tL_account_updateProfile.last_name = charSequence2;
-            tL_account_updateProfile.flags |= 4;
+            updateprofile.last_name = charSequence2;
+            updateprofile.flags |= 4;
             String charSequence3 = this.bioEdit.getText().toString();
             userFull.about = charSequence3;
-            tL_account_updateProfile.about = charSequence3;
+            updateprofile.about = charSequence3;
             userFull.flags = TextUtils.isEmpty(charSequence3) ? userFull.flags & (-3) : userFull.flags | 2;
-            arrayList.add(tL_account_updateProfile);
+            arrayList.add(updateprofile);
         }
-        final TLRPC.TL_birthday tL_birthday = userFull.birthday;
+        final TL_account.TL_birthday tL_birthday = userFull.birthday;
         if (!birthdaysEqual(this.currentBirthday, this.birthday)) {
-            TLRPC.TL_account_updateBirthday tL_account_updateBirthday = new TLRPC.TL_account_updateBirthday();
-            TLRPC.TL_birthday tL_birthday2 = this.birthday;
+            TL_account.updateBirthday updatebirthday = new TL_account.updateBirthday();
+            TL_account.TL_birthday tL_birthday2 = this.birthday;
             if (tL_birthday2 != null) {
                 userFull.flags2 |= 32;
                 userFull.birthday = tL_birthday2;
-                tL_account_updateBirthday.flags |= 1;
-                tL_account_updateBirthday.birthday = tL_birthday2;
+                updatebirthday.flags |= 1;
+                updatebirthday.birthday = tL_birthday2;
             } else {
                 userFull.flags2 &= -33;
                 userFull.birthday = null;
             }
-            arrayList.add(tL_account_updateBirthday);
+            arrayList.add(updatebirthday);
             getMessagesController().invalidateContentSettings();
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.premiumPromoUpdated, new Object[0]);
         }
         long j = this.currentChannel;
         TLRPC.Chat chat = this.channel;
         if (j != (chat != null ? chat.id : 0L)) {
-            TLRPC.TL_account_updatePersonalChannel tL_account_updatePersonalChannel = new TLRPC.TL_account_updatePersonalChannel();
-            tL_account_updatePersonalChannel.channel = MessagesController.getInputChannel(this.channel);
+            TL_account.updatePersonalChannel updatepersonalchannel = new TL_account.updatePersonalChannel();
+            updatepersonalchannel.channel = MessagesController.getInputChannel(this.channel);
             TLRPC.Chat chat2 = this.channel;
             if (chat2 != null) {
                 userFull.flags |= 64;
@@ -486,7 +487,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
                 userFull.personal_channel_message = 0;
                 userFull.personal_channel_id = 0L;
             }
-            arrayList.add(tL_account_updatePersonalChannel);
+            arrayList.add(updatepersonalchannel);
         }
         if (arrayList.isEmpty()) {
             lambda$onBackPressed$321();
@@ -538,7 +539,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
         String str3 = userFull.about;
         this.currentBio = str3;
         editTextCell3.setText(str3);
-        TLRPC.TL_birthday tL_birthday = userFull.birthday;
+        TL_account.TL_birthday tL_birthday = userFull.birthday;
         this.currentBirthday = tL_birthday;
         this.birthday = tL_birthday;
         if ((userFull.flags2 & 64) != 0) {
@@ -655,7 +656,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
         arrayList.add(UItem.asShadow(this.bioInfo));
         arrayList.add(UItem.asHeader(LocaleController.getString(R.string.EditProfileBirthday)));
         String string2 = LocaleController.getString(R.string.EditProfileBirthdayText);
-        TLRPC.TL_birthday tL_birthday = this.birthday;
+        TL_account.TL_birthday tL_birthday = this.birthday;
         arrayList.add(UItem.asButton(1, string2, tL_birthday == null ? LocaleController.getString(R.string.EditProfileBirthdayAdd) : birthdayString(tL_birthday)));
         if (this.birthday != null) {
             arrayList.add(UItem.asButton(2, LocaleController.getString(R.string.EditProfileBirthdayRemove)).red());
@@ -734,7 +735,7 @@ public class UserInfoActivity extends UniversalFragment implements NotificationC
             showDialog(AlertsCreator.createBirthdayPickerDialog(getContext(), LocaleController.getString(R.string.EditProfileBirthdayTitle), LocaleController.getString(R.string.EditProfileBirthdayButton), this.birthday, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    UserInfoActivity.this.lambda$onClick$2((TLRPC.TL_birthday) obj);
+                    UserInfoActivity.this.lambda$onClick$2((TL_account.TL_birthday) obj);
                 }
             }, null, getResourceProvider()).create());
             return;

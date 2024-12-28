@@ -326,7 +326,7 @@ public class WebmEncoder {
                     spannableString.setSpan(animatedEmojiSpan, i, next.length + i, 33);
                 }
             }
-            CharSequence replaceEmoji = Emoji.replaceEmoji((CharSequence) spannableString, editTextOutline.getPaint().getFontMetricsInt(), (int) (editTextOutline.getTextSize() * 0.8f), false);
+            CharSequence replaceEmoji = Emoji.replaceEmoji(spannableString, editTextOutline.getPaint().getFontMetricsInt(), false);
             if ((replaceEmoji instanceof Spanned) && (emojiSpanArr = (Emoji.EmojiSpan[]) ((Spanned) replaceEmoji).getSpans(0, replaceEmoji.length(), Emoji.EmojiSpan.class)) != null) {
                 for (Emoji.EmojiSpan emojiSpan : emojiSpanArr) {
                     emojiSpan.scale = 0.85f;

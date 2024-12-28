@@ -902,7 +902,7 @@ public abstract class CaptionContainerView extends FrameLayout {
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(this.editText.getText());
             spannableStringBuilder.replace(i, i2 + i, charSequence);
             if (z) {
-                Emoji.replaceEmoji((CharSequence) spannableStringBuilder, this.editText.getEditText().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                Emoji.replaceEmoji(spannableStringBuilder, this.editText.getEditText().getPaint().getFontMetricsInt(), false);
             }
             this.editText.setText(spannableStringBuilder);
             this.editText.setSelection(i + charSequence.length());

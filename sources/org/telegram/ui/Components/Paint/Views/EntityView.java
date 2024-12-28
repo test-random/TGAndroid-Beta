@@ -61,7 +61,7 @@ public abstract class EntityView extends FrameLayout {
     private ValueAnimator selectAnimator;
     private float selectT;
     private boolean selecting;
-    protected SelectionView selectionView;
+    public SelectionView selectionView;
     private Runnable setStickyAngleRunnable;
     private Runnable setStickyXRunnable;
     private Runnable setStickyYRunnable;
@@ -187,7 +187,7 @@ public abstract class EntityView extends FrameLayout {
 
         protected abstract int pointInsideHandle(float f, float f2);
 
-        protected void updatePosition() {
+        public void updatePosition() {
             Rect selectionBounds = EntityView.this.getSelectionBounds();
             FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) getLayoutParams();
             layoutParams.leftMargin = (int) selectionBounds.x;

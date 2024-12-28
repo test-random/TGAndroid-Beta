@@ -106,6 +106,7 @@ public class TableView extends android.widget.TableLayout {
     }
 
     public static class TableRowFullContent extends FrameLayout {
+        private boolean filled;
         private boolean first;
         private boolean last;
         private final Theme.ResourcesProvider resourcesProvider;
@@ -156,11 +157,21 @@ public class TableView extends android.widget.TableLayout {
                 RectF rectF = AndroidUtilities.rectTmp;
                 rectF.set(this.table.hw, this.table.hw, getWidth() - this.table.hw, getHeight() + (this.table.hw * AndroidUtilities.dp(this.last ? -1.0f : 1.0f)));
                 this.table.path.addRoundRect(rectF, this.table.radii, Path.Direction.CW);
+                if (this.filled) {
+                    canvas.drawPath(this.table.path, this.table.backgroundPaint);
+                }
                 canvas.drawPath(this.table.path, this.table.borderPaint);
             } else {
+                if (this.filled) {
+                    canvas.drawRect(this.table.hw, this.table.hw, getWidth() + this.table.hw, getHeight() + this.table.hw, this.table.backgroundPaint);
+                }
                 canvas.drawRect(this.table.hw, this.table.hw, getWidth() - this.table.hw, getHeight() + this.table.hw, this.table.borderPaint);
             }
             super.onDraw(canvas);
+        }
+
+        public void setFilled(boolean z) {
+            this.filled = z;
         }
 
         public void setFirstLast(boolean z, boolean z2) {
@@ -250,17 +261,20 @@ public class TableView extends android.widget.TableLayout {
         setColumnStretchable(1, true);
     }
 
-    public void addFullRow(CharSequence charSequence) {
+    public TableRowFullContent addFullRow(CharSequence charSequence) {
         SpoilersTextView spoilersTextView = new SpoilersTextView(getContext());
         spoilersTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, this.resourcesProvider));
+        spoilersTextView.setLinkTextColor(Theme.getColor(Theme.key_chat_messageLinkIn, this.resourcesProvider));
         spoilersTextView.setTextSize(1, 14.0f);
         spoilersTextView.setText(Emoji.replaceEmoji(charSequence, spoilersTextView.getPaint().getFontMetricsInt(), false));
         NotificationCenter.listenEmojiLoading(spoilersTextView);
         TableRow tableRow = new TableRow(getContext());
         TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(-2, -1);
         layoutParams.span = 2;
-        tableRow.addView(new TableRowFullContent(this, spoilersTextView), layoutParams);
+        TableRowFullContent tableRowFullContent = new TableRowFullContent(this, spoilersTextView);
+        tableRow.addView(tableRowFullContent, layoutParams);
         addView(tableRow);
+        return tableRowFullContent;
     }
 
     public void addFullRow(CharSequence charSequence, ArrayList arrayList) {
@@ -419,13 +433,17 @@ public class TableView extends android.widget.TableLayout {
             }, 3, spannableStringBuilder.length(), 33);
         }
         if (charSequence2 != null) {
-            spannableStringBuilder.append((CharSequence) " ").append(ButtonSpan.make(charSequence2, runnable2, this.resourcesProvider));
+            textViewButtons.addButton(new ButtonSpan(charSequence2, runnable2, this.resourcesProvider));
         }
         textViewButtons.setText(spannableStringBuilder);
         if (z) {
             return null;
         }
         return addRowUnpadded(charSequence, textViewButtons);
+    }
+
+    public void clear() {
+        removeAllViews();
     }
 
     @Override

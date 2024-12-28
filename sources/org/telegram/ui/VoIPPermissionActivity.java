@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.voip.VoIPPreNotificationService;
 import org.telegram.messenger.voip.VoIPService;
-import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_phone;
 import org.telegram.ui.Components.voip.VoIPHelper;
 
 public class VoIPPermissionActivity extends Activity {
@@ -19,7 +19,7 @@ public class VoIPPermissionActivity extends Activity {
         super.onCreate(bundle);
         VoIPService sharedInstance = VoIPService.getSharedInstance();
         if (sharedInstance != null) {
-            TLRPC.PhoneCall phoneCall = sharedInstance.privateCall;
+            TL_phone.PhoneCall phoneCall = sharedInstance.privateCall;
             isVideo = phoneCall != null && phoneCall.video;
         } else {
             isVideo = VoIPPreNotificationService.isVideo();

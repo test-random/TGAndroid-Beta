@@ -889,7 +889,7 @@ public class SuggestEmojiView extends FrameLayout implements NotificationCenter.
             fontMetricsInt = paint.getFontMetricsInt();
         }
         if (str == null || !str.startsWith("animated_")) {
-            return Emoji.replaceEmoji((CharSequence) str, fontMetricsInt, AndroidUtilities.dp(20.0f), true);
+            return Emoji.replaceEmoji(str, fontMetricsInt, true);
         }
         try {
             long parseLong = Long.parseLong(str.substring(9));

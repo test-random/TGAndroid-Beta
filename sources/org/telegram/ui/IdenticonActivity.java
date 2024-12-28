@@ -317,6 +317,6 @@ public class IdenticonActivity extends BaseFragment implements NotificationCente
             return;
         }
         TextView textView = this.emojiTextView;
-        textView.setText(Emoji.replaceEmoji((CharSequence) str, textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(32.0f), false));
+        textView.setText(Emoji.replaceEmoji(str, textView.getPaint().getFontMetricsInt(), false));
     }
 }

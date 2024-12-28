@@ -44,6 +44,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -1296,9 +1297,9 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
 
     public void lambda$initTransfer$11(TLRPC.TL_error tL_error, TLObject tLObject, TwoStepVerificationActivity twoStepVerificationActivity) {
         if (tL_error == null) {
-            TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-            twoStepVerificationActivity.setCurrentPasswordInfo(null, account_password);
-            TwoStepVerificationActivity.initPasswordNewAlgo(account_password);
+            TL_account.Password password = (TL_account.Password) tLObject;
+            twoStepVerificationActivity.setCurrentPasswordInfo(null, password);
+            TwoStepVerificationActivity.initPasswordNewAlgo(password);
             lambda$initTransfer$8(twoStepVerificationActivity.getNewSrpPassword(), twoStepVerificationActivity);
         }
     }
@@ -1346,7 +1347,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
         } else {
             if (!"PASSWORD_MISSING".equals(tL_error.text) && !tL_error.text.startsWith("PASSWORD_TOO_FRESH_") && !tL_error.text.startsWith("SESSION_TOO_FRESH_")) {
                 if ("SRP_ID_INVALID".equals(tL_error.text)) {
-                    ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+                    ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                         @Override
                         public final void run(TLObject tLObject, TLRPC.TL_error tL_error2) {
                             ChatRightsEditActivity.this.lambda$initTransfer$12(twoStepVerificationActivity, tLObject, tL_error2);

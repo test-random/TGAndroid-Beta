@@ -38,6 +38,7 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
@@ -47,6 +48,7 @@ public class AnimatedEmojiDrawable extends Drawable {
     private static boolean LOG_MEMORY_LEAK = false;
     public static int attachedCount;
     public static ArrayList attachedDrawable;
+    private static boolean disabledToggleableAnimations;
     private static HashMap dominantColors;
     private static HashMap fetchers;
     private static SparseArray globalEmojiCache;
@@ -101,8 +103,8 @@ public class AnimatedEmojiDrawable extends Drawable {
 
         public void lambda$loadFromServer$4(ArrayList arrayList, TLObject tLObject) {
             HashSet hashSet = new HashSet(arrayList);
-            if (tLObject instanceof TLRPC.Vector) {
-                ArrayList<Object> arrayList2 = ((TLRPC.Vector) tLObject).objects;
+            if (tLObject instanceof Vector) {
+                ArrayList arrayList2 = ((Vector) tLObject).objects;
                 putToStorage(arrayList2);
                 processDocuments(arrayList2);
                 for (int i = 0; i < arrayList2.size(); i++) {
@@ -567,6 +569,10 @@ public class AnimatedEmojiDrawable extends Drawable {
             invalidateSelf();
         }
 
+        public boolean isEmpty() {
+            return this.drawables[0] == null;
+        }
+
         public float isNotEmpty() {
             return (this.drawables[1] != null ? 1.0f - this.changeProgress.get() : 0.0f) + (this.drawables[0] != null ? this.changeProgress.get() : 0.0f);
         }
@@ -1001,6 +1007,44 @@ public class AnimatedEmojiDrawable extends Drawable {
         return animatedEmojiDrawable2;
     }
 
+    public static void toggleAnimations(int i, boolean z) {
+        LongSparseArray longSparseArray;
+        ImageReceiver imageReceiver;
+        boolean z2 = !z;
+        if (disabledToggleableAnimations == z2) {
+            return;
+        }
+        disabledToggleableAnimations = z2;
+        if (globalEmojiCache == null || (longSparseArray = (LongSparseArray) globalEmojiCache.get(Objects.hash(Integer.valueOf(i), 25))) == null) {
+            return;
+        }
+        for (int i2 = 0; i2 < longSparseArray.size(); i2++) {
+            AnimatedEmojiDrawable animatedEmojiDrawable = (AnimatedEmojiDrawable) longSparseArray.valueAt(i2);
+            if (animatedEmojiDrawable != null && (imageReceiver = animatedEmojiDrawable.getImageReceiver()) != null) {
+                if (z) {
+                    imageReceiver.setAllowStartLottieAnimation(true);
+                    imageReceiver.setAllowStartAnimation(true);
+                    imageReceiver.setAutoRepeat(1);
+                    AnimatedFileDrawable animation = imageReceiver.getAnimation();
+                    if (animation != null) {
+                        animation.setUseSharedQueue(imageReceiver.useSharedAnimationQueue);
+                        animation.start();
+                    } else {
+                        RLottieDrawable lottieAnimation = imageReceiver.getLottieAnimation();
+                        if (lottieAnimation != null) {
+                            lottieAnimation.start();
+                        }
+                    }
+                } else {
+                    imageReceiver.setAllowStartAnimation(false);
+                    imageReceiver.setAllowStartLottieAnimation(false);
+                    imageReceiver.setAutoRepeat(0);
+                    imageReceiver.stopAnimation();
+                }
+            }
+        }
+    }
+
     public static void updateAll() {
         if (globalEmojiCache == null) {
             return;
@@ -1071,36 +1115,36 @@ public class AnimatedEmojiDrawable extends Drawable {
     }
 
     private void updateSize() {
-        int i;
-        float abs;
+        int abs;
+        float abs2;
         TextPaint textPaint;
-        int i2 = this.cacheType;
-        if (i2 == 0) {
-            i = (int) (((Math.abs(Theme.chat_msgTextPaint.ascent()) + Math.abs(Theme.chat_msgTextPaint.descent())) * 1.15f) / AndroidUtilities.density);
+        int i = this.cacheType;
+        if (i == 0 || i == 26) {
+            abs = (int) (((Math.abs(Theme.chat_msgTextPaint.ascent()) + Math.abs(Theme.chat_msgTextPaint.descent())) * 1.15f) / AndroidUtilities.density);
         } else {
             TextPaint[] textPaintArr = Theme.chat_msgTextPaintEmoji;
-            if (textPaintArr != null && (i2 == 1 || i2 == 4 || i2 == 19 || i2 == 20)) {
-                abs = Math.abs(textPaintArr[2].ascent());
+            if (textPaintArr != null && (i == 1 || i == 4 || i == 19 || i == 20)) {
+                abs2 = Math.abs(textPaintArr[2].ascent());
                 textPaint = Theme.chat_msgTextPaintEmoji[2];
-            } else if (textPaintArr != null && i2 == 8) {
-                abs = Math.abs(textPaintArr[0].ascent());
+            } else if (textPaintArr != null && i == 8) {
+                abs2 = Math.abs(textPaintArr[0].ascent());
                 textPaint = Theme.chat_msgTextPaintEmoji[0];
-            } else if (i2 == 14 || i2 == 15 || i2 == 17) {
-                i = 100;
-            } else if (i2 == 11 || i2 == 22) {
-                i = 56;
-            } else if (i2 == 24) {
-                i = 140;
+            } else if (i == 14 || i == 15 || i == 17) {
+                abs = 100;
+            } else if (i == 11 || i == 22) {
+                abs = 56;
+            } else if (i == 24) {
+                abs = 140;
             } else {
-                if (i2 == 23) {
+                if (i == 23) {
                     this.sizedp = 14;
                     return;
                 }
-                i = 34;
+                abs = 34;
             }
-            i = (int) (((abs + Math.abs(textPaint.descent())) * 1.15f) / AndroidUtilities.density);
+            abs = (int) (((abs2 + Math.abs(textPaint.descent())) * 1.15f) / AndroidUtilities.density);
         }
-        this.sizedp = i;
+        this.sizedp = abs;
     }
 
     public void addView(View view) {

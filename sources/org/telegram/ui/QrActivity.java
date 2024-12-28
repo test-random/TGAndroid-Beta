@@ -500,7 +500,7 @@ public class QrActivity extends BaseFragment {
                     if (str == null) {
                         str = "";
                     }
-                    staticLayout = StaticLayoutEx.createStaticLayout(Emoji.replaceEmoji((CharSequence) str, this.shareUsernameLayoutPaint.getFontMetricsInt(), AndroidUtilities.dp(20.0f), false), this.shareUsernameLayoutPaint, getWidth(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false, TextUtils.TruncateAt.END, getWidth() - AndroidUtilities.dp(60.0f), 1);
+                    staticLayout = StaticLayoutEx.createStaticLayout(Emoji.replaceEmoji(str, this.shareUsernameLayoutPaint.getFontMetricsInt(), false), this.shareUsernameLayoutPaint, getWidth(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false, TextUtils.TruncateAt.END, getWidth() - AndroidUtilities.dp(60.0f), 1);
                 } else {
                     staticLayout = null;
                 }

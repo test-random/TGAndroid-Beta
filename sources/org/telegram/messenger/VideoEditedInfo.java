@@ -15,6 +15,8 @@ import org.telegram.messenger.MediaController;
 import org.telegram.messenger.video.MediaCodecPlayer;
 import org.telegram.messenger.video.MediaCodecVideoConvertor;
 import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -91,11 +93,11 @@ public class VideoEditedInfo {
         public byte subType;
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            super.readParams(abstractSerializedData, z);
-            this.subType = abstractSerializedData.readByte(z);
-            if (abstractSerializedData.readBool(z)) {
-                this.documentAbsolutePath = abstractSerializedData.readString(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            super.readParams(inputSerializedData, z);
+            this.subType = inputSerializedData.readByte(z);
+            if (inputSerializedData.readBool(z)) {
+                this.documentAbsolutePath = inputSerializedData.readString(z);
             }
             if (TextUtils.isEmpty(this.documentAbsolutePath)) {
                 this.documentAbsolutePath = null;
@@ -103,14 +105,14 @@ public class VideoEditedInfo {
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            super.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeByte(this.subType);
-            abstractSerializedData.writeBool(!TextUtils.isEmpty(this.documentAbsolutePath));
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            super.serializeToStream(outputSerializedData);
+            outputSerializedData.writeByte(this.subType);
+            outputSerializedData.writeBool(!TextUtils.isEmpty(this.documentAbsolutePath));
             if (TextUtils.isEmpty(this.documentAbsolutePath)) {
                 return;
             }
-            abstractSerializedData.writeString(this.documentAbsolutePath);
+            outputSerializedData.writeString(this.documentAbsolutePath);
         }
     }
 
@@ -123,6 +125,7 @@ public class VideoEditedInfo {
         public static final byte TYPE_ROUND = 5;
         public static final byte TYPE_STICKER = 0;
         public static final byte TYPE_TEXT = 1;
+        public static final byte TYPE_VIDEO = 9;
         public static final byte TYPE_WEATHER = 8;
         public int H;
         public int W;
@@ -132,6 +135,7 @@ public class VideoEditedInfo {
         public Bitmap bitmap;
         public Canvas canvas;
         public int color;
+        public MediaController.CropState crop;
         public float currentFrame;
         public boolean customTextView;
         public float density;
@@ -258,10 +262,18 @@ public class VideoEditedInfo {
                 this.roundDuration = abstractSerializedData.readInt64(z2);
                 return;
             }
-            if (b == 2) {
-                this.segmentedPath = abstractSerializedData.readString(z2);
-            } else if (b == 8 && abstractSerializedData.readInt32(z2) == 132805945) {
-                this.weather = Weather.State.TLdeserialize(abstractSerializedData);
+            if (b != 2) {
+                if (b == 8 && abstractSerializedData.readInt32(z2) == 132805945) {
+                    this.weather = Weather.State.TLdeserialize(abstractSerializedData);
+                    return;
+                }
+                return;
+            }
+            this.segmentedPath = abstractSerializedData.readString(z2);
+            if (abstractSerializedData.readInt32(z2) == 1151577037) {
+                MediaController.CropState cropState = new MediaController.CropState();
+                this.crop = cropState;
+                cropState.readParams(abstractSerializedData, z2);
             }
         }
 
@@ -322,7 +334,6 @@ public class VideoEditedInfo {
 
         public void serializeTo(AbstractSerializedData abstractSerializedData, boolean z) {
             String key;
-            String str;
             abstractSerializedData.writeByte(this.type);
             abstractSerializedData.writeByte(this.subType);
             abstractSerializedData.writeFloat(this.x);
@@ -379,12 +390,10 @@ public class VideoEditedInfo {
                 }
                 messageMedia.serializeToStream(abstractSerializedData);
                 TLRPC.MessageMedia messageMedia2 = this.media;
-                if (!(messageMedia2 instanceof TLRPC.TL_messageMediaVenue) || ((TLRPC.TL_messageMediaVenue) messageMedia2).emoji == null) {
-                    abstractSerializedData.writeInt32(1450380236);
-                    return;
-                } else {
+                if ((messageMedia2 instanceof TLRPC.TL_messageMediaVenue) && ((TLRPC.TL_messageMediaVenue) messageMedia2).emoji != null) {
                     abstractSerializedData.writeInt32(-559038737);
-                    str = ((TLRPC.TL_messageMediaVenue) this.media).emoji;
+                    abstractSerializedData.writeString(((TLRPC.TL_messageMediaVenue) this.media).emoji);
+                    return;
                 }
             } else {
                 if (b == 7) {
@@ -417,9 +426,14 @@ public class VideoEditedInfo {
                     }
                     return;
                 }
-                str = this.segmentedPath;
+                abstractSerializedData.writeString(this.segmentedPath);
+                MediaController.CropState cropState = this.crop;
+                if (cropState != null) {
+                    cropState.serializeToStream(abstractSerializedData);
+                    return;
+                }
             }
-            abstractSerializedData.writeString(str);
+            abstractSerializedData.writeInt32(1450380236);
         }
     }
 
@@ -508,39 +522,39 @@ public class VideoEditedInfo {
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(z);
             this.flags = readInt32;
             this.isVideo = (readInt32 & 1) != 0;
             this.loop = (readInt32 & 2) != 0;
             this.muted = (readInt32 & 4) != 0;
-            this.path = abstractSerializedData.readString(z);
-            this.volume = abstractSerializedData.readFloat(z);
-            this.offset = abstractSerializedData.readInt64(z);
-            this.left = abstractSerializedData.readFloat(z);
-            this.right = abstractSerializedData.readFloat(z);
-            this.width = abstractSerializedData.readInt32(z);
-            this.height = abstractSerializedData.readInt32(z);
-            this.duration = abstractSerializedData.readInt64(z);
+            this.path = inputSerializedData.readString(z);
+            this.volume = inputSerializedData.readFloat(z);
+            this.offset = inputSerializedData.readInt64(z);
+            this.left = inputSerializedData.readFloat(z);
+            this.right = inputSerializedData.readFloat(z);
+            this.width = inputSerializedData.readInt32(z);
+            this.height = inputSerializedData.readInt32(z);
+            this.duration = inputSerializedData.readInt64(z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
             int i = this.isVideo ? this.flags | 1 : this.flags & (-2);
             this.flags = i;
             int i2 = this.loop ? i | 2 : i & (-3);
             this.flags = i2;
             int i3 = this.muted ? i2 | 4 : i2 & (-5);
             this.flags = i3;
-            abstractSerializedData.writeInt32(i3);
-            abstractSerializedData.writeString(this.path);
-            abstractSerializedData.writeFloat(this.volume);
-            abstractSerializedData.writeInt64(this.offset);
-            abstractSerializedData.writeFloat(this.left);
-            abstractSerializedData.writeFloat(this.right);
-            abstractSerializedData.writeInt32(this.width);
-            abstractSerializedData.writeInt32(this.height);
-            abstractSerializedData.writeInt64(this.duration);
+            outputSerializedData.writeInt32(i3);
+            outputSerializedData.writeString(this.path);
+            outputSerializedData.writeFloat(this.volume);
+            outputSerializedData.writeInt64(this.offset);
+            outputSerializedData.writeFloat(this.left);
+            outputSerializedData.writeFloat(this.right);
+            outputSerializedData.writeInt32(this.width);
+            outputSerializedData.writeInt32(this.height);
+            outputSerializedData.writeInt64(this.duration);
         }
     }
 

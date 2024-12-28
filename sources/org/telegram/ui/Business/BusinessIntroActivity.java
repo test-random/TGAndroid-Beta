@@ -25,6 +25,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -263,15 +264,15 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
         }
         this.doneButtonDrawable.animateToProgress(1.0f);
         TLRPC.UserFull userFull = getMessagesController().getUserFull(getUserConfig().getClientUserId());
-        TLRPC.TL_account_updateBusinessIntro tL_account_updateBusinessIntro = new TLRPC.TL_account_updateBusinessIntro();
+        TL_account.updateBusinessIntro updatebusinessintro = new TL_account.updateBusinessIntro();
         if (!isEmpty()) {
-            tL_account_updateBusinessIntro.flags |= 1;
-            TLRPC.TL_inputBusinessIntro tL_inputBusinessIntro = new TLRPC.TL_inputBusinessIntro();
-            tL_account_updateBusinessIntro.intro = tL_inputBusinessIntro;
+            updatebusinessintro.flags |= 1;
+            TL_account.TL_inputBusinessIntro tL_inputBusinessIntro = new TL_account.TL_inputBusinessIntro();
+            updatebusinessintro.intro = tL_inputBusinessIntro;
             tL_inputBusinessIntro.title = this.titleEdit.getText().toString();
-            tL_account_updateBusinessIntro.intro.description = this.messageEdit.getText().toString();
+            updatebusinessintro.intro.description = this.messageEdit.getText().toString();
             if (!this.stickerRandom && (this.sticker != null || this.inputSticker != null)) {
-                TLRPC.TL_inputBusinessIntro tL_inputBusinessIntro2 = tL_account_updateBusinessIntro.intro;
+                TL_account.TL_inputBusinessIntro tL_inputBusinessIntro2 = updatebusinessintro.intro;
                 tL_inputBusinessIntro2.flags |= 1;
                 TLRPC.InputDocument inputDocument = this.inputSticker;
                 if (inputDocument == null) {
@@ -281,9 +282,9 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
             }
             if (userFull != null) {
                 userFull.flags2 |= 16;
-                TLRPC.TL_businessIntro tL_businessIntro = new TLRPC.TL_businessIntro();
+                TL_account.TL_businessIntro tL_businessIntro = new TL_account.TL_businessIntro();
                 userFull.business_intro = tL_businessIntro;
-                TLRPC.TL_inputBusinessIntro tL_inputBusinessIntro3 = tL_account_updateBusinessIntro.intro;
+                TL_account.TL_inputBusinessIntro tL_inputBusinessIntro3 = updatebusinessintro.intro;
                 tL_businessIntro.title = tL_inputBusinessIntro3.title;
                 tL_businessIntro.description = tL_inputBusinessIntro3.description;
                 if (!this.stickerRandom && (document = this.sticker) != null) {
@@ -295,7 +296,7 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
             userFull.flags2 &= -17;
             userFull.business_intro = null;
         }
-        getConnectionsManager().sendRequest(tL_account_updateBusinessIntro, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatebusinessintro, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 BusinessIntroActivity.this.lambda$processDone$4(tLObject, tL_error);
@@ -331,7 +332,7 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
             getMessagesController().loadUserInfo(getUserConfig().getCurrentUser(), true, getClassGuid());
             return;
         }
-        TLRPC.TL_businessIntro tL_businessIntro = userFull.business_intro;
+        TL_account.TL_businessIntro tL_businessIntro = userFull.business_intro;
         if (tL_businessIntro != null) {
             EditTextCell editTextCell = this.titleEdit;
             String str = tL_businessIntro.title;
@@ -569,7 +570,7 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
     }
 
     @Override
-    protected void fillItems(ArrayList arrayList, UniversalAdapter universalAdapter) {
+    public void fillItems(ArrayList arrayList, UniversalAdapter universalAdapter) {
         arrayList.add(UItem.asCustom(this.previewContainer));
         arrayList.add(UItem.asHeader(LocaleController.getString(R.string.BusinessIntroHeader)));
         arrayList.add(UItem.asCustom(this.titleEdit));
@@ -643,7 +644,7 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
     }
 
     @Override
-    protected void onClick(UItem uItem, final View view, int i, float f, float f2) {
+    public void onClick(UItem uItem, final View view, int i, float f, float f2) {
         int i2 = uItem.id;
         if (i2 == 1) {
             EmojiBottomSheet emojiBottomSheet = new EmojiBottomSheet(getContext(), true, getResourceProvider(), true);
@@ -697,7 +698,7 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
     }
 
     @Override
-    protected boolean onLongClick(UItem uItem, View view, int i, float f, float f2) {
+    public boolean onLongClick(UItem uItem, View view, int i, float f, float f2) {
         return false;
     }
 }

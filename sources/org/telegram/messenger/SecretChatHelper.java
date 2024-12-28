@@ -18,8 +18,9 @@ import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.messenger.SecretChatHelper;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.support.LongSparseIntArray;
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
 import org.telegram.tgnet.NativeByteBuffer;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -46,28 +47,28 @@ public class SecretChatHelper extends BaseController {
         public boolean new_key_used;
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            abstractSerializedData.readInt64(z);
-            this.date = abstractSerializedData.readInt32(z);
-            this.layer = TLRPC.TL_decryptedMessageLayer.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
-            if (abstractSerializedData.readBool(z)) {
-                this.file = TLRPC.EncryptedFile.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            inputSerializedData.readInt64(z);
+            this.date = inputSerializedData.readInt32(z);
+            this.layer = TLRPC.TL_decryptedMessageLayer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+            if (inputSerializedData.readBool(z)) {
+                this.file = TLRPC.EncryptedFile.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             }
-            this.new_key_used = abstractSerializedData.readBool(z);
+            this.new_key_used = inputSerializedData.readBool(z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(constructor);
-            abstractSerializedData.writeInt64(0L);
-            abstractSerializedData.writeInt32(this.date);
-            this.layer.serializeToStream(abstractSerializedData);
-            abstractSerializedData.writeBool(this.file != null);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(constructor);
+            outputSerializedData.writeInt64(0L);
+            outputSerializedData.writeInt32(this.date);
+            this.layer.serializeToStream(outputSerializedData);
+            outputSerializedData.writeBool(this.file != null);
             TLRPC.EncryptedFile encryptedFile = this.file;
             if (encryptedFile != null) {
-                encryptedFile.serializeToStream(abstractSerializedData);
+                encryptedFile.serializeToStream(outputSerializedData);
             }
-            abstractSerializedData.writeBool(this.new_key_used);
+            outputSerializedData.writeBool(this.new_key_used);
         }
     }
 

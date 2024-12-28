@@ -52,6 +52,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
@@ -609,8 +610,8 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     }
 
     public void lambda$checkContinueText$4(final String str, TLObject tLObject, TLRPC.TL_error tL_error) {
-        if (tLObject != null) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
             if (vector.objects.isEmpty()) {
                 return;
             }

@@ -61,12 +61,12 @@ public class SpoilerEffect extends Drawable {
     private View mParent;
     private int maxParticles;
     private Runnable onRippleEndCallback;
-    private Paint[] particlePaints;
+    private final Paint[] particlePaints;
     float[][] particlePoints;
-    private float[] particleRands;
+    private final float[] particleRands;
     private ArrayList particles;
-    private Stack particlesPool;
-    private int[] renderCount;
+    private final Stack particlesPool;
+    private final int[] renderCount;
     private boolean reverseAnimator;
     private ValueAnimator rippleAnimator;
     private TimeInterpolator rippleInterpolator;

@@ -26,6 +26,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
@@ -350,13 +351,13 @@ public class SessionBottomSheet extends BottomSheet {
     }
 
     public void uploadSessionSettings() {
-        TLRPC.TL_account_changeAuthorizationSettings tL_account_changeAuthorizationSettings = new TLRPC.TL_account_changeAuthorizationSettings();
+        TL_account.changeAuthorizationSettings changeauthorizationsettings = new TL_account.changeAuthorizationSettings();
         TLRPC.TL_authorization tL_authorization = this.session;
-        tL_account_changeAuthorizationSettings.encrypted_requests_disabled = tL_authorization.encrypted_requests_disabled;
-        tL_account_changeAuthorizationSettings.call_requests_disabled = tL_authorization.call_requests_disabled;
-        tL_account_changeAuthorizationSettings.flags = 3;
-        tL_account_changeAuthorizationSettings.hash = tL_authorization.hash;
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_changeAuthorizationSettings, new RequestDelegate() {
+        changeauthorizationsettings.encrypted_requests_disabled = tL_authorization.encrypted_requests_disabled;
+        changeauthorizationsettings.call_requests_disabled = tL_authorization.call_requests_disabled;
+        changeauthorizationsettings.flags = 3;
+        changeauthorizationsettings.hash = tL_authorization.hash;
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(changeauthorizationsettings, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 SessionBottomSheet.lambda$uploadSessionSettings$0(tLObject, tL_error);

@@ -470,7 +470,7 @@ public class ChatAttachAlertContactsLayout extends ChatAttachAlert.AttachAlertLa
             SimpleTextView simpleTextView = new SimpleTextView(context) {
                 @Override
                 public boolean setText(CharSequence charSequence, boolean z2) {
-                    return super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false), z2);
+                    return super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), z2);
                 }
             };
             this.nameTextView = simpleTextView;

@@ -1,7 +1,6 @@
 package org.telegram.ui.Components;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -421,6 +420,8 @@ public class LinkSpanDrawable {
         private boolean disablePaddingsOffsetX;
         private boolean disablePaddingsOffsetY;
         private ColorFilter emojiColorFilter;
+        private int emojiColorFilterColor;
+        private boolean emojiColorIsLink;
         private boolean isCustomLinkCollector;
         private final LinkCollector links;
         private boolean loggedError;
@@ -441,6 +442,7 @@ public class LinkSpanDrawable {
         public LinksTextView(Context context, Theme.ResourcesProvider resourcesProvider) {
             super(context);
             this.loggedError = false;
+            this.emojiColorIsLink = true;
             this.isCustomLinkCollector = false;
             this.links = new LinkCollector(this);
             this.resourcesProvider = resourcesProvider;
@@ -449,6 +451,7 @@ public class LinkSpanDrawable {
         public LinksTextView(Context context, LinkCollector linkCollector, Theme.ResourcesProvider resourcesProvider) {
             super(context);
             this.loggedError = false;
+            this.emojiColorIsLink = true;
             this.isCustomLinkCollector = true;
             this.links = linkCollector;
             this.resourcesProvider = resourcesProvider;
@@ -509,7 +512,7 @@ public class LinkSpanDrawable {
         }
 
         @Override
-        public void onDetachedFromWindow() {
+        protected void onDetachedFromWindow() {
             super.onDetachedFromWindow();
             AnimatedEmojiSpan.release(this, this.stack);
         }
@@ -580,6 +583,12 @@ public class LinkSpanDrawable {
             return i;
         }
 
+        public void resetEmojiColor() {
+            this.emojiColorIsLink = false;
+            this.emojiColorFilter = null;
+            invalidate();
+        }
+
         public void setDisablePaddingsOffset(boolean z) {
             this.disablePaddingsOffset = z;
         }
@@ -590,6 +599,12 @@ public class LinkSpanDrawable {
 
         public void setDisablePaddingsOffsetY(boolean z) {
             this.disablePaddingsOffsetY = z;
+        }
+
+        public void setEmojiColor(int i) {
+            this.emojiColorIsLink = false;
+            this.emojiColorFilter = new PorterDuffColorFilter(i, PorterDuff.Mode.SRC_IN);
+            invalidate();
         }
 
         public void setLoading(CharacterStyle characterStyle) {
@@ -618,18 +633,6 @@ public class LinkSpanDrawable {
         public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
             super.setText(charSequence, bufferType);
             this.stack = AnimatedEmojiSpan.update(emojiCacheType(), this, this.stack, getLayout());
-        }
-
-        @Override
-        public void setTextColor(int i) {
-            super.setTextColor(i);
-            this.emojiColorFilter = new PorterDuffColorFilter(getPaint().linkColor, PorterDuff.Mode.SRC_IN);
-        }
-
-        @Override
-        public void setTextColor(ColorStateList colorStateList) {
-            super.setTextColor(colorStateList);
-            this.emojiColorFilter = new PorterDuffColorFilter(getPaint().linkColor, PorterDuff.Mode.SRC_IN);
         }
     }
 

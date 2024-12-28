@@ -20,6 +20,7 @@ import org.telegram.messenger.LiteMode;
 import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.Cells.TextDetailCell;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LinkSpanDrawable;
@@ -166,7 +167,7 @@ public class ProfileBirthdayEffect extends View {
         }
 
         public static BirthdayEffectFetcher of(int i, TLRPC.UserFull userFull, BirthdayEffectFetcher birthdayEffectFetcher) {
-            TLRPC.TL_birthday tL_birthday;
+            TL_account.TL_birthday tL_birthday;
             if (!LiteMode.isEnabled(2) || !BirthdayController.isToday(userFull)) {
                 if (birthdayEffectFetcher == null) {
                     return null;

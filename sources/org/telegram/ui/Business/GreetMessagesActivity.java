@@ -18,6 +18,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -34,7 +35,7 @@ import org.telegram.ui.Components.UniversalAdapter;
 import org.telegram.ui.Components.UniversalRecyclerView;
 
 public class GreetMessagesActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
-    public TLRPC.TL_businessGreetingMessage currentValue;
+    public TL_account.TL_businessGreetingMessage currentValue;
     private ActionBarMenuItem doneButton;
     private CrossfadeDrawable doneButtonDrawable;
     public boolean enabled;
@@ -202,17 +203,17 @@ public class GreetMessagesActivity extends BaseFragment implements NotificationC
         if (!z || this.recipientsHelper.validate(this.listView)) {
             this.doneButtonDrawable.animateToProgress(1.0f);
             TLRPC.UserFull userFull = getMessagesController().getUserFull(getUserConfig().getClientUserId());
-            TLRPC.TL_account_updateBusinessGreetingMessage tL_account_updateBusinessGreetingMessage = new TLRPC.TL_account_updateBusinessGreetingMessage();
+            TL_account.updateBusinessGreetingMessage updatebusinessgreetingmessage = new TL_account.updateBusinessGreetingMessage();
             if (this.enabled) {
-                TLRPC.TL_inputBusinessGreetingMessage tL_inputBusinessGreetingMessage = new TLRPC.TL_inputBusinessGreetingMessage();
-                tL_account_updateBusinessGreetingMessage.message = tL_inputBusinessGreetingMessage;
+                TL_account.TL_inputBusinessGreetingMessage tL_inputBusinessGreetingMessage = new TL_account.TL_inputBusinessGreetingMessage();
+                updatebusinessgreetingmessage.message = tL_inputBusinessGreetingMessage;
                 tL_inputBusinessGreetingMessage.shortcut_id = findReply.id;
                 tL_inputBusinessGreetingMessage.recipients = this.recipientsHelper.getInputValue();
-                tL_account_updateBusinessGreetingMessage.message.no_activity_days = this.inactivityDays;
-                tL_account_updateBusinessGreetingMessage.flags |= 1;
+                updatebusinessgreetingmessage.message.no_activity_days = this.inactivityDays;
+                updatebusinessgreetingmessage.flags |= 1;
                 if (userFull != null) {
                     userFull.flags2 |= 4;
-                    TLRPC.TL_businessGreetingMessage tL_businessGreetingMessage = new TLRPC.TL_businessGreetingMessage();
+                    TL_account.TL_businessGreetingMessage tL_businessGreetingMessage = new TL_account.TL_businessGreetingMessage();
                     userFull.business_greeting_message = tL_businessGreetingMessage;
                     tL_businessGreetingMessage.shortcut_id = findReply.id;
                     tL_businessGreetingMessage.recipients = this.recipientsHelper.getValue();
@@ -222,7 +223,7 @@ public class GreetMessagesActivity extends BaseFragment implements NotificationC
                 userFull.flags2 &= -5;
                 userFull.business_greeting_message = null;
             }
-            getConnectionsManager().sendRequest(tL_account_updateBusinessGreetingMessage, new RequestDelegate() {
+            getConnectionsManager().sendRequest(updatebusinessgreetingmessage, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     GreetMessagesActivity.this.lambda$processDone$2(tLObject, tL_error);
@@ -242,7 +243,7 @@ public class GreetMessagesActivity extends BaseFragment implements NotificationC
             getMessagesController().loadUserInfo(getUserConfig().getCurrentUser(), true, getClassGuid());
             return;
         }
-        TLRPC.TL_businessGreetingMessage tL_businessGreetingMessage = userFull.business_greeting_message;
+        TL_account.TL_businessGreetingMessage tL_businessGreetingMessage = userFull.business_greeting_message;
         this.currentValue = tL_businessGreetingMessage;
         this.enabled = tL_businessGreetingMessage != null;
         this.inactivityDays = tL_businessGreetingMessage != null ? tL_businessGreetingMessage.no_activity_days : 7;
@@ -293,7 +294,7 @@ public class GreetMessagesActivity extends BaseFragment implements NotificationC
         this.recipientsHelper = businessRecipientsHelper;
         businessRecipientsHelper.doNotExcludeNewChats();
         BusinessRecipientsHelper businessRecipientsHelper2 = this.recipientsHelper;
-        TLRPC.TL_businessGreetingMessage tL_businessGreetingMessage = this.currentValue;
+        TL_account.TL_businessGreetingMessage tL_businessGreetingMessage = this.currentValue;
         businessRecipientsHelper2.setValue(tL_businessGreetingMessage == null ? null : tL_businessGreetingMessage.recipients);
         UniversalRecyclerView universalRecyclerView = new UniversalRecyclerView(this, new Utilities.Callback2() {
             @Override
@@ -334,7 +335,7 @@ public class GreetMessagesActivity extends BaseFragment implements NotificationC
             return false;
         }
         boolean z = this.enabled;
-        TLRPC.TL_businessGreetingMessage tL_businessGreetingMessage = this.currentValue;
+        TL_account.TL_businessGreetingMessage tL_businessGreetingMessage = this.currentValue;
         if (z != (tL_businessGreetingMessage != null)) {
             return true;
         }

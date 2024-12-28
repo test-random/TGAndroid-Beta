@@ -117,7 +117,20 @@ public class RecordControl extends View implements FlashViews.Invertable {
     private final Drawable unlockDrawable;
 
     public interface Delegate {
+
+        public abstract class CC {
+            public static long $default$getMaxVideoDuration(Delegate delegate) {
+                return 60000L;
+            }
+
+            public static boolean $default$showStoriesDrafts(Delegate delegate) {
+                return true;
+            }
+        }
+
         boolean canRecordAudio();
+
+        long getMaxVideoDuration();
 
         void onCheckClick();
 
@@ -138,6 +151,8 @@ public class RecordControl extends View implements FlashViews.Invertable {
         void onVideoRecordStart(boolean z, Runnable runnable);
 
         void onZoom(float f);
+
+        boolean showStoriesDrafts();
     }
 
     public RecordControl(Context context) {
@@ -599,34 +614,32 @@ public class RecordControl extends View implements FlashViews.Invertable {
     }
 
     public void updateGalleryImage() {
-        ImageReceiver imageReceiver;
-        ImageLocation forPath;
         String str;
         ArrayList<MediaController.PhotoEntry> arrayList;
-        ArrayList arrayList2 = MessagesController.getInstance(this.galleryImage.getCurrentAccount()).getStoriesController().getDraftsController().drafts;
-        this.galleryImage.setOrientation(0, 0, true);
-        if (arrayList2 != null && !arrayList2.isEmpty() && ((StoryEntry) arrayList2.get(0)).draftThumbFile != null) {
-            this.galleryImage.setImage(ImageLocation.getForPath(((StoryEntry) arrayList2.get(0)).draftThumbFile.getAbsolutePath()), "80_80", null, null, this.noGalleryDrawable, 0L, null, null, 0);
-            return;
+        Delegate delegate = this.delegate;
+        if (delegate != null && delegate.showStoriesDrafts()) {
+            ArrayList arrayList2 = MessagesController.getInstance(this.galleryImage.getCurrentAccount()).getStoriesController().getDraftsController().drafts;
+            this.galleryImage.setOrientation(0, 0, true);
+            if (arrayList2 != null && !arrayList2.isEmpty() && ((StoryEntry) arrayList2.get(0)).draftThumbFile != null) {
+                this.galleryImage.setImage(ImageLocation.getForPath(((StoryEntry) arrayList2.get(0)).draftThumbFile.getAbsolutePath()), "80_80", null, null, this.noGalleryDrawable, 0L, null, null, 0);
+                return;
+            }
         }
         MediaController.AlbumEntry albumEntry = MediaController.allMediaAlbumEntry;
         MediaController.PhotoEntry photoEntry = (albumEntry == null || (arrayList = albumEntry.photos) == null || arrayList.isEmpty()) ? null : albumEntry.photos.get(0);
         if (photoEntry != null && (str = photoEntry.thumbPath) != null) {
-            imageReceiver = this.galleryImage;
-            forPath = ImageLocation.getForPath(str);
-        } else {
-            if (photoEntry == null || photoEntry.path == null) {
-                this.galleryImage.setImageBitmap(this.noGalleryDrawable);
-                return;
-            }
-            if (!photoEntry.isVideo) {
-                this.galleryImage.setOrientation(photoEntry.orientation, photoEntry.invert, true);
-                this.galleryImage.setImage(ImageLocation.getForPath("thumb://" + photoEntry.imageId + ":" + photoEntry.path), "80_80", null, null, this.noGalleryDrawable, 0L, null, null, 0);
-                return;
-            }
-            imageReceiver = this.galleryImage;
-            forPath = ImageLocation.getForPath("vthumb://" + photoEntry.imageId + ":" + photoEntry.path);
+            this.galleryImage.setImage(ImageLocation.getForPath(str), "80_80", null, null, this.noGalleryDrawable, 0L, null, null, 0);
+            return;
         }
-        imageReceiver.setImage(forPath, "80_80", null, null, this.noGalleryDrawable, 0L, null, null, 0);
+        if (photoEntry == null || photoEntry.path == null) {
+            this.galleryImage.setImageBitmap(this.noGalleryDrawable);
+            return;
+        }
+        if (photoEntry.isVideo) {
+            this.galleryImage.setImage(ImageLocation.getForPath("vthumb://" + photoEntry.imageId + ":" + photoEntry.path), "80_80", null, null, this.noGalleryDrawable, 0L, null, null, 0);
+            return;
+        }
+        this.galleryImage.setOrientation(photoEntry.orientation, photoEntry.invert, true);
+        this.galleryImage.setImage(ImageLocation.getForPath("thumb://" + photoEntry.imageId + ":" + photoEntry.path), "80_80", null, null, this.noGalleryDrawable, 0L, null, null, 0);
     }
 }

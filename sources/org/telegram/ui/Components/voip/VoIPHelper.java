@@ -41,6 +41,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_phone;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
@@ -444,11 +445,11 @@ public abstract class VoIPHelper {
         ((TextView) view).setText(LocaleController.getString(i < 4 ? R.string.Next : R.string.Send).toUpperCase());
     }
 
-    public static void lambda$showRateAlert$16(int i, boolean[] zArr, File file, TLRPC.TL_phone_setCallRating tL_phone_setCallRating, ArrayList arrayList, Context context, TLObject tLObject, TLRPC.TL_error tL_error) {
+    public static void lambda$showRateAlert$16(int i, boolean[] zArr, File file, TL_phone.setCallRating setcallrating, ArrayList arrayList, Context context, TLObject tLObject, TLRPC.TL_error tL_error) {
         if (tLObject instanceof TLRPC.TL_updates) {
             MessagesController.getInstance(i).processUpdates((TLRPC.TL_updates) tLObject, false);
         }
-        if (zArr[0] && file.exists() && tL_phone_setCallRating.rating < 4) {
+        if (zArr[0] && file.exists() && setcallrating.rating < 4) {
             SendMessagesHelper.prepareSendingDocument(AccountInstance.getInstance(UserConfig.selectedAccount), file.getAbsolutePath(), file.getAbsolutePath(), null, TextUtils.join(" ", arrayList), "text/plain", 4244000L, null, null, null, null, null, true, 0, null, null, 0, false);
             Toast.makeText(context, LocaleController.getString(R.string.CallReportSent), 1).show();
         }
@@ -470,8 +471,8 @@ public abstract class VoIPHelper {
             return;
         }
         final int i2 = UserConfig.selectedAccount;
-        final TLRPC.TL_phone_setCallRating tL_phone_setCallRating = new TLRPC.TL_phone_setCallRating();
-        tL_phone_setCallRating.rating = betterRatingView.getRating();
+        final TL_phone.setCallRating setcallrating = new TL_phone.setCallRating();
+        setcallrating.rating = betterRatingView.getRating();
         final ArrayList arrayList = new ArrayList();
         for (int i3 = 0; i3 < linearLayout.getChildCount(); i3++) {
             CheckBoxCell checkBoxCell2 = (CheckBoxCell) linearLayout.getChildAt(i3);
@@ -479,19 +480,19 @@ public abstract class VoIPHelper {
                 arrayList.add("#" + checkBoxCell2.getTag());
             }
         }
-        tL_phone_setCallRating.comment = tL_phone_setCallRating.rating < 5 ? editTextBoldCursor.getText().toString() : "";
+        setcallrating.comment = setcallrating.rating < 5 ? editTextBoldCursor.getText().toString() : "";
         if (!arrayList.isEmpty() && !zArr[0]) {
-            tL_phone_setCallRating.comment += " " + TextUtils.join(" ", arrayList);
+            setcallrating.comment += " " + TextUtils.join(" ", arrayList);
         }
         TLRPC.TL_inputPhoneCall tL_inputPhoneCall = new TLRPC.TL_inputPhoneCall();
-        tL_phone_setCallRating.peer = tL_inputPhoneCall;
+        setcallrating.peer = tL_inputPhoneCall;
         tL_inputPhoneCall.access_hash = j;
         tL_inputPhoneCall.id = j2;
-        tL_phone_setCallRating.user_initiative = z;
-        ConnectionsManager.getInstance(i).sendRequest(tL_phone_setCallRating, new RequestDelegate() {
+        setcallrating.user_initiative = z;
+        ConnectionsManager.getInstance(i).sendRequest(setcallrating, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                VoIPHelper.lambda$showRateAlert$16(i2, zArr, file, tL_phone_setCallRating, arrayList, context, tLObject, tL_error);
+                VoIPHelper.lambda$showRateAlert$16(i2, zArr, file, setcallrating, arrayList, context, tLObject, tL_error);
             }
         });
         alertDialog.dismiss();
@@ -526,15 +527,15 @@ public abstract class VoIPHelper {
 
     public static void sendCallRating(long j, long j2, int i, int i2) {
         final int i3 = UserConfig.selectedAccount;
-        TLRPC.TL_phone_setCallRating tL_phone_setCallRating = new TLRPC.TL_phone_setCallRating();
-        tL_phone_setCallRating.rating = i2;
-        tL_phone_setCallRating.comment = "";
+        TL_phone.setCallRating setcallrating = new TL_phone.setCallRating();
+        setcallrating.rating = i2;
+        setcallrating.comment = "";
         TLRPC.TL_inputPhoneCall tL_inputPhoneCall = new TLRPC.TL_inputPhoneCall();
-        tL_phone_setCallRating.peer = tL_inputPhoneCall;
+        setcallrating.peer = tL_inputPhoneCall;
         tL_inputPhoneCall.access_hash = j2;
         tL_inputPhoneCall.id = j;
-        tL_phone_setCallRating.user_initiative = false;
-        ConnectionsManager.getInstance(i).sendRequest(tL_phone_setCallRating, new RequestDelegate() {
+        setcallrating.user_initiative = false;
+        ConnectionsManager.getInstance(i).sendRequest(setcallrating, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 VoIPHelper.lambda$sendCallRating$9(i3, tLObject, tL_error);

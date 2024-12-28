@@ -23,6 +23,7 @@ import org.telegram.tgnet.TLObject;
 
 public class BackupImageView extends View {
     public AnimatedEmojiDrawable animatedEmojiDrawable;
+    public ColorFilter animatedEmojiDrawableColorFilter;
     public boolean applyAttach;
     boolean attached;
     private AvatarDrawable avatarDrawable;
@@ -263,6 +264,11 @@ public class BackupImageView extends View {
 
     public void setColorFilter(ColorFilter colorFilter) {
         this.imageReceiver.setColorFilter(colorFilter);
+    }
+
+    public void setEmojiColorFilter(ColorFilter colorFilter) {
+        this.animatedEmojiDrawableColorFilter = colorFilter;
+        invalidate();
     }
 
     public void setForUserOrChat(TLObject tLObject, AvatarDrawable avatarDrawable) {

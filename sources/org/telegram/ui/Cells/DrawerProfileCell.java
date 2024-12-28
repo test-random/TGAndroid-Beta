@@ -593,7 +593,7 @@ public abstract class DrawerProfileCell extends FrameLayout implements Notificat
         setArrowState(false);
         CharSequence userName = UserObject.getUserName(user);
         try {
-            userName = Emoji.replaceEmoji(userName, this.nameTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(22.0f), false);
+            userName = Emoji.replaceEmoji(userName, this.nameTextView.getPaint().getFontMetricsInt(), false);
         } catch (Exception unused) {
         }
         this.drawPremium = false;

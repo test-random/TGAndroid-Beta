@@ -51,6 +51,8 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.EmojiThemes;
@@ -1574,15 +1576,15 @@ public class MediaDataController extends BaseController {
 
     public void lambda$fetchEmojiStatuses$233(int i, TLObject tLObject, TLRPC.TL_error tL_error) {
         this.emojiStatusesFetchDate[i] = Long.valueOf(System.currentTimeMillis() / 1000);
-        if (tLObject instanceof TLRPC.TL_account_emojiStatusesNotModified) {
+        if (tLObject instanceof TL_account.TL_emojiStatusesNotModified) {
             this.emojiStatusesFetching[i] = false;
             return;
         }
-        if (tLObject instanceof TLRPC.TL_account_emojiStatuses) {
-            TLRPC.TL_account_emojiStatuses tL_account_emojiStatuses = (TLRPC.TL_account_emojiStatuses) tLObject;
-            this.emojiStatusesHash[i] = tL_account_emojiStatuses.hash;
-            this.emojiStatuses[i] = tL_account_emojiStatuses.statuses;
-            updateEmojiStatuses(i, tL_account_emojiStatuses);
+        if (tLObject instanceof TL_account.TL_emojiStatuses) {
+            TL_account.TL_emojiStatuses tL_emojiStatuses = (TL_account.TL_emojiStatuses) tLObject;
+            this.emojiStatusesHash[i] = tL_emojiStatuses.hash;
+            this.emojiStatuses[i] = tL_emojiStatuses.statuses;
+            updateEmojiStatuses(i, tL_emojiStatuses);
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
@@ -1896,8 +1898,8 @@ public class MediaDataController extends BaseController {
     }
 
     public void lambda$getMediaCount$130(long j, long j2, int i, int i2, TLObject tLObject, TLRPC.TL_error tL_error) {
-        if (tLObject != null) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
             if (vector.objects.isEmpty()) {
                 return;
             }
@@ -1949,8 +1951,8 @@ public class MediaDataController extends BaseController {
                 iArr[i2] = 0;
             }
         }
-        if (tLObject != null) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
             int size = vector.objects.size();
             for (int i3 = 0; i3 < size; i3++) {
                 TLRPC.TL_messages_searchCounter tL_messages_searchCounter = (TLRPC.TL_messages_searchCounter) vector.objects.get(i3);
@@ -4898,8 +4900,8 @@ public class MediaDataController extends BaseController {
 
     public void lambda$saveToRingtones$203(TLObject tLObject, TLRPC.Document document) {
         if (tLObject != null) {
-            if (tLObject instanceof TLRPC.TL_account_savedRingtoneConverted) {
-                this.ringtoneDataStore.addTone(((TLRPC.TL_account_savedRingtoneConverted) tLObject).document);
+            if (tLObject instanceof TL_account.TL_savedRingtoneConverted) {
+                this.ringtoneDataStore.addTone(((TL_account.TL_savedRingtoneConverted) tLObject).document);
             } else {
                 this.ringtoneDataStore.addTone(document);
             }
@@ -5262,13 +5264,13 @@ public class MediaDataController extends BaseController {
         }
     }
 
-    public void lambda$updateEmojiStatuses$234(int i, TLRPC.TL_account_emojiStatuses tL_account_emojiStatuses) {
+    public void lambda$updateEmojiStatuses$234(int i, TL_account.TL_emojiStatuses tL_emojiStatuses) {
         try {
             getMessagesStorage().getDatabase().executeFast("DELETE FROM emoji_statuses WHERE type = " + i).stepThis().dispose();
             SQLitePreparedStatement executeFast = getMessagesStorage().getDatabase().executeFast("INSERT INTO emoji_statuses VALUES(?, ?)");
             executeFast.requery();
-            NativeByteBuffer nativeByteBuffer = new NativeByteBuffer(tL_account_emojiStatuses.getObjectSize());
-            tL_account_emojiStatuses.serializeToStream(nativeByteBuffer);
+            NativeByteBuffer nativeByteBuffer = new NativeByteBuffer(tL_emojiStatuses.getObjectSize());
+            tL_emojiStatuses.serializeToStream(nativeByteBuffer);
             executeFast.bindByteBuffer(1, nativeByteBuffer);
             executeFast.bindInteger(2, i);
             executeFast.step();
@@ -5920,11 +5922,11 @@ public class MediaDataController extends BaseController {
         });
     }
 
-    private void updateEmojiStatuses(final int i, final TLRPC.TL_account_emojiStatuses tL_account_emojiStatuses) {
+    private void updateEmojiStatuses(final int i, final TL_account.TL_emojiStatuses tL_emojiStatuses) {
         getMessagesStorage().getStorageQueue().postRunnable(new Runnable() {
             @Override
             public final void run() {
-                MediaDataController.this.lambda$updateEmojiStatuses$234(i, tL_account_emojiStatuses);
+                MediaDataController.this.lambda$updateEmojiStatuses$234(i, tL_emojiStatuses);
             }
         });
     }
@@ -6661,7 +6663,7 @@ public class MediaDataController extends BaseController {
     }
 
     public void fetchEmojiStatuses(final int i, boolean z) {
-        TLRPC.TL_account_getChannelDefaultEmojiStatuses tL_account_getChannelDefaultEmojiStatuses;
+        TL_account.getChannelDefaultEmojiStatuses getchanneldefaultemojistatuses;
         boolean[] zArr = this.emojiStatusesFetching;
         if (zArr[i]) {
             return;
@@ -6677,19 +6679,19 @@ public class MediaDataController extends BaseController {
             return;
         }
         if (i == 0) {
-            TLRPC.TL_account_getRecentEmojiStatuses tL_account_getRecentEmojiStatuses = new TLRPC.TL_account_getRecentEmojiStatuses();
-            tL_account_getRecentEmojiStatuses.hash = this.emojiStatusesHash[i];
-            tL_account_getChannelDefaultEmojiStatuses = tL_account_getRecentEmojiStatuses;
+            TL_account.getRecentEmojiStatuses getrecentemojistatuses = new TL_account.getRecentEmojiStatuses();
+            getrecentemojistatuses.hash = this.emojiStatusesHash[i];
+            getchanneldefaultemojistatuses = getrecentemojistatuses;
         } else if (i == 1) {
-            TLRPC.TL_account_getDefaultEmojiStatuses tL_account_getDefaultEmojiStatuses = new TLRPC.TL_account_getDefaultEmojiStatuses();
-            tL_account_getDefaultEmojiStatuses.hash = this.emojiStatusesHash[i];
-            tL_account_getChannelDefaultEmojiStatuses = tL_account_getDefaultEmojiStatuses;
+            TL_account.getDefaultEmojiStatuses getdefaultemojistatuses = new TL_account.getDefaultEmojiStatuses();
+            getdefaultemojistatuses.hash = this.emojiStatusesHash[i];
+            getchanneldefaultemojistatuses = getdefaultemojistatuses;
         } else {
-            TLRPC.TL_account_getChannelDefaultEmojiStatuses tL_account_getChannelDefaultEmojiStatuses2 = new TLRPC.TL_account_getChannelDefaultEmojiStatuses();
-            tL_account_getChannelDefaultEmojiStatuses2.hash = this.emojiStatusesHash[i];
-            tL_account_getChannelDefaultEmojiStatuses = tL_account_getChannelDefaultEmojiStatuses2;
+            TL_account.getChannelDefaultEmojiStatuses getchanneldefaultemojistatuses2 = new TL_account.getChannelDefaultEmojiStatuses();
+            getchanneldefaultemojistatuses2.hash = this.emojiStatusesHash[i];
+            getchanneldefaultemojistatuses = getchanneldefaultemojistatuses2;
         }
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_getChannelDefaultEmojiStatuses, new RequestDelegate() {
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(getchanneldefaultemojistatuses, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 MediaDataController.this.lambda$fetchEmojiStatuses$233(i, tLObject, tL_error);
@@ -8603,10 +8605,10 @@ public class MediaDataController extends BaseController {
             while (this.emojiStatuses[0].size() > 50) {
                 this.emojiStatuses[0].remove(r8.size() - 1);
             }
-            TLRPC.TL_account_emojiStatuses tL_account_emojiStatuses = new TLRPC.TL_account_emojiStatuses();
-            tL_account_emojiStatuses.hash = this.emojiStatusesHash[0];
-            tL_account_emojiStatuses.statuses = this.emojiStatuses[0];
-            updateEmojiStatuses(0, tL_account_emojiStatuses);
+            TL_account.TL_emojiStatuses tL_emojiStatuses = new TL_account.TL_emojiStatuses();
+            tL_emojiStatuses.hash = this.emojiStatusesHash[0];
+            tL_emojiStatuses.statuses = this.emojiStatuses[0];
+            updateEmojiStatuses(0, tL_emojiStatuses);
         }
     }
 
@@ -9260,13 +9262,13 @@ public class MediaDataController extends BaseController {
                 return false;
             }
         }
-        TLRPC.TL_account_saveRingtone tL_account_saveRingtone = new TLRPC.TL_account_saveRingtone();
+        TL_account.saveRingtone saveringtone = new TL_account.saveRingtone();
         TLRPC.TL_inputDocument tL_inputDocument = new TLRPC.TL_inputDocument();
-        tL_account_saveRingtone.id = tL_inputDocument;
+        saveringtone.id = tL_inputDocument;
         tL_inputDocument.id = document.id;
         tL_inputDocument.file_reference = document.file_reference;
         tL_inputDocument.access_hash = document.access_hash;
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_saveRingtone, new RequestDelegate() {
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(saveringtone, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 MediaDataController.this.lambda$saveToRingtones$204(document, tLObject, tL_error);

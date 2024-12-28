@@ -52,6 +52,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_stars;
 import org.telegram.tgnet.tl.TL_stats;
 import org.telegram.tgnet.tl.TL_stories;
@@ -1359,9 +1360,9 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
 
     public void lambda$initWithdraw$21(TLRPC.TL_error tL_error, TLObject tLObject, TwoStepVerificationActivity twoStepVerificationActivity, boolean z) {
         if (tL_error == null) {
-            TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-            twoStepVerificationActivity.setCurrentPasswordInfo(null, account_password);
-            TwoStepVerificationActivity.initPasswordNewAlgo(account_password);
+            TL_account.Password password = (TL_account.Password) tLObject;
+            twoStepVerificationActivity.setCurrentPasswordInfo(null, password);
+            TwoStepVerificationActivity.initPasswordNewAlgo(password);
             initWithdraw(z, twoStepVerificationActivity.getNewSrpPassword(), twoStepVerificationActivity);
         }
     }
@@ -1395,7 +1396,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
         if (!"PASSWORD_MISSING".equals(tL_error.text) && !tL_error.text.startsWith("PASSWORD_TOO_FRESH_") && !tL_error.text.startsWith("SESSION_TOO_FRESH_")) {
             if ("SRP_ID_INVALID".equals(tL_error.text)) {
-                ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+                ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject2, TLRPC.TL_error tL_error2) {
                         ChannelMonetizationLayout.this.lambda$initWithdraw$22(twoStepVerificationActivity, z, tLObject2, tL_error2);

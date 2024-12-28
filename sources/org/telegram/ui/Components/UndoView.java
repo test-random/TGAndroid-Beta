@@ -61,6 +61,7 @@ public class UndoView extends FrameLayout {
     private int hideAnimationType;
     private CharSequence infoText;
     private LinkSpanDrawable.LinksTextView infoTextView;
+    private int infoTextViewEmojiCacheType;
     private boolean isShown;
     private long lastUpdateTime;
     private RLottieImageView leftImageView;
@@ -120,6 +121,7 @@ public class UndoView extends FrameLayout {
 
     public UndoView(Context context, BaseFragment baseFragment, boolean z, Theme.ResourcesProvider resourcesProvider) {
         super(context);
+        this.infoTextViewEmojiCacheType = 0;
         this.currentAccount = UserConfig.selectedAccount;
         this.currentAction = -1;
         this.hideAnimationType = 1;
@@ -128,7 +130,12 @@ public class UndoView extends FrameLayout {
         this.resourcesProvider = resourcesProvider;
         this.parentFragment = baseFragment;
         this.fromTop = z;
-        LinkSpanDrawable.LinksTextView linksTextView = new LinkSpanDrawable.LinksTextView(context, resourcesProvider);
+        LinkSpanDrawable.LinksTextView linksTextView = new LinkSpanDrawable.LinksTextView(context, resourcesProvider) {
+            @Override
+            protected int emojiCacheType() {
+                return UndoView.this.infoTextViewEmojiCacheType;
+            }
+        };
         this.infoTextView = linksTextView;
         linksTextView.setTextSize(1, 15.0f);
         LinkSpanDrawable.LinksTextView linksTextView2 = this.infoTextView;
@@ -545,7 +552,7 @@ public class UndoView extends FrameLayout {
         showWithAction(j, i, (Object) null, (Object) null, runnable, runnable2);
     }
 
-    public void showWithAction(java.util.ArrayList r25, int r26, java.lang.Object r27, java.lang.Object r28, java.lang.Runnable r29, java.lang.Runnable r30) {
+    public void showWithAction(java.util.ArrayList r27, int r28, java.lang.Object r29, java.lang.Object r30, java.lang.Runnable r31, java.lang.Runnable r32) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.UndoView.showWithAction(java.util.ArrayList, int, java.lang.Object, java.lang.Object, java.lang.Runnable, java.lang.Runnable):void");
     }
 }

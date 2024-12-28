@@ -71,6 +71,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
@@ -1864,7 +1865,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
             textView = this.stickerEmojiTextView;
             emojiForSticker = MediaDataController.getInstance(this.currentAccount).getEmojiForSticker(this.selectedSticker.id);
             paint = this.stickerEmojiTextView.getPaint();
-            textView.setText(Emoji.replaceEmoji((CharSequence) emojiForSticker, paint.getFontMetricsInt(), AndroidUtilities.dp(30.0f), false));
+            textView.setText(Emoji.replaceEmoji(emojiForSticker, paint.getFontMetricsInt(), false));
             TLRPC.TL_messages_stickerSet tL_messages_stickerSet2 = this.stickerSet;
             if ((tL_messages_stickerSet2 != null && (stickerSet = tL_messages_stickerSet2.set) != null && stickerSet.emojis) || ContentPreviewViewer.getInstance().showMenuFor(view)) {
                 return;
@@ -1886,7 +1887,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
                 return;
             }
             TextView textView2 = this.stickerEmojiTextView;
-            textView2.setText(Emoji.replaceEmoji((CharSequence) importingSticker.emoji, textView2.getPaint().getFontMetricsInt(), AndroidUtilities.dp(30.0f), false));
+            textView2.setText(Emoji.replaceEmoji(importingSticker.emoji, textView2.getPaint().getFontMetricsInt(), false));
             this.stickerImageView.setImage(ImageLocation.getForPath(this.selectedStickerPath.path), (String) null, (ImageLocation) null, (String) null, (Drawable) null, (Bitmap) null, this.selectedStickerPath.animated ? "tgs" : null, 0, (Object) null);
             FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) this.stickerPreviewLayout.getLayoutParams();
             layoutParams2.topMargin = this.scrollOffsetY;
@@ -1948,8 +1949,8 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
 
     public void lambda$new$0(TLRPC.TL_error tL_error, TLObject tLObject, TLRPC.TL_messages_getAttachedStickers tL_messages_getAttachedStickers) {
         this.reqId = 0;
-        if (tL_error == null) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tL_error == null && (tLObject instanceof Vector)) {
+            Vector vector = (Vector) tLObject;
             if (!vector.objects.isEmpty()) {
                 if (vector.objects.size() == 1) {
                     TLRPC.StickerSetCovered stickerSetCovered = (TLRPC.StickerSetCovered) vector.objects.get(0);
@@ -1961,10 +1962,9 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
                     loadStickerSet(false);
                     return;
                 }
-                this.stickerSetCovereds = new ArrayList();
-                for (int i = 0; i < vector.objects.size(); i++) {
-                    this.stickerSetCovereds.add((TLRPC.StickerSetCovered) vector.objects.get(i));
-                }
+                ArrayList arrayList = new ArrayList();
+                this.stickerSetCovereds = arrayList;
+                arrayList.addAll(vector.objects);
                 this.gridView.setLayoutParams(LayoutHelper.createFrame(-1, -1.0f, 51, 0.0f, 0.0f, 0.0f, 48.0f));
                 this.titleTextView.setVisibility(8);
                 this.shadow[0].setVisibility(8);
@@ -2624,7 +2624,7 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
             this.pickerBottomLayout.setEnabled(true);
             return;
         }
-        CharSequence replaceEmoji = Emoji.replaceEmoji((CharSequence) this.stickerSet.set.title, this.titleTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(18.0f), false);
+        CharSequence replaceEmoji = Emoji.replaceEmoji(this.stickerSet.set.title, this.titleTextView.getPaint().getFontMetricsInt(), false);
         try {
             if (this.urlPattern == null) {
                 this.urlPattern = Pattern.compile("@[a-zA-Z\\d_]{1,32}");

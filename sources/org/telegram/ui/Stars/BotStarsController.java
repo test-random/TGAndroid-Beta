@@ -14,6 +14,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.tgnet.tl.TL_payments;
 import org.telegram.tgnet.tl.TL_stars;
@@ -430,8 +431,8 @@ public class BotStarsController {
     public void lambda$loadAdmined$6(TLObject tLObject) {
         this.adminedBots = new ArrayList();
         this.loadingAdminedBots = false;
-        if (tLObject instanceof TLRPC.Vector) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
             for (int i = 0; i < vector.objects.size(); i++) {
                 this.adminedBots.add((TLRPC.User) vector.objects.get(i));
             }

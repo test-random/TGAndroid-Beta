@@ -12,6 +12,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 
 public class RingtoneUploader implements NotificationCenter.NotificationCenterDelegate {
     private boolean canceled;
@@ -80,13 +81,13 @@ public class RingtoneUploader implements NotificationCenter.NotificationCenterDe
             String str = (String) objArr[0];
             if (!this.canceled && str.equals(this.filePath)) {
                 TLRPC.InputFile inputFile = (TLRPC.InputFile) objArr[1];
-                TLRPC.TL_account_uploadRingtone tL_account_uploadRingtone = new TLRPC.TL_account_uploadRingtone();
-                tL_account_uploadRingtone.file = inputFile;
-                tL_account_uploadRingtone.file_name = inputFile.name;
+                TL_account.uploadRingtone uploadringtone = new TL_account.uploadRingtone();
+                uploadringtone.file = inputFile;
+                uploadringtone.file_name = inputFile.name;
                 String fileExtension = FileLoader.getFileExtension(new File(inputFile.name));
-                tL_account_uploadRingtone.mime_type = fileExtension;
-                tL_account_uploadRingtone.mime_type = "ogg".equals(fileExtension) ? "audio/ogg" : "audio/mpeg";
-                ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_uploadRingtone, new RequestDelegate() {
+                uploadringtone.mime_type = fileExtension;
+                uploadringtone.mime_type = "ogg".equals(fileExtension) ? "audio/ogg" : "audio/mpeg";
+                ConnectionsManager.getInstance(this.currentAccount).sendRequest(uploadringtone, new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                         RingtoneUploader.this.lambda$didReceivedNotification$1(tLObject, tL_error);

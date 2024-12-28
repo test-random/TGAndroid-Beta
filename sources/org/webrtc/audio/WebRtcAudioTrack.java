@@ -208,7 +208,6 @@ public class WebRtcAudioTrack {
         AudioAttributes build;
         int usage2;
         int contentType2;
-        int flags;
         int contentType3;
         int usage3;
         usage = new AudioAttributes.Builder().setUsage(DEFAULT_USAGE);
@@ -224,8 +223,7 @@ public class WebRtcAudioTrack {
                 contentType3 = audioAttributes.getContentType();
                 contentType.setContentType(contentType3);
             }
-            flags = audioAttributes.getFlags();
-            contentType.setFlags(flags);
+            contentType.setFlags(WebRtcAudioTrack$$ExternalSyntheticApiModelOutline6.m(audioAttributes));
             if (Build.VERSION.SDK_INT >= 29) {
                 contentType = applyAttributesOnQOrHigher(contentType, audioAttributes);
             }

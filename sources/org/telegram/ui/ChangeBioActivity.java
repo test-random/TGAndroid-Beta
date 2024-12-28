@@ -27,6 +27,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -69,21 +70,21 @@ public class ChangeBioActivity extends BaseFragment {
         lambda$onBackPressed$321();
     }
 
-    public void lambda$saveName$3(AlertDialog alertDialog, TLRPC.TL_error tL_error, TLRPC.TL_account_updateProfile tL_account_updateProfile) {
+    public void lambda$saveName$3(AlertDialog alertDialog, TLRPC.TL_error tL_error, TL_account.updateProfile updateprofile) {
         try {
             alertDialog.dismiss();
         } catch (Exception e) {
             FileLog.e(e);
         }
-        AlertsCreator.processError(this.currentAccount, tL_error, this, tL_account_updateProfile, new Object[0]);
+        AlertsCreator.processError(this.currentAccount, tL_error, this, updateprofile, new Object[0]);
     }
 
-    public void lambda$saveName$4(final AlertDialog alertDialog, final TLRPC.UserFull userFull, final String str, final TLRPC.TL_account_updateProfile tL_account_updateProfile, TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$saveName$4(final AlertDialog alertDialog, final TLRPC.UserFull userFull, final String str, final TL_account.updateProfile updateprofile, TLObject tLObject, final TLRPC.TL_error tL_error) {
         if (tL_error != null) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChangeBioActivity.this.lambda$saveName$3(alertDialog, tL_error, tL_account_updateProfile);
+                    ChangeBioActivity.this.lambda$saveName$3(alertDialog, tL_error, updateprofile);
                 }
             });
         } else {
@@ -116,13 +117,13 @@ public class ChangeBioActivity extends BaseFragment {
             return;
         }
         final AlertDialog alertDialog = new AlertDialog(getParentActivity(), 3);
-        final TLRPC.TL_account_updateProfile tL_account_updateProfile = new TLRPC.TL_account_updateProfile();
-        tL_account_updateProfile.about = replace;
-        tL_account_updateProfile.flags |= 4;
-        final int sendRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_updateProfile, new RequestDelegate() {
+        final TL_account.updateProfile updateprofile = new TL_account.updateProfile();
+        updateprofile.about = replace;
+        updateprofile.flags |= 4;
+        final int sendRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(updateprofile, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                ChangeBioActivity.this.lambda$saveName$4(alertDialog, userFull, replace, tL_account_updateProfile, tLObject, tL_error);
+                ChangeBioActivity.this.lambda$saveName$4(alertDialog, userFull, replace, updateprofile, tLObject, tL_error);
             }
         }, 2);
         ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(sendRequest, this.classGuid);

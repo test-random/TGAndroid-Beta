@@ -39,6 +39,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.LaunchActivity;
@@ -456,8 +457,8 @@ public abstract class BoostRepository {
     }
 
     public static void lambda$loadGiftOptions$31(final TLRPC.Chat chat, final int i, final Utilities.Callback callback, TLObject tLObject, TLRPC.TL_error tL_error) {
-        if (tLObject != null) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
             final ArrayList arrayList = new ArrayList();
             ArrayList arrayList2 = new ArrayList();
             for (int i2 = 0; i2 < vector.objects.size(); i2++) {

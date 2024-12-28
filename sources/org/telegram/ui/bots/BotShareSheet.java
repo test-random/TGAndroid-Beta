@@ -120,6 +120,11 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
             }
 
             @Override
+            public void didPressReaction(ChatActionCell chatActionCell2, TLRPC.ReactionCount reactionCount, boolean z, float f, float f2) {
+                ChatActionCell.ChatActionCellDelegate.CC.$default$didPressReaction(this, chatActionCell2, reactionCount, z, f, f2);
+            }
+
+            @Override
             public void didPressReplyMessage(ChatActionCell chatActionCell2, int i3) {
                 ChatActionCell.ChatActionCellDelegate.CC.$default$didPressReplyMessage(this, chatActionCell2, i3);
             }

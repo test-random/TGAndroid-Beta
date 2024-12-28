@@ -22,6 +22,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_phone;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.TextDetailCell;
@@ -136,10 +137,10 @@ public class CreateRtmpStreamBottomSheet extends BottomSheetWithRecyclerListView
         recyclerListView.setPadding(i, 0, i, AndroidUtilities.dp(72.0f));
         fixNavigationBar();
         updateTitle();
-        TLRPC.TL_phone_getGroupCallStreamRtmpUrl tL_phone_getGroupCallStreamRtmpUrl = new TLRPC.TL_phone_getGroupCallStreamRtmpUrl();
-        tL_phone_getGroupCallStreamRtmpUrl.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(j);
-        tL_phone_getGroupCallStreamRtmpUrl.revoke = false;
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_phone_getGroupCallStreamRtmpUrl, new RequestDelegate() {
+        TL_phone.getGroupCallStreamRtmpUrl getgroupcallstreamrtmpurl = new TL_phone.getGroupCallStreamRtmpUrl();
+        getgroupcallstreamrtmpurl.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(j);
+        getgroupcallstreamrtmpurl.revoke = false;
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(getgroupcallstreamrtmpurl, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 CreateRtmpStreamBottomSheet.this.lambda$new$2(tLObject, tL_error);
@@ -162,12 +163,12 @@ public class CreateRtmpStreamBottomSheet extends BottomSheetWithRecyclerListView
     }
 
     public void lambda$new$1(TLObject tLObject) {
-        if (tLObject == null || !(tLObject instanceof TLRPC.TL_phone_groupCallStreamRtmpUrl)) {
+        if (tLObject == null || !(tLObject instanceof TL_phone.groupCallStreamRtmpUrl)) {
             return;
         }
-        TLRPC.TL_phone_groupCallStreamRtmpUrl tL_phone_groupCallStreamRtmpUrl = (TLRPC.TL_phone_groupCallStreamRtmpUrl) tLObject;
-        this.rtmpUrl = tL_phone_groupCallStreamRtmpUrl.url;
-        this.rtmpKey = tL_phone_groupCallStreamRtmpUrl.key;
+        TL_phone.groupCallStreamRtmpUrl groupcallstreamrtmpurl = (TL_phone.groupCallStreamRtmpUrl) tLObject;
+        this.rtmpUrl = groupcallstreamrtmpurl.url;
+        this.rtmpKey = groupcallstreamrtmpurl.key;
         this.adapter.update(false);
     }
 

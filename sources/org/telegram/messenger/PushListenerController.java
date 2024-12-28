@@ -478,11 +478,15 @@ public class PushListenerController {
         LocationController.getInstance(i).setNewLocationEndWatchTime();
     }
 
-    public static void lambda$processRemoteMessage$5(java.lang.String r60, java.lang.String r61, long r62) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.PushListenerController.lambda$processRemoteMessage$5(java.lang.String, java.lang.String, long):void");
+    public static void lambda$processRemoteMessage$5(int i, long j, int i2) {
+        MessagesController.getInstance(i).reportMessageDelivery(j, i2, true);
     }
 
-    public static void lambda$processRemoteMessage$6(final String str, final String str2, final long j) {
+    public static void lambda$processRemoteMessage$6(java.lang.String r60, java.lang.String r61, long r62) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.PushListenerController.lambda$processRemoteMessage$6(java.lang.String, java.lang.String, long):void");
+    }
+
+    public static void lambda$processRemoteMessage$7(final String str, final String str2, final long j) {
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d(str + " PRE INIT APP");
         }
@@ -493,7 +497,7 @@ public class PushListenerController {
         Utilities.stageQueue.postRunnable(new Runnable() {
             @Override
             public final void run() {
-                PushListenerController.lambda$processRemoteMessage$5(str, str2, j);
+                PushListenerController.lambda$processRemoteMessage$6(str, str2, j);
             }
         });
     }
@@ -570,7 +574,7 @@ public class PushListenerController {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                PushListenerController.lambda$processRemoteMessage$6(str2, str, j);
+                PushListenerController.lambda$processRemoteMessage$7(str2, str, j);
             }
         });
         try {

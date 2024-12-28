@@ -57,6 +57,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
@@ -1999,7 +2000,7 @@ public class NotificationsController extends BaseController {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.NotificationsController.showExtraNotifications(androidx.core.app.NotificationCompat$Builder, java.lang.String, long, long, java.lang.String, long[], int, android.net.Uri, int, boolean, boolean, boolean, int):void");
     }
 
-    private void showOrUpdateNotification(boolean r57) {
+    private void showOrUpdateNotification(boolean r58) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.NotificationsController.showOrUpdateNotification(boolean):void");
     }
 
@@ -2732,43 +2733,43 @@ public class NotificationsController extends BaseController {
     }
 
     public void updateServerNotificationsSettings(int i) {
-        TLRPC.TL_reactionsNotifySettings tL_reactionsNotifySettings;
-        TLRPC.ReactionNotificationsFrom tL_reactionNotificationsFromAll;
-        TLRPC.TL_reactionsNotifySettings tL_reactionsNotifySettings2;
-        TLRPC.ReactionNotificationsFrom tL_reactionNotificationsFromAll2;
+        TL_account.TL_reactionsNotifySettings tL_reactionsNotifySettings;
+        TL_account.ReactionNotificationsFrom tL_reactionNotificationsFromAll;
+        TL_account.TL_reactionsNotifySettings tL_reactionsNotifySettings2;
+        TL_account.ReactionNotificationsFrom tL_reactionNotificationsFromAll2;
         TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings;
         String str;
         String str2;
         String str3;
         SharedPreferences notificationsSettings = getAccountInstance().getNotificationsSettings();
         if (i == 4 || i == 5) {
-            TLRPC.TL_account_setReactionsNotifySettings tL_account_setReactionsNotifySettings = new TLRPC.TL_account_setReactionsNotifySettings();
-            tL_account_setReactionsNotifySettings.settings = new TLRPC.TL_reactionsNotifySettings();
+            TL_account.setReactionsNotifySettings setreactionsnotifysettings = new TL_account.setReactionsNotifySettings();
+            setreactionsnotifysettings.settings = new TL_account.TL_reactionsNotifySettings();
             if (notificationsSettings.getBoolean("EnableReactionsMessages", true)) {
-                tL_account_setReactionsNotifySettings.settings.flags |= 1;
+                setreactionsnotifysettings.settings.flags |= 1;
                 if (notificationsSettings.getBoolean("EnableReactionsMessagesContacts", false)) {
-                    tL_reactionsNotifySettings2 = tL_account_setReactionsNotifySettings.settings;
-                    tL_reactionNotificationsFromAll2 = new TLRPC.TL_reactionNotificationsFromContacts();
+                    tL_reactionsNotifySettings2 = setreactionsnotifysettings.settings;
+                    tL_reactionNotificationsFromAll2 = new TL_account.TL_reactionNotificationsFromContacts();
                 } else {
-                    tL_reactionsNotifySettings2 = tL_account_setReactionsNotifySettings.settings;
-                    tL_reactionNotificationsFromAll2 = new TLRPC.TL_reactionNotificationsFromAll();
+                    tL_reactionsNotifySettings2 = setreactionsnotifysettings.settings;
+                    tL_reactionNotificationsFromAll2 = new TL_account.TL_reactionNotificationsFromAll();
                 }
                 tL_reactionsNotifySettings2.messages_notify_from = tL_reactionNotificationsFromAll2;
             }
             if (notificationsSettings.getBoolean("EnableReactionsStories", true)) {
-                tL_account_setReactionsNotifySettings.settings.flags |= 2;
+                setreactionsnotifysettings.settings.flags |= 2;
                 if (notificationsSettings.getBoolean("EnableReactionsStoriesContacts", false)) {
-                    tL_reactionsNotifySettings = tL_account_setReactionsNotifySettings.settings;
-                    tL_reactionNotificationsFromAll = new TLRPC.TL_reactionNotificationsFromContacts();
+                    tL_reactionsNotifySettings = setreactionsnotifysettings.settings;
+                    tL_reactionNotificationsFromAll = new TL_account.TL_reactionNotificationsFromContacts();
                 } else {
-                    tL_reactionsNotifySettings = tL_account_setReactionsNotifySettings.settings;
-                    tL_reactionNotificationsFromAll = new TLRPC.TL_reactionNotificationsFromAll();
+                    tL_reactionsNotifySettings = setreactionsnotifysettings.settings;
+                    tL_reactionNotificationsFromAll = new TL_account.TL_reactionNotificationsFromAll();
                 }
                 tL_reactionsNotifySettings.stories_notify_from = tL_reactionNotificationsFromAll;
             }
-            tL_account_setReactionsNotifySettings.settings.show_previews = notificationsSettings.getBoolean("EnableReactionsPreview", true);
-            tL_account_setReactionsNotifySettings.settings.sound = getInputSound(notificationsSettings, "ReactionSound", "ReactionSoundDocId", "ReactionSoundPath");
-            getConnectionsManager().sendRequest(tL_account_setReactionsNotifySettings, new RequestDelegate() {
+            setreactionsnotifysettings.settings.show_previews = notificationsSettings.getBoolean("EnableReactionsPreview", true);
+            setreactionsnotifysettings.settings.sound = getInputSound(notificationsSettings, "ReactionSound", "ReactionSoundDocId", "ReactionSoundPath");
+            getConnectionsManager().sendRequest(setreactionsnotifysettings, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     NotificationsController.lambda$updateServerNotificationsSettings$48(tLObject, tL_error);
@@ -2776,56 +2777,56 @@ public class NotificationsController extends BaseController {
             });
             return;
         }
-        TLRPC.TL_account_updateNotifySettings tL_account_updateNotifySettings = new TLRPC.TL_account_updateNotifySettings();
+        TL_account.updateNotifySettings updatenotifysettings = new TL_account.updateNotifySettings();
         TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings2 = new TLRPC.TL_inputPeerNotifySettings();
-        tL_account_updateNotifySettings.settings = tL_inputPeerNotifySettings2;
+        updatenotifysettings.settings = tL_inputPeerNotifySettings2;
         tL_inputPeerNotifySettings2.flags = 5;
         if (i == 0) {
-            tL_account_updateNotifySettings.peer = new TLRPC.TL_inputNotifyChats();
-            tL_account_updateNotifySettings.settings.mute_until = notificationsSettings.getInt("EnableGroup2", 0);
-            tL_account_updateNotifySettings.settings.show_previews = notificationsSettings.getBoolean("EnablePreviewGroup", true);
-            tL_inputPeerNotifySettings = tL_account_updateNotifySettings.settings;
+            updatenotifysettings.peer = new TLRPC.TL_inputNotifyChats();
+            updatenotifysettings.settings.mute_until = notificationsSettings.getInt("EnableGroup2", 0);
+            updatenotifysettings.settings.show_previews = notificationsSettings.getBoolean("EnablePreviewGroup", true);
+            tL_inputPeerNotifySettings = updatenotifysettings.settings;
             tL_inputPeerNotifySettings.flags |= 8;
             str = "GroupSoundDocId";
             str2 = "GroupSoundPath";
             str3 = "GroupSound";
         } else {
             if (i == 1 || i == 3) {
-                tL_account_updateNotifySettings.peer = new TLRPC.TL_inputNotifyUsers();
-                tL_account_updateNotifySettings.settings.mute_until = notificationsSettings.getInt("EnableAll2", 0);
-                tL_account_updateNotifySettings.settings.show_previews = notificationsSettings.getBoolean("EnablePreviewAll", true);
-                TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings3 = tL_account_updateNotifySettings.settings;
+                updatenotifysettings.peer = new TLRPC.TL_inputNotifyUsers();
+                updatenotifysettings.settings.mute_until = notificationsSettings.getInt("EnableAll2", 0);
+                updatenotifysettings.settings.show_previews = notificationsSettings.getBoolean("EnablePreviewAll", true);
+                TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings3 = updatenotifysettings.settings;
                 tL_inputPeerNotifySettings3.flags |= 128;
                 tL_inputPeerNotifySettings3.stories_hide_sender = notificationsSettings.getBoolean("EnableHideStoriesSenders", false);
                 if (notificationsSettings.contains("EnableAllStories")) {
-                    TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings4 = tL_account_updateNotifySettings.settings;
+                    TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings4 = updatenotifysettings.settings;
                     tL_inputPeerNotifySettings4.flags |= 64;
                     tL_inputPeerNotifySettings4.stories_muted = !notificationsSettings.getBoolean("EnableAllStories", true);
                 }
-                TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings5 = tL_account_updateNotifySettings.settings;
+                TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings5 = updatenotifysettings.settings;
                 tL_inputPeerNotifySettings5.flags |= 8;
                 tL_inputPeerNotifySettings5.sound = getInputSound(notificationsSettings, "GlobalSound", "GlobalSoundDocId", "GlobalSoundPath");
-                TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings6 = tL_account_updateNotifySettings.settings;
+                TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings6 = updatenotifysettings.settings;
                 tL_inputPeerNotifySettings6.flags |= 256;
                 tL_inputPeerNotifySettings6.stories_sound = getInputSound(notificationsSettings, "StoriesSound", "StoriesSoundDocId", "StoriesSoundPath");
-                getConnectionsManager().sendRequest(tL_account_updateNotifySettings, new RequestDelegate() {
+                getConnectionsManager().sendRequest(updatenotifysettings, new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                         NotificationsController.lambda$updateServerNotificationsSettings$49(tLObject, tL_error);
                     }
                 });
             }
-            tL_account_updateNotifySettings.peer = new TLRPC.TL_inputNotifyBroadcasts();
-            tL_account_updateNotifySettings.settings.mute_until = notificationsSettings.getInt("EnableChannel2", 0);
-            tL_account_updateNotifySettings.settings.show_previews = notificationsSettings.getBoolean("EnablePreviewChannel", true);
-            tL_inputPeerNotifySettings = tL_account_updateNotifySettings.settings;
+            updatenotifysettings.peer = new TLRPC.TL_inputNotifyBroadcasts();
+            updatenotifysettings.settings.mute_until = notificationsSettings.getInt("EnableChannel2", 0);
+            updatenotifysettings.settings.show_previews = notificationsSettings.getBoolean("EnablePreviewChannel", true);
+            tL_inputPeerNotifySettings = updatenotifysettings.settings;
             tL_inputPeerNotifySettings.flags |= 8;
             str = "ChannelSoundDocId";
             str2 = "ChannelSoundPath";
             str3 = "ChannelSound";
         }
         tL_inputPeerNotifySettings.sound = getInputSound(notificationsSettings, str3, str, str2);
-        getConnectionsManager().sendRequest(tL_account_updateNotifySettings, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatenotifysettings, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 NotificationsController.lambda$updateServerNotificationsSettings$49(tLObject, tL_error);
@@ -2846,23 +2847,23 @@ public class NotificationsController extends BaseController {
             return;
         }
         SharedPreferences notificationsSettings = getAccountInstance().getNotificationsSettings();
-        TLRPC.TL_account_updateNotifySettings tL_account_updateNotifySettings = new TLRPC.TL_account_updateNotifySettings();
-        tL_account_updateNotifySettings.settings = new TLRPC.TL_inputPeerNotifySettings();
+        TL_account.updateNotifySettings updatenotifysettings = new TL_account.updateNotifySettings();
+        updatenotifysettings.settings = new TLRPC.TL_inputPeerNotifySettings();
         String sharedPrefKey = getSharedPrefKey(j, j2);
-        TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings = tL_account_updateNotifySettings.settings;
+        TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings = updatenotifysettings.settings;
         tL_inputPeerNotifySettings.flags |= 1;
         tL_inputPeerNotifySettings.show_previews = notificationsSettings.getBoolean("content_preview_" + sharedPrefKey, true);
-        TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings2 = tL_account_updateNotifySettings.settings;
+        TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings2 = updatenotifysettings.settings;
         tL_inputPeerNotifySettings2.flags = tL_inputPeerNotifySettings2.flags | 2;
         tL_inputPeerNotifySettings2.silent = notificationsSettings.getBoolean("silent_" + sharedPrefKey, false);
         if (notificationsSettings.contains("stories_" + sharedPrefKey)) {
-            TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings3 = tL_account_updateNotifySettings.settings;
+            TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings3 = updatenotifysettings.settings;
             tL_inputPeerNotifySettings3.flags |= 64;
             tL_inputPeerNotifySettings3.stories_muted = !notificationsSettings.getBoolean("stories_" + sharedPrefKey, true);
         }
         int i2 = notificationsSettings.getInt("notify2_" + getSharedPrefKey(j, j2), -1);
         if (i2 != -1) {
-            TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings4 = tL_account_updateNotifySettings.settings;
+            TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings4 = updatenotifysettings.settings;
             tL_inputPeerNotifySettings4.flags |= 4;
             if (i2 == 3) {
                 i = notificationsSettings.getInt("notifyuntil_" + getSharedPrefKey(j, j2), 0);
@@ -2873,33 +2874,33 @@ public class NotificationsController extends BaseController {
         }
         long j3 = notificationsSettings.getLong("sound_document_id_" + getSharedPrefKey(j, j2), 0L);
         String string = notificationsSettings.getString("sound_path_" + getSharedPrefKey(j, j2), null);
-        TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings5 = tL_account_updateNotifySettings.settings;
+        TLRPC.TL_inputPeerNotifySettings tL_inputPeerNotifySettings5 = updatenotifysettings.settings;
         tL_inputPeerNotifySettings5.flags = tL_inputPeerNotifySettings5.flags | 8;
         if (j3 != 0) {
             TLRPC.TL_notificationSoundRingtone tL_notificationSoundRingtone = new TLRPC.TL_notificationSoundRingtone();
             tL_notificationSoundRingtone.id = j3;
-            tL_account_updateNotifySettings.settings.sound = tL_notificationSoundRingtone;
+            updatenotifysettings.settings.sound = tL_notificationSoundRingtone;
         } else if (string == null) {
             tL_inputPeerNotifySettings5.sound = new TLRPC.TL_notificationSoundDefault();
         } else if (string.equalsIgnoreCase("NoSound")) {
-            tL_account_updateNotifySettings.settings.sound = new TLRPC.TL_notificationSoundNone();
+            updatenotifysettings.settings.sound = new TLRPC.TL_notificationSoundNone();
         } else {
             TLRPC.TL_notificationSoundLocal tL_notificationSoundLocal = new TLRPC.TL_notificationSoundLocal();
             tL_notificationSoundLocal.title = notificationsSettings.getString("sound_" + getSharedPrefKey(j, j2), null);
             tL_notificationSoundLocal.data = string;
-            tL_account_updateNotifySettings.settings.sound = tL_notificationSoundLocal;
+            updatenotifysettings.settings.sound = tL_notificationSoundLocal;
         }
         if (j2 == 0 || j == getUserConfig().getClientUserId()) {
             TLRPC.TL_inputNotifyPeer tL_inputNotifyPeer = new TLRPC.TL_inputNotifyPeer();
-            tL_account_updateNotifySettings.peer = tL_inputNotifyPeer;
+            updatenotifysettings.peer = tL_inputNotifyPeer;
             tL_inputNotifyPeer.peer = getMessagesController().getInputPeer(j);
         } else {
             TLRPC.TL_inputNotifyForumTopic tL_inputNotifyForumTopic = new TLRPC.TL_inputNotifyForumTopic();
             tL_inputNotifyForumTopic.peer = getMessagesController().getInputPeer(j);
             tL_inputNotifyForumTopic.top_msg_id = (int) j2;
-            tL_account_updateNotifySettings.peer = tL_inputNotifyForumTopic;
+            updatenotifysettings.peer = tL_inputNotifyForumTopic;
         }
-        getConnectionsManager().sendRequest(tL_account_updateNotifySettings, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatenotifysettings, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 NotificationsController.lambda$updateServerNotificationsSettings$47(tLObject, tL_error);

@@ -80,6 +80,7 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -616,8 +617,8 @@ public abstract class AlertsCreator {
         return builder;
     }
 
-    public static org.telegram.ui.ActionBar.BottomSheet.Builder createBirthdayPickerDialog(android.content.Context r28, java.lang.String r29, java.lang.String r30, org.telegram.tgnet.TLRPC.TL_birthday r31, final org.telegram.messenger.Utilities.Callback r32, java.lang.Runnable r33, org.telegram.ui.ActionBar.Theme.ResourcesProvider r34) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.AlertsCreator.createBirthdayPickerDialog(android.content.Context, java.lang.String, java.lang.String, org.telegram.tgnet.TLRPC$TL_birthday, org.telegram.messenger.Utilities$Callback, java.lang.Runnable, org.telegram.ui.ActionBar.Theme$ResourcesProvider):org.telegram.ui.ActionBar.BottomSheet$Builder");
+    public static org.telegram.ui.ActionBar.BottomSheet.Builder createBirthdayPickerDialog(android.content.Context r28, java.lang.String r29, java.lang.String r30, org.telegram.tgnet.tl.TL_account.TL_birthday r31, final org.telegram.messenger.Utilities.Callback r32, java.lang.Runnable r33, org.telegram.ui.ActionBar.Theme.ResourcesProvider r34) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.AlertsCreator.createBirthdayPickerDialog(android.content.Context, java.lang.String, java.lang.String, org.telegram.tgnet.tl.TL_account$TL_birthday, org.telegram.messenger.Utilities$Callback, java.lang.Runnable, org.telegram.ui.ActionBar.Theme$ResourcesProvider):org.telegram.ui.ActionBar.BottomSheet$Builder");
     }
 
     public static void createBlockDialogAlert(BaseFragment baseFragment, int i, boolean z, TLRPC.User user, final BlockDialogCallback blockDialogCallback) {
@@ -3463,7 +3464,7 @@ public abstract class AlertsCreator {
     }
 
     public static void lambda$createBirthdayPickerDialog$100(NumberPicker numberPicker, NumberPicker numberPicker2, NumberPicker numberPicker3, int i, BottomSheet.Builder builder, Utilities.Callback callback, View view) {
-        TLRPC.TL_birthday tL_birthday = new TLRPC.TL_birthday();
+        TL_account.TL_birthday tL_birthday = new TL_account.TL_birthday();
         tL_birthday.day = numberPicker.getValue();
         tL_birthday.month = numberPicker2.getValue() + 1;
         if (numberPicker3.getValue() != i) {
@@ -3757,11 +3758,11 @@ public abstract class AlertsCreator {
                 dialogInterface.dismiss();
                 return;
             }
-            TLRPC.TL_account_updateProfile tL_account_updateProfile = new TLRPC.TL_account_updateProfile();
-            tL_account_updateProfile.about = trim;
-            tL_account_updateProfile.flags = 4 | tL_account_updateProfile.flags;
+            TL_account.updateProfile updateprofile = new TL_account.updateProfile();
+            updateprofile.about = trim;
+            updateprofile.flags = 4 | updateprofile.flags;
             NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.showBulletin, 2, Long.valueOf(j));
-            ConnectionsManager.getInstance(i).sendRequest(tL_account_updateProfile, new RequestDelegate() {
+            ConnectionsManager.getInstance(i).sendRequest(updateprofile, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     AlertsCreator.lambda$createChangeBioAlert$43(tLObject, tL_error);
@@ -3821,21 +3822,21 @@ public abstract class AlertsCreator {
                 dialogInterface.dismiss();
                 return;
             }
-            TLRPC.TL_account_updateProfile tL_account_updateProfile = new TLRPC.TL_account_updateProfile();
-            tL_account_updateProfile.flags = 3;
-            tL_account_updateProfile.first_name = obj;
+            TL_account.updateProfile updateprofile = new TL_account.updateProfile();
+            updateprofile.flags = 3;
+            updateprofile.first_name = obj;
             user.first_name = obj;
-            tL_account_updateProfile.last_name = obj2;
+            updateprofile.last_name = obj2;
             user.last_name = obj2;
             TLRPC.User user2 = MessagesController.getInstance(i).getUser(Long.valueOf(UserConfig.getInstance(i).getClientUserId()));
             if (user2 != null) {
-                user2.first_name = tL_account_updateProfile.first_name;
-                user2.last_name = tL_account_updateProfile.last_name;
+                user2.first_name = updateprofile.first_name;
+                user2.last_name = updateprofile.last_name;
             }
             UserConfig.getInstance(i).saveConfig(true);
             NotificationCenter.getInstance(i).lambda$postNotificationNameOnUIThread$1(NotificationCenter.mainUserInfoChanged, new Object[0]);
             NotificationCenter.getInstance(i).lambda$postNotificationNameOnUIThread$1(NotificationCenter.updateInterfaces, Integer.valueOf(MessagesController.UPDATE_MASK_NAME));
-            ConnectionsManager.getInstance(i).sendRequest(tL_account_updateProfile, new RequestDelegate() {
+            ConnectionsManager.getInstance(i).sendRequest(updateprofile, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     AlertsCreator.lambda$createChangeNameAlert$47(tLObject, tL_error);

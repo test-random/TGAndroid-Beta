@@ -1142,7 +1142,7 @@ public final class BulletinFactory {
             }
         } else {
             textView.setSingleLine(false);
-            usersLayout.textView.setMaxLines(2);
+            usersLayout.textView.setMaxLines(4);
             usersLayout.textView.setText(charSequence);
             if (usersLayout.textView.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
                 dp = AndroidUtilities.dp(70 - ((3 - i) * 12));
@@ -1163,6 +1163,10 @@ public final class BulletinFactory {
             usersLayout.setButton(new Bulletin.UndoButton(getContext(), true, this.resourcesProvider).setText(LocaleController.getString(R.string.Undo)).setUndoAction(undoObject.onUndo).setDelayedAction(undoObject.onAction));
         }
         return create(usersLayout, 5000);
+    }
+
+    public Bulletin createUsersBulletin(TLObject tLObject, CharSequence charSequence) {
+        return createUsersBulletin(Arrays.asList(tLObject), charSequence, null, null);
     }
 
     public Bulletin createUsersBulletin(TLObject tLObject, CharSequence charSequence, CharSequence charSequence2) {

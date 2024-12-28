@@ -776,7 +776,7 @@ public abstract class AboutLinkCell extends FrameLayout {
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(this.oldText);
         this.stringBuilder = spannableStringBuilder;
         MessageObject.addLinks(false, spannableStringBuilder, false, false, !z);
-        Emoji.replaceEmoji((CharSequence) this.stringBuilder, Theme.profile_aboutTextPaint.getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+        Emoji.replaceEmoji(this.stringBuilder, Theme.profile_aboutTextPaint.getFontMetricsInt(), false);
         if (this.lastMaxWidth <= 0) {
             this.lastMaxWidth = AndroidUtilities.displaySize.x - AndroidUtilities.dp(46.0f);
         }

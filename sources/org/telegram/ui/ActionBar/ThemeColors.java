@@ -719,6 +719,8 @@ public abstract class ThemeColors {
         sparseArray.put(Theme.key_chat_inReactionButtonText, "chat_inReactionButtonText");
         sparseArray.put(Theme.key_chat_inReactionButtonTextSelected, "chat_inReactionButtonTextSelected");
         sparseArray.put(Theme.key_chat_outReactionButtonTextSelected, "chat_outReactionButtonTextSelected");
+        sparseArray.put(Theme.key_chat_reactionServiceButtonBackgroundSelected, "chat_reactionServiceButtonBackgroundSelected");
+        sparseArray.put(Theme.key_chat_reactionServiceButtonTextSelected, "chat_reactionServiceButtonTextSelected");
         sparseArray.put(Theme.key_premiumGradient0, "premiumGradient0");
         sparseArray.put(Theme.key_premiumGradient1, "premiumGradient1");
         sparseArray.put(Theme.key_premiumGradient2, "premiumGradient2");
@@ -1472,6 +1474,8 @@ public abstract class ThemeColors {
         iArr[Theme.key_chat_outReactionButtonText] = -11162801;
         iArr[Theme.key_chat_inReactionButtonTextSelected] = -1;
         iArr[Theme.key_chat_outReactionButtonTextSelected] = -1;
+        iArr[Theme.key_chat_reactionServiceButtonBackgroundSelected] = -1;
+        iArr[Theme.key_chat_reactionServiceButtonTextSelected] = -16777216;
         iArr[Theme.key_premiumGradient0] = -11875005;
         iArr[Theme.key_premiumGradient1] = -11164161;
         iArr[Theme.key_premiumGradient2] = -5806081;

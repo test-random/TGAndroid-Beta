@@ -16,6 +16,7 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Components.BulletinFactory;
 
@@ -37,17 +38,17 @@ public class BusinessLinksController {
         this.currentAccount = i;
     }
 
-    private void editLink(final TLRPC.TL_businessChatLink tL_businessChatLink, TLRPC.TL_inputBusinessChatLink tL_inputBusinessChatLink, final Runnable runnable) {
-        TLRPC.TL_account_editBusinessChatLink tL_account_editBusinessChatLink = new TLRPC.TL_account_editBusinessChatLink();
-        tL_account_editBusinessChatLink.slug = tL_businessChatLink.link;
+    private void editLink(final TL_account.TL_businessChatLink tL_businessChatLink, TL_account.TL_inputBusinessChatLink tL_inputBusinessChatLink, final Runnable runnable) {
+        TL_account.editBusinessChatLink editbusinesschatlink = new TL_account.editBusinessChatLink();
+        editbusinesschatlink.slug = tL_businessChatLink.link;
         if (!tL_inputBusinessChatLink.entities.isEmpty()) {
             tL_inputBusinessChatLink.flags |= 1;
         }
         if (!TextUtils.isEmpty(tL_inputBusinessChatLink.title)) {
             tL_inputBusinessChatLink.flags |= 2;
         }
-        tL_account_editBusinessChatLink.link = tL_inputBusinessChatLink;
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_editBusinessChatLink, new RequestDelegate() {
+        editbusinesschatlink.link = tL_inputBusinessChatLink;
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(editbusinesschatlink, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 BusinessLinksController.this.lambda$editLink$12(tL_businessChatLink, runnable, tLObject, tL_error);
@@ -75,8 +76,8 @@ public class BusinessLinksController {
     }
 
     public void lambda$createEmptyLink$4(TLObject tLObject) {
-        if (tLObject instanceof TLRPC.TL_businessChatLink) {
-            TLRPC.TL_businessChatLink tL_businessChatLink = (TLRPC.TL_businessChatLink) tLObject;
+        if (tLObject instanceof TL_account.TL_businessChatLink) {
+            TL_account.TL_businessChatLink tL_businessChatLink = (TL_account.TL_businessChatLink) tLObject;
             this.links.add(tL_businessChatLink);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.businessLinksUpdated, new Object[0]);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.businessLinkCreated, tL_businessChatLink);
@@ -93,12 +94,12 @@ public class BusinessLinksController {
         });
     }
 
-    public void lambda$deleteLinkUndoable$6(int i, TLRPC.TL_businessChatLink tL_businessChatLink) {
+    public void lambda$deleteLinkUndoable$6(int i, TL_account.TL_businessChatLink tL_businessChatLink) {
         this.links.add(i, tL_businessChatLink);
         NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.businessLinksUpdated, new Object[0]);
     }
 
-    public void lambda$deleteLinkUndoable$7(TLObject tLObject, TLRPC.TL_businessChatLink tL_businessChatLink) {
+    public void lambda$deleteLinkUndoable$7(TLObject tLObject, TL_account.TL_businessChatLink tL_businessChatLink) {
         if (!(tLObject instanceof TLRPC.TL_boolTrue)) {
             FileLog.e(new RuntimeException("Unexpected response from server!"));
             return;
@@ -110,7 +111,7 @@ public class BusinessLinksController {
         saveToCache();
     }
 
-    public void lambda$deleteLinkUndoable$8(final TLRPC.TL_businessChatLink tL_businessChatLink, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$deleteLinkUndoable$8(final TL_account.TL_businessChatLink tL_businessChatLink, final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
@@ -119,10 +120,10 @@ public class BusinessLinksController {
         });
     }
 
-    public void lambda$deleteLinkUndoable$9(String str, final TLRPC.TL_businessChatLink tL_businessChatLink) {
-        TLRPC.TL_account_deleteBusinessChatLink tL_account_deleteBusinessChatLink = new TLRPC.TL_account_deleteBusinessChatLink();
-        tL_account_deleteBusinessChatLink.slug = str;
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_deleteBusinessChatLink, new RequestDelegate() {
+    public void lambda$deleteLinkUndoable$9(String str, final TL_account.TL_businessChatLink tL_businessChatLink) {
+        TL_account.deleteBusinessChatLink deletebusinesschatlink = new TL_account.deleteBusinessChatLink();
+        deletebusinesschatlink.slug = str;
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(deletebusinesschatlink, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 BusinessLinksController.this.lambda$deleteLinkUndoable$8(tL_businessChatLink, tLObject, tL_error);
@@ -130,9 +131,9 @@ public class BusinessLinksController {
         });
     }
 
-    public void lambda$editLink$11(TLObject tLObject, TLRPC.TL_businessChatLink tL_businessChatLink, Runnable runnable) {
-        if (tLObject instanceof TLRPC.TL_businessChatLink) {
-            TLRPC.TL_businessChatLink tL_businessChatLink2 = (TLRPC.TL_businessChatLink) tLObject;
+    public void lambda$editLink$11(TLObject tLObject, TL_account.TL_businessChatLink tL_businessChatLink, Runnable runnable) {
+        if (tLObject instanceof TL_account.TL_businessChatLink) {
+            TL_account.TL_businessChatLink tL_businessChatLink2 = (TL_account.TL_businessChatLink) tLObject;
             int indexOf = this.links.indexOf(tL_businessChatLink);
             if (indexOf != -1) {
                 this.links.set(indexOf, tL_businessChatLink2);
@@ -145,7 +146,7 @@ public class BusinessLinksController {
         }
     }
 
-    public void lambda$editLink$12(final TLRPC.TL_businessChatLink tL_businessChatLink, final Runnable runnable, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$editLink$12(final TL_account.TL_businessChatLink tL_businessChatLink, final Runnable runnable, final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
@@ -169,13 +170,13 @@ public class BusinessLinksController {
     }
 
     public void lambda$load$2(TLObject tLObject) {
-        if (tLObject instanceof TLRPC.TL_account_businessChatLinks) {
-            TLRPC.TL_account_businessChatLinks tL_account_businessChatLinks = (TLRPC.TL_account_businessChatLinks) tLObject;
+        if (tLObject instanceof TL_account.businessChatLinks) {
+            TL_account.businessChatLinks businesschatlinks = (TL_account.businessChatLinks) tLObject;
             this.links.clear();
-            this.links.addAll(tL_account_businessChatLinks.links);
-            MessagesController.getInstance(this.currentAccount).putUsers(tL_account_businessChatLinks.users, false);
-            MessagesController.getInstance(this.currentAccount).putChats(tL_account_businessChatLinks.chats, false);
-            MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(tL_account_businessChatLinks.users, tL_account_businessChatLinks.chats, true, true);
+            this.links.addAll(businesschatlinks.links);
+            MessagesController.getInstance(this.currentAccount).putUsers(businesschatlinks.users, false);
+            MessagesController.getInstance(this.currentAccount).putChats(businesschatlinks.chats, false);
+            MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(businesschatlinks.users, businesschatlinks.chats, true, true);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.businessLinksUpdated, new Object[0]);
             saveToCache();
         } else {
@@ -202,7 +203,7 @@ public class BusinessLinksController {
                 database.executeFast("DELETE FROM business_links").stepThis().dispose();
                 sQLitePreparedStatement = database.executeFast("REPLACE INTO business_links VALUES(?, ?)");
                 for (int i = 0; i < arrayList.size(); i++) {
-                    TLRPC.TL_businessChatLink tL_businessChatLink = (TLRPC.TL_businessChatLink) arrayList.get(i);
+                    TL_account.TL_businessChatLink tL_businessChatLink = (TL_account.TL_businessChatLink) arrayList.get(i);
                     NativeByteBuffer nativeByteBuffer = new NativeByteBuffer(tL_businessChatLink.getObjectSize());
                     tL_businessChatLink.serializeToStream(nativeByteBuffer);
                     sQLitePreparedStatement.requery();
@@ -243,7 +244,7 @@ public class BusinessLinksController {
                     }
                 });
             } else {
-                ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_getBusinessChatLinks(), new RequestDelegate() {
+                ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.getBusinessChatLinks(), new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                         BusinessLinksController.this.lambda$load$3(tLObject, tL_error);
@@ -273,11 +274,11 @@ public class BusinessLinksController {
     }
 
     public void createEmptyLink() {
-        TLRPC.TL_account_createBusinessChatLink tL_account_createBusinessChatLink = new TLRPC.TL_account_createBusinessChatLink();
-        TLRPC.TL_inputBusinessChatLink tL_inputBusinessChatLink = new TLRPC.TL_inputBusinessChatLink();
-        tL_account_createBusinessChatLink.link = tL_inputBusinessChatLink;
+        TL_account.createBusinessChatLink createbusinesschatlink = new TL_account.createBusinessChatLink();
+        TL_account.TL_inputBusinessChatLink tL_inputBusinessChatLink = new TL_account.TL_inputBusinessChatLink();
+        createbusinesschatlink.link = tL_inputBusinessChatLink;
         tL_inputBusinessChatLink.message = "";
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_createBusinessChatLink, new RequestDelegate() {
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(createbusinesschatlink, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 BusinessLinksController.this.lambda$createEmptyLink$5(tLObject, tL_error);
@@ -286,7 +287,7 @@ public class BusinessLinksController {
     }
 
     public void deleteLinkUndoable(BaseFragment baseFragment, final String str) {
-        final TLRPC.TL_businessChatLink findLink = findLink(str);
+        final TL_account.TL_businessChatLink findLink = findLink(str);
         if (findLink != null) {
             final int indexOf = this.links.indexOf(findLink);
             this.links.remove(findLink);
@@ -306,11 +307,11 @@ public class BusinessLinksController {
     }
 
     public void editLinkMessage(String str, String str2, ArrayList arrayList, Runnable runnable) {
-        TLRPC.TL_businessChatLink findLink = findLink(str);
+        TL_account.TL_businessChatLink findLink = findLink(str);
         if (findLink == null) {
             return;
         }
-        TLRPC.TL_inputBusinessChatLink tL_inputBusinessChatLink = new TLRPC.TL_inputBusinessChatLink();
+        TL_account.TL_inputBusinessChatLink tL_inputBusinessChatLink = new TL_account.TL_inputBusinessChatLink();
         tL_inputBusinessChatLink.message = str2;
         tL_inputBusinessChatLink.entities = arrayList;
         tL_inputBusinessChatLink.title = findLink.title;
@@ -318,20 +319,20 @@ public class BusinessLinksController {
     }
 
     public void editLinkTitle(String str, String str2) {
-        TLRPC.TL_businessChatLink findLink = findLink(str);
+        TL_account.TL_businessChatLink findLink = findLink(str);
         if (findLink == null) {
             return;
         }
-        TLRPC.TL_inputBusinessChatLink tL_inputBusinessChatLink = new TLRPC.TL_inputBusinessChatLink();
+        TL_account.TL_inputBusinessChatLink tL_inputBusinessChatLink = new TL_account.TL_inputBusinessChatLink();
         tL_inputBusinessChatLink.message = findLink.message;
         tL_inputBusinessChatLink.entities = findLink.entities;
         tL_inputBusinessChatLink.title = str2;
         editLink(findLink, tL_inputBusinessChatLink, null);
     }
 
-    public TLRPC.TL_businessChatLink findLink(String str) {
+    public TL_account.TL_businessChatLink findLink(String str) {
         for (int i = 0; i < this.links.size(); i++) {
-            TLRPC.TL_businessChatLink tL_businessChatLink = (TLRPC.TL_businessChatLink) this.links.get(i);
+            TL_account.TL_businessChatLink tL_businessChatLink = (TL_account.TL_businessChatLink) this.links.get(i);
             if (!TextUtils.equals(tL_businessChatLink.link, str)) {
                 if (!TextUtils.equals(tL_businessChatLink.link, "https://" + str)) {
                     if (!TextUtils.equals(tL_businessChatLink.link, "https://t.me/m/" + str)) {

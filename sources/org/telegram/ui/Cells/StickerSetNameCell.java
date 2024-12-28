@@ -136,7 +136,7 @@ public class StickerSetNameCell extends FrameLayout {
         } catch (Exception unused) {
         }
         TextView textView = this.textView;
-        textView.setText(Emoji.replaceEmoji((CharSequence) spannableStringBuilder, textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false));
+        textView.setText(Emoji.replaceEmoji(spannableStringBuilder, textView.getPaint().getFontMetricsInt(), false));
     }
 
     private void updateUrlSearchSpan() {
@@ -215,7 +215,7 @@ public class StickerSetNameCell extends FrameLayout {
                 updateTextSearchSpan();
             } else {
                 TextView textView = this.textView;
-                textView.setText(Emoji.replaceEmoji(charSequence, textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false));
+                textView.setText(Emoji.replaceEmoji(charSequence, textView.getPaint().getFontMetricsInt(), false));
             }
             imageView = this.buttonView;
             if (i != 0) {

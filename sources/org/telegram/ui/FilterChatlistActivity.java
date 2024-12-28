@@ -41,8 +41,10 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BotWebViewVibrationEffect;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DialogObject;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserObject;
@@ -76,6 +78,7 @@ import org.telegram.ui.Components.QRCodeBottomSheet;
 import org.telegram.ui.Components.RLottieImageView;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.TextStyleSpan;
+import org.telegram.ui.Components.spoilers.SpoilersTextView;
 import org.telegram.ui.FilterChatlistActivity;
 
 public class FilterChatlistActivity extends BaseFragment {
@@ -119,7 +122,7 @@ public class FilterChatlistActivity extends BaseFragment {
 
     public static class HintInnerCell extends FrameLayout {
         private RLottieImageView imageView;
-        private TextView subtitleTextView;
+        private SpoilersTextView subtitleTextView;
 
         public HintInnerCell(Context context, int i) {
             super(context);
@@ -130,13 +133,17 @@ public class FilterChatlistActivity extends BaseFragment {
             this.imageView.playAnimation();
             this.imageView.setImportantForAccessibility(2);
             addView(this.imageView, LayoutHelper.createFrame(90, 90.0f, 49, 0.0f, 14.0f, 0.0f, 0.0f));
-            TextView textView = new TextView(context);
-            this.subtitleTextView = textView;
-            textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText4));
+            SpoilersTextView spoilersTextView = new SpoilersTextView(context);
+            this.subtitleTextView = spoilersTextView;
+            spoilersTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText4));
             this.subtitleTextView.setTextSize(1, 14.0f);
             this.subtitleTextView.setGravity(17);
             this.subtitleTextView.setLines(2);
             addView(this.subtitleTextView, LayoutHelper.createFrame(-1, -2.0f, 49, 40.0f, 121.0f, 40.0f, 24.0f));
+        }
+
+        public SpoilersTextView getSubtitleTextView() {
+            return this.subtitleTextView;
         }
 
         @Override
@@ -146,6 +153,7 @@ public class FilterChatlistActivity extends BaseFragment {
 
         public void setText(CharSequence charSequence, boolean z) {
             this.subtitleTextView.setText(charSequence);
+            this.subtitleTextView.cacheType = z ? 26 : 0;
         }
     }
 
@@ -1348,7 +1356,12 @@ public class FilterChatlistActivity extends BaseFragment {
         if (hintInnerCell == null) {
             return;
         }
-        hintInnerCell.setText(this.invite == null ? LocaleController.getString(R.string.FilterInviteHeaderNo) : AndroidUtilities.replaceTags(LocaleController.formatPluralString("FilterInviteHeader", this.selectedPeers.size(), this.filter.name)), z);
+        if (this.invite == null) {
+            hintInnerCell.setText(LocaleController.getString(R.string.FilterInviteHeaderNo), false);
+            return;
+        }
+        Paint.FontMetricsInt fontMetricsInt = hintInnerCell.getSubtitleTextView().getPaint().getFontMetricsInt();
+        this.hintCountCell.setText(AndroidUtilities.replaceTags(LocaleController.formatPluralSpannable("FilterInviteHeader", this.selectedPeers.size(), MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(this.filter.name, fontMetricsInt, false), this.filter.entities, fontMetricsInt))), this.filter.title_noanimate);
     }
 
     @Override

@@ -76,7 +76,7 @@ public class TextMessageEnterTransition implements MessageEnterTransitionContain
     private final RectF messageReplySelectorRect = new RectF();
     private final int currentAccount = UserConfig.selectedAccount;
 
-    public TextMessageEnterTransition(final org.telegram.ui.Cells.ChatMessageCell r26, final org.telegram.ui.ChatActivity r27, org.telegram.ui.Components.RecyclerListView r28, final org.telegram.ui.MessageEnterTransitionContainer r29, org.telegram.ui.ActionBar.Theme.ResourcesProvider r30) {
+    public TextMessageEnterTransition(final org.telegram.ui.Cells.ChatMessageCell r25, final org.telegram.ui.ChatActivity r26, org.telegram.ui.Components.RecyclerListView r27, final org.telegram.ui.MessageEnterTransitionContainer r28, org.telegram.ui.ActionBar.Theme.ResourcesProvider r29) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.TextMessageEnterTransition.<init>(org.telegram.ui.Cells.ChatMessageCell, org.telegram.ui.ChatActivity, org.telegram.ui.Components.RecyclerListView, org.telegram.ui.MessageEnterTransitionContainer, org.telegram.ui.ActionBar.Theme$ResourcesProvider):void");
     }
 

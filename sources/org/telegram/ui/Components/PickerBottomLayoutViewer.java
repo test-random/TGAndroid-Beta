@@ -27,7 +27,7 @@ public class PickerBottomLayoutViewer extends FrameLayout {
         textView.setTextSize(1, 14.0f);
         this.cancelButton.setTextColor(this.isDarkTheme ? -1 : -15095832);
         this.cancelButton.setGravity(17);
-        this.cancelButton.setBackgroundDrawable(Theme.createSelectorDrawable(this.isDarkTheme ? -12763843 : 788529152, 0));
+        this.cancelButton.setBackground(Theme.createSelectorDrawable(this.isDarkTheme ? -12763843 : 788529152, 0));
         this.cancelButton.setPadding(AndroidUtilities.dp(20.0f), 0, AndroidUtilities.dp(20.0f), 0);
         this.cancelButton.setText(LocaleController.getString(R.string.Cancel).toUpperCase());
         this.cancelButton.setTypeface(AndroidUtilities.bold());

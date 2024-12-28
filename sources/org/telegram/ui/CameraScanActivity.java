@@ -116,7 +116,7 @@ public class CameraScanActivity extends BaseFragment {
     private long recognizedStart;
     private float recognizedT;
     private String recognizedText;
-    private Runnable requestShot;
+    private final Runnable requestShot;
     private int sps;
     private TextView titleTextView;
     private float useRecognizedBounds;

@@ -26,6 +26,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.CubicBezierInterpolator;
@@ -35,7 +36,7 @@ import org.telegram.ui.Components.TypefaceSpan;
 
 public class StoryContainsEmojiButton extends View {
     private static Object lastRequestParentObject;
-    private static TLRPC.Vector lastResponse;
+    private static Vector lastResponse;
     private final ColorFilter colorFilter;
     private boolean emoji;
     private ArrayList inputSets;
@@ -55,7 +56,7 @@ public class StoryContainsEmojiButton extends View {
     private boolean stickers;
     private final TextPaint textPaint;
     private CharSequence toSetText;
-    private TLRPC.Vector vector;
+    private Vector vector;
 
     public StoryContainsEmojiButton(Context context, int i, TLObject tLObject, Object obj, boolean z, ArrayList arrayList, Theme.ResourcesProvider resourcesProvider) {
         super(context);
@@ -129,67 +130,66 @@ public class StoryContainsEmojiButton extends View {
     }
 
     public void lambda$load$1(TLObject tLObject, Object obj, ArrayList arrayList, boolean[] zArr, int i) {
-        if (tLObject == null) {
-            return;
-        }
-        TLRPC.Vector vector = (TLRPC.Vector) tLObject;
-        this.vector = vector;
-        lastRequestParentObject = obj;
-        lastResponse = vector;
-        for (int i2 = 0; i2 < vector.objects.size(); i2++) {
-            TLRPC.StickerSetCovered stickerSetCovered = (TLRPC.StickerSetCovered) vector.objects.get(i2);
-            this.sets.add(stickerSetCovered);
-            TLRPC.StickerSet stickerSet = stickerSetCovered.set;
-            if (stickerSet != null) {
-                this.inputSets.add(MediaDataController.getInputStickerSet(stickerSet));
-                TLRPC.StickerSet stickerSet2 = stickerSetCovered.set;
-                if (stickerSet2.emojis) {
-                    this.emoji = true;
-                } else if (!stickerSet2.masks) {
-                    this.stickers = true;
-                }
-            }
-        }
-        int size = arrayList != null ? arrayList.size() : 0;
-        ArrayList arrayList2 = this.sets;
-        int size2 = size + (arrayList2 == null ? 0 : arrayList2.size());
-        if (this.inputSets != null && arrayList != null && !arrayList.isEmpty()) {
-            for (int i3 = 0; i3 < arrayList.size(); i3++) {
-                TLRPC.InputStickerSet inputStickerSet = (TLRPC.InputStickerSet) arrayList.get(i3);
-                long j = inputStickerSet.id;
-                int i4 = 0;
-                while (true) {
-                    if (i4 >= this.inputSets.size()) {
-                        this.inputSets.add(inputStickerSet);
-                        break;
-                    } else if (((TLRPC.InputStickerSet) this.inputSets.get(i4)).id == j) {
-                        break;
-                    } else {
-                        i4++;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
+            this.vector = vector;
+            lastRequestParentObject = obj;
+            lastResponse = vector;
+            for (int i2 = 0; i2 < vector.objects.size(); i2++) {
+                TLRPC.StickerSetCovered stickerSetCovered = (TLRPC.StickerSetCovered) vector.objects.get(i2);
+                this.sets.add(stickerSetCovered);
+                TLRPC.StickerSet stickerSet = stickerSetCovered.set;
+                if (stickerSet != null) {
+                    this.inputSets.add(MediaDataController.getInputStickerSet(stickerSet));
+                    TLRPC.StickerSet stickerSet2 = stickerSetCovered.set;
+                    if (stickerSet2.emojis) {
+                        this.emoji = true;
+                    } else if (!stickerSet2.masks) {
+                        this.stickers = true;
                     }
                 }
             }
-            this.emoji = true;
-            this.vector = null;
-        }
-        if (size2 != 1) {
-            set(size2);
-        } else if (this.sets.size() >= 1) {
-            set((TLRPC.StickerSetCovered) this.sets.get(0));
-        } else {
-            if (arrayList != null && arrayList.size() >= 1) {
-                zArr[0] = false;
-                MediaDataController.getInstance(i).getStickerSet((TLRPC.InputStickerSet) arrayList.get(0), 0, false, new Utilities.Callback() {
-                    @Override
-                    public final void run(Object obj2) {
-                        StoryContainsEmojiButton.this.lambda$load$0((TLRPC.TL_messages_stickerSet) obj2);
+            int size = arrayList != null ? arrayList.size() : 0;
+            ArrayList arrayList2 = this.sets;
+            int size2 = size + (arrayList2 == null ? 0 : arrayList2.size());
+            if (this.inputSets != null && arrayList != null && !arrayList.isEmpty()) {
+                for (int i3 = 0; i3 < arrayList.size(); i3++) {
+                    TLRPC.InputStickerSet inputStickerSet = (TLRPC.InputStickerSet) arrayList.get(i3);
+                    long j = inputStickerSet.id;
+                    int i4 = 0;
+                    while (true) {
+                        if (i4 >= this.inputSets.size()) {
+                            this.inputSets.add(inputStickerSet);
+                            break;
+                        } else if (((TLRPC.InputStickerSet) this.inputSets.get(i4)).id == j) {
+                            break;
+                        } else {
+                            i4++;
+                        }
                     }
-                });
-                return;
+                }
+                this.emoji = true;
+                this.vector = null;
             }
-            set(0);
+            if (size2 != 1) {
+                set(size2);
+            } else if (this.sets.size() >= 1) {
+                set((TLRPC.StickerSetCovered) this.sets.get(0));
+            } else {
+                if (arrayList != null && arrayList.size() >= 1) {
+                    zArr[0] = false;
+                    MediaDataController.getInstance(i).getStickerSet((TLRPC.InputStickerSet) arrayList.get(0), 0, false, new Utilities.Callback() {
+                        @Override
+                        public final void run(Object obj2) {
+                            StoryContainsEmojiButton.this.lambda$load$0((TLRPC.TL_messages_stickerSet) obj2);
+                        }
+                    });
+                    return;
+                }
+                set(0);
+            }
+            animateLoad(zArr[0]);
         }
-        animateLoad(zArr[0]);
     }
 
     public void lambda$load$2(final Object obj, final ArrayList arrayList, final boolean[] zArr, final int i, final TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -325,7 +325,7 @@ public class StoryContainsEmojiButton extends View {
 
     public void load(final int i, boolean z, TLObject tLObject, final ArrayList arrayList, final Object obj) {
         final RequestDelegate requestDelegate;
-        TLRPC.Vector vector;
+        Vector vector;
         TLRPC.TL_inputStickeredMediaDocument tL_inputStickeredMediaDocument;
         final boolean[] zArr = {true};
         this.parentObject = obj;

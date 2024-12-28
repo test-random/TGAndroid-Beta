@@ -11,6 +11,7 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Components.UItem;
@@ -19,7 +20,7 @@ import org.telegram.ui.UsersSelectActivity;
 
 public class BusinessRecipientsHelper {
     public boolean bot;
-    private TLRPC.TL_businessBotRecipients currentValue;
+    private TL_account.TL_businessBotRecipients currentValue;
     private boolean doNotExcludeNewChats;
     public boolean exclude;
     public boolean excludeExpanded;
@@ -207,8 +208,8 @@ public class BusinessRecipientsHelper {
         }
     }
 
-    public TLRPC.TL_inputBusinessBotRecipients getBotInputValue() {
-        TLRPC.TL_inputBusinessBotRecipients tL_inputBusinessBotRecipients = new TLRPC.TL_inputBusinessBotRecipients();
+    public TL_account.TL_inputBusinessBotRecipients getBotInputValue() {
+        TL_account.TL_inputBusinessBotRecipients tL_inputBusinessBotRecipients = new TL_account.TL_inputBusinessBotRecipients();
         int flags = getFlags();
         tL_inputBusinessBotRecipients.flags = flags & (-49);
         tL_inputBusinessBotRecipients.existing_chats = (flags & 1) != 0;
@@ -245,8 +246,8 @@ public class BusinessRecipientsHelper {
         return tL_inputBusinessBotRecipients;
     }
 
-    public TLRPC.TL_businessBotRecipients getBotValue() {
-        TLRPC.TL_businessBotRecipients tL_businessBotRecipients = new TLRPC.TL_businessBotRecipients();
+    public TL_account.TL_businessBotRecipients getBotValue() {
+        TL_account.TL_businessBotRecipients tL_businessBotRecipients = new TL_account.TL_businessBotRecipients();
         int flags = getFlags();
         tL_businessBotRecipients.flags = flags & (-49);
         tL_businessBotRecipients.existing_chats = (flags & 1) != 0;
@@ -285,8 +286,8 @@ public class BusinessRecipientsHelper {
         return this.exclude ? this.excludeFlags : this.includeFlags;
     }
 
-    public TLRPC.TL_inputBusinessRecipients getInputValue() {
-        TLRPC.TL_inputBusinessRecipients tL_inputBusinessRecipients = new TLRPC.TL_inputBusinessRecipients();
+    public TL_account.TL_inputBusinessRecipients getInputValue() {
+        TL_account.TL_inputBusinessRecipients tL_inputBusinessRecipients = new TL_account.TL_inputBusinessRecipients();
         int flags = getFlags();
         tL_inputBusinessRecipients.flags = flags & (-49);
         tL_inputBusinessRecipients.existing_chats = (flags & 1) != 0;
@@ -311,8 +312,8 @@ public class BusinessRecipientsHelper {
         return tL_inputBusinessRecipients;
     }
 
-    public TLRPC.TL_businessRecipients getValue() {
-        TLRPC.TL_businessRecipients tL_businessRecipients = new TLRPC.TL_businessRecipients();
+    public TL_account.TL_businessRecipients getValue() {
+        TL_account.TL_businessRecipients tL_businessRecipients = new TL_account.TL_businessRecipients();
         int flags = getFlags();
         tL_businessRecipients.flags = flags & (-49);
         tL_businessRecipients.existing_chats = (flags & 1) != 0;
@@ -337,7 +338,7 @@ public class BusinessRecipientsHelper {
     }
 
     public boolean hasChanges() {
-        TLRPC.TL_businessBotRecipients tL_businessBotRecipients = this.currentValue;
+        TL_account.TL_businessBotRecipients tL_businessBotRecipients = this.currentValue;
         if (tL_businessBotRecipients == null || tL_businessBotRecipients.exclude_selected != this.exclude || (tL_businessBotRecipients.flags & (-49)) != getFlags()) {
             return true;
         }
@@ -400,7 +401,7 @@ public class BusinessRecipientsHelper {
         this.exclude = z;
     }
 
-    public void setValue(TLRPC.TL_businessBotRecipients tL_businessBotRecipients) {
+    public void setValue(TL_account.TL_businessBotRecipients tL_businessBotRecipients) {
         ArrayList arrayList;
         ArrayList<Long> arrayList2;
         this.bot = true;
@@ -434,12 +435,12 @@ public class BusinessRecipientsHelper {
         arrayList.addAll(arrayList2);
     }
 
-    public void setValue(TLRPC.TL_businessRecipients tL_businessRecipients) {
+    public void setValue(TL_account.TL_businessRecipients tL_businessRecipients) {
         ArrayList arrayList;
         ArrayList<Long> arrayList2;
         this.bot = false;
         if (tL_businessRecipients != null) {
-            TLRPC.TL_businessBotRecipients tL_businessBotRecipients = new TLRPC.TL_businessBotRecipients();
+            TL_account.TL_businessBotRecipients tL_businessBotRecipients = new TL_account.TL_businessBotRecipients();
             this.currentValue = tL_businessBotRecipients;
             tL_businessBotRecipients.flags = tL_businessRecipients.flags;
             tL_businessBotRecipients.existing_chats = tL_businessRecipients.existing_chats;
@@ -451,7 +452,7 @@ public class BusinessRecipientsHelper {
         } else {
             this.currentValue = null;
         }
-        TLRPC.TL_businessBotRecipients tL_businessBotRecipients2 = this.currentValue;
+        TL_account.TL_businessBotRecipients tL_businessBotRecipients2 = this.currentValue;
         if (tL_businessBotRecipients2 == null) {
             this.exclude = true;
             this.excludeFlags = 0;

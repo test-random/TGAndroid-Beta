@@ -71,6 +71,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
@@ -3936,12 +3937,12 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         }
         if (!settingsPreloaded.contains(Long.valueOf(this.chatId))) {
             settingsPreloaded.add(Long.valueOf(this.chatId));
-            TLRPC.TL_account_getNotifyExceptions tL_account_getNotifyExceptions = new TLRPC.TL_account_getNotifyExceptions();
+            TL_account.getNotifyExceptions getnotifyexceptions = new TL_account.getNotifyExceptions();
             TLRPC.TL_inputNotifyPeer tL_inputNotifyPeer = new TLRPC.TL_inputNotifyPeer();
-            tL_account_getNotifyExceptions.peer = tL_inputNotifyPeer;
-            tL_account_getNotifyExceptions.flags |= 1;
+            getnotifyexceptions.peer = tL_inputNotifyPeer;
+            getnotifyexceptions.flags |= 1;
             tL_inputNotifyPeer.peer = getMessagesController().getInputPeer(-this.chatId);
-            getConnectionsManager().sendRequest(tL_account_getNotifyExceptions, null);
+            getConnectionsManager().sendRequest(getnotifyexceptions, null);
         }
         return true;
     }

@@ -11,6 +11,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.Stories.StoriesController;
@@ -1070,11 +1071,11 @@ public class FileRefController extends BaseController {
             }
         } else if (obj instanceof TLRPC.TL_wallPaper) {
             TLRPC.TL_wallPaper tL_wallPaper = (TLRPC.TL_wallPaper) obj;
-            TLRPC.TL_account_getWallPaper tL_account_getWallPaper = new TLRPC.TL_account_getWallPaper();
+            TL_account.getWallPaper getwallpaper = new TL_account.getWallPaper();
             TLRPC.TL_inputWallPaper tL_inputWallPaper = new TLRPC.TL_inputWallPaper();
             tL_inputWallPaper.id = tL_wallPaper.id;
             tL_inputWallPaper.access_hash = tL_wallPaper.access_hash;
-            tL_account_getWallPaper.wallpaper = tL_inputWallPaper;
+            getwallpaper.wallpaper = tL_inputWallPaper;
             ConnectionsManager connectionsManager11 = getConnectionsManager();
             requestDelegate = new RequestDelegate() {
                 @Override
@@ -1083,15 +1084,15 @@ public class FileRefController extends BaseController {
                 }
             };
             connectionsManager = connectionsManager11;
-            tLObject = tL_account_getWallPaper;
+            tLObject = getwallpaper;
         } else if (obj instanceof TLRPC.TL_theme) {
             TLRPC.TL_theme tL_theme = (TLRPC.TL_theme) obj;
-            TLRPC.TL_account_getTheme tL_account_getTheme = new TLRPC.TL_account_getTheme();
+            TL_account.getTheme gettheme = new TL_account.getTheme();
             TLRPC.TL_inputTheme tL_inputTheme = new TLRPC.TL_inputTheme();
             tL_inputTheme.id = tL_theme.id;
             tL_inputTheme.access_hash = tL_theme.access_hash;
-            tL_account_getTheme.theme = tL_inputTheme;
-            tL_account_getTheme.format = "android";
+            gettheme.theme = tL_inputTheme;
+            gettheme.format = "android";
             ConnectionsManager connectionsManager12 = getConnectionsManager();
             requestDelegate = new RequestDelegate() {
                 @Override
@@ -1100,7 +1101,7 @@ public class FileRefController extends BaseController {
                 }
             };
             connectionsManager = connectionsManager12;
-            tLObject = tL_account_getTheme;
+            tLObject = gettheme;
         } else if (obj instanceof TLRPC.WebPage) {
             TLRPC.TL_messages_getWebPage tL_messages_getWebPage = new TLRPC.TL_messages_getWebPage();
             tL_messages_getWebPage.url = ((TLRPC.WebPage) obj).url;
@@ -1161,7 +1162,7 @@ public class FileRefController extends BaseController {
                 String str3 = (String) obj;
                 if ("wallpaper".equals(str3)) {
                     if (this.wallpaperWaiters.isEmpty()) {
-                        getConnectionsManager().sendRequest(new TLRPC.TL_account_getWallPapers(), new RequestDelegate() {
+                        getConnectionsManager().sendRequest(new TL_account.getWallPapers(), new RequestDelegate() {
                             @Override
                             public final void run(TLObject tLObject2, TLRPC.TL_error tL_error) {
                                 FileRefController.this.lambda$requestReferenceFromServer$17(tLObject2, tL_error);

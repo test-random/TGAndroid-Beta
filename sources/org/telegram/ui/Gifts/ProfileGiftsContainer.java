@@ -34,8 +34,8 @@ import org.telegram.ui.Components.UItem;
 import org.telegram.ui.Components.UniversalAdapter;
 import org.telegram.ui.Components.UniversalRecyclerView;
 import org.telegram.ui.Gifts.GiftSheet;
+import org.telegram.ui.Stars.StarGiftSheet;
 import org.telegram.ui.Stars.StarsController;
-import org.telegram.ui.Stars.StarsIntroActivity;
 import org.telegram.ui.Stories.recorder.ButtonWithCounterView;
 
 public abstract class ProfileGiftsContainer extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
@@ -215,7 +215,7 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
                     if (!it.hasNext()) {
                         break loop0;
                     }
-                    arrayList.add(GiftSheet.GiftCell.Factory.asStarGift(0, (TL_stars.UserStarGift) it.next()));
+                    arrayList.add(GiftSheet.GiftCell.Factory.asStarGift(0, (TL_stars.UserStarGift) it.next(), true));
                     i--;
                 } while (i != 0);
             }
@@ -262,10 +262,10 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
         HashSet hashSet = new HashSet();
         ArrayList arrayList = new ArrayList();
         for (int i = 0; arrayList.size() < 3 && i < this.list.gifts.size(); i++) {
-            TL_stars.UserStarGift userStarGift = (TL_stars.UserStarGift) this.list.gifts.get(i);
-            if (!hashSet.contains(Long.valueOf(userStarGift.gift.sticker.id))) {
-                hashSet.add(Long.valueOf(userStarGift.gift.sticker.id));
-                arrayList.add(userStarGift.gift.sticker);
+            TLRPC.Document document = ((TL_stars.UserStarGift) this.list.gifts.get(i)).gift.getDocument();
+            if (document != null && !hashSet.contains(Long.valueOf(document.id))) {
+                hashSet.add(Long.valueOf(document.id));
+                arrayList.add(document);
             }
         }
         if (arrayList.isEmpty()) {
@@ -287,10 +287,10 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
             HashSet hashSet = new HashSet();
             int i = 0;
             for (int i2 = 0; i < 3 && i2 < this.list.gifts.size(); i2++) {
-                TL_stars.UserStarGift userStarGift = (TL_stars.UserStarGift) this.list.gifts.get(i2);
-                if (!hashSet.contains(Long.valueOf(userStarGift.gift.sticker.id))) {
-                    hashSet.add(Long.valueOf(userStarGift.gift.sticker.id));
-                    j = Objects.hash(Long.valueOf(j), Long.valueOf(userStarGift.gift.sticker.id));
+                TLRPC.Document document = ((TL_stars.UserStarGift) this.list.gifts.get(i2)).gift.getDocument();
+                if (document != null) {
+                    hashSet.add(Long.valueOf(document.id));
+                    j = Objects.hash(Long.valueOf(j), Long.valueOf(document.id));
                     i++;
                 }
             }
@@ -327,11 +327,7 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
     public void onItemClick(UItem uItem, View view, int i, float f, float f2) {
         Object obj = uItem.object;
         if (obj instanceof TL_stars.UserStarGift) {
-            TL_stars.UserStarGift userStarGift = (TL_stars.UserStarGift) obj;
-            Context context = getContext();
-            int i2 = this.currentAccount;
-            long j = this.userId;
-            StarsIntroActivity.showGiftSheet(context, i2, j, j == UserConfig.getInstance(i2).getClientUserId(), userStarGift, this.resourcesProvider);
+            new StarGiftSheet(getContext(), this.currentAccount, this.userId, this.resourcesProvider).set(this.userId == UserConfig.getInstance(this.currentAccount).getClientUserId(), (TL_stars.UserStarGift) obj).show();
         }
     }
 

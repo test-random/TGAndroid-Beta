@@ -46,6 +46,7 @@ public class EffectsTextView extends SpoilersTextView {
         this.links.clear();
     }
 
+    @Override
     public ClickableSpan hit(int i, int i2) {
         Layout layout = getLayout();
         if (layout == null) {
@@ -127,14 +128,17 @@ public class EffectsTextView extends SpoilersTextView {
         return this.pressedLink != null || super.onTouchEvent(motionEvent);
     }
 
+    @Override
     public void setDisablePaddingsOffset(boolean z) {
         this.disablePaddingsOffset = z;
     }
 
+    @Override
     public void setDisablePaddingsOffsetX(boolean z) {
         this.disablePaddingsOffsetX = z;
     }
 
+    @Override
     public void setDisablePaddingsOffsetY(boolean z) {
         this.disablePaddingsOffsetY = z;
     }
@@ -149,6 +153,6 @@ public class EffectsTextView extends SpoilersTextView {
 
     @Override
     public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-        super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false), bufferType);
+        super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
     }
 }

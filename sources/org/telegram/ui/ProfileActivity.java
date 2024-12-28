@@ -162,6 +162,7 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.tgnet.tl.TL_fragment;
 import org.telegram.tgnet.tl.TL_payments;
@@ -341,6 +342,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private int botPermissionsHeader;
     private int botStarsBalanceRow;
     private int botTonBalanceRow;
+    private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[] botVerificationDrawable;
     private ButtonWithCounterView[] bottomButton;
     private FrameLayout[] bottomButtonContainer;
     private SpannableStringBuilder bottomButtonPostText;
@@ -369,7 +371,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private TLRPC.EncryptedChat currentEncryptedChat;
     private float currentExpanAnimatorFracture;
     private float currentExpandAnimatorValue;
-    private TLRPC.TL_account_password currentPassword;
+    private TL_account.TL_password currentPassword;
     private float customAvatarProgress;
     private float customPhotoOffset;
     private int dataRow;
@@ -382,7 +384,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private ActionBarMenuSubItem editColorItem;
     private ActionBarMenuItem editItem;
     private boolean editItemVisible;
-    private AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[] emojiStatusDrawable;
+    private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[] emojiStatusDrawable;
     private int emptyRow;
     private StickerEmptyView emptyView;
     private ValueAnimator expandAnimator;
@@ -1124,7 +1126,14 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         edit.remove(str3);
                     }
                 }
-                edit.commit();
+                edit.apply();
+                SharedPreferences.Editor edit2 = MessagesController.getNotificationsSettings(((BaseFragment) ProfileActivity.this).currentAccount).edit();
+                for (String str4 : MessagesController.getNotificationsSettings(((BaseFragment) ProfileActivity.this).currentAccount).getAll().keySet()) {
+                    if (str4.startsWith("dialog_bar_botver")) {
+                        edit2.remove(str4);
+                    }
+                }
+                edit2.apply();
                 return;
             }
             if (i == 7) {
@@ -2146,26 +2155,26 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             TLRPC.TL_channels_updateEmojiStatus tL_channels_updateEmojiStatus;
             AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable;
             if (ProfileActivity.this.currentChat == null) {
-                TLRPC.TL_account_updateEmojiStatus tL_account_updateEmojiStatus = new TLRPC.TL_account_updateEmojiStatus();
+                TL_account.updateEmojiStatus updateemojistatus = new TL_account.updateEmojiStatus();
                 if (l == null) {
-                    tL_account_updateEmojiStatus.emoji_status = new TLRPC.TL_emojiStatusEmpty();
+                    updateemojistatus.emoji_status = new TLRPC.TL_emojiStatusEmpty();
                 } else if (num != null) {
                     TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = new TLRPC.TL_emojiStatusUntil();
-                    tL_account_updateEmojiStatus.emoji_status = tL_emojiStatusUntil;
+                    updateemojistatus.emoji_status = tL_emojiStatusUntil;
                     tL_emojiStatusUntil.document_id = l.longValue();
-                    ((TLRPC.TL_emojiStatusUntil) tL_account_updateEmojiStatus.emoji_status).until = num.intValue();
+                    ((TLRPC.TL_emojiStatusUntil) updateemojistatus.emoji_status).until = num.intValue();
                 } else {
                     TLRPC.TL_emojiStatus tL_emojiStatus = new TLRPC.TL_emojiStatus();
-                    tL_account_updateEmojiStatus.emoji_status = tL_emojiStatus;
+                    updateemojistatus.emoji_status = tL_emojiStatus;
                     tL_emojiStatus.document_id = l.longValue();
                 }
                 TLRPC.User user = MessagesController.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).getUser(Long.valueOf(UserConfig.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).getClientUserId()));
-                tL_channels_updateEmojiStatus = tL_account_updateEmojiStatus;
+                tL_channels_updateEmojiStatus = updateemojistatus;
                 if (user != null) {
-                    user.emoji_status = tL_account_updateEmojiStatus.emoji_status;
+                    user.emoji_status = updateemojistatus.emoji_status;
                     MessagesController.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).updateEmojiStatusUntilUpdate(user.id, user.emoji_status);
                     NotificationCenter.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.userEmojiStatusUpdated, user);
-                    tL_channels_updateEmojiStatus = tL_account_updateEmojiStatus;
+                    tL_channels_updateEmojiStatus = updateemojistatus;
                 }
             } else {
                 TLRPC.TL_channels_updateEmojiStatus tL_channels_updateEmojiStatus2 = new TLRPC.TL_channels_updateEmojiStatus();
@@ -3242,6 +3251,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     ProfileActivity.this.emojiStatusDrawable[i].attach();
                 }
             }
+            for (int i2 = 0; i2 < ProfileActivity.this.botVerificationDrawable.length; i2++) {
+                if (ProfileActivity.this.botVerificationDrawable[i2] != null) {
+                    ProfileActivity.this.botVerificationDrawable[i2].attach();
+                }
+            }
         }
 
         @Override
@@ -3251,6 +3265,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             for (int i = 0; i < ProfileActivity.this.emojiStatusDrawable.length; i++) {
                 if (ProfileActivity.this.emojiStatusDrawable[i] != null) {
                     ProfileActivity.this.emojiStatusDrawable[i].detach();
+                }
+            }
+            for (int i2 = 0; i2 < ProfileActivity.this.botVerificationDrawable.length; i2++) {
+                if (ProfileActivity.this.botVerificationDrawable[i2] != null) {
+                    ProfileActivity.this.botVerificationDrawable[i2].detach();
                 }
             }
         }
@@ -3843,11 +3862,30 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             }
         }
 
-        public class AnonymousClass10 extends ClickableSpan {
+        public class AnonymousClass10 extends URLSpan {
+            final String val$url;
+
+            AnonymousClass10(String str, String str2) {
+                super(str);
+                r3 = str2;
+            }
+
+            @Override
+            public void onClick(View view) {
+                Browser.openUrl(ProfileActivity.this.getContext(), r3);
+            }
+
+            @Override
+            public void updateDrawState(TextPaint textPaint) {
+                textPaint.setUnderlineText(true);
+            }
+        }
+
+        public class AnonymousClass11 extends ClickableSpan {
             final TLRPC.TL_username val$usernameObj;
             final String val$usernameRaw;
 
-            AnonymousClass10(TLRPC.TL_username tL_username, String str) {
+            AnonymousClass11(TLRPC.TL_username tL_username, String str) {
                 this.val$usernameObj = tL_username;
                 this.val$usernameRaw = str;
             }
@@ -3869,7 +3907,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public final void run() {
-                        ProfileActivity.ListAdapter.AnonymousClass10.this.lambda$onClick$0(tLObject, tL_username, tL_error);
+                        ProfileActivity.ListAdapter.AnonymousClass11.this.lambda$onClick$0(tLObject, tL_username, tL_error);
                     }
                 });
             }
@@ -3899,7 +3937,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 ProfileActivity.this.getConnectionsManager().bindRequestToGuid(connectionsManager.sendRequest(tL_getCollectibleInfo, new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                        ProfileActivity.ListAdapter.AnonymousClass10.this.lambda$onClick$1(tL_username, tLObject, tL_error);
+                        ProfileActivity.ListAdapter.AnonymousClass11.this.lambda$onClick$1(tL_username, tLObject, tL_error);
                     }
                 }), ProfileActivity.this.getClassGuid());
             }
@@ -4260,13 +4298,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (clickableSpan != null) {
                 return clickableSpan;
             }
-            AnonymousClass10 anonymousClass10 = new AnonymousClass10(tL_username, tL_username.username);
-            this.usernameSpans.put(tL_username, anonymousClass10);
-            return anonymousClass10;
+            AnonymousClass11 anonymousClass11 = new AnonymousClass11(tL_username, tL_username.username);
+            this.usernameSpans.put(tL_username, anonymousClass11);
+            return anonymousClass11;
         }
 
         @Override
-        public void onBindViewHolder(final androidx.recyclerview.widget.RecyclerView.ViewHolder r26, final int r27) {
+        public void onBindViewHolder(final androidx.recyclerview.widget.RecyclerView.ViewHolder r31, final int r32) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ProfileActivity.ListAdapter.onBindViewHolder(androidx.recyclerview.widget.RecyclerView$ViewHolder, int):void");
         }
 
@@ -7713,6 +7751,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         this.verifiedDrawable = new Drawable[2];
         this.premiumStarDrawable = new Drawable[2];
         this.emojiStatusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[2];
+        this.botVerificationDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[2];
         this.verifiedCheckDrawable = new Drawable[2];
         this.verifiedCrossfadeDrawable = new CrossfadeDrawable[2];
         this.premiumCrossfadeDrawable = new CrossfadeDrawable[2];
@@ -7871,7 +7910,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         this.sharedMediaPreloader = sharedMediaPreloader;
     }
 
-    public static void access$35900(ProfileActivity profileActivity, View view) {
+    public static void access$36200(ProfileActivity profileActivity, View view) {
         profileActivity.onTextDetailCellImageClicked(view);
     }
 
@@ -8298,6 +8337,23 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
     public int getAverageColor(ImageReceiver imageReceiver) {
         return imageReceiver.getDrawable() instanceof VectorAvatarThumbDrawable ? ((VectorAvatarThumbDrawable) imageReceiver.getDrawable()).gradientTools.getAverageColor() : AndroidUtilities.calcBitmapColor(this.avatarImage.getImageReceiver().getBitmap());
+    }
+
+    private Drawable getBotVerificationDrawable(long j, boolean z, int i) {
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[] swapAnimatedEmojiDrawableArr = this.botVerificationDrawable;
+        if (swapAnimatedEmojiDrawableArr[i] == null) {
+            swapAnimatedEmojiDrawableArr[i] = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this.nameTextView[i], AndroidUtilities.dp(18.0f), i == 0 ? 7 : 2);
+            if (this.fragmentViewAttached) {
+                this.botVerificationDrawable[i].attach();
+            }
+        }
+        if (j != 0) {
+            this.botVerificationDrawable[i].set(j, z);
+        } else {
+            this.botVerificationDrawable[i].set((Drawable) null, z);
+        }
+        updateEmojiStatusDrawableColor();
+        return this.botVerificationDrawable[i];
     }
 
     public void getChannelParticipants(boolean z) {
@@ -9626,12 +9682,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     public void lambda$editRow$104(TLRPC.UserFull userFull, int i, DialogInterface dialogInterface, int i2) {
-        TLRPC.TL_account_updateBusinessLocation tL_account_updateBusinessLocation = new TLRPC.TL_account_updateBusinessLocation();
+        TL_account.updateBusinessLocation updatebusinesslocation = new TL_account.updateBusinessLocation();
         if (userFull != null) {
             userFull.business_location = null;
             userFull.flags2 &= -3;
         }
-        getConnectionsManager().sendRequest(tL_account_updateBusinessLocation, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatebusinesslocation, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ProfileActivity.this.lambda$editRow$103(tLObject, tL_error);
@@ -9668,7 +9724,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         presentFragment(new ActionIntroActivity(3));
     }
 
-    public void lambda$editRow$109(TLObject tLObject, TLRPC.UserFull userFull, TLRPC.TL_birthday tL_birthday, TLRPC.TL_error tL_error) {
+    public void lambda$editRow$109(TLObject tLObject, TLRPC.UserFull userFull, TL_account.TL_birthday tL_birthday, TLRPC.TL_error tL_error) {
         Bulletin createSimpleBulletin;
         String str;
         if (tLObject instanceof TLRPC.TL_boolTrue) {
@@ -9692,7 +9748,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         createSimpleBulletin.show();
     }
 
-    public void lambda$editRow$110(final TLRPC.UserFull userFull, final TLRPC.TL_birthday tL_birthday, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$editRow$110(final TLRPC.UserFull userFull, final TL_account.TL_birthday tL_birthday, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
@@ -9701,17 +9757,17 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         });
     }
 
-    public void lambda$editRow$111(final TLRPC.UserFull userFull, TLRPC.TL_birthday tL_birthday) {
-        TLRPC.TL_account_updateBirthday tL_account_updateBirthday = new TLRPC.TL_account_updateBirthday();
-        tL_account_updateBirthday.flags |= 1;
-        tL_account_updateBirthday.birthday = tL_birthday;
-        final TLRPC.TL_birthday tL_birthday2 = userFull != null ? userFull.birthday : null;
+    public void lambda$editRow$111(final TLRPC.UserFull userFull, TL_account.TL_birthday tL_birthday) {
+        TL_account.updateBirthday updatebirthday = new TL_account.updateBirthday();
+        updatebirthday.flags |= 1;
+        updatebirthday.birthday = tL_birthday;
+        final TL_account.TL_birthday tL_birthday2 = userFull != null ? userFull.birthday : null;
         if (userFull != null) {
             userFull.flags2 |= 32;
             userFull.birthday = tL_birthday;
         }
         getMessagesController().invalidateContentSettings();
-        getConnectionsManager().sendRequest(tL_account_updateBirthday, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatebirthday, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ProfileActivity.this.lambda$editRow$110(userFull, tL_birthday2, tLObject, tL_error);
@@ -9730,7 +9786,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         showDialog(AlertsCreator.createBirthdayPickerDialog(getContext(), LocaleController.getString(R.string.EditProfileBirthdayTitle), LocaleController.getString(R.string.EditProfileBirthdayButton), userFull.birthday, new Utilities.Callback() {
             @Override
             public final void run(Object obj) {
-                ProfileActivity.this.lambda$editRow$111(userFull, (TLRPC.TL_birthday) obj);
+                ProfileActivity.this.lambda$editRow$111(userFull, (TL_account.TL_birthday) obj);
             }
         }, new Runnable() {
             @Override
@@ -9758,13 +9814,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     public void lambda$editRow$116(TLRPC.UserFull userFull, DialogInterface dialogInterface, int i) {
-        TLRPC.TL_account_updateBirthday tL_account_updateBirthday = new TLRPC.TL_account_updateBirthday();
+        TL_account.updateBirthday updatebirthday = new TL_account.updateBirthday();
         if (userFull != null) {
             userFull.birthday = null;
             userFull.flags2 &= -33;
         }
         getMessagesController().invalidateContentSettings();
-        getConnectionsManager().sendRequest(tL_account_updateBirthday, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatebirthday, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ProfileActivity.this.lambda$editRow$115(tLObject, tL_error);
@@ -9814,14 +9870,14 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     public void lambda$editRow$122(TLRPC.UserFull userFull, DialogInterface dialogInterface, int i) {
-        TLRPC.TL_account_updatePersonalChannel tL_account_updatePersonalChannel = new TLRPC.TL_account_updatePersonalChannel();
-        tL_account_updatePersonalChannel.channel = new TLRPC.TL_inputChannelEmpty();
+        TL_account.updatePersonalChannel updatepersonalchannel = new TL_account.updatePersonalChannel();
+        updatepersonalchannel.channel = new TLRPC.TL_inputChannelEmpty();
         if (userFull != null) {
             userFull.personal_channel_id = 0L;
             userFull.personal_channel_message = 0;
             userFull.flags2 &= -65;
         }
-        getConnectionsManager().sendRequest(tL_account_updatePersonalChannel, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatepersonalchannel, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ProfileActivity.this.lambda$editRow$121(tLObject, tL_error);
@@ -9875,12 +9931,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     public void lambda$editRow$99(TLRPC.UserFull userFull, int i, DialogInterface dialogInterface, int i2) {
-        TLRPC.TL_account_updateBusinessWorkHours tL_account_updateBusinessWorkHours = new TLRPC.TL_account_updateBusinessWorkHours();
+        TL_account.updateBusinessWorkHours updatebusinessworkhours = new TL_account.updateBusinessWorkHours();
         if (userFull != null) {
             userFull.business_work_hours = null;
             userFull.flags2 &= -2;
         }
-        getConnectionsManager().sendRequest(tL_account_updateBusinessWorkHours, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatebusinessworkhours, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ProfileActivity.this.lambda$editRow$98(tLObject, tL_error);
@@ -10027,8 +10083,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     public void lambda$onFragmentCreate$1(TLObject tLObject, TLRPC.TL_error tL_error) {
-        if (tLObject instanceof TLRPC.TL_account_password) {
-            this.currentPassword = (TLRPC.TL_account_password) tLObject;
+        if (tLObject instanceof TL_account.TL_password) {
+            this.currentPassword = (TL_account.TL_password) tLObject;
         }
     }
 
@@ -11903,7 +11959,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 return false;
             }
             if (i == this.bizHoursRow) {
-                TLRPC.TL_businessWorkHours tL_businessWorkHours = userFull2.business_work_hours;
+                TL_account.TL_businessWorkHours tL_businessWorkHours = userFull2.business_work_hours;
                 if (tL_businessWorkHours == null) {
                     return false;
                 }
@@ -12549,10 +12605,15 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     public void updateEmojiStatusDrawableColor(float f) {
         for (int i = 0; i < 2; i++) {
             MessagesController.PeerColor peerColor = this.peerColor;
-            int blendARGB = ColorUtils.blendARGB(ColorUtils.blendARGB((peerColor == null || i != 1) ? AndroidUtilities.getOffsetColor(getThemedColor(Theme.key_profile_verifiedBackground), getThemedColor(Theme.key_player_actionBarTitle), this.mediaHeaderAnimationProgress, 1.0f) : ColorUtils.blendARGB(peerColor.getColor2(), this.peerColor.hasColor6(Theme.isCurrentThemeDark()) ? this.peerColor.getColor5() : this.peerColor.getColor3(), 0.5f), -1, f), getThemedColor(Theme.key_player_actionBarTitle), this.mediaHeaderAnimationProgress);
+            int offsetColor = (peerColor == null || i != 1) ? AndroidUtilities.getOffsetColor(getThemedColor(Theme.key_profile_verifiedBackground), getThemedColor(Theme.key_player_actionBarTitle), this.mediaHeaderAnimationProgress, 1.0f) : ColorUtils.blendARGB(peerColor.getColor2(), this.peerColor.hasColor6(Theme.isCurrentThemeDark()) ? this.peerColor.getColor5() : this.peerColor.getColor3(), 0.5f);
+            int blendARGB = ColorUtils.blendARGB(ColorUtils.blendARGB(offsetColor, -1, f), getThemedColor(Theme.key_player_actionBarTitle), this.mediaHeaderAnimationProgress);
             AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = this.emojiStatusDrawable[i];
             if (swapAnimatedEmojiDrawable != null) {
                 swapAnimatedEmojiDrawable.setColor(Integer.valueOf(blendARGB));
+            }
+            AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.botVerificationDrawable[i];
+            if (swapAnimatedEmojiDrawable2 != null) {
+                swapAnimatedEmojiDrawable2.setColor(Integer.valueOf(ColorUtils.blendARGB(ColorUtils.blendARGB(offsetColor, -1711276033, f), -1711276033, this.mediaHeaderAnimationProgress)));
             }
             if (i == 1) {
                 this.animatedStatusView.setColor(blendARGB);
@@ -12724,7 +12785,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    public void updateProfileData(boolean r35) {
+    public void updateProfileData(boolean r33) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ProfileActivity.updateProfileData(boolean):void");
     }
 
@@ -14019,7 +14080,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             getMessagesController().ensureMessagesLoaded(this.userId, 0, null);
         }
         if (this.userId != 0 && UserObject.isUserSelf(getMessagesController().getUser(Long.valueOf(this.userId)))) {
-            getConnectionsManager().sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+            getConnectionsManager().sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     ProfileActivity.this.lambda$onFragmentCreate$1(tLObject, tL_error);
@@ -14704,44 +14765,39 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         int min = (int) Math.min(AndroidUtilities.dp(324.0f), AndroidUtilities.displaySize.x * 0.95f);
         int centerX = rect.centerX();
         int clamp = MathUtils.clamp(centerX - (min / 2), 0, AndroidUtilities.displaySize.x - min);
-        int i2 = centerX - clamp;
-        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = this.emojiStatusDrawable[1];
-        if (swapAnimatedEmojiDrawable != null) {
-            boolean z = swapAnimatedEmojiDrawable.getDrawable() instanceof AnimatedEmojiDrawable;
-        }
-        AnonymousClass36 anonymousClass36 = new SelectAnimatedEmojiDialog(this, getContext(), true, Integer.valueOf(Math.max(0, i2)), this.currentChat == null ? 0 : 9, true, this.resourcesProvider, i) {
+        AnonymousClass36 anonymousClass36 = new SelectAnimatedEmojiDialog(this, getContext(), true, Integer.valueOf(Math.max(0, centerX - clamp)), this.currentChat == null ? 0 : 9, true, this.resourcesProvider, i) {
             final SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow[] val$popup;
 
-            AnonymousClass36(BaseFragment this, Context context, boolean z2, Integer num, int i3, boolean z22, Theme.ResourcesProvider resourcesProvider, int i4, SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow[] selectAnimatedEmojiDialogWindowArr2) {
-                super(this, context, z2, num, i3, z22, resourcesProvider, i4);
+            AnonymousClass36(BaseFragment this, Context context, boolean z, Integer num, int i2, boolean z2, Theme.ResourcesProvider resourcesProvider, int i3, SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow[] selectAnimatedEmojiDialogWindowArr2) {
+                super(this, context, z, num, i2, z2, resourcesProvider, i3);
                 r20 = selectAnimatedEmojiDialogWindowArr2;
             }
 
             @Override
             protected void onEmojiSelected(View view, Long l, TLRPC.Document document, Integer num) {
                 TLRPC.TL_channels_updateEmojiStatus tL_channels_updateEmojiStatus;
-                AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2;
+                AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable;
                 if (ProfileActivity.this.currentChat == null) {
-                    TLRPC.TL_account_updateEmojiStatus tL_account_updateEmojiStatus = new TLRPC.TL_account_updateEmojiStatus();
+                    TL_account.updateEmojiStatus updateemojistatus = new TL_account.updateEmojiStatus();
                     if (l == null) {
-                        tL_account_updateEmojiStatus.emoji_status = new TLRPC.TL_emojiStatusEmpty();
+                        updateemojistatus.emoji_status = new TLRPC.TL_emojiStatusEmpty();
                     } else if (num != null) {
                         TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = new TLRPC.TL_emojiStatusUntil();
-                        tL_account_updateEmojiStatus.emoji_status = tL_emojiStatusUntil;
+                        updateemojistatus.emoji_status = tL_emojiStatusUntil;
                         tL_emojiStatusUntil.document_id = l.longValue();
-                        ((TLRPC.TL_emojiStatusUntil) tL_account_updateEmojiStatus.emoji_status).until = num.intValue();
+                        ((TLRPC.TL_emojiStatusUntil) updateemojistatus.emoji_status).until = num.intValue();
                     } else {
                         TLRPC.TL_emojiStatus tL_emojiStatus = new TLRPC.TL_emojiStatus();
-                        tL_account_updateEmojiStatus.emoji_status = tL_emojiStatus;
+                        updateemojistatus.emoji_status = tL_emojiStatus;
                         tL_emojiStatus.document_id = l.longValue();
                     }
                     TLRPC.User user = MessagesController.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).getUser(Long.valueOf(UserConfig.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).getClientUserId()));
-                    tL_channels_updateEmojiStatus = tL_account_updateEmojiStatus;
+                    tL_channels_updateEmojiStatus = updateemojistatus;
                     if (user != null) {
-                        user.emoji_status = tL_account_updateEmojiStatus.emoji_status;
+                        user.emoji_status = updateemojistatus.emoji_status;
                         MessagesController.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).updateEmojiStatusUntilUpdate(user.id, user.emoji_status);
                         NotificationCenter.getInstance(((BaseFragment) ProfileActivity.this).currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.userEmojiStatusUpdated, user);
-                        tL_channels_updateEmojiStatus = tL_account_updateEmojiStatus;
+                        tL_channels_updateEmojiStatus = updateemojistatus;
                     }
                 } else {
                     TLRPC.TL_channels_updateEmojiStatus tL_channels_updateEmojiStatus2 = new TLRPC.TL_channels_updateEmojiStatus();
@@ -14766,27 +14822,27 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         tL_channels_updateEmojiStatus = tL_channels_updateEmojiStatus2;
                     }
                 }
-                int i3 = 0;
+                int i2 = 0;
                 while (true) {
                     Drawable drawable = null;
-                    if (i3 >= 2) {
+                    if (i2 >= 2) {
                         break;
                     }
-                    if (ProfileActivity.this.emojiStatusDrawable[i3] != null) {
+                    if (ProfileActivity.this.emojiStatusDrawable[i2] != null) {
                         if (l == null && ProfileActivity.this.currentChat == null) {
-                            swapAnimatedEmojiDrawable2 = ProfileActivity.this.emojiStatusDrawable[i3];
-                            drawable = ProfileActivity.this.getPremiumCrossfadeDrawable(i3);
+                            swapAnimatedEmojiDrawable = ProfileActivity.this.emojiStatusDrawable[i2];
+                            drawable = ProfileActivity.this.getPremiumCrossfadeDrawable(i2);
                         } else {
                             AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[] swapAnimatedEmojiDrawableArr = ProfileActivity.this.emojiStatusDrawable;
                             if (l != null) {
-                                swapAnimatedEmojiDrawableArr[i3].set(l.longValue(), true);
+                                swapAnimatedEmojiDrawableArr[i2].set(l.longValue(), true);
                             } else {
-                                swapAnimatedEmojiDrawable2 = swapAnimatedEmojiDrawableArr[i3];
+                                swapAnimatedEmojiDrawable = swapAnimatedEmojiDrawableArr[i2];
                             }
                         }
-                        swapAnimatedEmojiDrawable2.set(drawable, true);
+                        swapAnimatedEmojiDrawable.set(drawable, true);
                     }
-                    i3++;
+                    i2++;
                 }
                 if (l != null) {
                     ProfileActivity.this.animatedStatusView.animateChange(ReactionsLayoutInBubble.VisibleReaction.fromCustomEmoji(l));
@@ -14804,13 +14860,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         if (user != null) {
             anonymousClass36.setExpireDateHint(DialogObject.getEmojiStatusUntil(user.emoji_status));
         }
-        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.emojiStatusDrawable[1];
-        anonymousClass36.setSelected((swapAnimatedEmojiDrawable2 == null || !(swapAnimatedEmojiDrawable2.getDrawable() instanceof AnimatedEmojiDrawable)) ? null : Long.valueOf(((AnimatedEmojiDrawable) this.emojiStatusDrawable[1].getDrawable()).getDocumentId()));
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = this.emojiStatusDrawable[1];
+        anonymousClass36.setSelected((swapAnimatedEmojiDrawable == null || !(swapAnimatedEmojiDrawable.getDrawable() instanceof AnimatedEmojiDrawable)) ? null : Long.valueOf(((AnimatedEmojiDrawable) this.emojiStatusDrawable[1].getDrawable()).getDocumentId()));
         anonymousClass36.setSaveState(3);
         anonymousClass36.setScrimDrawable(this.emojiStatusDrawable[1], this.nameTextView[1]);
         AnonymousClass37 anonymousClass37 = new SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow(anonymousClass36, -2, -2) {
-            AnonymousClass37(View anonymousClass362, int i3, int i22) {
-                super(anonymousClass362, i3, i22);
+            AnonymousClass37(View anonymousClass362, int i2, int i22) {
+                super(anonymousClass362, i2, i22);
             }
 
             @Override

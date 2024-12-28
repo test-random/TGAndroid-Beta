@@ -1,18 +1,19 @@
 package org.telegram.tgnet.tl;
 
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 
 public class TL_fragment {
 
     public static class InputCollectible extends TLObject {
-        public static InputCollectible TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static InputCollectible TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             InputCollectible tL_inputCollectibleUsername = i != -1562241884 ? i != -476815191 ? null : new TL_inputCollectibleUsername() : new TL_inputCollectiblePhone();
             if (tL_inputCollectibleUsername == null && z) {
                 throw new RuntimeException(String.format("can't parse magic %x in InputCollectible", Integer.valueOf(i)));
             }
             if (tL_inputCollectibleUsername != null) {
-                tL_inputCollectibleUsername.readParams(abstractSerializedData, z);
+                tL_inputCollectibleUsername.readParams(inputSerializedData, z);
             }
             return tL_inputCollectibleUsername;
         }
@@ -27,7 +28,7 @@ public class TL_fragment {
         public int purchase_date;
         public String url;
 
-        public static TL_collectibleInfo TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static TL_collectibleInfo TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             if (1857945489 != i) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in TL_collectibleInfo", Integer.valueOf(i)));
@@ -35,29 +36,29 @@ public class TL_fragment {
                 return null;
             }
             TL_collectibleInfo tL_collectibleInfo = new TL_collectibleInfo();
-            tL_collectibleInfo.readParams(abstractSerializedData, z);
+            tL_collectibleInfo.readParams(inputSerializedData, z);
             return tL_collectibleInfo;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.purchase_date = abstractSerializedData.readInt32(z);
-            this.currency = abstractSerializedData.readString(z);
-            this.amount = abstractSerializedData.readInt64(z);
-            this.crypto_currency = abstractSerializedData.readString(z);
-            this.crypto_amount = abstractSerializedData.readInt64(z);
-            this.url = abstractSerializedData.readString(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.purchase_date = inputSerializedData.readInt32(z);
+            this.currency = inputSerializedData.readString(z);
+            this.amount = inputSerializedData.readInt64(z);
+            this.crypto_currency = inputSerializedData.readString(z);
+            this.crypto_amount = inputSerializedData.readInt64(z);
+            this.url = inputSerializedData.readString(z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1857945489);
-            abstractSerializedData.writeInt32(this.purchase_date);
-            abstractSerializedData.writeString(this.currency);
-            abstractSerializedData.writeInt64(this.amount);
-            abstractSerializedData.writeString(this.crypto_currency);
-            abstractSerializedData.writeInt64(this.crypto_amount);
-            abstractSerializedData.writeString(this.url);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1857945489);
+            outputSerializedData.writeInt32(this.purchase_date);
+            outputSerializedData.writeString(this.currency);
+            outputSerializedData.writeInt64(this.amount);
+            outputSerializedData.writeString(this.crypto_currency);
+            outputSerializedData.writeInt64(this.crypto_amount);
+            outputSerializedData.writeString(this.url);
         }
     }
 
@@ -66,14 +67,14 @@ public class TL_fragment {
         public InputCollectible collectible;
 
         @Override
-        public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
-            return TL_collectibleInfo.TLdeserialize(abstractSerializedData, i, z);
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TL_collectibleInfo.TLdeserialize(inputSerializedData, i, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-1105295942);
-            this.collectible.serializeToStream(abstractSerializedData);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-1105295942);
+            this.collectible.serializeToStream(outputSerializedData);
         }
     }
 
@@ -82,14 +83,14 @@ public class TL_fragment {
         public String phone;
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.phone = abstractSerializedData.readString(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.phone = inputSerializedData.readString(z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-1562241884);
-            abstractSerializedData.writeString(this.phone);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-1562241884);
+            outputSerializedData.writeString(this.phone);
         }
     }
 
@@ -98,14 +99,14 @@ public class TL_fragment {
         public String username;
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.username = abstractSerializedData.readString(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.username = inputSerializedData.readString(z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-476815191);
-            abstractSerializedData.writeString(this.username);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-476815191);
+            outputSerializedData.writeString(this.username);
         }
     }
 }

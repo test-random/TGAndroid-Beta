@@ -6737,7 +6737,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             canvas.drawRoundRect(rectF, AndroidUtilities.dpf2(12.0f), AndroidUtilities.dpf2(12.0f), this.backgroundPaint);
             this.backgroundPaint.setAlpha(alpha);
             canvas.save();
-            canvas.translate(((getWidth() - currentWidth) / 2.0f) + AndroidUtilities.dp(9.0f), f2 + AndroidUtilities.dp(10.0f));
+            canvas.translate(((getWidth() - currentWidth) / 2.0f) + AndroidUtilities.dp(9.0f), f2 + AndroidUtilities.dp(9.5f));
             AnimatedTextView.AnimatedTextDrawable animatedTextDrawable = this.left;
             animatedTextDrawable.setBounds(0, 0, (int) animatedTextDrawable.getCurrentWidth(), AndroidUtilities.dp(23.0f));
             int i = (int) (f * 255.0f);
@@ -12946,7 +12946,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         if (messageObject == null || messageObject.messageOwner == null) {
             return "";
         }
-        Spannable replaceAnimatedEmoji = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji((CharSequence) new SpannableStringBuilder(messageObject.messageOwner.translatedText.text), Theme.chat_msgTextPaint.getFontMetricsInt(), AndroidUtilities.dp(20.0f), false), messageObject.messageOwner.translatedText.entities, Theme.chat_msgTextPaint.getFontMetricsInt(), false);
+        Spannable replaceAnimatedEmoji = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(new SpannableStringBuilder(messageObject.messageOwner.translatedText.text), Theme.chat_msgTextPaint.getFontMetricsInt(), false), messageObject.messageOwner.translatedText.entities, Theme.chat_msgTextPaint.getFontMetricsInt(), false);
         if (MessageObject.containsUrls(replaceAnimatedEmoji)) {
             try {
                 AndroidUtilities.addLinksSafe(replaceAnimatedEmoji, 5, false, true);
@@ -14296,7 +14296,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                                 MessageObject.addUrlsByPattern(messageObject.isOutOwner(), spannableStringBuilder, false, 3, (int) messageObject.getDuration(), false);
                             }
                         }
-                        cloneSpans = Emoji.replaceEmoji(spannableStringBuilder, nextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                        cloneSpans = Emoji.replaceEmoji(spannableStringBuilder, nextView.getPaint().getFontMetricsInt(), false);
                     }
                     if (messageObject != null && messageObject.isSponsored()) {
                         cloneSpans = sponsoredCaption(messageObject, cloneSpans);
@@ -17930,7 +17930,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         this.resetButton.setGravity(17);
         this.resetButton.setBackgroundDrawable(Theme.createSelectorDrawable(-12763843, 0));
         this.resetButton.setPadding(AndroidUtilities.dp(20.0f), 0, AndroidUtilities.dp(20.0f), 0);
-        this.resetButton.setText(LocaleController.getString("Reset", R.string.CropReset).toUpperCase());
+        this.resetButton.setText(LocaleController.getString(R.string.CropReset).toUpperCase());
         this.resetButton.setTypeface(AndroidUtilities.bold());
         this.editorDoneLayout.addView(this.resetButton, LayoutHelper.createFrame(-2, -1, 49));
         this.resetButton.setOnClickListener(new View.OnClickListener() {

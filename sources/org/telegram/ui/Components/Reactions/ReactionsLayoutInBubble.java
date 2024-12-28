@@ -42,6 +42,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Cells.ChatActionCell;
 import org.telegram.ui.Cells.ChatMessageCell;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
@@ -57,7 +58,7 @@ import org.telegram.ui.Stars.StarsReactionsSheet;
 public class ReactionsLayoutInBubble {
     private static int animationUniq;
     private int animateFromTotalHeight;
-    private boolean animateHeight;
+    public boolean animateHeight;
     private boolean animateMove;
     private boolean animateWidth;
     boolean attached;
@@ -81,7 +82,7 @@ public class ReactionsLayoutInBubble {
     float lastY;
     Runnable longPressRunnable;
     MessageObject messageObject;
-    ChatMessageCell parentView;
+    View parentView;
     public int positionOffsetY;
     boolean pressed;
     Theme.ResourcesProvider resourcesProvider;
@@ -115,9 +116,10 @@ public class ReactionsLayoutInBubble {
     HashMap lastDrawingReactionButtonsTmp = new HashMap();
     HashMap animatedReactions = new HashMap();
     private final RectF scrimRect = new RectF();
+    private final Rect scrimRect2 = new Rect();
     int currentAccount = UserConfig.selectedAccount;
 
-    private static class ButtonsComparator implements Comparator {
+    public static class ButtonsComparator implements Comparator {
         int currentAccount;
         long dialogId;
 
@@ -216,32 +218,6 @@ public class ReactionsLayoutInBubble {
         private RectF bounds = new RectF();
         private RectF rect2 = new RectF();
         private final Path tagPath = new Path();
-        private final Drawable.Callback callback = new Drawable.Callback() {
-            @Override
-            public void invalidateDrawable(Drawable drawable) {
-                if (ReactionButton.this.parentView != null) {
-                    ReactionButton.this.parentView.invalidate();
-                    ReactionButton reactionButton = ReactionButton.this;
-                    if (reactionButton.inGroup && (reactionButton.parentView.getParent() instanceof View)) {
-                        ((View) ReactionButton.this.parentView.getParent()).invalidate();
-                    }
-                }
-            }
-
-            @Override
-            public void scheduleDrawable(Drawable drawable, Runnable runnable, long j) {
-                if (ReactionButton.this.parentView != null) {
-                    ReactionButton.this.parentView.scheduleDrawable(drawable, runnable, j);
-                }
-            }
-
-            @Override
-            public void unscheduleDrawable(Drawable drawable, Runnable runnable) {
-                if (ReactionButton.this.parentView != null) {
-                    ReactionButton.this.parentView.unscheduleDrawable(drawable, runnable);
-                }
-            }
-        };
 
         public ReactionButton(ReactionButton reactionButton, int i, View view, TLRPC.ReactionCount reactionCount, boolean z, boolean z2, Theme.ResourcesProvider resourcesProvider) {
             String l;
@@ -381,7 +357,7 @@ public class ReactionsLayoutInBubble {
             this.counterDrawable.gravity = 3;
         }
 
-        public void drawImage(Canvas canvas, Rect rect, float f) {
+        private void drawImage(Canvas canvas, Rect rect, float f) {
             boolean z;
             AnimatedEmojiDrawable animatedEmojiDrawable = this.animatedEmojiDrawable;
             ImageReceiver imageReceiver = (animatedEmojiDrawable == null || animatedEmojiDrawable.getImageReceiver() == null) ? this.imageReceiver : this.animatedEmojiDrawable.getImageReceiver();
@@ -865,10 +841,29 @@ public class ReactionsLayoutInBubble {
         }
     }
 
-    public ReactionsLayoutInBubble(ChatMessageCell chatMessageCell) {
-        this.parentView = chatMessageCell;
+    public ReactionsLayoutInBubble(View view) {
+        this.parentView = view;
         initPaints(this.resourcesProvider);
         this.touchSlop = ViewConfiguration.get(ApplicationLoader.applicationContext).getScaledTouchSlop();
+    }
+
+    private void didPressReaction(TLRPC.ReactionCount reactionCount, boolean z, float f, float f2) {
+        ChatActionCell chatActionCell;
+        ChatActionCell.ChatActionCellDelegate delegate;
+        View view = this.parentView;
+        if (!(view instanceof ChatMessageCell)) {
+            if (!(view instanceof ChatActionCell) || (delegate = (chatActionCell = (ChatActionCell) view).getDelegate()) == null) {
+                return;
+            }
+            delegate.didPressReaction(chatActionCell, reactionCount, z, f, f2);
+            return;
+        }
+        ChatMessageCell chatMessageCell = (ChatMessageCell) view;
+        ChatMessageCell.ChatMessageCellDelegate delegate2 = chatMessageCell.getDelegate();
+        if (delegate2 == null) {
+            return;
+        }
+        delegate2.didPressReaction(chatMessageCell, reactionCount, z, f, f2);
     }
 
     public static boolean equalsTLReaction(TLRPC.Reaction reaction, TLRPC.Reaction reaction2) {
@@ -928,6 +923,11 @@ public class ReactionsLayoutInBubble {
         path.close();
     }
 
+    private int getParentWidth() {
+        View view = this.parentView;
+        return view instanceof ChatMessageCell ? ((ChatMessageCell) view).getParentWidth() : AndroidUtilities.displaySize.x;
+    }
+
     private static long getPeerId(TLObject tLObject) {
         if (tLObject instanceof TLRPC.User) {
             return ((TLRPC.User) tLObject).id;
@@ -947,7 +947,7 @@ public class ReactionsLayoutInBubble {
     }
 
     public void lambda$checkTouchEvent$1(ReactionButton reactionButton) {
-        this.parentView.getDelegate().didPressReaction(this.parentView, reactionButton.reactionCount, true, 0.0f, 0.0f);
+        didPressReaction(reactionButton.reactionCount, true, 0.0f, 0.0f);
         reactionButton.bounce.setPressed(false);
         this.lastSelectedButton = null;
         this.pressed = false;
@@ -1143,8 +1143,8 @@ public class ReactionsLayoutInBubble {
                 AndroidUtilities.cancelRunOnUIThread(runnable4);
                 this.longPressRunnable = null;
             }
-            if (this.pressed && this.lastSelectedButton != null && motionEvent.getAction() == 1 && this.parentView.getDelegate() != null) {
-                this.parentView.getDelegate().didPressReaction(this.parentView, this.lastSelectedButton.reactionCount, false, motionEvent.getX(), motionEvent.getY());
+            if (this.pressed && this.lastSelectedButton != null && motionEvent.getAction() == 1) {
+                didPressReaction(this.lastSelectedButton.reactionCount, false, motionEvent.getX(), motionEvent.getY());
             }
             this.pressed = false;
             ReactionButton reactionButton3 = this.lastSelectedButton;
@@ -1271,7 +1271,7 @@ public class ReactionsLayoutInBubble {
                 rectF.set(reactionButton.drawingImageRect);
                 float dp = AndroidUtilities.dp(140.0f);
                 float dp2 = AndroidUtilities.dp(14.0f);
-                float clamp = Utilities.clamp(rectF.left - AndroidUtilities.dp(12.0f), ((this.parentView != null ? r5.getParentWidth() : AndroidUtilities.displaySize.x) - dp) - AndroidUtilities.dp(24.0f), AndroidUtilities.dp(24.0f));
+                float clamp = Utilities.clamp(rectF.left - AndroidUtilities.dp(12.0f), (getParentWidth() - dp) - AndroidUtilities.dp(24.0f), AndroidUtilities.dp(24.0f));
                 RectF rectF2 = this.scrimRect;
                 float f = rectF.top - dp2;
                 float f2 = i;
@@ -1280,15 +1280,9 @@ public class ReactionsLayoutInBubble {
                 RectF rectF3 = this.scrimRect;
                 AndroidUtilities.lerp(rectF, rectF3, interpolation, rectF3);
                 reactionButton.attachPreview(view);
-                Rect rect = AndroidUtilities.rectTmp2;
+                Rect rect = this.scrimRect2;
                 RectF rectF4 = this.scrimRect;
                 rect.set((int) rectF4.left, (int) rectF4.top, (int) rectF4.right, (int) rectF4.bottom);
-                float f3 = 1.0f - interpolation;
-                if (f3 > 0.0f) {
-                    canvas.saveLayerAlpha(this.scrimRect, (int) (f3 * 255.0f), 31);
-                    reactionButton.drawImage(canvas, rect, 1.0f);
-                    canvas.restore();
-                }
                 reactionButton.drawPreview(view, canvas, this.scrimRect, interpolation);
             }
         }
@@ -1327,8 +1321,105 @@ public class ReactionsLayoutInBubble {
         return this.hasPaidReaction && !(this.isEmpty && this.outButtons.isEmpty()) && LiteMode.isEnabled(8200);
     }
 
-    public void measure(int r14, int r15) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.measure(int, int):void");
+    public void measure(int i, int i2) {
+        this.height = 0;
+        this.width = 0;
+        this.positionOffsetY = 0;
+        this.totalHeight = 0;
+        if (this.isEmpty) {
+            return;
+        }
+        this.availableWidth = i;
+        int i3 = 0;
+        int i4 = 0;
+        int i5 = 0;
+        for (int i6 = 0; i6 < this.reactionButtons.size(); i6++) {
+            ReactionButton reactionButton = (ReactionButton) this.reactionButtons.get(i6);
+            if (reactionButton.isSmall) {
+                reactionButton.width = AndroidUtilities.dp(14.0f);
+                reactionButton.height = AndroidUtilities.dp(14.0f);
+            } else if (reactionButton.isTag) {
+                reactionButton.width = AndroidUtilities.dp(42.0f);
+                reactionButton.height = AndroidUtilities.dp(26.0f);
+                if (reactionButton.hasName) {
+                    reactionButton.width = (int) (reactionButton.width + reactionButton.textDrawable.getAnimateToWidth() + AndroidUtilities.dp(8.0f));
+                } else {
+                    CounterView.CounterDrawable counterDrawable = reactionButton.counterDrawable;
+                    if (counterDrawable != null && reactionButton.count > 1) {
+                        reactionButton.width += counterDrawable.getCurrentWidth() + AndroidUtilities.dp(8.0f);
+                    }
+                }
+            } else {
+                reactionButton.width = AndroidUtilities.dp(8.0f) + AndroidUtilities.dp(20.0f) + AndroidUtilities.dp(reactionButton.animatedEmojiDrawable != null ? 6.0f : 4.0f);
+                if (reactionButton.avatarsDrawable == null || reactionButton.users.size() <= 0) {
+                    reactionButton.width = reactionButton.hasName ? (int) (reactionButton.width + reactionButton.textDrawable.getAnimateToWidth() + AndroidUtilities.dp(8.0f)) : reactionButton.width + reactionButton.counterDrawable.getCurrentWidth() + AndroidUtilities.dp(8.0f);
+                } else {
+                    reactionButton.users.size();
+                    reactionButton.width = (int) (reactionButton.width + AndroidUtilities.dp(2.0f) + AndroidUtilities.dp(20.0f) + ((reactionButton.users.size() > 1 ? reactionButton.users.size() - 1 : 0) * AndroidUtilities.dp(20.0f) * 0.8f) + AndroidUtilities.dp(1.0f));
+                    reactionButton.avatarsDrawable.height = AndroidUtilities.dp(26.0f);
+                }
+                reactionButton.height = AndroidUtilities.dp(26.0f);
+            }
+            if (reactionButton.width + i4 > i) {
+                i5 += reactionButton.height + AndroidUtilities.dp(4.0f);
+                i4 = 0;
+            }
+            reactionButton.x = i4;
+            reactionButton.y = i5;
+            i4 += reactionButton.width + AndroidUtilities.dp(4.0f);
+            if (i4 > i3) {
+                i3 = i4;
+            }
+        }
+        if (i2 == 5 && !this.reactionButtons.isEmpty()) {
+            int i7 = ((ReactionButton) this.reactionButtons.get(0)).y;
+            int i8 = 0;
+            for (int i9 = 0; i9 < this.reactionButtons.size(); i9++) {
+                if (((ReactionButton) this.reactionButtons.get(i9)).y != i7) {
+                    int i10 = i9 - 1;
+                    int i11 = i - (((ReactionButton) this.reactionButtons.get(i10)).x + ((ReactionButton) this.reactionButtons.get(i10)).width);
+                    while (i8 < i9) {
+                        ((ReactionButton) this.reactionButtons.get(i8)).x += i11;
+                        i8++;
+                    }
+                    i8 = i9;
+                }
+            }
+            int size = this.reactionButtons.size() - 1;
+            int i12 = i - (((ReactionButton) this.reactionButtons.get(size)).x + ((ReactionButton) this.reactionButtons.get(size)).width);
+            while (i8 <= size) {
+                ((ReactionButton) this.reactionButtons.get(i8)).x += i12;
+                i8++;
+            }
+        } else if (i2 == 1 && !this.reactionButtons.isEmpty()) {
+            int i13 = ((ReactionButton) this.reactionButtons.get(0)).y;
+            int i14 = 0;
+            for (int i15 = 0; i15 < this.reactionButtons.size(); i15++) {
+                if (((ReactionButton) this.reactionButtons.get(i15)).y != i13) {
+                    int i16 = i15 - 1;
+                    int i17 = i - (((ReactionButton) this.reactionButtons.get(i16)).x + ((ReactionButton) this.reactionButtons.get(i16)).width);
+                    while (i14 < i15) {
+                        ((ReactionButton) this.reactionButtons.get(i14)).x += i17;
+                        i14++;
+                    }
+                    i14 = i15;
+                }
+            }
+            int size2 = this.reactionButtons.size() - 1;
+            int i18 = i - (((ReactionButton) this.reactionButtons.get(size2)).x + ((ReactionButton) this.reactionButtons.get(size2)).width);
+            while (i14 <= size2) {
+                ((ReactionButton) this.reactionButtons.get(i14)).x = (int) (r12.x + (i18 / 2.0f));
+                i14++;
+            }
+        }
+        this.lastLineX = i4;
+        if (i2 == 5 || i2 == 1) {
+            this.width = i;
+        } else {
+            this.width = i3;
+        }
+        this.height = i5 + (this.reactionButtons.size() == 0 ? 0 : AndroidUtilities.dp(26.0f));
+        this.drawServiceShaderBackground = 0.0f;
     }
 
     public void onAttachToWindow() {

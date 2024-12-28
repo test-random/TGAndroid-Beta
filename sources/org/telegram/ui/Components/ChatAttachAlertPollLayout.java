@@ -243,7 +243,7 @@ public class ChatAttachAlertPollLayout extends ChatAttachAlert.AttachAlertLayout
                 selectionEnd = 0;
             }
             try {
-                CharSequence replaceEmoji = Emoji.replaceEmoji((CharSequence) str, editField.getPaint().getFontMetricsInt(), AndroidUtilities.dp(18.0f), false);
+                CharSequence replaceEmoji = Emoji.replaceEmoji(str, editField.getPaint().getFontMetricsInt(), false);
                 editField.setText(editField.getText().insert(selectionEnd, replaceEmoji));
                 int length = selectionEnd + replaceEmoji.length();
                 editField.setSelection(length, length);
@@ -468,7 +468,7 @@ public class ChatAttachAlertPollLayout extends ChatAttachAlert.AttachAlertLayout
                                 for (ImageSpan imageSpan : (ImageSpan[]) editable.getSpans(0, editable.length(), ImageSpan.class)) {
                                     editable.removeSpan(imageSpan);
                                 }
-                                Emoji.replaceEmoji((CharSequence) editable, pollEditTextCell2.getEditField().getPaint().getFontMetricsInt(), AndroidUtilities.dp(18.0f), false);
+                                Emoji.replaceEmoji(editable, pollEditTextCell2.getEditField().getPaint().getFontMetricsInt(), false);
                                 ChatAttachAlertPollLayout.this.suggestEmojiPanel.setDirection(1);
                                 ChatAttachAlertPollLayout.this.suggestEmojiPanel.setDelegate(pollEditTextCell2);
                                 ChatAttachAlertPollLayout.this.suggestEmojiPanel.setTranslationY(findViewHolderForAdapterPosition.itemView.getY());
@@ -583,7 +583,7 @@ public class ChatAttachAlertPollLayout extends ChatAttachAlert.AttachAlertLayout
                                 for (ImageSpan imageSpan : (ImageSpan[]) editable.getSpans(0, editable.length(), ImageSpan.class)) {
                                     editable.removeSpan(imageSpan);
                                 }
-                                Emoji.replaceEmoji((CharSequence) editable, pollEditTextCell3.getEditField().getPaint().getFontMetricsInt(), AndroidUtilities.dp(18.0f), false);
+                                Emoji.replaceEmoji(editable, pollEditTextCell3.getEditField().getPaint().getFontMetricsInt(), false);
                                 float y = (findContainingViewHolder.itemView.getY() - AndroidUtilities.dp(166.0f)) + findContainingViewHolder.itemView.getMeasuredHeight();
                                 if (y > 0.0f) {
                                     ChatAttachAlertPollLayout.this.suggestEmojiPanel.setDirection(0);
@@ -672,7 +672,7 @@ public class ChatAttachAlertPollLayout extends ChatAttachAlert.AttachAlertLayout
                                 for (ImageSpan imageSpan : (ImageSpan[]) editable.getSpans(0, editable.length(), ImageSpan.class)) {
                                     editable.removeSpan(imageSpan);
                                 }
-                                Emoji.replaceEmoji((CharSequence) editable, pollEditTextCell4.getEditField().getPaint().getFontMetricsInt(), AndroidUtilities.dp(18.0f), false);
+                                Emoji.replaceEmoji(editable, pollEditTextCell4.getEditField().getPaint().getFontMetricsInt(), false);
                                 ChatAttachAlertPollLayout.this.suggestEmojiPanel.setDirection(1);
                                 ChatAttachAlertPollLayout.this.suggestEmojiPanel.setDelegate(pollEditTextCell4);
                                 ChatAttachAlertPollLayout.this.suggestEmojiPanel.setTranslationY(findViewHolderForAdapterPosition.itemView.getY());

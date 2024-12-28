@@ -27,6 +27,7 @@ import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -47,8 +48,8 @@ import org.telegram.ui.Components.UniversalAdapter;
 import org.telegram.ui.Components.UniversalRecyclerView;
 
 public class ChatbotsActivity extends BaseFragment {
-    public TLRPC.TL_connectedBot currentBot;
-    public TLRPC.TL_account_connectedBots currentValue;
+    public TL_account.TL_connectedBot currentBot;
+    public TL_account.connectedBots currentValue;
     private ActionBarMenuItem doneButton;
     private CrossfadeDrawable doneButtonDrawable;
     private EditTextBoldCursor editText;
@@ -278,13 +279,13 @@ public class ChatbotsActivity extends BaseFragment {
         });
     }
 
-    public void lambda$setValue$6(TLRPC.TL_account_connectedBots tL_account_connectedBots) {
+    public void lambda$setValue$6(TL_account.connectedBots connectedbots) {
         UniversalAdapter universalAdapter;
-        this.currentValue = tL_account_connectedBots;
-        TLRPC.TL_connectedBot tL_connectedBot = (tL_account_connectedBots == null || tL_account_connectedBots.connected_bots.isEmpty()) ? null : this.currentValue.connected_bots.get(0);
+        this.currentValue = connectedbots;
+        TL_account.TL_connectedBot tL_connectedBot = (connectedbots == null || connectedbots.connected_bots.isEmpty()) ? null : this.currentValue.connected_bots.get(0);
         this.currentBot = tL_connectedBot;
         this.selectedBot = tL_connectedBot == null ? null : getMessagesController().getUser(Long.valueOf(this.currentBot.bot_id));
-        TLRPC.TL_connectedBot tL_connectedBot2 = this.currentBot;
+        TL_account.TL_connectedBot tL_connectedBot2 = this.currentBot;
         this.allowReply = tL_connectedBot2 != null ? tL_connectedBot2.can_reply : true;
         this.exclude = tL_connectedBot2 != null ? tL_connectedBot2.recipients.exclude_selected : true;
         BusinessRecipientsHelper businessRecipientsHelper = this.recipientsHelper;
@@ -350,22 +351,22 @@ public class ChatbotsActivity extends BaseFragment {
         }
         if (this.recipientsHelper.validate(this.listView)) {
             final ArrayList arrayList = new ArrayList();
-            TLRPC.TL_connectedBot tL_connectedBot = this.currentBot;
+            TL_account.TL_connectedBot tL_connectedBot = this.currentBot;
             if (tL_connectedBot != null && ((user = this.selectedBot) == null || tL_connectedBot.bot_id != user.id)) {
-                TLRPC.TL_account_updateConnectedBot tL_account_updateConnectedBot = new TLRPC.TL_account_updateConnectedBot();
-                tL_account_updateConnectedBot.deleted = true;
-                tL_account_updateConnectedBot.bot = getMessagesController().getInputUser(this.currentBot.bot_id);
-                tL_account_updateConnectedBot.recipients = new TLRPC.TL_inputBusinessBotRecipients();
-                arrayList.add(tL_account_updateConnectedBot);
+                TL_account.updateConnectedBot updateconnectedbot = new TL_account.updateConnectedBot();
+                updateconnectedbot.deleted = true;
+                updateconnectedbot.bot = getMessagesController().getInputUser(this.currentBot.bot_id);
+                updateconnectedbot.recipients = new TL_account.TL_inputBusinessBotRecipients();
+                arrayList.add(updateconnectedbot);
             }
             if (this.selectedBot != null) {
-                TLRPC.TL_account_updateConnectedBot tL_account_updateConnectedBot2 = new TLRPC.TL_account_updateConnectedBot();
-                tL_account_updateConnectedBot2.deleted = false;
-                tL_account_updateConnectedBot2.can_reply = this.allowReply;
-                tL_account_updateConnectedBot2.bot = getMessagesController().getInputUser(this.selectedBot);
-                tL_account_updateConnectedBot2.recipients = this.recipientsHelper.getBotInputValue();
-                arrayList.add(tL_account_updateConnectedBot2);
-                TLRPC.TL_connectedBot tL_connectedBot2 = this.currentBot;
+                TL_account.updateConnectedBot updateconnectedbot2 = new TL_account.updateConnectedBot();
+                updateconnectedbot2.deleted = false;
+                updateconnectedbot2.can_reply = this.allowReply;
+                updateconnectedbot2.bot = getMessagesController().getInputUser(this.selectedBot);
+                updateconnectedbot2.recipients = this.recipientsHelper.getBotInputValue();
+                arrayList.add(updateconnectedbot2);
+                TL_account.TL_connectedBot tL_connectedBot2 = this.currentBot;
                 if (tL_connectedBot2 != null) {
                     tL_connectedBot2.bot_id = this.selectedBot.id;
                     tL_connectedBot2.recipients = this.recipientsHelper.getBotValue();
@@ -410,7 +411,7 @@ public class ChatbotsActivity extends BaseFragment {
         BusinessChatbotController.getInstance(this.currentAccount).load(new Utilities.Callback() {
             @Override
             public final void run(Object obj) {
-                ChatbotsActivity.this.lambda$setValue$6((TLRPC.TL_account_connectedBots) obj);
+                ChatbotsActivity.this.lambda$setValue$6((TL_account.connectedBots) obj);
             }
         });
     }
@@ -564,7 +565,7 @@ public class ChatbotsActivity extends BaseFragment {
             }
         });
         this.recipientsHelper = businessRecipientsHelper;
-        TLRPC.TL_connectedBot tL_connectedBot = this.currentBot;
+        TL_account.TL_connectedBot tL_connectedBot = this.currentBot;
         businessRecipientsHelper.setValue(tL_connectedBot == null ? null : tL_connectedBot.recipients);
         UniversalRecyclerView universalRecyclerView = new UniversalRecyclerView(this, new Utilities.Callback2() {
             @Override
@@ -589,7 +590,7 @@ public class ChatbotsActivity extends BaseFragment {
         }
         TLRPC.User user = this.selectedBot;
         boolean z = user != null;
-        TLRPC.TL_connectedBot tL_connectedBot = this.currentBot;
+        TL_account.TL_connectedBot tL_connectedBot = this.currentBot;
         if (z != (tL_connectedBot != null)) {
             return true;
         }

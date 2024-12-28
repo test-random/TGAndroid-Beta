@@ -33,6 +33,7 @@ import org.telegram.messenger.WebFile;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -150,12 +151,12 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
     public void lambda$onClick$6(DialogInterface dialogInterface, int i) {
         this.doneButtonDrawable.animateToProgress(1.0f);
         TLRPC.UserFull userFull = getMessagesController().getUserFull(getUserConfig().getClientUserId());
-        TLRPC.TL_account_updateBusinessLocation tL_account_updateBusinessLocation = new TLRPC.TL_account_updateBusinessLocation();
+        TL_account.updateBusinessLocation updatebusinesslocation = new TL_account.updateBusinessLocation();
         if (userFull != null) {
             userFull.business_location = null;
             userFull.flags2 &= -3;
         }
-        getConnectionsManager().sendRequest(tL_account_updateBusinessLocation, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatebusinesslocation, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 LocationActivity.this.lambda$onClick$5(tLObject, tL_error);
@@ -286,18 +287,18 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         }
         this.doneButtonDrawable.animateToProgress(1.0f);
         TLRPC.UserFull userFull = getMessagesController().getUserFull(getUserConfig().getClientUserId());
-        TLRPC.TL_account_updateBusinessLocation tL_account_updateBusinessLocation = new TLRPC.TL_account_updateBusinessLocation();
+        TL_account.updateBusinessLocation updatebusinesslocation = new TL_account.updateBusinessLocation();
         if (!z) {
             if (this.geo != null) {
-                tL_account_updateBusinessLocation.flags |= 2;
+                updatebusinesslocation.flags |= 2;
                 TLRPC.TL_inputGeoPoint tL_inputGeoPoint = new TLRPC.TL_inputGeoPoint();
-                tL_account_updateBusinessLocation.geo_point = tL_inputGeoPoint;
+                updatebusinesslocation.geo_point = tL_inputGeoPoint;
                 TLRPC.GeoPoint geoPoint = this.geo;
                 tL_inputGeoPoint.lat = geoPoint.lat;
                 tL_inputGeoPoint._long = geoPoint._long;
             }
-            tL_account_updateBusinessLocation.flags |= 1;
-            tL_account_updateBusinessLocation.address = this.address;
+            updatebusinesslocation.flags |= 1;
+            updatebusinesslocation.address = this.address;
             if (userFull != null) {
                 userFull.flags2 |= 2;
                 TLRPC.TL_businessLocation tL_businessLocation = new TLRPC.TL_businessLocation();
@@ -316,7 +317,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             userFull.flags2 &= -3;
             userFull.business_location = null;
         }
-        getConnectionsManager().sendRequest(tL_account_updateBusinessLocation, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatebusinesslocation, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 LocationActivity.this.lambda$processDone$1(tLObject, tL_error);

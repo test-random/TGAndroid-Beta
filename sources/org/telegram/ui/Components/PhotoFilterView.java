@@ -34,7 +34,8 @@ import org.telegram.messenger.MediaController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.Utilities;
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.PhotoEditRadioCell;
 import org.telegram.ui.Cells.PhotoEditToolCell;
@@ -205,18 +206,18 @@ public class PhotoFilterView extends FrameLayout implements FilterShaders.Filter
             this.curveBuffer.position(0);
         }
 
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.luminanceCurve.readParams(abstractSerializedData, z);
-            this.redCurve.readParams(abstractSerializedData, z);
-            this.greenCurve.readParams(abstractSerializedData, z);
-            this.blueCurve.readParams(abstractSerializedData, z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.luminanceCurve.readParams(inputSerializedData, z);
+            this.redCurve.readParams(inputSerializedData, z);
+            this.greenCurve.readParams(inputSerializedData, z);
+            this.blueCurve.readParams(inputSerializedData, z);
         }
 
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            this.luminanceCurve.serializeToStream(abstractSerializedData);
-            this.redCurve.serializeToStream(abstractSerializedData);
-            this.greenCurve.serializeToStream(abstractSerializedData);
-            this.blueCurve.serializeToStream(abstractSerializedData);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            this.luminanceCurve.serializeToStream(outputSerializedData);
+            this.redCurve.serializeToStream(outputSerializedData);
+            this.greenCurve.serializeToStream(outputSerializedData);
+            this.blueCurve.serializeToStream(outputSerializedData);
         }
 
         public boolean shouldBeSkipped() {
@@ -319,30 +320,30 @@ public class PhotoFilterView extends FrameLayout implements FilterShaders.Filter
             return ((double) Math.abs(this.blacksLevel - 0.0f)) < 1.0E-5d && ((double) Math.abs(this.shadowsLevel - 25.0f)) < 1.0E-5d && ((double) Math.abs(this.midtonesLevel - 50.0f)) < 1.0E-5d && ((double) Math.abs(this.highlightsLevel - 75.0f)) < 1.0E-5d && ((double) Math.abs(this.whitesLevel - 100.0f)) < 1.0E-5d;
         }
 
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            float readFloat = abstractSerializedData.readFloat(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            float readFloat = inputSerializedData.readFloat(z);
             this.previousBlacksLevel = readFloat;
             this.blacksLevel = readFloat;
-            float readFloat2 = abstractSerializedData.readFloat(z);
+            float readFloat2 = inputSerializedData.readFloat(z);
             this.previousShadowsLevel = readFloat2;
             this.shadowsLevel = readFloat2;
-            float readFloat3 = abstractSerializedData.readFloat(z);
+            float readFloat3 = inputSerializedData.readFloat(z);
             this.previousMidtonesLevel = readFloat3;
             this.midtonesLevel = readFloat3;
-            float readFloat4 = abstractSerializedData.readFloat(z);
+            float readFloat4 = inputSerializedData.readFloat(z);
             this.previousHighlightsLevel = readFloat4;
             this.highlightsLevel = readFloat4;
-            float readFloat5 = abstractSerializedData.readFloat(z);
+            float readFloat5 = inputSerializedData.readFloat(z);
             this.previousWhitesLevel = readFloat5;
             this.whitesLevel = readFloat5;
         }
 
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeFloat(this.blacksLevel);
-            abstractSerializedData.writeFloat(this.shadowsLevel);
-            abstractSerializedData.writeFloat(this.midtonesLevel);
-            abstractSerializedData.writeFloat(this.highlightsLevel);
-            abstractSerializedData.writeFloat(this.whitesLevel);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeFloat(this.blacksLevel);
+            outputSerializedData.writeFloat(this.shadowsLevel);
+            outputSerializedData.writeFloat(this.midtonesLevel);
+            outputSerializedData.writeFloat(this.highlightsLevel);
+            outputSerializedData.writeFloat(this.whitesLevel);
         }
     }
 

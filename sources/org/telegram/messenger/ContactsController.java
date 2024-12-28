@@ -32,6 +32,8 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Components.Bulletin;
 
@@ -1144,10 +1146,10 @@ public class ContactsController extends BaseController {
 
     public void lambda$loadPrivacySettings$64(TLRPC.TL_error tL_error, TLObject tLObject, int i) {
         if (tL_error == null) {
-            TLRPC.TL_account_privacyRules tL_account_privacyRules = (TLRPC.TL_account_privacyRules) tLObject;
-            getMessagesController().putUsers(tL_account_privacyRules.users, false);
-            getMessagesController().putChats(tL_account_privacyRules.chats, false);
-            ArrayList<TLRPC.PrivacyRule> arrayList = tL_account_privacyRules.rules;
+            TL_account.privacyRules privacyrules = (TL_account.privacyRules) tLObject;
+            getMessagesController().putUsers(privacyrules.users, false);
+            getMessagesController().putChats(privacyrules.chats, false);
+            ArrayList<TLRPC.PrivacyRule> arrayList = privacyrules.rules;
             switch (i) {
                 case 0:
                     this.lastseenPrivacyRules = arrayList;
@@ -1829,7 +1831,7 @@ public class ContactsController extends BaseController {
     }
 
     public void lambda$reloadContactsStatuses$59(final SharedPreferences.Editor editor, final TLObject tLObject, TLRPC.TL_error tL_error) {
-        if (tL_error == null) {
+        if (tLObject instanceof Vector) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
@@ -2428,7 +2430,7 @@ public class ContactsController extends BaseController {
     public void loadGlobalPrivacySetting() {
         if (this.loadingGlobalSettings == 0) {
             this.loadingGlobalSettings = 1;
-            getConnectionsManager().sendRequest(new TLRPC.TL_account_getGlobalPrivacySettings(), new RequestDelegate() {
+            getConnectionsManager().sendRequest(new TL_account.getGlobalPrivacySettings(), new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     ContactsController.this.lambda$loadGlobalPrivacySetting$61(tLObject, tL_error);
@@ -2441,7 +2443,7 @@ public class ContactsController extends BaseController {
         TLRPC.InputPrivacyKey tL_inputPrivacyKeyStatusTimestamp;
         if (this.loadingDeleteInfo == 0) {
             this.loadingDeleteInfo = 1;
-            getConnectionsManager().sendRequest(new TLRPC.TL_account_getAccountTTL(), new RequestDelegate() {
+            getConnectionsManager().sendRequest(new TL_account.getAccountTTL(), new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     ContactsController.this.lambda$loadPrivacySettings$63(tLObject, tL_error);
@@ -2458,7 +2460,7 @@ public class ContactsController extends BaseController {
             }
             if (iArr[i] == 0) {
                 iArr[i] = 1;
-                TLRPC.TL_account_getPrivacy tL_account_getPrivacy = new TLRPC.TL_account_getPrivacy();
+                TL_account.getPrivacy getprivacy = new TL_account.getPrivacy();
                 switch (i) {
                     case 0:
                         tL_inputPrivacyKeyStatusTimestamp = new TLRPC.TL_inputPrivacyKeyStatusTimestamp();
@@ -2497,8 +2499,8 @@ public class ContactsController extends BaseController {
                         tL_inputPrivacyKeyStatusTimestamp = new TLRPC.TL_inputPrivacyKeyStarGiftsAutoSave();
                         break;
                 }
-                tL_account_getPrivacy.key = tL_inputPrivacyKeyStatusTimestamp;
-                getConnectionsManager().sendRequest(tL_account_getPrivacy, new RequestDelegate() {
+                getprivacy.key = tL_inputPrivacyKeyStatusTimestamp;
+                getConnectionsManager().sendRequest(getprivacy, new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                         ContactsController.this.lambda$loadPrivacySettings$65(i, tLObject, tL_error);

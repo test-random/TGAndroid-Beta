@@ -176,7 +176,6 @@ public class SharedPhotoVideoCell2 extends FrameLayout {
         this.viewsAlpha = new AnimatedFloat(this, 0L, 350L, cubicBezierInterpolator);
         this.viewsText = new AnimatedTextView.AnimatedTextDrawable(false, true, true);
         this.path = new Path();
-        this.mediaSpoilerEffect = new SpoilerEffect();
         this.style = 0;
         this.scrimPaint = new Paint(1);
         this.progressPaint = new Paint(1);

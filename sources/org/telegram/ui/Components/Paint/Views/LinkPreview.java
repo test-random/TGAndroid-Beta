@@ -18,7 +18,8 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.R;
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Components.AnimatedFloat;
@@ -92,7 +93,7 @@ public class LinkPreview extends View {
         public String url;
         public TLRPC.WebPage webpage;
 
-        public static WebPagePreview TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static WebPagePreview TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             if (-625858389 != i) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in WebPagePreview", Integer.valueOf(i)));
@@ -100,31 +101,31 @@ public class LinkPreview extends View {
                 return null;
             }
             WebPagePreview webPagePreview = new WebPagePreview();
-            webPagePreview.readParams(abstractSerializedData, z);
+            webPagePreview.readParams(inputSerializedData, z);
             return webPagePreview;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(z);
             this.flags = readInt32;
             this.largePhoto = (readInt32 & 8) != 0;
             this.captionAbove = (readInt32 & 16) != 0;
-            this.url = abstractSerializedData.readString(z);
+            this.url = inputSerializedData.readString(z);
             if ((this.flags & 1) != 0) {
-                this.webpage = TLRPC.WebPage.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                this.webpage = TLRPC.WebPage.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             }
             if ((this.flags & 2) != 0) {
-                this.name = abstractSerializedData.readString(z);
+                this.name = inputSerializedData.readString(z);
             }
             if ((this.flags & 4) != 0) {
-                this.photoSize = abstractSerializedData.readInt32(z);
+                this.photoSize = inputSerializedData.readInt32(z);
             }
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(-625858389);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-625858389);
             this.flags = this.webpage != null ? this.flags | 1 : this.flags & (-2);
             int i = !TextUtils.isEmpty(this.name) ? this.flags | 2 : this.flags & (-3);
             this.flags = i;
@@ -132,16 +133,16 @@ public class LinkPreview extends View {
             this.flags = i2;
             int i3 = this.captionAbove ? i2 | 16 : i2 & (-17);
             this.flags = i3;
-            abstractSerializedData.writeInt32(i3);
-            abstractSerializedData.writeString(this.url);
+            outputSerializedData.writeInt32(i3);
+            outputSerializedData.writeString(this.url);
             if ((this.flags & 1) != 0) {
-                this.webpage.serializeToStream(abstractSerializedData);
+                this.webpage.serializeToStream(outputSerializedData);
             }
             if ((this.flags & 2) != 0) {
-                abstractSerializedData.writeString(this.name);
+                outputSerializedData.writeString(this.name);
             }
             if ((this.flags & 4) != 0) {
-                abstractSerializedData.writeInt32(this.photoSize);
+                outputSerializedData.writeInt32(this.photoSize);
             }
         }
     }

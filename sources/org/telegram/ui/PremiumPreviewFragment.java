@@ -66,6 +66,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.INavigationLayout;
@@ -1258,9 +1259,9 @@ public class PremiumPreviewFragment extends BaseFragment implements Notification
             TextCell textCell = (TextCell) view;
             textCell.setChecked(!textCell.isChecked());
             userFull.sponsored_enabled = textCell.isChecked();
-            TLRPC.TL_account_toggleSponsoredMessages tL_account_toggleSponsoredMessages = new TLRPC.TL_account_toggleSponsoredMessages();
-            tL_account_toggleSponsoredMessages.enabled = userFull.sponsored_enabled;
-            getConnectionsManager().sendRequest(tL_account_toggleSponsoredMessages, new RequestDelegate() {
+            TL_account.toggleSponsoredMessages togglesponsoredmessages = new TL_account.toggleSponsoredMessages();
+            togglesponsoredmessages.enabled = userFull.sponsored_enabled;
+            getConnectionsManager().sendRequest(togglesponsoredmessages, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     PremiumPreviewFragment.this.lambda$createView$1(tLObject, tL_error);

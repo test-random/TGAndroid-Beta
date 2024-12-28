@@ -31,7 +31,8 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.ui.Components.LayoutHelper;
@@ -54,11 +55,11 @@ public class WebMetadataCache {
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(z);
             for (int i = 0; i < readInt32; i++) {
                 WebMetadata webMetadata = new WebMetadata();
-                webMetadata.readParams(abstractSerializedData, z);
+                webMetadata.readParams(inputSerializedData, z);
                 if (TextUtils.isEmpty(webMetadata.domain)) {
                     return;
                 }
@@ -67,10 +68,10 @@ public class WebMetadataCache {
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(this.array.size());
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(this.array.size());
             for (int i = 0; i < this.array.size(); i++) {
-                ((WebMetadata) this.array.get(i)).serializeToStream(abstractSerializedData);
+                ((WebMetadata) this.array.get(i)).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -141,50 +142,50 @@ public class WebMetadataCache {
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
             Bitmap decodeStream;
-            this.time = abstractSerializedData.readInt64(z);
-            this.domain = abstractSerializedData.readString(z);
-            this.title = abstractSerializedData.readString(z);
-            this.sitename = abstractSerializedData.readString(z);
-            this.actionBarColor = abstractSerializedData.readInt32(z);
-            this.backgroundColor = abstractSerializedData.readInt32(z);
-            if (abstractSerializedData.readInt32(z) == 1450380236) {
+            this.time = inputSerializedData.readInt64(z);
+            this.domain = inputSerializedData.readString(z);
+            this.title = inputSerializedData.readString(z);
+            this.sitename = inputSerializedData.readString(z);
+            this.actionBarColor = inputSerializedData.readInt32(z);
+            this.backgroundColor = inputSerializedData.readInt32(z);
+            if (inputSerializedData.readInt32(z) == 1450380236) {
                 decodeStream = null;
             } else {
-                this.faviconBytes = abstractSerializedData.readByteArray(z);
+                this.faviconBytes = inputSerializedData.readByteArray(z);
                 decodeStream = BitmapFactory.decodeStream(new ByteArrayInputStream(this.faviconBytes));
             }
             this.favicon = decodeStream;
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
             Bitmap bitmap;
             Bitmap.CompressFormat compressFormat;
-            abstractSerializedData.writeInt64(this.time);
+            outputSerializedData.writeInt64(this.time);
             String str = this.domain;
             if (str == null) {
                 str = "";
             }
-            abstractSerializedData.writeString(str);
+            outputSerializedData.writeString(str);
             String str2 = this.title;
             if (str2 == null) {
                 str2 = "";
             }
-            abstractSerializedData.writeString(str2);
+            outputSerializedData.writeString(str2);
             String str3 = this.sitename;
-            abstractSerializedData.writeString(str3 != null ? str3 : "");
-            abstractSerializedData.writeInt32(this.actionBarColor);
-            abstractSerializedData.writeInt32(this.backgroundColor);
+            outputSerializedData.writeString(str3 != null ? str3 : "");
+            outputSerializedData.writeInt32(this.actionBarColor);
+            outputSerializedData.writeInt32(this.backgroundColor);
             if (this.favicon == null) {
-                abstractSerializedData.writeInt32(1450380236);
+                outputSerializedData.writeInt32(1450380236);
                 return;
             }
-            abstractSerializedData.writeInt32(953850003);
+            outputSerializedData.writeInt32(953850003);
             byte[] bArr = this.faviconBytes;
             if (bArr != null) {
-                abstractSerializedData.writeByteArray(bArr);
+                outputSerializedData.writeByteArray(bArr);
                 return;
             }
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -198,7 +199,7 @@ public class WebMetadataCache {
             bitmap.compress(compressFormat, 80, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             this.faviconBytes = byteArray;
-            abstractSerializedData.writeByteArray(byteArray);
+            outputSerializedData.writeByteArray(byteArray);
             try {
                 byteArrayOutputStream.close();
             } catch (Exception e) {

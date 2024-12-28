@@ -10,7 +10,7 @@ import android.widget.TextView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
-import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.BulletinFactory;
@@ -21,7 +21,7 @@ public class BusinessLinksEmptyView extends LinearLayout {
     private ImageView imageView;
     private TextView linkView;
 
-    public BusinessLinksEmptyView(Context context, final BaseFragment baseFragment, final TLRPC.TL_businessChatLink tL_businessChatLink, Theme.ResourcesProvider resourcesProvider) {
+    public BusinessLinksEmptyView(Context context, final BaseFragment baseFragment, final TL_account.TL_businessChatLink tL_businessChatLink, Theme.ResourcesProvider resourcesProvider) {
         super(context);
         setOrientation(1);
         int i = Theme.key_chat_serviceText;
@@ -57,13 +57,13 @@ public class BusinessLinksEmptyView extends LinearLayout {
         this.linkView.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                BusinessLinksEmptyView.lambda$new$0(TLRPC.TL_businessChatLink.this, baseFragment, view);
+                BusinessLinksEmptyView.lambda$new$0(TL_account.TL_businessChatLink.this, baseFragment, view);
             }
         });
         addView(this.linkView, LayoutHelper.createLinear(-2, -2, 49, 17, 0, 17, 17));
     }
 
-    public static void lambda$new$0(TLRPC.TL_businessChatLink tL_businessChatLink, BaseFragment baseFragment, View view) {
+    public static void lambda$new$0(TL_account.TL_businessChatLink tL_businessChatLink, BaseFragment baseFragment, View view) {
         AndroidUtilities.addToClipboard(tL_businessChatLink.link);
         BulletinFactory.of(baseFragment).createCopyLinkBulletin().show();
     }

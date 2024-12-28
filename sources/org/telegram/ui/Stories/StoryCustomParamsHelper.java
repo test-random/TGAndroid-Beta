@@ -1,7 +1,8 @@
 package org.telegram.ui.Stories;
 
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
 import org.telegram.tgnet.NativeByteBuffer;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.tl.TL_stories;
@@ -25,34 +26,34 @@ public abstract class StoryCustomParamsHelper {
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(true);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(true);
             this.flags = readInt32;
             TL_stories.StoryItem storyItem = this.storyItem;
             storyItem.translated = (readInt32 & 1) != 0;
             if ((readInt32 & 2) != 0) {
-                storyItem.detectedLng = abstractSerializedData.readString(z);
+                storyItem.detectedLng = inputSerializedData.readString(z);
             }
             if ((this.flags & 4) != 0) {
-                this.storyItem.translatedText = TLRPC.TL_textWithEntities.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                this.storyItem.translatedText = TLRPC.TL_textWithEntities.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             }
             if ((this.flags & 8) != 0) {
-                this.storyItem.translatedLng = abstractSerializedData.readString(z);
+                this.storyItem.translatedLng = inputSerializedData.readString(z);
             }
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1);
-            abstractSerializedData.writeInt32(this.flags);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1);
+            outputSerializedData.writeInt32(this.flags);
             if ((this.flags & 2) != 0) {
-                abstractSerializedData.writeString(this.storyItem.detectedLng);
+                outputSerializedData.writeString(this.storyItem.detectedLng);
             }
             if ((this.flags & 4) != 0) {
-                this.storyItem.translatedText.serializeToStream(abstractSerializedData);
+                this.storyItem.translatedText.serializeToStream(outputSerializedData);
             }
             if ((this.flags & 8) != 0) {
-                abstractSerializedData.writeString(this.storyItem.translatedLng);
+                outputSerializedData.writeString(this.storyItem.translatedLng);
             }
         }
     }

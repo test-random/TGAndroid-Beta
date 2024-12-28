@@ -3,6 +3,7 @@ package org.telegram.ui.Components.Premium.boosts.cells.selector;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
 import java.util.Date;
@@ -170,6 +171,23 @@ public class SelectorUserCell extends BaseCell {
         if (checkBox2 != null && checkBox2.getVisibility() == 0) {
             this.checkBox.setChecked(z, z2);
         }
+    }
+
+    public void setCustomUser(Drawable drawable, CharSequence charSequence, CharSequence charSequence2) {
+        this.optionsView.setVisibility(8);
+        this.user = null;
+        this.chat = null;
+        this.imageView.setRoundRadius(AndroidUtilities.dp(20.0f));
+        this.imageView.setImageDrawable(drawable);
+        this.titleTextView.setText(charSequence);
+        this.isOnline[0] = false;
+        setSubtitle(charSequence2);
+        this.subtitleTextView.setTextColor(Theme.getColor(this.isOnline[0] ? Theme.key_dialogTextBlue2 : Theme.key_dialogTextGray3, this.resourcesProvider));
+        CheckBox2 checkBox2 = this.checkBox;
+        if (checkBox2 != null) {
+            checkBox2.setAlpha(1.0f);
+        }
+        this.titleTextView.setRightDrawable((Drawable) null);
     }
 
     public void setOptions(View.OnClickListener onClickListener) {

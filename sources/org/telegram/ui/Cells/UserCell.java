@@ -310,7 +310,7 @@ public class UserCell extends FrameLayout implements NotificationCenter.Notifica
             try {
                 SimpleTextView simpleTextView = this.nameTextView;
                 if (simpleTextView != null) {
-                    charSequence = Emoji.replaceEmoji(charSequence, simpleTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(18.0f), false);
+                    charSequence = Emoji.replaceEmoji(charSequence, simpleTextView.getPaint().getFontMetricsInt(), false);
                 }
             } catch (Exception unused) {
             }

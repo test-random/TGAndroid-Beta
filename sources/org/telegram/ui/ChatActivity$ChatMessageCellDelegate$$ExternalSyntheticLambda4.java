@@ -2,10 +2,10 @@ package org.telegram.ui;
 
 import org.telegram.messenger.browser.Browser;
 
-public final class ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10 implements Runnable {
+public final class ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4 implements Runnable {
     public final Browser.Progress f$0;
 
-    public ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10(Browser.Progress progress) {
+    public ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4(Browser.Progress progress) {
         this.f$0 = progress;
     }
 

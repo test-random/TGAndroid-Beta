@@ -1539,7 +1539,7 @@ public class ContentPreviewViewer {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ContentPreviewViewer.onTouch(android.view.MotionEvent, org.telegram.ui.Components.RecyclerListView, int, java.lang.Object, org.telegram.ui.ContentPreviewViewer$ContentPreviewViewerDelegate, org.telegram.ui.ActionBar.Theme$ResourcesProvider):boolean");
     }
 
-    public void open(org.telegram.tgnet.TLRPC.Document r46, org.telegram.messenger.SendMessagesHelper.ImportingSticker r47, java.lang.String r48, java.lang.String r49, org.telegram.tgnet.TLRPC.BotInlineResult r50, int r51, boolean r52, java.lang.Object r53, org.telegram.ui.ActionBar.Theme.ResourcesProvider r54) {
+    public void open(org.telegram.tgnet.TLRPC.Document r38, org.telegram.messenger.SendMessagesHelper.ImportingSticker r39, java.lang.String r40, java.lang.String r41, org.telegram.tgnet.TLRPC.BotInlineResult r42, int r43, boolean r44, java.lang.Object r45, org.telegram.ui.ActionBar.Theme.ResourcesProvider r46) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ContentPreviewViewer.open(org.telegram.tgnet.TLRPC$Document, org.telegram.messenger.SendMessagesHelper$ImportingSticker, java.lang.String, java.lang.String, org.telegram.tgnet.TLRPC$BotInlineResult, int, boolean, java.lang.Object, org.telegram.ui.ActionBar.Theme$ResourcesProvider):void");
     }
 

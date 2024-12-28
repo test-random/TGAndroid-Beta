@@ -21,6 +21,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -110,8 +111,8 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
         ArrayList arrayList2 = new ArrayList(arrayList);
         ArrayList arrayList3 = new ArrayList(arrayList2.size());
         for (int i3 = 0; i3 < arrayList2.size(); i3++) {
-            TLRPC.TL_businessWeeklyOpen tL_businessWeeklyOpen = (TLRPC.TL_businessWeeklyOpen) arrayList2.get(i3);
-            TLRPC.TL_businessWeeklyOpen tL_businessWeeklyOpen2 = new TLRPC.TL_businessWeeklyOpen();
+            TL_account.TL_businessWeeklyOpen tL_businessWeeklyOpen = (TL_account.TL_businessWeeklyOpen) arrayList2.get(i3);
+            TL_account.TL_businessWeeklyOpen tL_businessWeeklyOpen2 = new TL_account.TL_businessWeeklyOpen();
             if (i != 0) {
                 int i4 = tL_businessWeeklyOpen.start_minute;
                 int i5 = i4 % 1440;
@@ -135,7 +136,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
                     tL_businessWeeklyOpen2.end_minute = i2;
                 } else {
                     tL_businessWeeklyOpen2.start_minute = 0;
-                    tL_businessWeeklyOpen2 = new TLRPC.TL_businessWeeklyOpen();
+                    tL_businessWeeklyOpen2 = new TL_account.TL_businessWeeklyOpen();
                     tL_businessWeeklyOpen2.start_minute = tL_businessWeeklyOpen.start_minute + 10080 + i;
                     tL_businessWeeklyOpen2.end_minute = 10079;
                     arrayList3.add(tL_businessWeeklyOpen2);
@@ -147,7 +148,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
                     tL_businessWeeklyOpen2.end_minute = i2;
                 } else {
                     tL_businessWeeklyOpen2.end_minute = 10079;
-                    tL_businessWeeklyOpen2 = new TLRPC.TL_businessWeeklyOpen();
+                    tL_businessWeeklyOpen2 = new TL_account.TL_businessWeeklyOpen();
                     tL_businessWeeklyOpen2.start_minute = 0;
                     tL_businessWeeklyOpen2.end_minute = (tL_businessWeeklyOpen.end_minute + i) - 10079;
                     arrayList3.add(tL_businessWeeklyOpen2);
@@ -158,7 +159,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
             @Override
             public final int compare(Object obj, Object obj2) {
                 int lambda$adaptWeeklyOpen$0;
-                lambda$adaptWeeklyOpen$0 = OpeningHoursActivity.lambda$adaptWeeklyOpen$0((TLRPC.TL_businessWeeklyOpen) obj, (TLRPC.TL_businessWeeklyOpen) obj2);
+                lambda$adaptWeeklyOpen$0 = OpeningHoursActivity.lambda$adaptWeeklyOpen$0((TL_account.TL_businessWeeklyOpen) obj, (TL_account.TL_businessWeeklyOpen) obj2);
                 return lambda$adaptWeeklyOpen$0;
             }
         });
@@ -213,7 +214,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
                 if (arrayListArr[i] != null) {
                     for (int i2 = 0; i2 < arrayListArr[i].size(); i2++) {
                         Period period = (Period) arrayListArr[i].get(i2);
-                        TLRPC.TL_businessWeeklyOpen tL_businessWeeklyOpen = new TLRPC.TL_businessWeeklyOpen();
+                        TL_account.TL_businessWeeklyOpen tL_businessWeeklyOpen = new TL_account.TL_businessWeeklyOpen();
                         int i3 = i * 1440;
                         tL_businessWeeklyOpen.start_minute = period.start + i3;
                         tL_businessWeeklyOpen.end_minute = i3 + period.end;
@@ -232,7 +233,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
             arrayListArr[i2] = new ArrayList();
         }
         for (int i3 = 0; i3 < arrayList.size(); i3++) {
-            TLRPC.TL_businessWeeklyOpen tL_businessWeeklyOpen = (TLRPC.TL_businessWeeklyOpen) arrayList.get(i3);
+            TL_account.TL_businessWeeklyOpen tL_businessWeeklyOpen = (TL_account.TL_businessWeeklyOpen) arrayList.get(i3);
             int i4 = tL_businessWeeklyOpen.start_minute;
             int i5 = i4 % 1440;
             arrayListArr[(i4 / 1440) % 7].add(new Period(i5, (tL_businessWeeklyOpen.end_minute - i4) + i5));
@@ -243,7 +244,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
             int i8 = i7 * 1440;
             int i9 = i6 * 1440;
             for (int i10 = 0; i10 < arrayList.size(); i10++) {
-                TLRPC.TL_businessWeeklyOpen tL_businessWeeklyOpen2 = (TLRPC.TL_businessWeeklyOpen) arrayList.get(i10);
+                TL_account.TL_businessWeeklyOpen tL_businessWeeklyOpen2 = (TL_account.TL_businessWeeklyOpen) arrayList.get(i10);
                 if (tL_businessWeeklyOpen2.start_minute <= i9 && (i = tL_businessWeeklyOpen2.end_minute) >= i9) {
                     i9 = i + 1;
                 }
@@ -300,13 +301,13 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
         return LocaleController.getString(i);
     }
 
-    public static boolean is24x7(TLRPC.TL_businessWorkHours tL_businessWorkHours) {
+    public static boolean is24x7(TL_account.TL_businessWorkHours tL_businessWorkHours) {
         if (tL_businessWorkHours == null || tL_businessWorkHours.weekly_open.isEmpty()) {
             return false;
         }
         int i = 0;
         for (int i2 = 0; i2 < tL_businessWorkHours.weekly_open.size(); i2++) {
-            TLRPC.TL_businessWeeklyOpen tL_businessWeeklyOpen = tL_businessWorkHours.weekly_open.get(i2);
+            TL_account.TL_businessWeeklyOpen tL_businessWeeklyOpen = tL_businessWorkHours.weekly_open.get(i2);
             if (tL_businessWeeklyOpen.start_minute > i + 1) {
                 return false;
             }
@@ -330,7 +331,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
         return i == 1439 || i == 1440;
     }
 
-    public static int lambda$adaptWeeklyOpen$0(TLRPC.TL_businessWeeklyOpen tL_businessWeeklyOpen, TLRPC.TL_businessWeeklyOpen tL_businessWeeklyOpen2) {
+    public static int lambda$adaptWeeklyOpen$0(TL_account.TL_businessWeeklyOpen tL_businessWeeklyOpen, TL_account.TL_businessWeeklyOpen tL_businessWeeklyOpen2) {
         return tL_businessWeeklyOpen.start_minute - tL_businessWeeklyOpen2.start_minute;
     }
 
@@ -468,14 +469,14 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
         }
         this.doneButtonDrawable.animateToProgress(1.0f);
         TLRPC.UserFull userFull = getMessagesController().getUserFull(getUserConfig().getClientUserId());
-        TLRPC.TL_account_updateBusinessWorkHours tL_account_updateBusinessWorkHours = new TLRPC.TL_account_updateBusinessWorkHours();
+        TL_account.updateBusinessWorkHours updatebusinessworkhours = new TL_account.updateBusinessWorkHours();
         ArrayList fromDaysHours = fromDaysHours(this.value);
         if (this.enabled && !fromDaysHours.isEmpty()) {
-            TLRPC.TL_businessWorkHours tL_businessWorkHours = new TLRPC.TL_businessWorkHours();
+            TL_account.TL_businessWorkHours tL_businessWorkHours = new TL_account.TL_businessWorkHours();
             tL_businessWorkHours.timezone_id = this.timezoneId;
             tL_businessWorkHours.weekly_open.addAll(fromDaysHours);
-            tL_account_updateBusinessWorkHours.flags |= 1;
-            tL_account_updateBusinessWorkHours.business_work_hours = tL_businessWorkHours;
+            updatebusinessworkhours.flags |= 1;
+            updatebusinessworkhours.business_work_hours = tL_businessWorkHours;
             if (userFull != null) {
                 userFull.flags2 |= 1;
                 userFull.business_work_hours = tL_businessWorkHours;
@@ -484,7 +485,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
             userFull.flags2 &= -2;
             userFull.business_work_hours = null;
         }
-        getConnectionsManager().sendRequest(tL_account_updateBusinessWorkHours, new RequestDelegate() {
+        getConnectionsManager().sendRequest(updatebusinessworkhours, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 OpeningHoursActivity.this.lambda$processDone$2(tLObject, tL_error);
@@ -503,7 +504,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
             getMessagesController().loadUserInfo(getUserConfig().getCurrentUser(), true, getClassGuid());
             return;
         }
-        TLRPC.TL_businessWorkHours tL_businessWorkHours = userFull.business_work_hours;
+        TL_account.TL_businessWorkHours tL_businessWorkHours = userFull.business_work_hours;
         boolean z = tL_businessWorkHours != null;
         this.enabled = z;
         if (!z) {
@@ -539,7 +540,7 @@ public class OpeningHoursActivity extends BaseFragment implements NotificationCe
         this.valueSet = true;
     }
 
-    public static String toString(int i, TLRPC.User user, TLRPC.TL_businessWorkHours tL_businessWorkHours) {
+    public static String toString(int i, TLRPC.User user, TL_account.TL_businessWorkHours tL_businessWorkHours) {
         int i2;
         if (tL_businessWorkHours == null) {
             return null;

@@ -54,6 +54,7 @@ public class DraftsController {
         public ArrayList captionEntities;
         public CollageLayout collage;
         public ArrayList collageParts;
+        public MediaController.CropState crop;
         public long date;
         public long duration;
         public long editDocumentId;
@@ -291,17 +292,22 @@ public class DraftsController {
                     this.botEdit = TLRPC.InputMedia.TLdeserialize(abstractSerializedData, readInt327, z);
                 }
             }
-            if (abstractSerializedData.remaining() <= 0 || abstractSerializedData.readInt32(z) != -559038737) {
+            if (abstractSerializedData.remaining() > 0 && abstractSerializedData.readInt32(z) == -559038737) {
+                this.collage = new CollageLayout(abstractSerializedData.readString(z));
+                this.collageParts = new ArrayList();
+                for (int i6 = 0; i6 < this.collage.parts.size(); i6++) {
+                    VideoEditedInfo.Part part = new VideoEditedInfo.Part();
+                    part.readParams(abstractSerializedData, z);
+                    part.part = (CollageLayout.Part) this.collage.parts.get(i6);
+                    this.collageParts.add(part);
+                }
+            }
+            if (abstractSerializedData.remaining() <= 0 || abstractSerializedData.readInt32(z) != 1151577037) {
                 return;
             }
-            this.collage = new CollageLayout(abstractSerializedData.readString(z));
-            this.collageParts = new ArrayList();
-            for (int i6 = 0; i6 < this.collage.parts.size(); i6++) {
-                VideoEditedInfo.Part part = new VideoEditedInfo.Part();
-                part.readParams(abstractSerializedData, z);
-                part.part = (CollageLayout.Part) this.collage.parts.get(i6);
-                this.collageParts.add(part);
-            }
+            MediaController.CropState cropState = new MediaController.CropState();
+            this.crop = cropState;
+            cropState.readParams(abstractSerializedData, z);
         }
 
         public StoryDraft(StoryEntry storyEntry) {
@@ -333,6 +339,7 @@ public class DraftsController {
             this.invert = storyEntry.invert;
             this.width = storyEntry.width;
             this.height = storyEntry.height;
+            this.crop = storyEntry.crop;
             this.resultWidth = storyEntry.resultWidth;
             this.resultHeight = storyEntry.resultHeight;
             this.duration = j;
@@ -419,6 +426,7 @@ public class DraftsController {
             storyEntry.invert = this.invert;
             storyEntry.width = this.width;
             storyEntry.height = this.height;
+            storyEntry.crop = this.crop;
             storyEntry.resultWidth = this.resultWidth;
             storyEntry.resultHeight = this.resultHeight;
             storyEntry.matrix.setValues(this.matrixValues);
@@ -633,13 +641,19 @@ public class DraftsController {
             CollageLayout collageLayout = this.collage;
             if (collageLayout == null || collageLayout.parts.size() <= 1 || (arrayList = this.collageParts) == null || arrayList.size() <= 1) {
                 abstractSerializedData.writeInt32(1450380236);
-                return;
+            } else {
+                abstractSerializedData.writeInt32(-559038737);
+                abstractSerializedData.writeString(this.collage.toString());
+                Iterator it = this.collageParts.iterator();
+                while (it.hasNext()) {
+                    ((VideoEditedInfo.Part) it.next()).serializeToStream(abstractSerializedData);
+                }
             }
-            abstractSerializedData.writeInt32(-559038737);
-            abstractSerializedData.writeString(this.collage.toString());
-            Iterator it = this.collageParts.iterator();
-            while (it.hasNext()) {
-                ((VideoEditedInfo.Part) it.next()).serializeToStream(abstractSerializedData);
+            MediaController.CropState cropState = this.crop;
+            if (cropState == null) {
+                abstractSerializedData.writeInt32(1450380236);
+            } else {
+                cropState.serializeToStream(abstractSerializedData);
             }
         }
     }

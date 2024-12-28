@@ -161,7 +161,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     private String uniqKeyPrefix;
     private boolean useRoundForThumb;
     private boolean useRoundRadius;
-    private boolean useSharedAnimationQueue;
+    public boolean useSharedAnimationQueue;
     private boolean videoThumbIsSame;
 
     public static class BackgroundThreadDrawHolder {

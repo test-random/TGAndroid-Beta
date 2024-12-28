@@ -46,6 +46,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -193,9 +194,9 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                 if (valueAt instanceof TLRPC.WallPaper) {
                     iArr[0] = iArr[0] + 1;
                     TLRPC.WallPaper wallPaper2 = (TLRPC.WallPaper) valueAt;
-                    TLRPC.TL_account_saveWallPaper tL_account_saveWallPaper = new TLRPC.TL_account_saveWallPaper();
-                    tL_account_saveWallPaper.settings = new TLRPC.TL_wallPaperSettings();
-                    tL_account_saveWallPaper.unsave = true;
+                    TL_account.saveWallPaper savewallpaper = new TL_account.saveWallPaper();
+                    savewallpaper.settings = new TLRPC.TL_wallPaperSettings();
+                    savewallpaper.unsave = true;
                     if (valueAt instanceof TLRPC.TL_wallPaperNoFile) {
                         TLRPC.TL_inputWallPaperNoFile tL_inputWallPaperNoFile = new TLRPC.TL_inputWallPaperNoFile();
                         tL_inputWallPaperNoFile.id = wallPaper2.id;
@@ -206,14 +207,14 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                         tL_inputWallPaper2.access_hash = wallPaper2.access_hash;
                         tL_inputWallPaper = tL_inputWallPaper2;
                     }
-                    tL_account_saveWallPaper.wallpaper = tL_inputWallPaper;
+                    savewallpaper.wallpaper = tL_inputWallPaper;
                     String str = wallPaper2.slug;
                     if (str != null && str.equals(WallpapersListActivity.this.selectedBackgroundSlug)) {
                         WallpapersListActivity.this.selectedBackgroundSlug = Theme.hasWallpaperFromTheme() ? "t" : "d";
                         Theme.getActiveTheme().setOverrideWallpaper(null);
                         Theme.reloadWallpaper(true);
                     }
-                    ConnectionsManager.getInstance(((BaseFragment) WallpapersListActivity.this).currentAccount).sendRequest(tL_account_saveWallPaper, new RequestDelegate() {
+                    ConnectionsManager.getInstance(((BaseFragment) WallpapersListActivity.this).currentAccount).sendRequest(savewallpaper, new RequestDelegate() {
                         @Override
                         public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                             WallpapersListActivity.AnonymousClass2.this.lambda$onItemClick$1(iArr, tLObject, tL_error);
@@ -992,7 +993,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
         this.progressDialog = alertDialog;
         alertDialog.setCanCancel(false);
         this.progressDialog.show();
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_resetWallPapers(), new RequestDelegate() {
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.resetWallPapers(), new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 WallpapersListActivity.this.lambda$createView$2(tLObject, tL_error);
@@ -1086,8 +1087,8 @@ public class WallpapersListActivity extends BaseFragment implements Notification
         TLRPC.WallPaperSettings wallPaperSettings2;
         TLRPC.WallPaperSettings wallPaperSettings3;
         TLRPC.Document document;
-        if (tLObject instanceof TLRPC.TL_account_wallPapers) {
-            TLRPC.TL_account_wallPapers tL_account_wallPapers = (TLRPC.TL_account_wallPapers) tLObject;
+        if (tLObject instanceof TL_account.TL_wallPapers) {
+            TL_account.TL_wallPapers tL_wallPapers = (TL_account.TL_wallPapers) tLObject;
             this.patterns.clear();
             this.patternsDict.clear();
             int i2 = this.currentType;
@@ -1095,12 +1096,12 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                 this.wallPapers.clear();
                 this.allWallPapersDict.clear();
                 this.allWallPapers.clear();
-                this.allWallPapers.addAll(tL_account_wallPapers.wallpapers);
+                this.allWallPapers.addAll(tL_wallPapers.wallpapers);
                 this.wallPapers.addAll(this.localWallPapers);
             }
-            int size = tL_account_wallPapers.wallpapers.size();
+            int size = tL_wallPapers.wallpapers.size();
             for (int i3 = 0; i3 < size; i3++) {
-                TLRPC.WallPaper wallPaper = tL_account_wallPapers.wallpapers.get(i3);
+                TLRPC.WallPaper wallPaper = tL_wallPapers.wallpapers.get(i3);
                 if (!"fqv01SQemVIBAAAApND8LDRUhRU".equals(wallPaper.slug)) {
                     if ((wallPaper instanceof TLRPC.TL_wallPaper) && !(wallPaper.document instanceof TLRPC.TL_documentEmpty)) {
                         this.allWallPapersDict.put(wallPaper.slug, wallPaper);
@@ -1126,7 +1127,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                 }
             }
             fillWallpapersWithCustom();
-            getMessagesStorage().putWallpapers(tL_account_wallPapers.wallpapers, 1);
+            getMessagesStorage().putWallpapers(tL_wallPapers.wallpapers, 1);
         }
         AlertDialog alertDialog = this.progressDialog;
         if (alertDialog != null) {
@@ -1171,9 +1172,9 @@ public class WallpapersListActivity extends BaseFragment implements Notification
             }
             j = j2;
         }
-        TLRPC.TL_account_getWallPapers tL_account_getWallPapers = new TLRPC.TL_account_getWallPapers();
-        tL_account_getWallPapers.hash = j;
-        ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_getWallPapers, new RequestDelegate() {
+        TL_account.getWallPapers getwallpapers = new TL_account.getWallPapers();
+        getwallpapers.hash = j;
+        ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(ConnectionsManager.getInstance(this.currentAccount).sendRequest(getwallpapers, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 WallpapersListActivity.this.lambda$loadWallpapers$8(z, tLObject, tL_error);

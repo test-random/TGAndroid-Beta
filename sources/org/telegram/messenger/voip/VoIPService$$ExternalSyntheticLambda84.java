@@ -1,6 +1,6 @@
 package org.telegram.messenger.voip;
 
-public final class VoIPService$$ExternalSyntheticLambda87 implements Runnable {
+public final class VoIPService$$ExternalSyntheticLambda84 implements Runnable {
     public final NativeInstance f$0;
 
     @Override

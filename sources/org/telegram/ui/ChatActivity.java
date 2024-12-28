@@ -431,7 +431,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private float bottomPanelTranslationY;
     private float bottomPanelTranslationYReverse;
     Bulletin.Delegate bulletinDelegate;
-    public TLRPC.TL_businessChatLink businessLink;
+    public TL_account.TL_businessChatLink businessLink;
     private BusinessLinksEmptyView businessLinksEmptyView;
     private boolean[] cacheEndReached;
     private ChannelBoostsController.CanApplyBoost canApplyBoosts;
@@ -836,7 +836,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private AnimatorSet reportSpamViewAnimator;
     private String reportTitle;
     private boolean requestClearSearchPages;
-    private TLRPC.TL_account_resolvedBusinessChatLinks resolvedChatLink;
+    private TL_account.resolvedBusinessChatLinks resolvedChatLink;
     private TextView restartTopicButton;
     private int returnToLoadIndex;
     private int returnToMessageId;
@@ -948,6 +948,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private boolean showScrollToMessageError;
     private boolean showSearchAsIcon;
     private boolean showTapForForwardingOptionsHit;
+    private boolean shownBotVerification;
     private boolean shownConversionDateTimeToast;
     private boolean shownRestartTopic;
     private boolean shownTranslateTopic;
@@ -1139,34 +1140,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public class AnonymousClass100 extends AnimatorListenerAdapter {
-        final int val$newVisibilityFinal;
-
-        AnonymousClass100(int i) {
-            r2 = i;
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animator) {
-            if (ChatActivity.this.replyButtonAnimation == null || !ChatActivity.this.replyButtonAnimation.equals(animator)) {
-                return;
-            }
-            ChatActivity.this.replyButtonAnimation = null;
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animator) {
-            if (ChatActivity.this.replyButtonAnimation == null || !ChatActivity.this.replyButtonAnimation.equals(animator) || ChatActivity.this.replyButton == null || r2 != 8) {
-                return;
-            }
-            ChatActivity.this.replyButton.setVisibility(8);
-        }
-    }
-
-    public class AnonymousClass101 extends AnimatorListenerAdapter {
         final ActionBarMenuItem val$editItem;
         final int val$newEditVisibility;
 
-        AnonymousClass101(int i, ActionBarMenuItem actionBarMenuItem) {
+        AnonymousClass100(int i, ActionBarMenuItem actionBarMenuItem) {
             r2 = i;
             r3 = actionBarMenuItem;
         }
@@ -1187,11 +1164,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass102 extends PhotoViewer.EmptyPhotoViewerProvider {
+    public class AnonymousClass101 extends PhotoViewer.EmptyPhotoViewerProvider {
         final ArrayList val$cameraPhoto;
         final Bitmap val$thumb;
 
-        AnonymousClass102(Bitmap bitmap, ArrayList arrayList) {
+        AnonymousClass101(Bitmap bitmap, ArrayList arrayList) {
             r2 = bitmap;
             r3 = arrayList;
         }
@@ -1217,11 +1194,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass103 extends PhotoViewer.EmptyPhotoViewerProvider {
+    public class AnonymousClass102 extends PhotoViewer.EmptyPhotoViewerProvider {
         final boolean[] val$checked;
         final ArrayList val$entries;
 
-        AnonymousClass103(ArrayList arrayList, boolean[] zArr) {
+        AnonymousClass102(ArrayList arrayList, boolean[] zArr) {
             r2 = arrayList;
             r3 = zArr;
         }
@@ -1257,11 +1234,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass104 extends PhotoViewer.EmptyPhotoViewerProvider {
+    public class AnonymousClass103 extends PhotoViewer.EmptyPhotoViewerProvider {
         final MediaController.PhotoEntry val$entry;
         final MessageObject val$object;
 
-        AnonymousClass104(MessageObject messageObject, MediaController.PhotoEntry photoEntry) {
+        AnonymousClass103(MessageObject messageObject, MediaController.PhotoEntry photoEntry) {
             r2 = messageObject;
             r3 = photoEntry;
         }
@@ -1321,8 +1298,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass105 extends GigagroupConvertAlert {
-        AnonymousClass105(Context context, BaseFragment baseFragment) {
+    public class AnonymousClass104 extends GigagroupConvertAlert {
+        AnonymousClass104(Context context, BaseFragment baseFragment) {
             super(context, baseFragment);
         }
 
@@ -1354,14 +1331,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             messagesController.convertToGigaGroup(parentActivity, chatActivity.currentChat, chatActivity, new MessagesStorage.BooleanCallback() {
                 @Override
                 public final void run(boolean z) {
-                    ChatActivity.AnonymousClass105.this.lambda$onCovert$0(z);
+                    ChatActivity.AnonymousClass104.this.lambda$onCovert$0(z);
                 }
             });
         }
     }
 
-    public class AnonymousClass106 extends HintView2 {
-        AnonymousClass106(Context context, int i) {
+    public class AnonymousClass105 extends HintView2 {
+        AnonymousClass105(Context context, int i) {
             super(context, i);
         }
 
@@ -1372,8 +1349,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass107 extends AnimatorListenerAdapter {
-        AnonymousClass107() {
+    public class AnonymousClass106 extends AnimatorListenerAdapter {
+        AnonymousClass106() {
         }
 
         @Override
@@ -1385,8 +1362,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass108 extends AnimatorListenerAdapter {
-        AnonymousClass108() {
+    public class AnonymousClass107 extends AnimatorListenerAdapter {
+        AnonymousClass107() {
         }
 
         @Override
@@ -1396,14 +1373,37 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass109 extends AnimatorListenerAdapter {
-        AnonymousClass109() {
+    public class AnonymousClass108 extends AnimatorListenerAdapter {
+        AnonymousClass108() {
         }
 
         @Override
         public void onAnimationEnd(Animator animator) {
             ChatActivity.this.searchExpandProgress = 0.0f;
             ChatActivity.this.invalidateChatListViewTopPadding();
+        }
+    }
+
+    public class AnonymousClass109 extends AnimatorListenerAdapter {
+        AnonymousClass109() {
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animator) {
+            if (ChatActivity.this.alertViewAnimator == null || !ChatActivity.this.alertViewAnimator.equals(animator)) {
+                return;
+            }
+            ChatActivity.this.alertViewAnimator = null;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animator) {
+            if (ChatActivity.this.alertViewAnimator == null || !ChatActivity.this.alertViewAnimator.equals(animator)) {
+                return;
+            }
+            ChatActivity.this.alertViewEnterProgress = 1.0f;
+            ChatActivity.this.invalidateChatListViewTopPadding();
+            ChatActivity.this.alertViewAnimator = null;
         }
     }
 
@@ -1496,30 +1496,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass110 extends AnimatorListenerAdapter {
-        AnonymousClass110() {
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animator) {
-            if (ChatActivity.this.alertViewAnimator == null || !ChatActivity.this.alertViewAnimator.equals(animator)) {
-                return;
-            }
-            ChatActivity.this.alertViewAnimator = null;
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animator) {
-            if (ChatActivity.this.alertViewAnimator == null || !ChatActivity.this.alertViewAnimator.equals(animator)) {
-                return;
-            }
-            ChatActivity.this.alertViewEnterProgress = 1.0f;
-            ChatActivity.this.invalidateChatListViewTopPadding();
-            ChatActivity.this.alertViewAnimator = null;
-        }
-    }
-
-    public class AnonymousClass111 implements Runnable {
+    public class AnonymousClass110 implements Runnable {
 
         class AnonymousClass1 extends AnimatorListenerAdapter {
             AnonymousClass1() {
@@ -1545,7 +1522,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        AnonymousClass111() {
+        AnonymousClass110() {
         }
 
         public void lambda$run$0(ValueAnimator valueAnimator) {
@@ -1566,7 +1543,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        ChatActivity.AnonymousClass111.this.lambda$run$0(valueAnimator);
+                        ChatActivity.AnonymousClass110.this.lambda$run$0(valueAnimator);
                     }
                 });
                 ChatActivity.this.alertViewAnimator.playTogether(ofFloat);
@@ -1599,8 +1576,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass112 extends AnimatorListenerAdapter {
-        AnonymousClass112() {
+    public class AnonymousClass111 extends AnimatorListenerAdapter {
+        AnonymousClass111() {
         }
 
         @Override
@@ -1623,12 +1600,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass113 extends AnimatorListenerAdapter {
+    public class AnonymousClass112 extends AnimatorListenerAdapter {
         final boolean val$showClosed;
         final boolean val$showPinned;
         final boolean val$showProgress;
 
-        AnonymousClass113(boolean z, boolean z2, boolean z3) {
+        AnonymousClass112(boolean z, boolean z2, boolean z3) {
             r2 = z;
             r3 = z2;
             r4 = z3;
@@ -1643,10 +1620,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass114 implements ValueAnimator.AnimatorUpdateListener {
+    public class AnonymousClass113 implements ValueAnimator.AnimatorUpdateListener {
         int position = -1;
 
-        AnonymousClass114() {
+        AnonymousClass113() {
         }
 
         @Override
@@ -1657,8 +1634,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass115 extends AnimatorListenerAdapter {
-        AnonymousClass115() {
+    public class AnonymousClass114 extends AnimatorListenerAdapter {
+        AnonymousClass114() {
         }
 
         @Override
@@ -1678,7 +1655,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass116 extends AnimatorListenerAdapter {
+    public class AnonymousClass115 extends AnimatorListenerAdapter {
         final boolean val$animateButton;
         final BackupImageView val$animateImage;
         final boolean val$animateName;
@@ -1693,15 +1670,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                AnonymousClass116 anonymousClass116 = AnonymousClass116.this;
+                AnonymousClass115 anonymousClass115 = AnonymousClass115.this;
                 if (r2) {
                     r5.setTranslationY(0.0f);
                 }
-                AnonymousClass116 anonymousClass1162 = AnonymousClass116.this;
+                AnonymousClass115 anonymousClass1152 = AnonymousClass115.this;
                 if (r3) {
                     r6.setTranslationY(0.0f);
                 }
-                AnonymousClass116 anonymousClass1163 = AnonymousClass116.this;
+                AnonymousClass115 anonymousClass1153 = AnonymousClass115.this;
                 if (r7) {
                     r8.setTranslationY(0.0f);
                 }
@@ -1713,7 +1690,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        AnonymousClass116(boolean z, boolean z2, BackupImageView backupImageView, TrackingWidthSimpleTextView trackingWidthSimpleTextView, SimpleTextView simpleTextView, boolean z3, PinnedMessageButton pinnedMessageButton) {
+        AnonymousClass115(boolean z, boolean z2, BackupImageView backupImageView, TrackingWidthSimpleTextView trackingWidthSimpleTextView, SimpleTextView simpleTextView, boolean z3, PinnedMessageButton pinnedMessageButton) {
             r2 = z;
             r3 = z2;
             r4 = backupImageView;
@@ -1759,15 +1736,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
                     @Override
                     public void onAnimationEnd(Animator animator2) {
-                        AnonymousClass116 anonymousClass116 = AnonymousClass116.this;
+                        AnonymousClass115 anonymousClass115 = AnonymousClass115.this;
                         if (r2) {
                             r5.setTranslationY(0.0f);
                         }
-                        AnonymousClass116 anonymousClass1162 = AnonymousClass116.this;
+                        AnonymousClass115 anonymousClass1152 = AnonymousClass115.this;
                         if (r3) {
                             r6.setTranslationY(0.0f);
                         }
-                        AnonymousClass116 anonymousClass1163 = AnonymousClass116.this;
+                        AnonymousClass115 anonymousClass1153 = AnonymousClass115.this;
                         if (r7) {
                             r8.setTranslationY(0.0f);
                         }
@@ -1784,7 +1761,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass117 extends AnimatorListenerAdapter {
+    public class AnonymousClass116 extends AnimatorListenerAdapter {
         final boolean val$animateButton;
         final boolean val$animateText;
         final PinnedMessageButton val$buttonTextView;
@@ -1792,7 +1769,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         final TrackingWidthSimpleTextView val$nameTextView;
         final boolean val$noImage;
 
-        AnonymousClass117(TrackingWidthSimpleTextView trackingWidthSimpleTextView, boolean z, SimpleTextView simpleTextView, boolean z2, PinnedMessageButton pinnedMessageButton, boolean z3) {
+        AnonymousClass116(TrackingWidthSimpleTextView trackingWidthSimpleTextView, boolean z, SimpleTextView simpleTextView, boolean z2, PinnedMessageButton pinnedMessageButton, boolean z3) {
             r2 = trackingWidthSimpleTextView;
             r3 = z;
             r4 = simpleTextView;
@@ -1859,13 +1836,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass118 implements View.OnClickListener {
+    public class AnonymousClass117 implements View.OnClickListener {
         final String val$chatWithAdmin;
         final boolean val$chatWithAdminChannel;
         final int val$chatWithAdminDate;
         final TLRPC.User val$user;
 
-        AnonymousClass118(TLRPC.User user, String str, boolean z, int i) {
+        AnonymousClass117(TLRPC.User user, String str, boolean z, int i) {
             r2 = user;
             r3 = str;
             r4 = z;
@@ -1878,8 +1855,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass119 extends ClickableSpan {
-        AnonymousClass119() {
+    public class AnonymousClass118 extends ClickableSpan {
+        AnonymousClass118() {
         }
 
         @Override
@@ -1894,6 +1871,27 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
+    public class AnonymousClass119 extends AnimatorListenerAdapter {
+        AnonymousClass119() {
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animator) {
+            if (ChatActivity.this.reportSpamViewAnimator == null || !ChatActivity.this.reportSpamViewAnimator.equals(animator)) {
+                return;
+            }
+            ChatActivity.this.reportSpamViewAnimator = null;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animator) {
+            if (ChatActivity.this.reportSpamViewAnimator == null || !ChatActivity.this.reportSpamViewAnimator.equals(animator)) {
+                return;
+            }
+            ChatActivity.this.reportSpamViewAnimator = null;
+        }
+    }
+
     public class AnonymousClass12 implements RecyclerListView.OnItemClickListenerExtended {
         AnonymousClass12() {
         }
@@ -1904,6 +1902,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public boolean hasDoubleTap(View view, int i) {
+            MessageObject messageObject;
             TLRPC.ChatFull chatFull;
             if (ChatActivity.this.chatMode == 5) {
                 return false;
@@ -1920,26 +1919,40 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
                 z = ChatObject.reactionIsAvailable(chatFull, doubleTapReaction);
             }
-            if (!z || !(view instanceof ChatMessageCell)) {
+            if (!z) {
                 return false;
             }
-            ChatMessageCell chatMessageCell = (ChatMessageCell) view;
-            return (chatMessageCell.getMessageObject().isSending() || chatMessageCell.getMessageObject().isEditing() || chatMessageCell.getMessageObject().type == 16 || ((BaseFragment) ChatActivity.this).actionBar.isActionModeShowed() || ChatActivity.this.isSecretChat() || ChatActivity.this.isInScheduleMode() || chatMessageCell.getMessageObject().isSponsored()) ? false : true;
+            if (view instanceof ChatMessageCell) {
+                messageObject = ((ChatMessageCell) view).getPrimaryMessageObject();
+            } else {
+                if (!(view instanceof ChatActionCell)) {
+                    return false;
+                }
+                messageObject = ((ChatActionCell) view).getMessageObject();
+            }
+            return (messageObject == null || messageObject.isSending() || !messageObject.canSetReaction() || messageObject.isEditing() || messageObject.type == 16 || ((BaseFragment) ChatActivity.this).actionBar.isActionModeShowed() || ChatActivity.this.isSecretChat() || ChatActivity.this.isInScheduleMode() || messageObject.isSponsored()) ? false : true;
         }
 
         @Override
         public void onDoubleTap(View view, int i, float f, float f2) {
+            MessageObject messageObject;
             boolean z;
             ChatActivity chatActivity;
             ReactionsLayoutInBubble.VisibleReaction fromEmojicon;
             TLRPC.ChatFull chatFull;
             TLRPC.ChatFull chatFull2;
-            if (!(view instanceof ChatMessageCell) || ChatActivity.this.getParentActivity() == null || ChatActivity.this.isSecretChat() || ChatActivity.this.isInScheduleMode() || ChatActivity.this.isInPreviewMode() || ChatActivity.this.chatMode == 5) {
+            if (ChatActivity.this.getParentActivity() == null || ChatActivity.this.isSecretChat() || ChatActivity.this.isInScheduleMode() || ChatActivity.this.isInPreviewMode() || ChatActivity.this.chatMode == 5) {
                 return;
             }
-            ChatMessageCell chatMessageCell = (ChatMessageCell) view;
-            MessageObject primaryMessageObject = chatMessageCell.getPrimaryMessageObject();
-            if (primaryMessageObject.isSecretMedia() || primaryMessageObject.isExpiredStory() || primaryMessageObject.type == 27) {
+            if (view instanceof ChatMessageCell) {
+                messageObject = ((ChatMessageCell) view).getPrimaryMessageObject();
+            } else if (!(view instanceof ChatActionCell)) {
+                return;
+            } else {
+                messageObject = ((ChatActionCell) view).getMessageObject();
+            }
+            MessageObject messageObject2 = messageObject;
+            if (messageObject2.isSecretMedia() || !messageObject2.canSetReaction() || messageObject2.isExpiredStory() || messageObject2.type == 27) {
                 return;
             }
             ReactionsEffectOverlay.removeCurrent(false);
@@ -1956,7 +1969,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 fromEmojicon = ReactionsLayoutInBubble.VisibleReaction.fromEmojicon(doubleTapReaction);
             } else {
                 TLRPC.TL_availableReaction tL_availableReaction = ChatActivity.this.getMediaDataController().getReactionsMap().get(doubleTapReaction);
-                if (tL_availableReaction == null || chatMessageCell.getMessageObject().isSponsored()) {
+                if (tL_availableReaction == null || messageObject2.isSponsored()) {
                     return;
                 }
                 z = ChatActivity.this.dialog_id >= 0;
@@ -1969,7 +1982,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 chatActivity = ChatActivity.this;
                 fromEmojicon = ReactionsLayoutInBubble.VisibleReaction.fromEmojicon(tL_availableReaction);
             }
-            chatActivity.selectReaction(chatMessageCell, primaryMessageObject, null, null, f, f2, fromEmojicon, true, false, false, false);
+            chatActivity.selectReaction(view, messageObject2, null, null, f, f2, fromEmojicon, true, false, false, false);
         }
 
         @Override
@@ -2059,27 +2072,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public void onAnimationEnd(Animator animator) {
-            if (ChatActivity.this.reportSpamViewAnimator == null || !ChatActivity.this.reportSpamViewAnimator.equals(animator)) {
-                return;
-            }
-            ChatActivity.this.reportSpamViewAnimator = null;
-        }
-    }
-
-    public class AnonymousClass121 extends AnimatorListenerAdapter {
-        AnonymousClass121() {
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animator) {
-            if (ChatActivity.this.reportSpamViewAnimator == null || !ChatActivity.this.reportSpamViewAnimator.equals(animator)) {
-                return;
-            }
-            ChatActivity.this.reportSpamViewAnimator = null;
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animator) {
             if (ChatActivity.this.reportSpamViewAnimator != null && ChatActivity.this.reportSpamViewAnimator.equals(animator)) {
                 ChatActivity.this.topChatPanelView.setVisibility(8);
                 ChatActivity.this.reportSpamViewAnimator = null;
@@ -2089,8 +2081,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass122 extends AnimatorListenerAdapter {
-        AnonymousClass122() {
+    public class AnonymousClass121 extends AnimatorListenerAdapter {
+        AnonymousClass121() {
         }
 
         @Override
@@ -2110,8 +2102,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass123 extends AnimatorListenerAdapter {
-        AnonymousClass123() {
+    public class AnonymousClass122 extends AnimatorListenerAdapter {
+        AnonymousClass122() {
         }
 
         @Override
@@ -2133,8 +2125,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass124 implements Bulletin.Delegate {
-        AnonymousClass124() {
+    public class AnonymousClass123 implements Bulletin.Delegate {
+        AnonymousClass123() {
         }
 
         @Override
@@ -2191,8 +2183,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass125 implements ViewTreeObserver.OnPreDrawListener {
-        AnonymousClass125() {
+    public class AnonymousClass124 implements ViewTreeObserver.OnPreDrawListener {
+        AnonymousClass124() {
         }
 
         @Override
@@ -2204,8 +2196,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass126 implements AutoDeletePopupWrapper.Callback {
-        AnonymousClass126() {
+    public class AnonymousClass125 implements AutoDeletePopupWrapper.Callback {
+        AnonymousClass125() {
         }
 
         @Override
@@ -2241,7 +2233,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass127 extends PagerAdapter {
+    public class AnonymousClass126 extends PagerAdapter {
         final SparseIntArray val$cachedHeights;
         final SparseArray val$cachedViews;
         final List val$counters;
@@ -2268,7 +2260,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        AnonymousClass127(int i, SparseArray sparseArray, boolean z, List list, MessageObject messageObject, ReactedHeaderView reactedHeaderView, MessageObject messageObject2, SparseIntArray sparseIntArray, int i2, ViewPager viewPager, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout, int[] iArr, int i3) {
+        AnonymousClass126(int i, SparseArray sparseArray, boolean z, List list, MessageObject messageObject, ReactedHeaderView reactedHeaderView, MessageObject messageObject2, SparseIntArray sparseIntArray, int i2, ViewPager viewPager, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout, int[] iArr, int i3) {
             this.val$size = i;
             this.val$cachedViews = sparseArray;
             this.val$showAllReactionsTab = z;
@@ -2351,14 +2343,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ReactedUsersListView onCustomEmojiSelectedListener = new ReactedUsersListView(context, chatActivity.themeDelegate, ((BaseFragment) chatActivity).currentAccount, this.val$message, reactionCount, false, true).setSeenUsers(this.val$reactedView.getSeenUsers()).setOnCustomEmojiSelectedListener(new ReactedUsersListView.OnCustomEmojiSelectedListener() {
                 @Override
                 public final void showCustomEmojiAlert(ReactedUsersListView reactedUsersListView, ArrayList arrayList) {
-                    ChatActivity.AnonymousClass127.this.lambda$instantiateItem$0(reactedUsersListView, arrayList);
+                    ChatActivity.AnonymousClass126.this.lambda$instantiateItem$0(reactedUsersListView, arrayList);
                 }
             });
             final MessageObject messageObject = this.val$primaryMessage;
             ReactedUsersListView onProfileSelectedListener = onCustomEmojiSelectedListener.setOnProfileSelectedListener(new ReactedUsersListView.OnProfileSelectedListener() {
                 @Override
                 public final void onProfileSelected(ReactedUsersListView reactedUsersListView, long j, TLRPC.MessagePeerReaction messagePeerReaction) {
-                    ChatActivity.AnonymousClass127.this.lambda$instantiateItem$1(messageObject, reactedUsersListView, j, messagePeerReaction);
+                    ChatActivity.AnonymousClass126.this.lambda$instantiateItem$1(messageObject, reactedUsersListView, j, messagePeerReaction);
                 }
             });
             final SparseIntArray sparseIntArray = this.val$cachedHeights;
@@ -2369,7 +2361,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ReactedUsersListView onHeightChangedListener = onProfileSelectedListener.setOnHeightChangedListener(new ReactedUsersListView.OnHeightChangedListener() {
                 @Override
                 public final void onHeightChanged(ReactedUsersListView reactedUsersListView, int i4) {
-                    ChatActivity.AnonymousClass127.lambda$instantiateItem$2(sparseIntArray, i, i3, viewPager, actionBarPopupWindowLayout, iArr, reactedUsersListView, i4);
+                    ChatActivity.AnonymousClass126.lambda$instantiateItem$2(sparseIntArray, i, i3, viewPager, actionBarPopupWindowLayout, iArr, reactedUsersListView, i4);
                 }
             });
             if (i2 < 0) {
@@ -2387,7 +2379,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass128 implements ViewPager.OnPageChangeListener {
+    public class AnonymousClass127 implements ViewPager.OnPageChangeListener {
         final SparseIntArray val$cachedHeights;
         final int[] val$foregroundIndex;
         final ActionBarPopupWindow.ActionBarPopupWindowLayout val$popupLayout;
@@ -2396,7 +2388,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         final HorizontalScrollView val$tabsScrollView;
         final LinearLayout val$tabsView;
 
-        AnonymousClass128(AtomicBoolean atomicBoolean, LinearLayout linearLayout, int i, HorizontalScrollView horizontalScrollView, SparseIntArray sparseIntArray, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout, int[] iArr) {
+        AnonymousClass127(AtomicBoolean atomicBoolean, LinearLayout linearLayout, int i, HorizontalScrollView horizontalScrollView, SparseIntArray sparseIntArray, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout, int[] iArr) {
             r2 = atomicBoolean;
             r3 = linearLayout;
             r4 = i;
@@ -2444,8 +2436,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass129 extends EmojiPacksAlert {
-        AnonymousClass129(BaseFragment baseFragment, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList) {
+    public class AnonymousClass128 extends EmojiPacksAlert {
+        AnonymousClass128(BaseFragment baseFragment, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList) {
             super(baseFragment, context, resourcesProvider, arrayList);
         }
 
@@ -2453,6 +2445,20 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         public void dismiss() {
             super.dismiss();
             ChatActivity.this.dimBehindView(false);
+        }
+    }
+
+    public class AnonymousClass129 implements View.OnClickListener {
+        final ActionBarPopupWindow.ActionBarPopupWindowLayout val$popupLayout;
+
+        AnonymousClass129(ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout) {
+            r2 = actionBarPopupWindowLayout;
+        }
+
+        @Override
+        public void onClick(View view) {
+            Bulletin.hideVisible();
+            r2.getSwipeBack().closeForeground();
         }
     }
 
@@ -3011,27 +3017,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public class AnonymousClass130 implements View.OnClickListener {
-        final ActionBarPopupWindow.ActionBarPopupWindowLayout val$popupLayout;
-
-        AnonymousClass130(ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout) {
-            r2 = actionBarPopupWindowLayout;
-        }
-
-        @Override
-        public void onClick(View view) {
-            Bulletin.hideVisible();
-            r2.getSwipeBack().closeForeground();
-        }
-    }
-
-    public class AnonymousClass131 implements View.OnClickListener {
         final MessageSeenView val$finalMessageSeenView;
         final int[] val$foregroundIndex;
         final LinearLayout val$linearLayout;
         final RecyclerListView val$listView2;
         final ActionBarPopupWindow.ActionBarPopupWindowLayout val$popupLayout;
 
-        AnonymousClass131(MessageSeenView messageSeenView, RecyclerListView recyclerListView, LinearLayout linearLayout, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout, int[] iArr) {
+        AnonymousClass130(MessageSeenView messageSeenView, RecyclerListView recyclerListView, LinearLayout linearLayout, ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout, int[] iArr) {
             r2 = messageSeenView;
             r3 = recyclerListView;
             r4 = linearLayout;
@@ -3081,10 +3073,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass132 implements Runnable {
+    public class AnonymousClass131 implements Runnable {
         boolean clicked;
 
-        AnonymousClass132() {
+        AnonymousClass131() {
         }
 
         @Override
@@ -3097,54 +3089,54 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass133 extends FrameLayout {
+    public class AnonymousClass132 extends FrameLayout {
+        AnonymousClass132(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onMeasure(int i, int i2) {
+            super.onMeasure(i, i2);
+        }
+    }
+
+    public class AnonymousClass133 extends TextView {
         AnonymousClass133(Context context) {
             super(context);
         }
 
         @Override
         protected void onMeasure(int i, int i2) {
+            if (View.MeasureSpec.getMode(i) == Integer.MIN_VALUE && getLayout() != null) {
+                Layout layout = getLayout();
+                int i3 = 0;
+                for (int i4 = 0; i4 < layout.getLineCount(); i4++) {
+                    i3 = Math.max(i3, (int) Math.ceil(layout.getLineWidth(i4)));
+                }
+                i = View.MeasureSpec.makeMeasureSpec(getPaddingLeft() + i3 + getPaddingRight(), 1073741824);
+            }
             super.onMeasure(i, i2);
         }
     }
 
-    public class AnonymousClass134 extends TextView {
+    public class AnonymousClass134 extends FrameLayout {
         AnonymousClass134(Context context) {
             super(context);
         }
 
         @Override
         protected void onMeasure(int i, int i2) {
-            if (View.MeasureSpec.getMode(i) == Integer.MIN_VALUE && getLayout() != null) {
-                Layout layout = getLayout();
-                int i3 = 0;
-                for (int i4 = 0; i4 < layout.getLineCount(); i4++) {
-                    i3 = Math.max(i3, (int) Math.ceil(layout.getLineWidth(i4)));
-                }
-                i = View.MeasureSpec.makeMeasureSpec(getPaddingLeft() + i3 + getPaddingRight(), 1073741824);
-            }
             super.onMeasure(i, i2);
         }
     }
 
-    public class AnonymousClass135 extends FrameLayout {
+    public class AnonymousClass135 extends TextView {
         AnonymousClass135(Context context) {
             super(context);
         }
 
         @Override
         protected void onMeasure(int i, int i2) {
-            super.onMeasure(i, i2);
-        }
-    }
-
-    public class AnonymousClass136 extends TextView {
-        AnonymousClass136(Context context) {
-            super(context);
-        }
-
-        @Override
-        protected void onMeasure(int i, int i2) {
             if (View.MeasureSpec.getMode(i) == Integer.MIN_VALUE && getLayout() != null) {
                 Layout layout = getLayout();
                 int i3 = 0;
@@ -3157,8 +3149,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass137 extends ChatScrimPopupContainerLayout {
-        AnonymousClass137(Context context) {
+    public class AnonymousClass136 extends ChatScrimPopupContainerLayout {
+        AnonymousClass136(Context context) {
             super(context);
         }
 
@@ -3180,25 +3172,25 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass138 implements View.OnTouchListener {
+    public class AnonymousClass137 implements View.OnTouchListener {
         private int[] pos = new int[2];
         final Rect val$rect;
 
-        AnonymousClass138(Rect rect) {
+        AnonymousClass137(Rect rect) {
             r2 = rect;
         }
 
         @Override
         public boolean onTouch(android.view.View r8, android.view.MotionEvent r9) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass138.onTouch(android.view.View, android.view.MotionEvent):boolean");
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass137.onTouch(android.view.View, android.view.MotionEvent):boolean");
         }
     }
 
-    public class AnonymousClass139 implements ReactionsContainerLayout.ReactionsContainerDelegate {
+    public class AnonymousClass138 implements ReactionsContainerLayout.ReactionsContainerDelegate {
         final ReactionsContainerLayout val$finalReactionsLayout;
         final MessageObject val$primaryMessage;
 
-        AnonymousClass139(MessageObject messageObject, ReactionsContainerLayout reactionsContainerLayout) {
+        AnonymousClass138(MessageObject messageObject, ReactionsContainerLayout reactionsContainerLayout) {
             r2 = messageObject;
             r3 = reactionsContainerLayout;
         }
@@ -3238,6 +3230,28 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 f = reactionsLayoutInBubble.x + reactionButton.x + (reactionButton.width / 2.0f);
             }
             ChatActivity.this.selectReaction(findMessageCell, r2, r3, view, f, f2, visibleReaction, false, (visibleReaction == null || !visibleReaction.isStar) ? z : true, z2, false);
+        }
+    }
+
+    public class AnonymousClass139 implements PopupSwipeBackLayout.OnSwipeBackProgressListener {
+        boolean isEnter = true;
+        final ReactionsContainerLayout val$finalReactionsLayout;
+
+        AnonymousClass139(ReactionsContainerLayout reactionsContainerLayout) {
+            r2 = reactionsContainerLayout;
+        }
+
+        @Override
+        public void onSwipeBackProgress(PopupSwipeBackLayout popupSwipeBackLayout, float f, float f2) {
+            if (f == 0.0f && !this.isEnter) {
+                r2.startEnterAnimation(false);
+                this.isEnter = true;
+            } else if (f == 1.0f && this.isEnter) {
+                r2.setAlpha(1.0f - f2);
+                if (f2 == 1.0f) {
+                    this.isEnter = false;
+                }
+            }
         }
     }
 
@@ -3299,30 +3313,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass140 implements PopupSwipeBackLayout.OnSwipeBackProgressListener {
-        boolean isEnter = true;
-        final ReactionsContainerLayout val$finalReactionsLayout;
-
-        AnonymousClass140(ReactionsContainerLayout reactionsContainerLayout) {
-            r2 = reactionsContainerLayout;
-        }
-
-        @Override
-        public void onSwipeBackProgress(PopupSwipeBackLayout popupSwipeBackLayout, float f, float f2) {
-            if (f == 0.0f && !this.isEnter) {
-                r2.startEnterAnimation(false);
-                this.isEnter = true;
-            } else if (f == 1.0f && this.isEnter) {
-                r2.setAlpha(1.0f - f2);
-                if (f2 == 1.0f) {
-                    this.isEnter = false;
-                }
-            }
-        }
-    }
-
-    public class AnonymousClass141 extends EmojiPacksAlert {
-        AnonymousClass141(BaseFragment baseFragment, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList) {
+    public class AnonymousClass140 extends EmojiPacksAlert {
+        AnonymousClass140(BaseFragment baseFragment, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList) {
             super(baseFragment, context, resourcesProvider, arrayList);
         }
 
@@ -3333,10 +3325,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass142 extends ActionBarPopupWindow {
+    public class AnonymousClass141 extends ActionBarPopupWindow {
         final ReactionsContainerLayout val$finalReactionsLayout1;
 
-        AnonymousClass142(View view, int i, int i2, ReactionsContainerLayout reactionsContainerLayout) {
+        AnonymousClass141(View view, int i, int i2, ReactionsContainerLayout reactionsContainerLayout) {
             super(view, i, i2);
             r5 = reactionsContainerLayout;
         }
@@ -3378,6 +3370,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
+    public class AnonymousClass142 extends ChatGreetingsView {
+        AnonymousClass142(Context context, TLRPC.User user, int i, TLRPC.Document document, Theme.ResourcesProvider resourcesProvider) {
+            super(context, user, i, document, resourcesProvider);
+        }
+
+        @Override
+        protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
+            super.onLayout(z, i, i2, i3, i4);
+            setVisiblePart(getY() + ChatActivity.this.emptyViewContent.getY(), ChatActivity.this.getServiceHeight(this));
+        }
+    }
+
     public class AnonymousClass143 extends ChatGreetingsView {
         AnonymousClass143(Context context, TLRPC.User user, int i, TLRPC.Document document, Theme.ResourcesProvider resourcesProvider) {
             super(context, user, i, document, resourcesProvider);
@@ -3390,20 +3394,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass144 extends ChatGreetingsView {
-        AnonymousClass144(Context context, TLRPC.User user, int i, TLRPC.Document document, Theme.ResourcesProvider resourcesProvider) {
-            super(context, user, i, document, resourcesProvider);
-        }
-
-        @Override
-        protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
-            super.onLayout(z, i, i2, i3, i4);
-            setVisiblePart(getY() + ChatActivity.this.emptyViewContent.getY(), ChatActivity.this.getServiceHeight(this));
-        }
-    }
-
-    public class AnonymousClass145 extends ChatActionCell {
-        AnonymousClass145(Context context, boolean z, Theme.ResourcesProvider resourcesProvider) {
+    public class AnonymousClass144 extends ChatActionCell {
+        AnonymousClass144(Context context, boolean z, Theme.ResourcesProvider resourcesProvider) {
             super(context, z, resourcesProvider);
         }
 
@@ -3414,7 +3406,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass146 implements Runnable {
+    public class AnonymousClass145 implements Runnable {
         final boolean val$added;
         final int val$finalMessageIdForCell;
         final boolean val$fromDoubleTap;
@@ -3425,7 +3417,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         final float val$x;
         final float val$y;
 
-        AnonymousClass146(boolean z, boolean z2, int i, boolean z3, ReactionsContainerLayout reactionsContainerLayout, float f, float f2, ReactionsLayoutInBubble.VisibleReaction visibleReaction, MessageObject messageObject) {
+        AnonymousClass145(boolean z, boolean z2, int i, boolean z3, ReactionsContainerLayout reactionsContainerLayout, float f, float f2, ReactionsLayoutInBubble.VisibleReaction visibleReaction, MessageObject messageObject) {
             this.val$withoutAnimation = z;
             this.val$fromDoubleTap = z2;
             this.val$finalMessageIdForCell = i;
@@ -3450,7 +3442,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.AnonymousClass146.this.lambda$run$0(i, z, reactionsContainerLayout, f, f2, visibleReaction);
+                    ChatActivity.AnonymousClass145.this.lambda$run$0(i, z, reactionsContainerLayout, f, f2, visibleReaction);
                 }
             }, 50L);
         }
@@ -3484,7 +3476,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     chatActivity.lambda$openDiscussionMessageChat$338(new Runnable() {
                         @Override
                         public final void run() {
-                            ChatActivity.AnonymousClass146.this.lambda$run$1(i, z, reactionsContainerLayout, f, f2, visibleReaction);
+                            ChatActivity.AnonymousClass145.this.lambda$run$1(i, z, reactionsContainerLayout, f, f2, visibleReaction);
                         }
                     });
                 } else {
@@ -3492,7 +3484,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     chatActivity.lambda$openDiscussionMessageChat$338(new Runnable() {
                         @Override
                         public final void run() {
-                            ChatActivity.AnonymousClass146.this.lambda$run$2(messageObject);
+                            ChatActivity.AnonymousClass145.this.lambda$run$2(messageObject);
                         }
                     });
                 }
@@ -3501,8 +3493,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass147 extends AnimatorListenerAdapter {
-        AnonymousClass147() {
+    public class AnonymousClass146 extends AnimatorListenerAdapter {
+        AnonymousClass146() {
         }
 
         @Override
@@ -3516,12 +3508,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass148 implements NotificationCenter.NotificationCenterDelegate {
+    public class AnonymousClass147 implements NotificationCenter.NotificationCenterDelegate {
         final ChatActivity val$chatActivity;
         final int val$commentsClassGuid;
         final Runnable val$openCommentsChat;
 
-        AnonymousClass148(int i, Runnable runnable, ChatActivity chatActivity) {
+        AnonymousClass147(int i, Runnable runnable, ChatActivity chatActivity) {
             this.val$commentsClassGuid = i;
             this.val$openCommentsChat = runnable;
             this.val$chatActivity = chatActivity;
@@ -3544,13 +3536,49 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass149 extends Browser.Progress {
+    public class AnonymousClass148 extends Browser.Progress {
         final ChatMessageCell val$cell;
         final CharacterStyle val$span;
 
-        AnonymousClass149(ChatMessageCell chatMessageCell, CharacterStyle characterStyle) {
+        AnonymousClass148(ChatMessageCell chatMessageCell, CharacterStyle characterStyle) {
             this.val$cell = chatMessageCell;
             this.val$span = characterStyle;
+        }
+
+        public void lambda$end$0(ChatMessageCell chatMessageCell) {
+            if (ChatActivity.this.progressDialogAtMessageId == chatMessageCell.getMessageObject().getId()) {
+                ChatActivity.this.resetProgressDialogLoading();
+            }
+        }
+
+        @Override
+        public void end(boolean z) {
+            if (z) {
+                return;
+            }
+            final ChatMessageCell chatMessageCell = this.val$cell;
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    ChatActivity.AnonymousClass148.this.lambda$end$0(chatMessageCell);
+                }
+            }, 240L);
+        }
+
+        @Override
+        public void init() {
+            ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
+            ChatActivity.this.progressDialogAtMessageType = 1;
+            ChatActivity.this.progressDialogLinkSpan = this.val$span;
+            this.val$cell.invalidate();
+        }
+    }
+
+    public class AnonymousClass149 extends Browser.Progress {
+        final ChatMessageCell val$cell;
+
+        AnonymousClass149(ChatMessageCell chatMessageCell) {
+            this.val$cell = chatMessageCell;
         }
 
         public void lambda$end$0(ChatMessageCell chatMessageCell) {
@@ -3576,8 +3604,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         @Override
         public void init() {
             ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
-            ChatActivity.this.progressDialogAtMessageType = 1;
-            ChatActivity.this.progressDialogLinkSpan = this.val$span;
+            ChatActivity.this.progressDialogAtMessageType = 6;
             this.val$cell.invalidate();
         }
     }
@@ -3613,9 +3640,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     public class AnonymousClass150 extends Browser.Progress {
         final ChatMessageCell val$cell;
+        final String val$url;
 
-        AnonymousClass150(ChatMessageCell chatMessageCell) {
+        AnonymousClass150(ChatMessageCell chatMessageCell, String str) {
             this.val$cell = chatMessageCell;
+            this.val$url = str;
         }
 
         public void lambda$end$0(ChatMessageCell chatMessageCell) {
@@ -3641,18 +3670,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         @Override
         public void init() {
             ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
-            ChatActivity.this.progressDialogAtMessageType = 6;
+            ChatActivity.this.progressDialogAtMessageType = 3;
+            ChatActivity.this.progressDialogBotButtonUrl = this.val$url;
             this.val$cell.invalidate();
         }
     }
 
     public class AnonymousClass151 extends Browser.Progress {
         final ChatMessageCell val$cell;
-        final String val$url;
 
-        AnonymousClass151(ChatMessageCell chatMessageCell, String str) {
+        AnonymousClass151(ChatMessageCell chatMessageCell) {
             this.val$cell = chatMessageCell;
-            this.val$url = str;
         }
 
         public void lambda$end$0(ChatMessageCell chatMessageCell) {
@@ -3678,54 +3706,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         @Override
         public void init() {
             ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
-            ChatActivity.this.progressDialogAtMessageType = 3;
-            ChatActivity.this.progressDialogBotButtonUrl = this.val$url;
-            this.val$cell.invalidate();
-        }
-    }
-
-    public class AnonymousClass152 extends Browser.Progress {
-        final ChatMessageCell val$cell;
-
-        AnonymousClass152(ChatMessageCell chatMessageCell) {
-            this.val$cell = chatMessageCell;
-        }
-
-        public void lambda$end$0(ChatMessageCell chatMessageCell) {
-            if (ChatActivity.this.progressDialogAtMessageId == chatMessageCell.getMessageObject().getId()) {
-                ChatActivity.this.resetProgressDialogLoading();
-            }
-        }
-
-        @Override
-        public void end(boolean z) {
-            if (z) {
-                return;
-            }
-            final ChatMessageCell chatMessageCell = this.val$cell;
-            AndroidUtilities.runOnUIThread(new Runnable() {
-                @Override
-                public final void run() {
-                    ChatActivity.AnonymousClass152.this.lambda$end$0(chatMessageCell);
-                }
-            }, 240L);
-        }
-
-        @Override
-        public void init() {
-            ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
             ChatActivity.this.progressDialogAtMessageType = 5;
             ChatActivity.this.progressDialogBotButtonUrl = null;
             this.val$cell.invalidate();
         }
     }
 
-    public class AnonymousClass153 extends AnimatorListenerAdapter {
+    public class AnonymousClass152 extends AnimatorListenerAdapter {
         int index;
         final Runnable val$callback;
         final ChatActivity val$previousChat;
 
-        AnonymousClass153(ChatActivity chatActivity, Runnable runnable) {
+        AnonymousClass152(ChatActivity chatActivity, Runnable runnable) {
             this.val$previousChat = chatActivity;
             this.val$callback = runnable;
         }
@@ -3743,7 +3735,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.AnonymousClass153.this.lambda$onAnimationEnd$0();
+                    ChatActivity.AnonymousClass152.this.lambda$onAnimationEnd$0();
                 }
             }, 32L);
             super.onAnimationEnd(animator);
@@ -3781,8 +3773,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    class AnonymousClass154 implements ValueAnimator.AnimatorUpdateListener {
-        AnonymousClass154() {
+    class AnonymousClass153 implements ValueAnimator.AnimatorUpdateListener {
+        AnonymousClass153() {
         }
 
         @Override
@@ -3792,12 +3784,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass155 extends AnimatorListenerAdapter {
+    public class AnonymousClass154 extends AnimatorListenerAdapter {
         int index;
         final Runnable val$callback;
         final boolean val$isOpen;
 
-        AnonymousClass155(boolean z, Runnable runnable) {
+        AnonymousClass154(boolean z, Runnable runnable) {
             this.val$isOpen = z;
             this.val$callback = runnable;
         }
@@ -3820,7 +3812,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.AnonymousClass155.this.lambda$onAnimationEnd$0();
+                    ChatActivity.AnonymousClass154.this.lambda$onAnimationEnd$0();
                 }
             }, 32L);
             this.val$callback.run();
@@ -3833,7 +3825,108 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public static class AnonymousClass156 {
+    public class AnonymousClass155 extends FrameLayout {
+        Path path = new Path();
+
+        AnonymousClass155(Context context) {
+            super(context);
+            this.path = new Path();
+        }
+
+        @Override
+        protected void dispatchDraw(Canvas canvas) {
+            if (Build.VERSION.SDK_INT < 21) {
+                super.dispatchDraw(canvas);
+                return;
+            }
+            canvas.save();
+            this.path.rewind();
+            this.path.addRoundRect(AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), getWidth() - AndroidUtilities.dp(8.0f), getHeight() - AndroidUtilities.dp(8.0f), AndroidUtilities.dp(6.0f), AndroidUtilities.dp(6.0f), Path.Direction.CW);
+            canvas.clipPath(this.path);
+            super.dispatchDraw(canvas);
+            canvas.restore();
+        }
+
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+            if (keyEvent.getKeyCode() == 4 && keyEvent.getRepeatCount() == 0) {
+                ChatActivity.this.closeMenu();
+            }
+            return super.dispatchKeyEvent(keyEvent);
+        }
+
+        @Override
+        protected void onMeasure(int i, int i2) {
+            int min = Math.min(View.MeasureSpec.getSize(i2), AndroidUtilities.dp(300.0f));
+            if (min == 0) {
+                min = AndroidUtilities.dp(300.0f);
+            }
+            super.onMeasure(i, View.MeasureSpec.makeMeasureSpec(min, Integer.MIN_VALUE));
+        }
+    }
+
+    public class AnonymousClass156 extends EmojiPacksAlert {
+        AnonymousClass156(BaseFragment baseFragment, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList) {
+            super(baseFragment, context, resourcesProvider, arrayList);
+        }
+
+        @Override
+        public void dismiss() {
+            super.dismiss();
+            ChatActivity.this.dimBehindView(false);
+        }
+    }
+
+    public class AnonymousClass157 extends BaseFragment {
+        AnonymousClass157() {
+        }
+
+        @Override
+        public Context getContext() {
+            return ChatActivity.this.getContext();
+        }
+
+        @Override
+        public int getCurrentAccount() {
+            return this.currentAccount;
+        }
+
+        @Override
+        public Theme.ResourcesProvider getResourceProvider() {
+            return ChatActivity.this.themeDelegate;
+        }
+    }
+
+    public class AnonymousClass158 extends ActionBarPopupWindow {
+        AnonymousClass158(View view, int i, int i2) {
+            super(view, i, i2);
+        }
+
+        @Override
+        public void dismiss() {
+            super.dismiss();
+            ChatActivity chatActivity = ChatActivity.this;
+            if (chatActivity.scrimPopupWindow != this) {
+                return;
+            }
+            chatActivity.scrimPopupWindow = null;
+            chatActivity.menuDeleteItem = null;
+            ChatActivity.this.scrimPopupWindowItems = null;
+            ChatActivity.this.chatLayoutManager.setCanScrollVertically(true);
+            if (ChatActivity.this.scrimPopupWindowHideDimOnDismiss) {
+                ChatActivity.this.dimBehindView(false);
+            } else {
+                ChatActivity.this.scrimPopupWindowHideDimOnDismiss = true;
+            }
+            ChatActivityEnterView chatActivityEnterView = ChatActivity.this.chatActivityEnterView;
+            if (chatActivityEnterView == null || chatActivityEnterView.getEditField() == null) {
+                return;
+            }
+            ChatActivity.this.chatActivityEnterView.getEditField().setAllowDrawCursor(true);
+        }
+    }
+
+    public static class AnonymousClass159 {
         static final int[] $SwitchMap$org$telegram$ui$AvatarPreviewer$MenuItem;
 
         static {
@@ -4163,6 +4256,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             canvas.translate(chatActionCell.getX(), chatActionCell.getY());
                             canvas.scale(chatActionCell.getScaleX(), chatActionCell.getScaleY(), chatActionCell.getMeasuredWidth() / 2.0f, chatActionCell.getMeasuredHeight() / 2.0f);
                             chatActionCell.drawBackground(canvas, true);
+                            chatActionCell.drawReactions(canvas, true);
                             canvas.restore();
                         }
                     }
@@ -6986,43 +7080,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass57 extends LinkSpanDrawable.LinksTextView {
-        PorterDuffColorFilter colorFilter;
-        int lastColor;
-        Layout lastLayout;
-        AnimatedEmojiSpan.EmojiGroupedSpans stack;
-
-        AnonymousClass57(Context context, Theme.ResourcesProvider resourcesProvider) {
-            super(context, resourcesProvider);
-        }
-
-        @Override
-        protected void dispatchDraw(Canvas canvas) {
-            super.dispatchDraw(canvas);
-            if (this.lastLayout != getLayout()) {
-                AnimatedEmojiSpan.EmojiGroupedSpans emojiGroupedSpans = this.stack;
-                Layout layout = getLayout();
-                this.lastLayout = layout;
-                this.stack = AnimatedEmojiSpan.update(7, this, emojiGroupedSpans, layout);
-            }
-            int themedColor = ChatActivity.this.getThemedColor(Theme.key_windowBackgroundWhiteBlueIcon);
-            if (this.lastColor != themedColor || this.colorFilter == null) {
-                this.colorFilter = new PorterDuffColorFilter(themedColor, PorterDuff.Mode.MULTIPLY);
-                this.lastColor = themedColor;
-            }
-            AnimatedEmojiSpan.drawAnimatedEmojis(canvas, getLayout(), this.stack, 0.0f, null, 0.0f, 0.0f, 0.0f, 1.0f, this.colorFilter);
-        }
-
-        @Override
-        public void onDetachedFromWindow() {
-            super.onDetachedFromWindow();
-            AnimatedEmojiSpan.release(this, this.stack);
-            this.lastLayout = null;
-        }
-    }
-
-    public class AnonymousClass58 extends TranslateButton {
-        AnonymousClass58(Context context, ChatActivity chatActivity, Theme.ResourcesProvider resourcesProvider) {
+    public class AnonymousClass57 extends TranslateButton {
+        AnonymousClass57(Context context, ChatActivity chatActivity, Theme.ResourcesProvider resourcesProvider) {
             super(context, chatActivity, resourcesProvider);
         }
 
@@ -7044,12 +7103,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass59 extends ReactionsContainerLayout {
+    public class AnonymousClass58 extends ReactionsContainerLayout {
         private boolean firstLayout;
         private int[] loc;
         private ValueAnimator va;
 
-        AnonymousClass59(int i, BaseFragment baseFragment, Context context, int i2, Theme.ResourcesProvider resourcesProvider) {
+        AnonymousClass58(int i, BaseFragment baseFragment, Context context, int i2, Theme.ResourcesProvider resourcesProvider) {
             super(i, baseFragment, context, i2, resourcesProvider);
             this.loc = new int[2];
             this.firstLayout = true;
@@ -7075,7 +7134,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
-                    ChatActivity.AnonymousClass59.this.lambda$updateBubbleOffset$0(valueAnimator2);
+                    ChatActivity.AnonymousClass58.this.lambda$updateBubbleOffset$0(valueAnimator2);
                 }
             });
             this.va.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
@@ -7102,26 +7161,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    class AnonymousClass6 extends AnimationProperties.FloatProperty {
-        AnonymousClass6(String str) {
-            super(str);
-        }
-
-        @Override
-        public Object get(Object obj) {
-            return Float.valueOf(ChatActivity.SKELETON_SATURATION);
-        }
-
-        @Override
-        public void setValue(Object obj, float f) {
-            float unused = ChatActivity.SKELETON_SATURATION = f;
-            ChatActivity.this.skeletonColorMatrix.setSaturation(f);
-            ChatActivity.this.skeletonServicePaint.setColorFilter(new ColorMatrixColorFilter(ChatActivity.this.skeletonColorMatrix));
-        }
-    }
-
-    public class AnonymousClass60 implements ReactionsContainerLayout.ReactionsContainerDelegate {
-        AnonymousClass60() {
+    public class AnonymousClass59 implements ReactionsContainerLayout.ReactionsContainerDelegate {
+        AnonymousClass59() {
         }
 
         @Override
@@ -7146,14 +7187,32 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public void onReactionClicked(android.view.View r25, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r26, boolean r27, boolean r28) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass60.onReactionClicked(android.view.View, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, boolean, boolean):void");
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass59.onReactionClicked(android.view.View, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, boolean, boolean):void");
         }
     }
 
-    public class AnonymousClass61 extends BlurredFrameLayout {
+    class AnonymousClass6 extends AnimationProperties.FloatProperty {
+        AnonymousClass6(String str) {
+            super(str);
+        }
+
+        @Override
+        public Object get(Object obj) {
+            return Float.valueOf(ChatActivity.SKELETON_SATURATION);
+        }
+
+        @Override
+        public void setValue(Object obj, float f) {
+            float unused = ChatActivity.SKELETON_SATURATION = f;
+            ChatActivity.this.skeletonColorMatrix.setSaturation(f);
+            ChatActivity.this.skeletonServicePaint.setColorFilter(new ColorMatrixColorFilter(ChatActivity.this.skeletonColorMatrix));
+        }
+    }
+
+    public class AnonymousClass60 extends BlurredFrameLayout {
         private Rect blurBounds = new Rect();
 
-        AnonymousClass61(Context context, SizeNotifierFrameLayout sizeNotifierFrameLayout) {
+        AnonymousClass60(Context context, SizeNotifierFrameLayout sizeNotifierFrameLayout) {
             super(context, sizeNotifierFrameLayout);
             this.blurBounds = new Rect();
         }
@@ -7199,8 +7258,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass62 implements MessagesStorage.IntCallback {
-        AnonymousClass62() {
+    public class AnonymousClass61 implements MessagesStorage.IntCallback {
+        AnonymousClass61() {
         }
 
         @Override
@@ -7209,8 +7268,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass63 extends InstantCameraView {
-        AnonymousClass63(Context context, InstantCameraView.Delegate delegate, Theme.ResourcesProvider resourcesProvider) {
+    public class AnonymousClass62 extends InstantCameraView {
+        AnonymousClass62(Context context, InstantCameraView.Delegate delegate, Theme.ResourcesProvider resourcesProvider) {
             super(context, delegate, resourcesProvider);
         }
 
@@ -7220,11 +7279,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass64 extends AnimatorListenerAdapter {
+    public class AnonymousClass63 extends AnimatorListenerAdapter {
         final ChatMessageCell val$cell;
         final boolean val$enable;
 
-        AnonymousClass64(boolean z, ChatMessageCell chatMessageCell) {
+        AnonymousClass63(boolean z, ChatMessageCell chatMessageCell) {
             r2 = z;
             r3 = chatMessageCell;
         }
@@ -7251,8 +7310,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass65 extends AnimatorListenerAdapter {
-        AnonymousClass65() {
+    public class AnonymousClass64 extends AnimatorListenerAdapter {
+        AnonymousClass64() {
         }
 
         @Override
@@ -7262,8 +7321,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass66 extends AnimatorListenerAdapter {
-        AnonymousClass66() {
+    public class AnonymousClass65 extends AnimatorListenerAdapter {
+        AnonymousClass65() {
         }
 
         @Override
@@ -7274,8 +7333,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass67 extends MessagePreviewView {
-        AnonymousClass67(Context context, ChatActivity chatActivity, MessagePreviewParams messagePreviewParams, TLRPC.User user, TLRPC.Chat chat, int i, MessagePreviewView.ResourcesDelegate resourcesDelegate, int i2, boolean z) {
+    public class AnonymousClass66 extends MessagePreviewView {
+        AnonymousClass66(Context context, ChatActivity chatActivity, MessagePreviewParams messagePreviewParams, TLRPC.User user, TLRPC.Chat chat, int i, MessagePreviewView.ResourcesDelegate resourcesDelegate, int i2, boolean z) {
             super(context, chatActivity, messagePreviewParams, user, chat, i, resourcesDelegate, i2, z);
         }
 
@@ -7335,7 +7394,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public final void run() {
-                        ChatActivity.AnonymousClass67.this.lambda$onDismiss$1();
+                        ChatActivity.AnonymousClass66.this.lambda$onDismiss$1();
                     }
                 }, 50L);
                 ChatActivity.this.keyboardWasVisible = false;
@@ -7353,7 +7412,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public final void run() {
-                        ChatActivity.AnonymousClass67.this.lambda$onFullDismiss$0();
+                        ChatActivity.AnonymousClass66.this.lambda$onFullDismiss$0();
                     }
                 }, 15L);
             }
@@ -7418,12 +7477,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         protected void selectAnotherChat(boolean r10) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass67.selectAnotherChat(boolean):void");
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass66.selectAnotherChat(boolean):void");
         }
     }
 
-    public class AnonymousClass68 extends AnimatorListenerAdapter {
-        AnonymousClass68() {
+    public class AnonymousClass67 extends AnimatorListenerAdapter {
+        AnonymousClass67() {
         }
 
         @Override
@@ -7433,8 +7492,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass69 extends UndoView {
-        AnonymousClass69(Context context, BaseFragment baseFragment, boolean z, Theme.ResourcesProvider resourcesProvider) {
+    public class AnonymousClass68 extends UndoView {
+        AnonymousClass68(Context context, BaseFragment baseFragment, boolean z, Theme.ResourcesProvider resourcesProvider) {
             super(context, baseFragment, z, resourcesProvider);
         }
 
@@ -7450,27 +7509,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass7 extends PhotoViewer.EmptyPhotoViewerProvider {
-        AnonymousClass7() {
-        }
-
-        @Override
-        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
-            return ChatActivity.this.getPlaceForPhoto(messageObject, fileLocation, i, z, false);
-        }
-    }
-
-    public class AnonymousClass70 extends BlurredFrameLayout {
+    public class AnonymousClass69 extends BlurredFrameLayout {
         float lastY;
         float startY;
 
-        AnonymousClass70(Context context, SizeNotifierFrameLayout sizeNotifierFrameLayout) {
+        AnonymousClass69(Context context, SizeNotifierFrameLayout sizeNotifierFrameLayout) {
             super(context, sizeNotifierFrameLayout);
             setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public final boolean onLongClick(View view) {
                     boolean lambda$new$0;
-                    lambda$new$0 = ChatActivity.AnonymousClass70.this.lambda$new$0(view);
+                    lambda$new$0 = ChatActivity.AnonymousClass69.this.lambda$new$0(view);
                     return lambda$new$0;
                 }
             });
@@ -7487,7 +7536,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         protected boolean drawChild(android.graphics.Canvas r4, android.view.View r5, long r6) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass70.drawChild(android.graphics.Canvas, android.view.View, long):boolean");
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass69.drawChild(android.graphics.Canvas, android.view.View, long):boolean");
         }
 
         @Override
@@ -7519,8 +7568,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass71 extends SimpleTextView {
-        AnonymousClass71(Context context) {
+    public class AnonymousClass7 extends PhotoViewer.EmptyPhotoViewerProvider {
+        AnonymousClass7() {
+        }
+
+        @Override
+        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
+            return ChatActivity.this.getPlaceForPhoto(messageObject, fileLocation, i, z, false);
+        }
+    }
+
+    public class AnonymousClass70 extends SimpleTextView {
+        AnonymousClass70(Context context) {
             super(context);
         }
 
@@ -7538,12 +7597,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass72 extends BackupImageView {
+    public class AnonymousClass71 extends BackupImageView {
         private SpoilerEffect spoilerEffect = new SpoilerEffect();
         private Path path = new Path();
         private float[] radii = new float[8];
 
-        AnonymousClass72(Context context) {
+        AnonymousClass71(Context context) {
             super(context);
             this.spoilerEffect = new SpoilerEffect();
             this.path = new Path();
@@ -7583,8 +7642,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass73 implements ChatActivityDelegate {
-        AnonymousClass73() {
+    public class AnonymousClass72 implements ChatActivityDelegate {
+        AnonymousClass72() {
         }
 
         public void lambda$onUnpin$0(boolean z, ArrayList arrayList, ArrayList arrayList2, int i, int i2) {
@@ -7657,12 +7716,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             chatActivity2.pinBulletin = BulletinFactory.createUnpinAllMessagesBulletin(chatActivity2, pinnedMessagesCount, z2, new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.AnonymousClass73.this.lambda$onUnpin$0(z2, arrayList, arrayList2, pinnedMessagesCount, access$33404);
+                    ChatActivity.AnonymousClass72.this.lambda$onUnpin$0(z2, arrayList, arrayList2, pinnedMessagesCount, access$33404);
                 }
             }, new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.AnonymousClass73.this.lambda$onUnpin$1(z2, access$33404);
+                    ChatActivity.AnonymousClass72.this.lambda$onUnpin$1(z2, access$33404);
                 }
             }, ChatActivity.this.themeDelegate);
         }
@@ -7678,8 +7737,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass74 extends BluredView {
-        AnonymousClass74(Context context, View view, Theme.ResourcesProvider resourcesProvider) {
+    public class AnonymousClass73 extends BluredView {
+        AnonymousClass73(Context context, View view, Theme.ResourcesProvider resourcesProvider) {
             super(context, view, resourcesProvider);
         }
 
@@ -7702,8 +7761,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass75 extends AnimatorListenerAdapter {
-        AnonymousClass75() {
+    public class AnonymousClass74 extends AnimatorListenerAdapter {
+        AnonymousClass74() {
         }
 
         @Override
@@ -7717,8 +7776,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass76 extends AnimatorListenerAdapter {
-        AnonymousClass76() {
+    public class AnonymousClass75 extends AnimatorListenerAdapter {
+        AnonymousClass75() {
         }
 
         @Override
@@ -7727,10 +7786,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass77 extends AnimatorListenerAdapter {
+    public class AnonymousClass76 extends AnimatorListenerAdapter {
         final View val$topViewFinal;
 
-        AnonymousClass77(View view) {
+        AnonymousClass76(View view) {
             r2 = view;
         }
 
@@ -7748,8 +7807,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass78 extends FrameLayout {
-        AnonymousClass78(Context context) {
+    public class AnonymousClass77 extends FrameLayout {
+        AnonymousClass77(Context context) {
             super(context);
         }
 
@@ -7760,8 +7819,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass79 extends ViewOutlineProvider {
-        AnonymousClass79() {
+    public class AnonymousClass78 extends ViewOutlineProvider {
+        AnonymousClass78() {
         }
 
         @Override
@@ -7781,25 +7840,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass8 extends PhotoViewer.EmptyPhotoViewerProvider {
-        AnonymousClass8() {
-        }
-
-        @Override
-        public boolean forceAllInGroup() {
-            return true;
-        }
-
-        @Override
-        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
-            return ChatActivity.this.getPlaceForPhoto(messageObject, fileLocation, i, z, false);
-        }
-    }
-
-    public class AnonymousClass80 extends FrameLayout {
+    public class AnonymousClass79 extends FrameLayout {
         RectF rect = new RectF();
 
-        AnonymousClass80(Context context) {
+        AnonymousClass79(Context context) {
             super(context);
             this.rect = new RectF();
         }
@@ -7847,11 +7891,26 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass81 extends AnimatorListenerAdapter {
+    public class AnonymousClass8 extends PhotoViewer.EmptyPhotoViewerProvider {
+        AnonymousClass8() {
+        }
+
+        @Override
+        public boolean forceAllInGroup() {
+            return true;
+        }
+
+        @Override
+        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
+            return ChatActivity.this.getPlaceForPhoto(messageObject, fileLocation, i, z, false);
+        }
+    }
+
+    public class AnonymousClass80 extends AnimatorListenerAdapter {
         final boolean val$loading;
         final boolean[] val$startedLoading;
 
-        AnonymousClass81(boolean z, boolean[] zArr) {
+        AnonymousClass80(boolean z, boolean[] zArr) {
             r2 = z;
             r3 = zArr;
         }
@@ -7872,10 +7931,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass82 extends AnimatorListenerAdapter {
+    public class AnonymousClass81 extends AnimatorListenerAdapter {
         final boolean val$show;
 
-        AnonymousClass82(boolean z) {
+        AnonymousClass81(boolean z) {
             r2 = z;
         }
 
@@ -7896,8 +7955,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass83 extends ChatAttachAlert {
-        AnonymousClass83(Context context, BaseFragment baseFragment, boolean z, boolean z2, boolean z3, Theme.ResourcesProvider resourcesProvider) {
+    public class AnonymousClass82 extends ChatAttachAlert {
+        AnonymousClass82(Context context, BaseFragment baseFragment, boolean z, boolean z2, boolean z3, Theme.ResourcesProvider resourcesProvider) {
             super(context, baseFragment, z, z2, z3, resourcesProvider);
         }
 
@@ -7929,8 +7988,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass84 implements ChatAttachAlert.ChatAttachViewDelegate {
-        AnonymousClass84() {
+    public class AnonymousClass83 implements ChatAttachAlert.ChatAttachViewDelegate {
+        AnonymousClass83() {
         }
 
         @Override
@@ -8080,10 +8139,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass85 extends AnimatorListenerAdapter {
+    public class AnonymousClass84 extends AnimatorListenerAdapter {
         final boolean val$show;
 
-        AnonymousClass85(boolean z) {
+        AnonymousClass84(boolean z) {
             r2 = z;
         }
 
@@ -8106,8 +8165,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass86 implements ChatActivityDelegate {
-        AnonymousClass86() {
+    public class AnonymousClass85 implements ChatActivityDelegate {
+        AnonymousClass85() {
         }
 
         @Override
@@ -8126,8 +8185,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass87 extends TextSelectionHint {
-        AnonymousClass87(Context context, Theme.ResourcesProvider resourcesProvider) {
+    public class AnonymousClass86 extends TextSelectionHint {
+        AnonymousClass86(Context context, Theme.ResourcesProvider resourcesProvider) {
             super(context, resourcesProvider);
         }
 
@@ -8149,7 +8208,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass89 extends AnimatorListenerAdapter {
+    public class AnonymousClass88 extends AnimatorListenerAdapter {
 
         public class AnonymousClass1 extends AnimatorListenerAdapter {
             AnonymousClass1() {
@@ -8163,7 +8222,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        AnonymousClass89() {
+        AnonymousClass88() {
         }
 
         public void lambda$onAnimationEnd$0() {
@@ -8192,9 +8251,21 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.AnonymousClass89.this.lambda$onAnimationEnd$0();
+                    ChatActivity.AnonymousClass88.this.lambda$onAnimationEnd$0();
                 }
             }, 2000L);
+        }
+    }
+
+    public class AnonymousClass89 extends AnimatorListenerAdapter {
+        AnonymousClass89() {
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animator) {
+            if (animator.equals(ChatActivity.this.floatingDateAnimation)) {
+                ChatActivity.this.floatingDateAnimation = null;
+            }
         }
     }
 
@@ -8229,20 +8300,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass91 extends AnimatorListenerAdapter {
+    public class AnonymousClass91 implements PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate {
         AnonymousClass91() {
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animator) {
-            if (animator.equals(ChatActivity.this.floatingDateAnimation)) {
-                ChatActivity.this.floatingDateAnimation = null;
-            }
-        }
-    }
-
-    public class AnonymousClass92 implements PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate {
-        AnonymousClass92() {
         }
 
         @Override
@@ -8267,8 +8326,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass93 extends AnimatorListenerAdapter {
-        AnonymousClass93() {
+    public class AnonymousClass92 extends AnimatorListenerAdapter {
+        AnonymousClass92() {
         }
 
         @Override
@@ -8278,8 +8337,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass94 extends AnimatorListenerAdapter {
-        AnonymousClass94() {
+    public class AnonymousClass93 extends AnimatorListenerAdapter {
+        AnonymousClass93() {
         }
 
         @Override
@@ -8290,8 +8349,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass95 extends AnimatorListenerAdapter {
-        AnonymousClass95() {
+    public class AnonymousClass94 extends AnimatorListenerAdapter {
+        AnonymousClass94() {
         }
 
         @Override
@@ -8301,8 +8360,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass96 extends AnimatorListenerAdapter {
-        AnonymousClass96() {
+    public class AnonymousClass95 extends AnimatorListenerAdapter {
+        AnonymousClass95() {
         }
 
         @Override
@@ -8314,8 +8373,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass97 extends AnimatorListenerAdapter {
-        AnonymousClass97() {
+    public class AnonymousClass96 extends AnimatorListenerAdapter {
+        AnonymousClass96() {
         }
 
         @Override
@@ -8325,8 +8384,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass98 extends AnimatorListenerAdapter {
-        AnonymousClass98() {
+    public class AnonymousClass97 extends AnimatorListenerAdapter {
+        AnonymousClass97() {
         }
 
         @Override
@@ -8337,13 +8396,37 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public class AnonymousClass99 extends AnimatorListenerAdapter {
-        AnonymousClass99() {
+    public class AnonymousClass98 extends AnimatorListenerAdapter {
+        AnonymousClass98() {
         }
 
         @Override
         public void onAnimationEnd(Animator animator) {
             ChatActivity.this.forwardButtonAnimation = null;
+        }
+    }
+
+    public class AnonymousClass99 extends AnimatorListenerAdapter {
+        final int val$newVisibilityFinal;
+
+        AnonymousClass99(int i) {
+            r2 = i;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animator) {
+            if (ChatActivity.this.replyButtonAnimation == null || !ChatActivity.this.replyButtonAnimation.equals(animator)) {
+                return;
+            }
+            ChatActivity.this.replyButtonAnimation = null;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animator) {
+            if (ChatActivity.this.replyButtonAnimation == null || !ChatActivity.this.replyButtonAnimation.equals(animator) || ChatActivity.this.replyButton == null || r2 != 8) {
+                return;
+            }
+            ChatActivity.this.replyButton.setVisibility(8);
         }
     }
 
@@ -8665,6 +8748,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             public void didOpenPremiumGiftChannel(ChatActionCell chatActionCell, String str, boolean z) {
                 initGiftProgressDialog(chatActionCell);
                 GiftInfoBottomSheet.show(getBaseFragment(), str, ChatActivity.this.progressDialogCurrent);
+            }
+
+            @Override
+            public void didPressReaction(ChatActionCell chatActionCell, TLRPC.ReactionCount reactionCount, boolean z, float f, float f2) {
+                ChatActivity.this.didPressReaction(chatActionCell, reactionCount, z, f, f2);
             }
 
             @Override
@@ -10885,7 +10973,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
 
         @Override
-        public void dispatchDraw(android.graphics.Canvas r38) {
+        public void dispatchDraw(android.graphics.Canvas r39) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.ChatActivityFragmentView.dispatchDraw(android.graphics.Canvas):void");
         }
 
@@ -11302,126 +11390,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        public class AnonymousClass11 extends Browser.Progress {
-            final ChatMessageCell val$cell;
-
-            AnonymousClass11(ChatMessageCell chatMessageCell) {
-                this.val$cell = chatMessageCell;
-            }
-
-            @Override
-            public void end(boolean z) {
-                if (z) {
-                    return;
-                }
-                final ChatActivity chatActivity = ChatActivity.this;
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    @Override
-                    public final void run() {
-                        ChatActivity.access$51800(ChatActivity.this);
-                    }
-                }, 250L);
-            }
-
-            @Override
-            public void init() {
-                ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
-                ChatActivity.this.progressDialogAtMessageType = 2;
-                ChatActivity.this.progressDialogLinkSpan = null;
-                this.val$cell.invalidate();
-            }
-        }
-
-        public class AnonymousClass12 extends Browser.Progress {
-            final ChatMessageCell val$cell;
-
-            AnonymousClass12(ChatMessageCell chatMessageCell) {
-                this.val$cell = chatMessageCell;
-            }
-
-            @Override
-            public void end(boolean z) {
-                if (z) {
-                    return;
-                }
-                final ChatActivity chatActivity = ChatActivity.this;
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    @Override
-                    public final void run() {
-                        ChatActivity.access$51800(ChatActivity.this);
-                    }
-                }, 250L);
-            }
-
-            @Override
-            public void init() {
-                ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
-                ChatActivity.this.progressDialogAtMessageType = 2;
-                ChatActivity.this.progressDialogLinkSpan = null;
-                this.val$cell.invalidate();
-            }
-        }
-
-        public class AnonymousClass13 extends Browser.Progress {
-            final ChatMessageCell val$cell;
-
-            AnonymousClass13(ChatMessageCell chatMessageCell) {
-                this.val$cell = chatMessageCell;
-            }
-
-            @Override
-            public void end(boolean z) {
-                if (z) {
-                    return;
-                }
-                final ChatActivity chatActivity = ChatActivity.this;
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    @Override
-                    public final void run() {
-                        ChatActivity.access$51800(ChatActivity.this);
-                    }
-                }, 250L);
-            }
-
-            @Override
-            public void init() {
-                ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
-                ChatActivity.this.progressDialogAtMessageType = 2;
-                ChatActivity.this.progressDialogLinkSpan = null;
-                this.val$cell.invalidate();
-            }
-        }
-
-        public class AnonymousClass14 extends Browser.Progress {
-            final ChatMessageCell val$cell;
-
-            AnonymousClass14(ChatMessageCell chatMessageCell) {
-                this.val$cell = chatMessageCell;
-            }
-
-            @Override
-            public void end(boolean z) {
-                if (z) {
-                    return;
-                }
-                final ChatActivity chatActivity = ChatActivity.this;
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    @Override
-                    public final void run() {
-                        ChatActivity.access$51800(ChatActivity.this);
-                    }
-                }, 250L);
-            }
-
-            @Override
-            public void init() {
-                ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
-                ChatActivity.this.progressDialogAtMessageType = 2;
-                ChatActivity.this.progressDialogLinkSpan = null;
-                this.val$cell.invalidate();
-            }
-        }
-
         public class AnonymousClass2 implements MessagesController.MessagesLoadedCallback {
             final ChatActivity val$chatActivity;
             final Browser.Progress val$progress;
@@ -11444,108 +11412,127 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        class AnonymousClass3 extends FrameLayout {
-            Path path = new Path();
+        class AnonymousClass3 extends Browser.Progress {
+            final ChatMessageCell val$cell;
 
-            AnonymousClass3(Context context) {
-                super(context);
-                this.path = new Path();
+            AnonymousClass3(ChatMessageCell chatMessageCell) {
+                this.val$cell = chatMessageCell;
             }
 
             @Override
-            protected void dispatchDraw(Canvas canvas) {
-                if (Build.VERSION.SDK_INT < 21) {
-                    super.dispatchDraw(canvas);
+            public void end(boolean z) {
+                if (z) {
                     return;
                 }
-                canvas.save();
-                this.path.rewind();
-                this.path.addRoundRect(AndroidUtilities.dp(8.0f), AndroidUtilities.dp(8.0f), getWidth() - AndroidUtilities.dp(8.0f), getHeight() - AndroidUtilities.dp(8.0f), AndroidUtilities.dp(6.0f), AndroidUtilities.dp(6.0f), Path.Direction.CW);
-                canvas.clipPath(this.path);
-                super.dispatchDraw(canvas);
-                canvas.restore();
+                final ChatActivity chatActivity = ChatActivity.this;
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public final void run() {
+                        ChatActivity.access$51800(ChatActivity.this);
+                    }
+                }, 250L);
             }
 
             @Override
-            public boolean dispatchKeyEvent(KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode() == 4 && keyEvent.getRepeatCount() == 0) {
-                    ChatActivity.this.closeMenu();
-                }
-                return super.dispatchKeyEvent(keyEvent);
-            }
-
-            @Override
-            protected void onMeasure(int i, int i2) {
-                int min = Math.min(View.MeasureSpec.getSize(i2), AndroidUtilities.dp(300.0f));
-                if (min == 0) {
-                    min = AndroidUtilities.dp(300.0f);
-                }
-                super.onMeasure(i, View.MeasureSpec.makeMeasureSpec(min, Integer.MIN_VALUE));
+            public void init() {
+                ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
+                ChatActivity.this.progressDialogAtMessageType = 2;
+                ChatActivity.this.progressDialogLinkSpan = null;
+                this.val$cell.invalidate();
             }
         }
 
-        public class AnonymousClass4 extends EmojiPacksAlert {
-            AnonymousClass4(BaseFragment baseFragment, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList) {
-                super(baseFragment, context, resourcesProvider, arrayList);
+        class AnonymousClass4 extends Browser.Progress {
+            final ChatMessageCell val$cell;
+
+            AnonymousClass4(ChatMessageCell chatMessageCell) {
+                this.val$cell = chatMessageCell;
             }
 
             @Override
-            public void dismiss() {
-                super.dismiss();
-                ChatActivity.this.dimBehindView(false);
-            }
-        }
-
-        public class AnonymousClass5 extends BaseFragment {
-            AnonymousClass5() {
-            }
-
-            @Override
-            public Context getContext() {
-                return ChatActivity.this.getContext();
-            }
-
-            @Override
-            public int getCurrentAccount() {
-                return this.currentAccount;
-            }
-
-            @Override
-            public Theme.ResourcesProvider getResourceProvider() {
-                return ChatActivity.this.themeDelegate;
-            }
-        }
-
-        class AnonymousClass6 extends ActionBarPopupWindow {
-            AnonymousClass6(View view, int i, int i2) {
-                super(view, i, i2);
-            }
-
-            @Override
-            public void dismiss() {
-                super.dismiss();
-                ChatActivity chatActivity = ChatActivity.this;
-                if (chatActivity.scrimPopupWindow != this) {
+            public void end(boolean z) {
+                if (z) {
                     return;
                 }
-                chatActivity.scrimPopupWindow = null;
-                chatActivity.menuDeleteItem = null;
-                ChatActivity.this.scrimPopupWindowItems = null;
-                ChatActivity.this.chatLayoutManager.setCanScrollVertically(true);
-                if (ChatActivity.this.scrimPopupWindowHideDimOnDismiss) {
-                    ChatActivity.this.dimBehindView(false);
-                } else {
-                    ChatActivity.this.scrimPopupWindowHideDimOnDismiss = true;
-                }
-                ChatActivityEnterView chatActivityEnterView = ChatActivity.this.chatActivityEnterView;
-                if (chatActivityEnterView == null || chatActivityEnterView.getEditField() == null) {
-                    return;
-                }
-                ChatActivity.this.chatActivityEnterView.getEditField().setAllowDrawCursor(true);
+                final ChatActivity chatActivity = ChatActivity.this;
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public final void run() {
+                        ChatActivity.access$51800(ChatActivity.this);
+                    }
+                }, 250L);
+            }
+
+            @Override
+            public void init() {
+                ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
+                ChatActivity.this.progressDialogAtMessageType = 0;
+                ChatActivity.this.progressDialogLinkSpan = null;
+                this.val$cell.invalidate();
             }
         }
 
-        class AnonymousClass7 extends Browser.Progress {
+        class AnonymousClass5 extends Browser.Progress {
+            final ChatMessageCell val$cell;
+
+            AnonymousClass5(ChatMessageCell chatMessageCell) {
+                this.val$cell = chatMessageCell;
+            }
+
+            @Override
+            public void end(boolean z) {
+                if (z) {
+                    return;
+                }
+                final ChatActivity chatActivity = ChatActivity.this;
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public final void run() {
+                        ChatActivity.access$51800(ChatActivity.this);
+                    }
+                }, 250L);
+            }
+
+            @Override
+            public void init() {
+                ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
+                ChatActivity.this.progressDialogAtMessageType = 2;
+                ChatActivity.this.progressDialogLinkSpan = null;
+                this.val$cell.invalidate();
+            }
+        }
+
+        public class AnonymousClass6 extends Browser.Progress {
+            final ChatMessageCell val$cell;
+
+            AnonymousClass6(ChatMessageCell chatMessageCell) {
+                this.val$cell = chatMessageCell;
+            }
+
+            @Override
+            public void end(boolean z) {
+                if (z) {
+                    return;
+                }
+                final ChatActivity chatActivity = ChatActivity.this;
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public final void run() {
+                        ChatActivity.access$51800(ChatActivity.this);
+                    }
+                }, 250L);
+            }
+
+            @Override
+            public void init() {
+                ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
+                ChatActivity.this.progressDialogAtMessageType = 2;
+                ChatActivity.this.progressDialogLinkSpan = null;
+                this.val$cell.invalidate();
+            }
+        }
+
+        public class AnonymousClass7 extends Browser.Progress {
             final ChatMessageCell val$cell;
 
             AnonymousClass7(ChatMessageCell chatMessageCell) {
@@ -11575,7 +11562,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        class AnonymousClass8 extends Browser.Progress {
+        public class AnonymousClass8 extends Browser.Progress {
             final ChatMessageCell val$cell;
 
             AnonymousClass8(ChatMessageCell chatMessageCell) {
@@ -11599,13 +11586,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             @Override
             public void init() {
                 ChatActivity.this.progressDialogAtMessageId = this.val$cell.getMessageObject().getId();
-                ChatActivity.this.progressDialogAtMessageType = 0;
+                ChatActivity.this.progressDialogAtMessageType = 2;
                 ChatActivity.this.progressDialogLinkSpan = null;
                 this.val$cell.invalidate();
             }
         }
 
-        class AnonymousClass9 extends Browser.Progress {
+        public class AnonymousClass9 extends Browser.Progress {
             final ChatMessageCell val$cell;
 
             AnonymousClass9(ChatMessageCell chatMessageCell) {
@@ -11728,7 +11715,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
 
         public void lambda$didLongPressChannelAvatar$9(TLRPC.Chat chat, ChatMessageCell chatMessageCell, AvatarPreviewer.MenuItem menuItem) {
-            int i = AnonymousClass156.$SwitchMap$org$telegram$ui$AvatarPreviewer$MenuItem[menuItem.ordinal()];
+            int i = AnonymousClass159.$SwitchMap$org$telegram$ui$AvatarPreviewer$MenuItem[menuItem.ordinal()];
             if (i == 1) {
                 lambda$didLongPressChannelAvatar$10(chat);
                 return;
@@ -11745,7 +11732,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
 
         public void lambda$didLongPressUserAvatar$2(ChatMessageCell chatMessageCell, TLRPC.User user, AvatarPreviewer.MenuItem menuItem) {
-            int i = AnonymousClass156.$SwitchMap$org$telegram$ui$AvatarPreviewer$MenuItem[menuItem.ordinal()];
+            int i = AnonymousClass159.$SwitchMap$org$telegram$ui$AvatarPreviewer$MenuItem[menuItem.ordinal()];
             if (i == 1) {
                 lambda$didLongPressUserAvatar$3(user);
                 return;
@@ -11766,17 +11753,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ChatActivity.this.lambda$openSearchWithUser$326(user);
         }
 
-        public void lambda$didPressChannelRecommendation$25(View view) {
+        public void lambda$didPressChannelRecommendation$19(View view) {
             if (((BaseFragment) ChatActivity.this).parentLayout != null) {
                 ((BaseFragment) ChatActivity.this).parentLayout.expandPreviewFragment();
             }
         }
 
-        public void lambda$didPressChannelRecommendation$26(TLRPC.Chat chat) {
+        public void lambda$didPressChannelRecommendation$20(TLRPC.Chat chat) {
             BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.contact_check, LocaleController.formatString(R.string.YouJoinedChannel, chat == null ? "" : chat.title)).show(true);
         }
 
-        public void lambda$didPressChannelRecommendation$27(final TLRPC.Chat chat, ChatMessageCell chatMessageCell, View view) {
+        public void lambda$didPressChannelRecommendation$21(final TLRPC.Chat chat, ChatMessageCell chatMessageCell, View view) {
             ChatActivity.this.finishPreviewFragment();
             chat.left = false;
             if (chatMessageCell != null && chatMessageCell.channelRecommendationsCell != null) {
@@ -11785,7 +11772,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ChatActivity.this.getMessagesController().addUserToChat(chat.id, ChatActivity.this.getUserConfig().getCurrentUser(), 0, null, ChatActivity.this, new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressChannelRecommendation$26(chat);
+                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressChannelRecommendation$20(chat);
                 }
             });
         }
@@ -11807,7 +11794,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ChatActivity.this.factCheckHint.show();
         }
 
-        public void lambda$didPressImage$30(MessageObject messageObject) {
+        public void lambda$didPressImage$24(MessageObject messageObject) {
             if (ChatActivity.this.checkSlowModeAlert()) {
                 SendMessagesHelper.SendMessageParams of = SendMessagesHelper.SendMessageParams.of(messageObject.getDiceEmoji(), ChatActivity.this.dialog_id, ChatActivity.this.replyingMessageObject, ChatActivity.this.getThreadMessage(), null, false, null, null, null, true, 0, null, false);
                 of.quick_reply_shortcut_id = ChatActivity.this.getQuickReplyId();
@@ -11817,7 +11804,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        public void lambda$didPressInstantButton$31(TLObject tLObject, boolean z) {
+        public void lambda$didPressInstantButton$25(TLObject tLObject, boolean z) {
             ChatActivity.this.progressDialogCurrent.end();
             if (!(tLObject instanceof TLRPC.TL_messages_stickerSet)) {
                 BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.error, LocaleController.getString(z ? R.string.AddEmojiNotFound : R.string.AddStickersNotFound)).show(true);
@@ -11845,124 +11832,48 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ChatActivity.this.showDialog(emojiPacksAlert);
         }
 
-        public void lambda$didPressInstantButton$32(final boolean z, final TLObject tLObject, TLRPC.TL_error tL_error) {
+        public void lambda$didPressInstantButton$26(final boolean z, final TLObject tLObject, TLRPC.TL_error tL_error) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$31(tLObject, z);
+                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$25(tLObject, z);
                 }
             });
         }
 
-        public void lambda$didPressInstantButton$33(int i) {
+        public void lambda$didPressInstantButton$27(int i) {
             ConnectionsManager.getInstance(((BaseFragment) ChatActivity.this).currentAccount).cancelRequest(i, true);
         }
 
-        public void lambda$didPressMoreChannelRecommendations$24() {
+        public void lambda$didPressMoreChannelRecommendations$18() {
             ChatActivity.this.presentFragment(new PremiumPreviewFragment("similar_channels"));
         }
 
-        public void lambda$didPressReaction$18(TLRPC.ReactionCount reactionCount, View view) {
-            ChatActivity.this.closeMenu();
-            SearchTagsList.openRenameTagAlert(ChatActivity.this.getContext(), ((BaseFragment) ChatActivity.this).currentAccount, reactionCount.reaction, ChatActivity.this.themeDelegate, false);
-        }
-
-        public void lambda$didPressReaction$19(TLRPC.ReactionCount reactionCount, View view) {
-            ChatActivity.this.closeMenu();
-            ChatActivity.this.lambda$openSearchWithText$324("");
-            SearchTagsList searchTagsList = ChatActivity.this.actionBarSearchTags;
-            if (searchTagsList != null) {
-                searchTagsList.setChosen(ReactionsLayoutInBubble.VisibleReaction.fromTL(reactionCount.reaction), true);
-            }
-        }
-
-        public void lambda$didPressReaction$20(ChatMessageCell chatMessageCell, TLRPC.ReactionCount reactionCount, View view) {
-            pressedReaction(chatMessageCell, reactionCount, 0.0f, 0.0f);
-        }
-
-        public void lambda$didPressReaction$21(ReactedUsersListView reactedUsersListView, ArrayList arrayList) {
-            ChatActivity chatActivity = ChatActivity.this;
-            AnonymousClass4 anonymousClass4 = new EmojiPacksAlert(chatActivity, chatActivity.getParentActivity(), ChatActivity.this.themeDelegate, arrayList) {
-                AnonymousClass4(BaseFragment chatActivity2, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList2) {
-                    super(chatActivity2, context, resourcesProvider, arrayList2);
-                }
-
-                @Override
-                public void dismiss() {
-                    super.dismiss();
-                    ChatActivity.this.dimBehindView(false);
-                }
-            };
-            anonymousClass4.setCalcMandatoryInsets(ChatActivity.this.isKeyboardVisible());
-            anonymousClass4.setDimBehind(false);
-            ChatActivity.this.closeMenu(false);
-            ChatActivity.this.showDialog(anonymousClass4);
-        }
-
-        public void lambda$didPressReaction$22(ChatMessageCell chatMessageCell, ReactedUsersListView reactedUsersListView, long j, TLRPC.MessagePeerReaction messagePeerReaction) {
-            String str;
-            Bundle bundle = new Bundle();
-            if (j > 0) {
-                str = "user_id";
-            } else {
-                j = -j;
-                str = "chat_id";
-            }
-            bundle.putLong(str, j);
-            bundle.putInt("report_reaction_message_id", chatMessageCell.getMessageObject().getId());
-            bundle.putLong("report_reaction_from_dialog_id", ChatActivity.this.dialog_id);
-            ChatActivity.this.presentFragment(new ProfileActivity(bundle));
-            ChatActivity.this.closeMenu();
-        }
-
-        public void lambda$didPressReaction$23(ArrayList arrayList, View view) {
-            new EmojiPacksAlert(new BaseFragment() {
-                AnonymousClass5() {
-                }
-
-                @Override
-                public Context getContext() {
-                    return ChatActivity.this.getContext();
-                }
-
-                @Override
-                public int getCurrentAccount() {
-                    return this.currentAccount;
-                }
-
-                @Override
-                public Theme.ResourcesProvider getResourceProvider() {
-                    return ChatActivity.this.themeDelegate;
-                }
-            }, ChatActivity.this.getContext(), ChatActivity.this.themeDelegate, arrayList).show();
-            ChatActivity.this.closeMenu();
-        }
-
-        public void lambda$didPressReplyMessage$28(MessageObject messageObject) {
+        public void lambda$didPressReplyMessage$22(MessageObject messageObject) {
             ChatActivity.this.progressDialogAtMessageId = messageObject.getId();
             ChatActivity.this.progressDialogAtMessageType = 0;
         }
 
-        public void lambda$didPressReplyMessage$29(int i, final MessageObject messageObject) {
+        public void lambda$didPressReplyMessage$23(int i, final MessageObject messageObject) {
             ChatActivity.this.scrollToMessageId(i, messageObject.getId(), true, messageObject.getDialogId() == ChatActivity.this.mergeDialogId ? 1 : 0, true, 0, new Runnable() {
                 @Override
                 public final void run() {
-                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressReplyMessage$28(messageObject);
+                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressReplyMessage$22(messageObject);
                 }
             });
         }
 
-        public static void lambda$didPressRevealSensitiveContent$34(boolean[] zArr, View view) {
+        public static void lambda$didPressRevealSensitiveContent$28(boolean[] zArr, View view) {
             boolean z = !zArr[0];
             zArr[0] = z;
             ((CheckBoxCell) view).setChecked(z, true);
         }
 
-        public void lambda$didPressRevealSensitiveContent$35() {
+        public void lambda$didPressRevealSensitiveContent$29() {
             ChatActivity.this.presentFragment(new ThemeActivity(0).highlightSensitiveRow());
         }
 
-        public void lambda$didPressRevealSensitiveContent$36(boolean[] zArr, TL_account.contentSettings contentsettings, ChatMessageCell chatMessageCell, DialogInterface dialogInterface, int i) {
+        public void lambda$didPressRevealSensitiveContent$30(boolean[] zArr, TL_account.contentSettings contentsettings, ChatMessageCell chatMessageCell, DialogInterface dialogInterface, int i) {
             if (!zArr[0]) {
                 if (chatMessageCell.getMessageObject() != null) {
                     chatMessageCell.getMessageObject().isSensitiveCached = Boolean.FALSE;
@@ -11975,7 +11886,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 BulletinFactory.of(ChatActivity.this).createSimpleBulletinDetail(R.raw.chats_infotip, AndroidUtilities.replaceArrows(AndroidUtilities.premiumText(LocaleController.getString(R.string.SensitiveContentSettingsToast), new Runnable() {
                     @Override
                     public final void run() {
-                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$35();
+                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$29();
                     }
                 }), true)).show(true);
             }
@@ -11990,7 +11901,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
 
-        public void lambda$didPressRevealSensitiveContent$37(AlertDialog alertDialog, final ChatMessageCell chatMessageCell, final TL_account.contentSettings contentsettings) {
+        public void lambda$didPressRevealSensitiveContent$31(AlertDialog alertDialog, final ChatMessageCell chatMessageCell, final TL_account.contentSettings contentsettings) {
             alertDialog.dismissUnless(200L);
             final boolean[] zArr = new boolean[1];
             FrameLayout frameLayout = new FrameLayout(ChatActivity.this.getContext());
@@ -12003,7 +11914,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 checkBoxCell.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public final void onClick(View view) {
-                        ChatActivity.ChatMessageCellDelegate.lambda$didPressRevealSensitiveContent$34(zArr, view);
+                        ChatActivity.ChatMessageCellDelegate.lambda$didPressRevealSensitiveContent$28(zArr, view);
                     }
                 });
             }
@@ -12011,7 +11922,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             chatActivity.showDialog(new AlertDialog.Builder(chatActivity.getContext(), ChatActivity.this.getResourceProvider()).setTitle(LocaleController.getString(R.string.MessageShowSensitiveContentMediaTitle)).setMessage(LocaleController.getString(R.string.MessageShowSensitiveContentMediaText)).setView(frameLayout).setCustomViewOffset(9).setNegativeButton(LocaleController.getString(R.string.Cancel), null).setPositiveButton(LocaleController.getString(R.string.MessageShowSensitiveContentButton), new DialogInterface.OnClickListener() {
                 @Override
                 public final void onClick(DialogInterface dialogInterface, int i) {
-                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$36(zArr, contentsettings, chatMessageCell, dialogInterface, i);
+                    ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$30(zArr, contentsettings, chatMessageCell, dialogInterface, i);
                 }
             }).create());
         }
@@ -12139,42 +12050,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             profileActivity.setPlayProfileAnimation(i);
             AndroidUtilities.setAdjustResizeToNothing(ChatActivity.this.getParentActivity(), ((BaseFragment) ChatActivity.this).classGuid);
             ChatActivity.this.presentFragment(profileActivity);
-        }
-
-        private void pressedReaction(ChatMessageCell chatMessageCell, TLRPC.ReactionCount reactionCount, float f, float f2) {
-            TLRPC.Message message;
-            ReactionsLayoutInBubble.VisibleReaction fromTL = ReactionsLayoutInBubble.VisibleReaction.fromTL(reactionCount.reaction);
-            MessageObject primaryMessageObject = chatMessageCell.getPrimaryMessageObject();
-            ChatActivity.this.selectReaction(chatMessageCell, chatMessageCell.getPrimaryMessageObject(), null, null, f, f2, fromTL, false, false, false, false);
-            if ((primaryMessageObject != null) & (primaryMessageObject.messageOwner != null)) {
-                if (ChatActivity.this.chatAdapter.isFiltered) {
-                    MessageObject messageObject = (MessageObject) ChatActivity.this.messagesDict[0].get(primaryMessageObject.getId());
-                    if (messageObject != null && (message = messageObject.messageOwner) != null) {
-                        message.reactions = primaryMessageObject.messageOwner.reactions;
-                    }
-                } else if (!ChatActivity.this.chatAdapter.isFiltered) {
-                    ChatActivity chatActivity = ChatActivity.this;
-                    if (chatActivity.searchingReaction != null) {
-                        chatActivity.updateFilteredMessages(false);
-                    }
-                }
-            }
-            if (!ChatActivity.this.chatAdapter.isFiltered || chatMessageCell.getPrimaryMessageObject().hasReaction(ChatActivity.this.searchingReaction)) {
-                return;
-            }
-            MessageObject primaryMessageObject2 = chatMessageCell.getPrimaryMessageObject();
-            MessageObject.GroupedMessages validGroupedMessage = ChatActivity.this.getValidGroupedMessage(primaryMessageObject2);
-            if (validGroupedMessage != null) {
-                for (int i = 0; i < validGroupedMessage.messages.size(); i++) {
-                    ChatActivity.this.getMediaDataController().removeMessageFromResults(validGroupedMessage.messages.get(i).getId());
-                }
-            } else {
-                ChatActivity.this.getMediaDataController().removeMessageFromResults(primaryMessageObject2.getId());
-            }
-            if (ChatActivity.this.messagesSearchAdapter != null) {
-                ChatActivity.this.messagesSearchAdapter.notifyDataSetChanged();
-            }
-            ChatActivity.this.updateFilteredMessages(true);
         }
 
         @Override
@@ -12323,7 +12198,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public final void onClick(View view) {
-                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressChannelRecommendation$25(view);
+                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressChannelRecommendation$19(view);
                     }
                 });
                 actionBarPopupWindowLayout.addView(actionBarMenuSubItem);
@@ -12333,7 +12208,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 actionBarMenuSubItem2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public final void onClick(View view) {
-                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressChannelRecommendation$27(chat, chatMessageCell, view);
+                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressChannelRecommendation$21(chat, chatMessageCell, view);
                     }
                 });
                 actionBarPopupWindowLayout.addView(actionBarMenuSubItem2);
@@ -12474,7 +12349,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 Browser.Progress makeProgressForPaidMedia = ChatActivity.this.makeProgressForPaidMedia(chatMessageCell);
                 StarsController starsController = StarsController.getInstance(((BaseFragment) ChatActivity.this).currentAccount);
                 Objects.requireNonNull(makeProgressForPaidMedia);
-                Runnable pay = starsController.pay(messageObject, new ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10(makeProgressForPaidMedia));
+                Runnable pay = starsController.pay(messageObject, new ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4(makeProgressForPaidMedia));
                 if (pay != null) {
                     makeProgressForPaidMedia.onCancel(pay);
                     makeProgressForPaidMedia.init();
@@ -12703,7 +12578,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (ChatActivity.this.progressDialogCurrent != null) {
                     ChatActivity.this.progressDialogCurrent.cancel(true);
                 }
-                ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass10(chatMessageCell) : null;
+                ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass6(chatMessageCell) : null;
                 BoostDialogs.openGiveAwayStatusDialog(messageObject, ChatActivity.this.progressDialogCurrent, ChatActivity.this.getContext(), ChatActivity.this.getResourceProvider());
                 return;
             }
@@ -12713,7 +12588,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         if (ChatActivity.this.progressDialogCurrent != null) {
                             ChatActivity.this.progressDialogCurrent.cancel(true);
                         }
-                        ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass11(chatMessageCell) : null;
+                        ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass7(chatMessageCell) : null;
                         LaunchActivity.instance.checkAppUpdate(true, ChatActivity.this.progressDialogCurrent);
                         return;
                     }
@@ -12792,7 +12667,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (ChatActivity.this.progressDialogCurrent != null) {
                     ChatActivity.this.progressDialogCurrent.cancel(true);
                 }
-                ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass12(chatMessageCell) : null;
+                ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass8(chatMessageCell) : null;
                 if (matcher.matches() && matcher.groupCount() > 1 && matcher.group(1) != null) {
                     String group = matcher.group(1);
                     if (MediaDataController.getInstance(((BaseFragment) ChatActivity.this).currentAccount).getStickerSetByName(group) == null) {
@@ -12804,13 +12679,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         final int sendRequest = ConnectionsManager.getInstance(((BaseFragment) ChatActivity.this).currentAccount).sendRequest(tL_messages_getStickerSet, new RequestDelegate() {
                             @Override
                             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                                ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$32(z, tLObject, tL_error);
+                                ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$26(z, tLObject, tL_error);
                             }
                         });
                         ChatActivity.this.progressDialogCurrent.onCancel(new Runnable() {
                             @Override
                             public final void run() {
-                                ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$33(sendRequest);
+                                ChatActivity.ChatMessageCellDelegate.this.lambda$didPressInstantButton$27(sendRequest);
                             }
                         });
                         return;
@@ -12823,7 +12698,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         if (ChatActivity.this.progressDialogCurrent != null) {
                             ChatActivity.this.progressDialogCurrent.cancel(true);
                         }
-                        ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass13(chatMessageCell) : null;
+                        ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass9(chatMessageCell) : null;
                         Browser.openUrl(ChatActivity.this.getContext(), Uri.parse(messageObject.sponsoredUrl), true, false, false, ChatActivity.this.progressDialogCurrent, null, false, ChatActivity.this.getMessagesController().sponsoredLinksInappAllow, false);
                         return;
                     }
@@ -12853,7 +12728,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (ChatActivity.this.progressDialogCurrent != null) {
                     ChatActivity.this.progressDialogCurrent.cancel(true);
                 }
-                ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass14(chatMessageCell) : null;
+                ChatActivity.this.progressDialogCurrent = chatMessageCell.getMessageObject() != null ? new AnonymousClass10(chatMessageCell) : null;
             }
             Browser.openUrl(ChatActivity.this.getParentActivity(), Uri.parse(webPage.url), true, true, false, ChatActivity.this.progressDialogCurrent, null, false, true, false);
         }
@@ -12864,7 +12739,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.star_premium_2, AndroidUtilities.replaceSingleTag(LocaleController.formatPluralStringComma("UnlockSimilarChannelsPremium", ChatActivity.this.getMessagesController().recommendedChannelsLimitPremium), new Runnable() {
                     @Override
                     public final void run() {
-                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressMoreChannelRecommendations$24();
+                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressMoreChannelRecommendations$18();
                     }
                 })).show();
                 return;
@@ -12893,8 +12768,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
 
         @Override
-        public void didPressReaction(final org.telegram.ui.Cells.ChatMessageCell r24, final org.telegram.tgnet.TLRPC.ReactionCount r25, boolean r26, float r27, float r28) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.ChatMessageCellDelegate.didPressReaction(org.telegram.ui.Cells.ChatMessageCell, org.telegram.tgnet.TLRPC$ReactionCount, boolean, float, float):void");
+        public void didPressReaction(ChatMessageCell chatMessageCell, TLRPC.ReactionCount reactionCount, boolean z, float f, float f2) {
+            ChatActivity.this.didPressReaction(chatMessageCell, reactionCount, z, f, f2);
         }
 
         @Override
@@ -12910,7 +12785,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.getMessagesController().getContentSettings(new Utilities.Callback() {
                     @Override
                     public final void run(Object obj) {
-                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$37(alertDialog, chatMessageCell, (TL_account.contentSettings) obj);
+                        ChatActivity.ChatMessageCellDelegate.this.lambda$didPressRevealSensitiveContent$31(alertDialog, chatMessageCell, (TL_account.contentSettings) obj);
                     }
                 });
             } else {
@@ -13181,7 +13056,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (ChatActivity.this.progressDialogCurrent != null) {
                 ChatActivity.this.progressDialogCurrent.cancel(true);
             }
-            ChatActivity.this.progressDialogCurrent = (chatMessageCell == null || chatMessageCell.getMessageObject() == null) ? null : new AnonymousClass7(chatMessageCell);
+            ChatActivity.this.progressDialogCurrent = (chatMessageCell == null || chatMessageCell.getMessageObject() == null) ? null : new AnonymousClass3(chatMessageCell);
             if (z || Browser.isInternalUri(parse, null)) {
                 Browser.openUrl(ChatActivity.this.getContext(), parse, true, true, false, ChatActivity.this.progressDialogCurrent, null, false, true, false);
             } else {
@@ -15725,7 +15600,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
             this.shownConversionDateTimeToast = true;
             HintView2 rounding = new HintView2(getContext(), 3) {
-                AnonymousClass106(Context context, int i) {
+                AnonymousClass105(Context context, int i) {
                     super(context, i);
                 }
 
@@ -15929,8 +15804,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (this.instantCameraView != null || getContext() == null) {
             return;
         }
-        AnonymousClass63 anonymousClass63 = new InstantCameraView(getContext(), this, this.themeDelegate) {
-            AnonymousClass63(Context context, InstantCameraView.Delegate this, Theme.ResourcesProvider resourcesProvider) {
+        AnonymousClass62 anonymousClass62 = new InstantCameraView(getContext(), this, this.themeDelegate) {
+            AnonymousClass62(Context context, InstantCameraView.Delegate this, Theme.ResourcesProvider resourcesProvider) {
                 super(context, this, resourcesProvider);
             }
 
@@ -15939,8 +15814,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 canvas.clipRect(0, 0, getWidth(), getHeight() - AndroidUtilities.dp(1.5f));
             }
         };
-        this.instantCameraView = anonymousClass63;
-        this.contentView.addView(anonymousClass63, 21, LayoutHelper.createFrame(-1, -1, 51));
+        this.instantCameraView = anonymousClass62;
+        this.contentView.addView(anonymousClass62, 21, LayoutHelper.createFrame(-1, -1, 51));
     }
 
     private void checkInstantSearch() {
@@ -16259,8 +16134,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         BluredView bluredView3 = this.blurredView;
         if (bluredView3 == null) {
-            AnonymousClass74 anonymousClass74 = new BluredView(this.fragmentView.getContext(), this.fragmentView, this.themeDelegate) {
-                AnonymousClass74(Context context, View view2, Theme.ResourcesProvider resourcesProvider) {
+            AnonymousClass73 anonymousClass73 = new BluredView(this.fragmentView.getContext(), this.fragmentView, this.themeDelegate) {
+                AnonymousClass73(Context context, View view2, Theme.ResourcesProvider resourcesProvider) {
                     super(context, view2, resourcesProvider);
                 }
 
@@ -16282,8 +16157,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 }
             };
-            this.blurredView = anonymousClass74;
-            this.contentView.addView(anonymousClass74, LayoutHelper.createFrame(-1, -1.0f));
+            this.blurredView = anonymousClass73;
+            this.contentView.addView(anonymousClass73, LayoutHelper.createFrame(-1, -1.0f));
         } else {
             if (this.contentView.indexOfChild(bluredView3) != this.contentView.getChildCount() - 1) {
                 this.contentView.removeView(this.blurredView);
@@ -16301,7 +16176,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         this.blurredView.setAlpha(0.0f);
         this.blurredView.animate().setListener(null).cancel();
         this.blurredView.animate().alpha(1.0f).setListener(new AnimatorListenerAdapter() {
-            AnonymousClass75() {
+            AnonymousClass74() {
             }
 
             @Override
@@ -16330,8 +16205,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (this.topUndoView != null) {
             return;
         }
-        AnonymousClass69 anonymousClass69 = new UndoView(getContext(), this, true, this.themeDelegate) {
-            AnonymousClass69(Context context, BaseFragment this, boolean z, Theme.ResourcesProvider resourcesProvider) {
+        AnonymousClass68 anonymousClass68 = new UndoView(getContext(), this, true, this.themeDelegate) {
+            AnonymousClass68(Context context, BaseFragment this, boolean z, Theme.ResourcesProvider resourcesProvider) {
                 super(context, this, z, resourcesProvider);
             }
 
@@ -16346,8 +16221,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 super.showWithAction(j, i, obj, obj2, runnable, runnable2);
             }
         };
-        this.topUndoView = anonymousClass69;
-        this.contentView.addView(anonymousClass69, 17, LayoutHelper.createFrame(-1, -2.0f, 51, 8.0f, 8.0f, 8.0f, 0.0f));
+        this.topUndoView = anonymousClass68;
+        this.contentView.addView(anonymousClass68, 17, LayoutHelper.createFrame(-1, -2.0f, 51, 8.0f, 8.0f, 8.0f, 0.0f));
     }
 
     public void checkTranslation(boolean z) {
@@ -16817,8 +16692,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (getParentActivity() == null || getContext() == null || this.chatAttachAlert != null) {
             return;
         }
-        AnonymousClass83 anonymousClass83 = new ChatAttachAlert(getParentActivity(), this, false, false, true, this.themeDelegate) {
-            AnonymousClass83(Context context, BaseFragment this, boolean z, boolean z2, boolean z3, Theme.ResourcesProvider resourcesProvider) {
+        AnonymousClass82 anonymousClass82 = new ChatAttachAlert(getParentActivity(), this, false, false, true, this.themeDelegate) {
+            AnonymousClass82(Context context, BaseFragment this, boolean z, boolean z2, boolean z3, Theme.ResourcesProvider resourcesProvider) {
                 super(context, this, z, z2, z3, resourcesProvider);
             }
 
@@ -16849,9 +16724,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.onEditTextDialogClose(false, false);
             }
         };
-        this.chatAttachAlert = anonymousClass83;
-        anonymousClass83.setDelegate(new ChatAttachAlert.ChatAttachViewDelegate() {
-            AnonymousClass84() {
+        this.chatAttachAlert = anonymousClass82;
+        anonymousClass82.setDelegate(new ChatAttachAlert.ChatAttachViewDelegate() {
+            AnonymousClass83() {
             }
 
             @Override
@@ -17044,7 +16919,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         return createMenu(view, z, z2, f, f2, true, z3);
     }
 
-    public boolean createMenu(final android.view.View r77, boolean r78, boolean r79, float r80, float r81, boolean r82, boolean r83) {
+    public boolean createMenu(final android.view.View r76, boolean r77, boolean r78, float r79, float r80, boolean r81, boolean r82) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.createMenu(android.view.View, boolean, boolean, float, float, boolean, boolean):boolean");
     }
 
@@ -17056,10 +16931,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (this.searchContainer != null || getContext() == null) {
             return;
         }
-        AnonymousClass61 anonymousClass61 = new BlurredFrameLayout(getContext(), this.contentView) {
+        AnonymousClass60 anonymousClass60 = new BlurredFrameLayout(getContext(), this.contentView) {
             private Rect blurBounds = new Rect();
 
-            AnonymousClass61(Context context, SizeNotifierFrameLayout sizeNotifierFrameLayout) {
+            AnonymousClass60(Context context, SizeNotifierFrameLayout sizeNotifierFrameLayout) {
                 super(context, sizeNotifierFrameLayout);
                 this.blurBounds = new Rect();
             }
@@ -17104,8 +16979,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             }
         };
-        this.searchContainer = anonymousClass61;
-        anonymousClass61.setClickable(false);
+        this.searchContainer = anonymousClass60;
+        anonymousClass60.setClickable(false);
         BlurredFrameLayout blurredFrameLayout = this.searchContainer;
         blurredFrameLayout.drawBlur = false;
         blurredFrameLayout.isTopView = false;
@@ -17211,8 +17086,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         AndroidUtilities.cancelRunOnUIThread(this.destroyTextureViewRunnable);
         if (this.videoPlayerContainer == null) {
             if (Build.VERSION.SDK_INT >= 21) {
-                AnonymousClass78 anonymousClass78 = new FrameLayout(getParentActivity()) {
-                    AnonymousClass78(Context context) {
+                AnonymousClass77 anonymousClass77 = new FrameLayout(getParentActivity()) {
+                    AnonymousClass77(Context context) {
                         super(context);
                     }
 
@@ -17222,9 +17097,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         ChatActivity.this.contentView.invalidate();
                     }
                 };
-                this.videoPlayerContainer = anonymousClass78;
-                anonymousClass78.setOutlineProvider(new ViewOutlineProvider() {
-                    AnonymousClass79() {
+                this.videoPlayerContainer = anonymousClass77;
+                anonymousClass77.setOutlineProvider(new ViewOutlineProvider() {
+                    AnonymousClass78() {
                     }
 
                     @Override
@@ -17248,7 +17123,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 this.videoPlayerContainer = new FrameLayout(getParentActivity()) {
                     RectF rect = new RectF();
 
-                    AnonymousClass80(Context context) {
+                    AnonymousClass79(Context context) {
                         super(context);
                         this.rect = new RectF();
                     }
@@ -17370,8 +17245,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (this.topChatPanelView == null) {
             return;
         }
-        AnonymousClass58 anonymousClass58 = new TranslateButton(getContext(), this, this.themeDelegate) {
-            AnonymousClass58(Context context, ChatActivity this, Theme.ResourcesProvider resourcesProvider) {
+        AnonymousClass57 anonymousClass57 = new TranslateButton(getContext(), this, this.themeDelegate) {
+            AnonymousClass57(Context context, ChatActivity this, Theme.ResourcesProvider resourcesProvider) {
                 super(context, this, resourcesProvider);
             }
 
@@ -17392,8 +17267,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.updateTopPanel(true);
             }
         };
-        this.translateButton = anonymousClass58;
-        this.topChatPanelView.addView(anonymousClass58, LayoutHelper.createFrame(-1, 36.0f, 83, 0.0f, 0.0f, 0.0f, 2.0f));
+        this.translateButton = anonymousClass57;
+        this.topChatPanelView.addView(anonymousClass57, LayoutHelper.createFrame(-1, 36.0f, 83, 0.0f, 0.0f, 0.0f, 2.0f));
     }
 
     public void createUndoView() {
@@ -17514,7 +17389,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             final ChatMessageCell val$cell;
             final boolean val$enable;
 
-            AnonymousClass64(boolean z32, ChatMessageCell chatMessageCell2) {
+            AnonymousClass63(boolean z32, ChatMessageCell chatMessageCell2) {
                 r2 = z32;
                 r3 = chatMessageCell2;
             }
@@ -17555,7 +17430,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         dimBehindView(view, false, z);
     }
 
-    public void dimBehindView(View view, boolean z, boolean z2) {
+    private void dimBehindView(View view, boolean z, boolean z2) {
         setScrimView(view);
         dimBehindView(z2 ? 0.2f : 0.0f, z, (view == this.reactionsMentiondownButton || view == this.mentiondownButton) ? false : true);
     }
@@ -17856,7 +17731,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         ChatAvatarContainer chatAvatarContainer = this.avatarContainer;
         if (chatAvatarContainer != null) {
             chatAvatarContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                AnonymousClass125() {
+                AnonymousClass124() {
                 }
 
                 @Override
@@ -18109,7 +17984,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (i2 == 6) {
             return -1;
         }
-        if (i2 == 10 || i2 == 11 || i2 == 21 || messageObject.isWallpaperAction()) {
+        if (i2 == 10 || i2 == 11 || i2 == 21 || i2 == 30 || messageObject.isWallpaperAction()) {
             return messageObject.getId() == 0 ? -1 : 1;
         }
         if (messageObject.isVoice()) {
@@ -18220,14 +18095,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     private void gotChatInfo() {
         TLRPC.ChatFull chatFull = this.chatInfo;
-        if (chatFull == null || !chatFull.paid_reactions_available) {
+        if (chatFull != null && chatFull.paid_reactions_available) {
+            getMessagesController().arePaidReactionsAnonymous();
+            if (!StarsController.getInstance(this.currentAccount).balanceAvailable()) {
+                StarsController.getInstance(this.currentAccount).getBalance();
+            }
+        }
+        TLRPC.ChatFull chatFull2 = this.chatInfo;
+        if (chatFull2 == null || chatFull2.bot_verification == null) {
             return;
         }
-        getMessagesController().arePaidReactionsAnonymous();
-        if (StarsController.getInstance(this.currentAccount).balanceAvailable()) {
-            return;
-        }
-        StarsController.getInstance(this.currentAccount).getBalance();
+        updateTopPanel(true);
     }
 
     private boolean hasSelectedNoforwardsMessage() {
@@ -18311,7 +18189,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 animatorSet.setDuration(150L);
                 this.floatingDateAnimation.playTogether(ObjectAnimator.ofFloat(this.floatingDateView, (Property<ChatActionCell, Float>) View.ALPHA, 0.0f));
                 this.floatingDateAnimation.addListener(new AnimatorListenerAdapter() {
-                    AnonymousClass91() {
+                    AnonymousClass90() {
                     }
 
                     @Override
@@ -18416,7 +18294,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         ofFloat.addListener(new AnimatorListenerAdapter() {
             final View val$topViewFinal;
 
-            AnonymousClass77(final View chatActionCell22) {
+            AnonymousClass76(final View chatActionCell22) {
                 r2 = chatActionCell22;
             }
 
@@ -18475,7 +18353,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             this.pinnedMessageViewAnimator.playTogether(ofFloat);
             this.pinnedMessageViewAnimator.setDuration(200L);
             this.pinnedMessageViewAnimator.addListener(new AnimatorListenerAdapter() {
-                AnonymousClass112() {
+                AnonymousClass111() {
                 }
 
                 @Override
@@ -19021,8 +18899,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public void lambda$createMenu$240(ReactedUsersListView reactedUsersListView, ArrayList arrayList) {
-        AnonymousClass129 anonymousClass129 = new EmojiPacksAlert(this, getParentActivity(), this.themeDelegate, arrayList) {
-            AnonymousClass129(BaseFragment this, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList2) {
+        AnonymousClass128 anonymousClass128 = new EmojiPacksAlert(this, getParentActivity(), this.themeDelegate, arrayList) {
+            AnonymousClass128(BaseFragment this, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList2) {
                 super(this, context, resourcesProvider, arrayList2);
             }
 
@@ -19032,10 +18910,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.dimBehindView(false);
             }
         };
-        anonymousClass129.setCalcMandatoryInsets(isKeyboardVisible());
-        anonymousClass129.setDimBehind(false);
+        anonymousClass128.setCalcMandatoryInsets(isKeyboardVisible());
+        anonymousClass128.setDimBehind(false);
         closeMenu(false);
-        showDialog(anonymousClass129);
+        showDialog(anonymousClass128);
     }
 
     public void lambda$createMenu$241(MessageObject messageObject, ReactedUsersListView reactedUsersListView, long j, TLRPC.MessagePeerReaction messagePeerReaction) {
@@ -19100,7 +18978,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             undoView.showWithAction(this.dialog_id, UndoView.ACTION_RINGTONE_ADDED, (Runnable) new Runnable() {
                 boolean clicked;
 
-                AnonymousClass132() {
+                AnonymousClass131() {
                 }
 
                 @Override
@@ -19379,8 +19257,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public void lambda$createMenu$277(ArrayList arrayList, View view) {
-        AnonymousClass141 anonymousClass141 = new EmojiPacksAlert(this, getParentActivity(), this.themeDelegate, arrayList) {
-            AnonymousClass141(BaseFragment this, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList2) {
+        AnonymousClass140 anonymousClass140 = new EmojiPacksAlert(this, getParentActivity(), this.themeDelegate, arrayList) {
+            AnonymousClass140(BaseFragment this, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList2) {
                 super(this, context, resourcesProvider, arrayList2);
             }
 
@@ -19390,10 +19268,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.dimBehindView(false);
             }
         };
-        anonymousClass141.setCalcMandatoryInsets(isKeyboardVisible());
-        anonymousClass141.setDimBehind(false);
+        anonymousClass140.setCalcMandatoryInsets(isKeyboardVisible());
+        anonymousClass140.setDimBehind(false);
         closeMenu(false);
-        showDialog(anonymousClass141);
+        showDialog(anonymousClass140);
     }
 
     public void lambda$createMenu$278() {
@@ -19524,7 +19402,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             AndroidUtilities.hideKeyboard(actionBarMenuItem.getSearchField());
         }
         showDialog(AlertsCreator.createCalendarPickerDialog(getParentActivity(), 1375315200000L, new MessagesStorage.IntCallback() {
-            AnonymousClass62() {
+            AnonymousClass61() {
             }
 
             @Override
@@ -19639,6 +19517,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (this.currentEncryptedChat != null) {
             j = this.currentUser.id;
         }
+        this.shownBotVerification = false;
         getMessagesController().hidePeerSettingsBar(j, this.currentUser, this.currentChat);
         updateTopPanel(true);
         updateInfoTopView(true);
@@ -21117,6 +20996,81 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         getConnectionsManager().cancelRequest(i, true);
     }
 
+    public void lambda$didPressReaction$406(TLRPC.ReactionCount reactionCount, View view) {
+        closeMenu();
+        SearchTagsList.openRenameTagAlert(getContext(), this.currentAccount, reactionCount.reaction, this.themeDelegate, false);
+    }
+
+    public void lambda$didPressReaction$407(TLRPC.ReactionCount reactionCount, View view) {
+        closeMenu();
+        lambda$openSearchWithText$324("");
+        SearchTagsList searchTagsList = this.actionBarSearchTags;
+        if (searchTagsList != null) {
+            searchTagsList.setChosen(ReactionsLayoutInBubble.VisibleReaction.fromTL(reactionCount.reaction), true);
+        }
+    }
+
+    public void lambda$didPressReaction$408(View view, TLRPC.ReactionCount reactionCount, View view2) {
+        pressedReaction(view, reactionCount, 0.0f, 0.0f);
+    }
+
+    public void lambda$didPressReaction$409(ReactedUsersListView reactedUsersListView, ArrayList arrayList) {
+        AnonymousClass156 anonymousClass156 = new EmojiPacksAlert(this, getParentActivity(), this.themeDelegate, arrayList) {
+            AnonymousClass156(BaseFragment this, Context context, Theme.ResourcesProvider resourcesProvider, ArrayList arrayList2) {
+                super(this, context, resourcesProvider, arrayList2);
+            }
+
+            @Override
+            public void dismiss() {
+                super.dismiss();
+                ChatActivity.this.dimBehindView(false);
+            }
+        };
+        anonymousClass156.setCalcMandatoryInsets(isKeyboardVisible());
+        anonymousClass156.setDimBehind(false);
+        closeMenu(false);
+        showDialog(anonymousClass156);
+    }
+
+    public void lambda$didPressReaction$410(MessageObject messageObject, ReactedUsersListView reactedUsersListView, long j, TLRPC.MessagePeerReaction messagePeerReaction) {
+        String str;
+        Bundle bundle = new Bundle();
+        if (j > 0) {
+            str = "user_id";
+        } else {
+            j = -j;
+            str = "chat_id";
+        }
+        bundle.putLong(str, j);
+        bundle.putInt("report_reaction_message_id", messageObject.getId());
+        bundle.putLong("report_reaction_from_dialog_id", this.dialog_id);
+        presentFragment(new ProfileActivity(bundle));
+        closeMenu();
+    }
+
+    public void lambda$didPressReaction$411(ArrayList arrayList, View view) {
+        new EmojiPacksAlert(new BaseFragment() {
+            AnonymousClass157() {
+            }
+
+            @Override
+            public Context getContext() {
+                return ChatActivity.this.getContext();
+            }
+
+            @Override
+            public int getCurrentAccount() {
+                return this.currentAccount;
+            }
+
+            @Override
+            public Theme.ResourcesProvider getResourceProvider() {
+                return ChatActivity.this.themeDelegate;
+            }
+        }, getContext(), this.themeDelegate, arrayList).show();
+        closeMenu();
+    }
+
     public void lambda$didReceivedNotification$156() {
         getNotificationCenter().onAnimationFinish(this.transitionAnimationIndex);
     }
@@ -22321,7 +22275,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         i4 = 0;
         final int classGuid = chatActivity.getClassGuid();
-        NotificationCenter.getInstance(this.currentAccount).addObserver(new AnonymousClass148(classGuid, runnable, chatActivity), NotificationCenter.messagesDidLoad);
+        NotificationCenter.getInstance(this.currentAccount).addObserver(new AnonymousClass147(classGuid, runnable, chatActivity), NotificationCenter.messagesDidLoad);
         final int i6 = i4;
         Utilities.stageQueue.postRunnable(new Runnable() {
             @Override
@@ -22743,14 +22697,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         });
     }
 
-    public void lambda$requestLinkPreviewCached$121(TLRPC.TL_messages_getWebPagePreview tL_messages_getWebPagePreview, Utilities.Callback2 callback2, Boolean bool, TLRPC.WebPage webPage) {
+    public void lambda$requestLinkPreviewCached$121(TL_account.getWebPagePreview getwebpagepreview, Utilities.Callback2 callback2, Boolean bool, TLRPC.WebPage webPage) {
         if (bool.booleanValue() && !(webPage instanceof TLRPC.TL_webPagePending)) {
             Iterator it = this.lastLinkPreviewResults.keySet().iterator();
             while (it.hasNext() && this.lastLinkPreviewResults.size() > 5) {
                 it.next();
                 it.remove();
             }
-            this.lastLinkPreviewResults.put(tL_messages_getWebPagePreview.message, webPage);
+            this.lastLinkPreviewResults.put(getwebpagepreview.message, webPage);
         }
         callback2.run(bool, webPage);
     }
@@ -22817,13 +22771,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         MessagesController.getGlobalMainSettings().edit().putInt("secretWebpage2", messagesController.secretWebpagePreview).commit();
     }
 
-    public void lambda$searchLinks$118(int i, Boolean bool, TLRPC.WebPage webPage, TLRPC.TL_messages_getWebPagePreview tL_messages_getWebPagePreview) {
+    public void lambda$searchLinks$118(int i, Boolean bool, TLRPC.WebPage webPage, TL_account.getWebPagePreview getwebpagepreview) {
         if (this.waitingForWebpageId != i) {
             return;
         }
         if (bool.booleanValue()) {
             this.foundWebPage = webPage;
-            String str = tL_messages_getWebPagePreview.message;
+            String str = getwebpagepreview.message;
             webPage.display_url = str;
             if ((webPage instanceof TLRPC.TL_webPage) || (webPage instanceof TLRPC.TL_webPagePending)) {
                 boolean z = webPage instanceof TLRPC.TL_webPagePending;
@@ -22857,11 +22811,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         fallbackFieldPanel();
     }
 
-    public void lambda$searchLinks$119(final int i, final TLRPC.TL_messages_getWebPagePreview tL_messages_getWebPagePreview, final Boolean bool, final TLRPC.WebPage webPage) {
+    public void lambda$searchLinks$119(final int i, final TL_account.getWebPagePreview getwebpagepreview, final Boolean bool, final TLRPC.WebPage webPage) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                ChatActivity.this.lambda$searchLinks$118(i, bool, webPage, tL_messages_getWebPagePreview);
+                ChatActivity.this.lambda$searchLinks$118(i, bool, webPage, getwebpagepreview);
             }
         });
     }
@@ -22944,20 +22898,20 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             });
             return;
         }
-        final TLRPC.TL_messages_getWebPagePreview tL_messages_getWebPagePreview = new TLRPC.TL_messages_getWebPagePreview();
+        final TL_account.getWebPagePreview getwebpagepreview = new TL_account.getWebPagePreview();
         if (charSequence2 instanceof String) {
-            tL_messages_getWebPagePreview.message = (String) charSequence2;
+            getwebpagepreview.message = (String) charSequence2;
         } else {
-            tL_messages_getWebPagePreview.message = charSequence2.toString();
+            getwebpagepreview.message = charSequence2.toString();
         }
         TLRPC.WebPage webPage = this.foundWebPage;
-        if (webPage == null || !tL_messages_getWebPagePreview.message.equals(webPage.displayedText)) {
+        if (webPage == null || !getwebpagepreview.message.equals(webPage.displayedText)) {
             final int i2 = this.waitingForWebpageId + 1;
             this.waitingForWebpageId = i2;
-            requestLinkPreviewCached(tL_messages_getWebPagePreview, new Utilities.Callback2() {
+            requestLinkPreviewCached(getwebpagepreview, new Utilities.Callback2() {
                 @Override
                 public final void run(Object obj, Object obj2) {
-                    ChatActivity.this.lambda$searchLinks$119(i2, tL_messages_getWebPagePreview, (Boolean) obj, (TLRPC.WebPage) obj2);
+                    ChatActivity.this.lambda$searchLinks$119(i2, getwebpagepreview, (Boolean) obj, (TLRPC.WebPage) obj2);
                 }
             });
         }
@@ -23086,7 +23040,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public void lambda$showGigagroupConvertAlert$184(DialogInterface dialogInterface, int i) {
-        showDialog(new AnonymousClass105(getParentActivity(), this));
+        showDialog(new AnonymousClass104(getParentActivity(), this));
     }
 
     public void lambda$showGigagroupConvertAlert$185(DialogInterface dialogInterface, int i) {
@@ -23634,58 +23588,58 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     public Browser.Progress makeProgressForBotButton(ChatMessageCell chatMessageCell, String str) {
         Browser.Progress progress = this.progressDialogCurrent;
-        AnonymousClass151 anonymousClass151 = null;
-        if (progress != null) {
-            progress.cancel(true);
-            this.progressDialogCurrent = null;
-        }
-        if (str != null && chatMessageCell != null && chatMessageCell.getMessageObject() != null) {
-            anonymousClass151 = new AnonymousClass151(chatMessageCell, str);
-        }
-        this.progressDialogCurrent = anonymousClass151;
-        return anonymousClass151;
-    }
-
-    public Browser.Progress makeProgressForForward(ChatMessageCell chatMessageCell) {
-        Browser.Progress progress = this.progressDialogCurrent;
         AnonymousClass150 anonymousClass150 = null;
         if (progress != null) {
             progress.cancel(true);
             this.progressDialogCurrent = null;
         }
-        if (chatMessageCell != null && chatMessageCell.getMessageObject() != null) {
-            anonymousClass150 = new AnonymousClass150(chatMessageCell);
+        if (str != null && chatMessageCell != null && chatMessageCell.getMessageObject() != null) {
+            anonymousClass150 = new AnonymousClass150(chatMessageCell, str);
         }
         this.progressDialogCurrent = anonymousClass150;
         return anonymousClass150;
     }
 
-    private Browser.Progress makeProgressForLink(ChatMessageCell chatMessageCell, CharacterStyle characterStyle) {
+    public Browser.Progress makeProgressForForward(ChatMessageCell chatMessageCell) {
         Browser.Progress progress = this.progressDialogCurrent;
         AnonymousClass149 anonymousClass149 = null;
         if (progress != null) {
             progress.cancel(true);
             this.progressDialogCurrent = null;
         }
-        if (characterStyle != null && chatMessageCell != null && chatMessageCell.getMessageObject() != null) {
-            anonymousClass149 = new AnonymousClass149(chatMessageCell, characterStyle);
+        if (chatMessageCell != null && chatMessageCell.getMessageObject() != null) {
+            anonymousClass149 = new AnonymousClass149(chatMessageCell);
         }
         this.progressDialogCurrent = anonymousClass149;
         return anonymousClass149;
     }
 
+    private Browser.Progress makeProgressForLink(ChatMessageCell chatMessageCell, CharacterStyle characterStyle) {
+        Browser.Progress progress = this.progressDialogCurrent;
+        AnonymousClass148 anonymousClass148 = null;
+        if (progress != null) {
+            progress.cancel(true);
+            this.progressDialogCurrent = null;
+        }
+        if (characterStyle != null && chatMessageCell != null && chatMessageCell.getMessageObject() != null) {
+            anonymousClass148 = new AnonymousClass148(chatMessageCell, characterStyle);
+        }
+        this.progressDialogCurrent = anonymousClass148;
+        return anonymousClass148;
+    }
+
     public Browser.Progress makeProgressForPaidMedia(ChatMessageCell chatMessageCell) {
         Browser.Progress progress = this.progressDialogCurrent;
-        AnonymousClass152 anonymousClass152 = null;
+        AnonymousClass151 anonymousClass151 = null;
         if (progress != null) {
             progress.cancel(true);
             this.progressDialogCurrent = null;
         }
         if (chatMessageCell != null && chatMessageCell.getMessageObject() != null) {
-            anonymousClass152 = new AnonymousClass152(chatMessageCell);
+            anonymousClass151 = new AnonymousClass151(chatMessageCell);
         }
-        this.progressDialogCurrent = anonymousClass152;
-        return anonymousClass152;
+        this.progressDialogCurrent = anonymousClass151;
+        return anonymousClass151;
     }
 
     private void markSponsoredAsRead(MessageObject messageObject) {
@@ -23960,7 +23914,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         final MediaController.PhotoEntry val$entry;
                         final MessageObject val$object;
 
-                        AnonymousClass104(MessageObject messageObject22, MediaController.PhotoEntry photoEntry2) {
+                        AnonymousClass103(MessageObject messageObject22, MediaController.PhotoEntry photoEntry2) {
                             r2 = messageObject22;
                             r3 = photoEntry2;
                         }
@@ -24126,9 +24080,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         int i3 = this.currentAccount;
         ThemeDelegate themeDelegate = this.themeDelegate;
         ReplyQuote replyQuote = this.replyingQuote;
-        AnonymousClass67 anonymousClass67 = new AnonymousClass67(context, this, messagePreviewParams2, user, chat, i3, themeDelegate, i, replyQuote != null && replyQuote.outdated);
-        this.forwardingPreviewView = anonymousClass67;
-        this.messagePreviewParams.attach(anonymousClass67);
+        AnonymousClass66 anonymousClass66 = new AnonymousClass66(context, this, messagePreviewParams2, user, chat, i3, themeDelegate, i, replyQuote != null && replyQuote.outdated);
+        this.forwardingPreviewView = anonymousClass66;
+        this.messagePreviewParams.attach(anonymousClass66);
         TLRPC.ChatFull chatFull = this.chatInfo;
         TLRPC.Peer peer = chatFull != null ? chatFull.default_send_as : null;
         if (peer == null && (tL_channels_sendAsPeers = this.sendAsPeersObj) != null && !tL_channels_sendAsPeers.peers.isEmpty()) {
@@ -24339,7 +24293,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         chatActivity.pinnedEndReached = this.pinnedEndReached;
         chatActivity.userInfo = this.userInfo;
         chatActivity.chatInfo = this.chatInfo;
-        chatActivity.chatActivityDelegate = new AnonymousClass73();
+        chatActivity.chatActivityDelegate = new AnonymousClass72();
         if (!z) {
             presentFragment(chatActivity, false);
         } else {
@@ -24405,7 +24359,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             ForumUtilities.applyTopic(chatActivity, MessagesStorage.TopicKey.of(getDialogId(), getTopicId()));
         }
         chatActivity.chatActivityDelegate = new ChatActivityDelegate() {
-            AnonymousClass86() {
+            AnonymousClass85() {
             }
 
             @Override
@@ -24635,6 +24589,48 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         findMessageCell.markReactionsAsRead();
     }
 
+    private void pressedReaction(View view, TLRPC.ReactionCount reactionCount, float f, float f2) {
+        MessageObject messageObject;
+        TLRPC.Message message;
+        ReactionsLayoutInBubble.VisibleReaction fromTL = ReactionsLayoutInBubble.VisibleReaction.fromTL(reactionCount.reaction);
+        if (view instanceof ChatMessageCell) {
+            messageObject = ((ChatMessageCell) view).getPrimaryMessageObject();
+        } else if (!(view instanceof ChatActionCell)) {
+            return;
+        } else {
+            messageObject = ((ChatActionCell) view).getMessageObject();
+        }
+        MessageObject messageObject2 = messageObject;
+        selectReaction(view, messageObject2, null, null, f, f2, fromTL, false, false, false, false);
+        if ((messageObject2 != null) & (messageObject2.messageOwner != null)) {
+            boolean z = this.chatAdapter.isFiltered;
+            if (z) {
+                MessageObject messageObject3 = (MessageObject) this.messagesDict[0].get(messageObject2.getId());
+                if (messageObject3 != null && (message = messageObject3.messageOwner) != null) {
+                    message.reactions = messageObject2.messageOwner.reactions;
+                }
+            } else if (!z && this.searchingReaction != null) {
+                updateFilteredMessages(false);
+            }
+        }
+        if (!this.chatAdapter.isFiltered || messageObject2.hasReaction(this.searchingReaction)) {
+            return;
+        }
+        MessageObject.GroupedMessages validGroupedMessage = getValidGroupedMessage(messageObject2);
+        if (validGroupedMessage != null) {
+            for (int i = 0; i < validGroupedMessage.messages.size(); i++) {
+                getMediaDataController().removeMessageFromResults(validGroupedMessage.messages.get(i).getId());
+            }
+        } else {
+            getMediaDataController().removeMessageFromResults(messageObject2.getId());
+        }
+        MessagesSearchAdapter messagesSearchAdapter = this.messagesSearchAdapter;
+        if (messagesSearchAdapter != null) {
+            messagesSearchAdapter.notifyDataSetChanged();
+        }
+        updateFilteredMessages(true);
+    }
+
     private void processDeletedMessages(ArrayList arrayList, long j, boolean z) {
         processDeletedMessages(arrayList, j, z, true);
     }
@@ -24741,7 +24737,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     photoAlbumPickerActivity.setMaxSelectedPhotos(10, true);
                 }
                 photoAlbumPickerActivity.setDelegate(new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
-                    AnonymousClass92() {
+                    AnonymousClass91() {
                     }
 
                     @Override
@@ -24801,7 +24797,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    private void processSelectedOption(int r22) {
+    private void processSelectedOption(int r29) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.processSelectedOption(int):void");
     }
 
@@ -25108,9 +25104,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         updatePinnedTopicStarterMessage();
     }
 
-    private void requestLinkPreview(TLRPC.TL_messages_getWebPagePreview tL_messages_getWebPagePreview, final Utilities.Callback2 callback2) {
+    private void requestLinkPreview(TL_account.getWebPagePreview getwebpagepreview, final Utilities.Callback2 callback2) {
         cancelSearchLinks();
-        this.linkSearchRequestId = getConnectionsManager().sendRequest(tL_messages_getWebPagePreview, new RequestDelegate() {
+        this.linkSearchRequestId = getConnectionsManager().sendRequest(getwebpagepreview, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ChatActivity.this.lambda$requestLinkPreview$127(callback2, tLObject, tL_error);
@@ -25119,18 +25115,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         getConnectionsManager().bindRequestToGuid(this.linkSearchRequestId, this.classGuid);
     }
 
-    private void requestLinkPreviewCached(final TLRPC.TL_messages_getWebPagePreview tL_messages_getWebPagePreview, final Utilities.Callback2 callback2) {
+    private void requestLinkPreviewCached(final TL_account.getWebPagePreview getwebpagepreview, final Utilities.Callback2 callback2) {
         if (this.lastLinkPreviewResults == null) {
             this.lastLinkPreviewResults = new HashMap();
         }
-        TLRPC.WebPage webPage = (TLRPC.WebPage) this.lastLinkPreviewResults.get(tL_messages_getWebPagePreview.message);
+        TLRPC.WebPage webPage = (TLRPC.WebPage) this.lastLinkPreviewResults.get(getwebpagepreview.message);
         if (webPage != null) {
             callback2.run(Boolean.TRUE, webPage);
         } else {
-            requestLinkPreview(tL_messages_getWebPagePreview, new Utilities.Callback2() {
+            requestLinkPreview(getwebpagepreview, new Utilities.Callback2() {
                 @Override
                 public final void run(Object obj, Object obj2) {
-                    ChatActivity.this.lambda$requestLinkPreviewCached$121(tL_messages_getWebPagePreview, callback2, (Boolean) obj, (TLRPC.WebPage) obj2);
+                    ChatActivity.this.lambda$requestLinkPreviewCached$121(getwebpagepreview, callback2, (Boolean) obj, (TLRPC.WebPage) obj2);
                 }
             });
         }
@@ -25182,7 +25178,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         Property property = View.ALPHA;
         animatorSet.playTogether(ofFloat, ofFloat2, ObjectAnimator.ofFloat(cameraContainer, (Property<InstantCameraView.InstantViewCameraContainer, Float>) property, 0.0f), ObjectAnimator.ofFloat(this.instantCameraView.getSwitchButtonView(), (Property<View, Float>) property, 0.0f), ObjectAnimator.ofFloat(this.instantCameraView.getFlashButtonView(), (Property<View, Float>) property, 0.0f), ObjectAnimator.ofInt(this.instantCameraView.getPaint(), (Property<Paint, Integer>) AnimationProperties.PAINT_ALPHA, 0), ObjectAnimator.ofFloat(this.instantCameraView.getMuteImageView(), (Property<View, Float>) property, 0.0f));
         animatorSet.addListener(new AnimatorListenerAdapter() {
-            AnonymousClass147() {
+            AnonymousClass146() {
             }
 
             @Override
@@ -25510,7 +25506,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             final boolean val$loading;
             final boolean[] val$startedLoading;
 
-            AnonymousClass81(final boolean z3, final boolean[] zArr2) {
+            AnonymousClass80(final boolean z3, final boolean[] zArr2) {
                 r2 = z3;
                 r3 = zArr2;
             }
@@ -25751,7 +25747,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             animatorSet2.setDuration(150L);
             this.floatingDateAnimation.playTogether(ObjectAnimator.ofFloat(this.floatingDateView, (Property<ChatActionCell, Float>) View.ALPHA, 1.0f));
             this.floatingDateAnimation.addListener(new AnimatorListenerAdapter() {
-                AnonymousClass90() {
+                AnonymousClass89() {
                 }
 
                 @Override
@@ -25826,7 +25822,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 HintView hintView2 = this.gifHintTextView;
                 Property property = View.ALPHA;
                 animatorSet.playTogether(ObjectAnimator.ofFloat(hintView2, (Property<HintView, Float>) property, 0.0f, 1.0f), ObjectAnimator.ofFloat(this.emojiButtonRed, (Property<View, Float>) property, 0.0f, 1.0f));
-                animatorSet.addListener(new AnonymousClass89());
+                animatorSet.addListener(new AnonymousClass88());
                 animatorSet.setDuration(300L);
                 animatorSet.start();
                 View emojiButton = this.chatActivityEnterView.getEmojiButton();
@@ -25856,13 +25852,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private void showGreetInfo(boolean z) {
-        TLRPC.TL_businessIntro tL_businessIntro;
+        TL_account.TL_businessIntro tL_businessIntro;
         if (this.emptyViewContent == null) {
             return;
         }
         if (z && this.greetingsInfo == null) {
-            AnonymousClass145 anonymousClass145 = new ChatActionCell(getContext(), false, getResourceProvider()) {
-                AnonymousClass145(Context context, boolean z2, Theme.ResourcesProvider resourcesProvider) {
+            AnonymousClass144 anonymousClass144 = new ChatActionCell(getContext(), false, getResourceProvider()) {
+                AnonymousClass144(Context context, boolean z2, Theme.ResourcesProvider resourcesProvider) {
                     super(context, z2, resourcesProvider);
                 }
 
@@ -25872,8 +25868,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     setVisiblePart(getY() + ChatActivity.this.emptyViewContent.getY(), ChatActivity.this.getServiceHeight(this));
                 }
             };
-            this.greetingsInfo = anonymousClass145;
-            ScaleStateListAnimator.apply(anonymousClass145, 0.02f, 1.2f);
+            this.greetingsInfo = anonymousClass144;
+            ScaleStateListAnimator.apply(anonymousClass144, 0.02f, 1.2f);
             this.greetingsInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
@@ -25938,7 +25934,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     public void showMentionDownButton(boolean z, boolean z2) {
         ValueAnimator valueAnimator;
-        Animator.AnimatorListener anonymousClass98;
+        Animator.AnimatorListener anonymousClass97;
         FrameLayout frameLayout = this.mentiondownButton;
         if (frameLayout == null) {
             return;
@@ -25969,8 +25965,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 });
                 valueAnimator = this.mentiondownButtonAnimation;
-                anonymousClass98 = new AnimatorListenerAdapter() {
-                    AnonymousClass98() {
+                anonymousClass97 = new AnimatorListenerAdapter() {
+                    AnonymousClass97() {
                     }
 
                     @Override
@@ -26007,8 +26003,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             });
             valueAnimator = this.mentiondownButtonAnimation;
-            anonymousClass98 = new AnimatorListenerAdapter() {
-                AnonymousClass97() {
+            anonymousClass97 = new AnimatorListenerAdapter() {
+                AnonymousClass96() {
                 }
 
                 @Override
@@ -26018,7 +26014,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             };
         }
-        valueAnimator.addListener(anonymousClass98);
+        valueAnimator.addListener(anonymousClass97);
         this.mentiondownButtonAnimation.setDuration(200L);
         this.mentiondownButtonAnimation.start();
     }
@@ -26087,7 +26083,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     this.messagesSearchListViewAnimation.addListener(new AnimatorListenerAdapter() {
                         final boolean val$show;
 
-                        AnonymousClass85(boolean z4) {
+                        AnonymousClass84(boolean z4) {
                             r2 = z4;
                         }
 
@@ -26122,9 +26118,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    private void showMultipleReactionsPromo(ChatMessageCell chatMessageCell, ReactionsLayoutInBubble.VisibleReaction visibleReaction, int i) {
+    private void showMultipleReactionsPromo(View view, ReactionsLayoutInBubble.VisibleReaction visibleReaction, int i) {
         TLRPC.Document findDocument;
-        if (SharedConfig.multipleReactionsPromoShowed || chatMessageCell == null || chatMessageCell.getMessageObject() == null || visibleReaction == null || getUserConfig().isPremium() || i != 1) {
+        if (SharedConfig.multipleReactionsPromoShowed || view == null || visibleReaction == null || getUserConfig().isPremium() || i != 1) {
             return;
         }
         SharedConfig.setMultipleReactionsPromoShowed(true);
@@ -26210,7 +26206,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (pollResults.solution_entities.isEmpty()) {
             charSequence = pollResults.solution;
         } else {
-            charSequence = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji((CharSequence) new SpannableStringBuilder(pollResults.solution), Theme.chat_msgBotButtonPaint.getFontMetricsInt(), AndroidUtilities.dp(13.0f), false), pollResults.solution_entities, Theme.chat_msgBotButtonPaint.getFontMetricsInt());
+            charSequence = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(new SpannableStringBuilder(pollResults.solution), Theme.chat_msgBotButtonPaint.getFontMetricsInt(), false), pollResults.solution_entities, Theme.chat_msgBotButtonPaint.getFontMetricsInt());
             MessageObject.addEntitiesToText(charSequence, pollResults.solution_entities, false, true, true, false);
         }
         showInfoHint(messageObject, charSequence, 0);
@@ -26246,7 +26242,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         } else {
             this.progressView.animate().setListener(null).cancel();
             listener = this.progressView.animate().alpha(0.0f).scaleX(0.3f).scaleY(0.3f).setDuration(150L).setListener(new AnimatorListenerAdapter() {
-                AnonymousClass76() {
+                AnonymousClass75() {
                 }
 
                 @Override
@@ -26304,11 +26300,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     public void showTagSelector() {
         if (getDialogId() == getUserConfig().getClientUserId() && getUserConfig().isPremium() && this.tagSelector == null) {
-            AnonymousClass59 anonymousClass59 = new AnonymousClass59(3, this, getContext(), this.currentAccount, this.themeDelegate);
-            this.tagSelector = anonymousClass59;
-            anonymousClass59.setPadding(AndroidUtilities.dp(4.0f), AndroidUtilities.dp(24.0f), AndroidUtilities.dp(4.0f), AndroidUtilities.dp(0.0f));
+            AnonymousClass58 anonymousClass58 = new AnonymousClass58(3, this, getContext(), this.currentAccount, this.themeDelegate);
+            this.tagSelector = anonymousClass58;
+            anonymousClass58.setPadding(AndroidUtilities.dp(4.0f), AndroidUtilities.dp(24.0f), AndroidUtilities.dp(4.0f), AndroidUtilities.dp(0.0f));
             this.tagSelector.setDelegate(new ReactionsContainerLayout.ReactionsContainerDelegate() {
-                AnonymousClass60() {
+                AnonymousClass59() {
                 }
 
                 @Override
@@ -26333,7 +26329,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
                 @Override
                 public void onReactionClicked(android.view.View r25, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r26, boolean r27, boolean r28) {
-                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass60.onReactionClicked(android.view.View, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, boolean, boolean):void");
+                    throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.AnonymousClass59.onReactionClicked(android.view.View, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, boolean, boolean):void");
                 }
             });
             this.tagSelector.setTop(true);
@@ -26379,8 +26375,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             this.textSelectionHintWasShowed = true;
             SharedConfig.increaseTextSelectionHintShowed();
             if (this.textSelectionHint == null) {
-                AnonymousClass87 anonymousClass87 = new TextSelectionHint(getParentActivity(), this.themeDelegate) {
-                    AnonymousClass87(Context context, Theme.ResourcesProvider resourcesProvider) {
+                AnonymousClass86 anonymousClass86 = new TextSelectionHint(getParentActivity(), this.themeDelegate) {
+                    AnonymousClass86(Context context, Theme.ResourcesProvider resourcesProvider) {
                         super(context, resourcesProvider);
                     }
 
@@ -26401,8 +26397,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         setTranslationY((ChatActivity.this.chatActivityEnterView.getTop() - ChatActivity.this.contentView.getMeasuredHeight()) - ((r1 + i) * (1.0f - getPrepareProgress())));
                     }
                 };
-                this.textSelectionHint = anonymousClass87;
-                this.contentView.addView(anonymousClass87, LayoutHelper.createFrame(-2, 56.0f, 83, 8.0f, 0.0f, 8.0f, 8.0f));
+                this.textSelectionHint = anonymousClass86;
+                this.contentView.addView(anonymousClass86, LayoutHelper.createFrame(-2, 56.0f, 83, 8.0f, 0.0f, 8.0f, 8.0f));
             }
             this.textSelectionHint.show();
         }
@@ -27234,7 +27230,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     public void updatePagedownButtonVisibility(boolean z) {
         ValueAnimator valueAnimator;
-        Animator.AnimatorListener anonymousClass94;
+        Animator.AnimatorListener anonymousClass93;
         if (this.pagedownButton == null) {
             return;
         }
@@ -27266,8 +27262,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             });
             valueAnimator = this.pagedownButtonAnimation;
-            anonymousClass94 = new AnimatorListenerAdapter() {
-                AnonymousClass94() {
+            anonymousClass93 = new AnimatorListenerAdapter() {
+                AnonymousClass93() {
                 }
 
                 @Override
@@ -27308,8 +27304,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 });
                 valueAnimator = this.pagedownButtonAnimation;
-                anonymousClass94 = new AnimatorListenerAdapter() {
-                    AnonymousClass93() {
+                anonymousClass93 = new AnimatorListenerAdapter() {
+                    AnonymousClass92() {
                     }
 
                     @Override
@@ -27320,7 +27316,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 };
             }
         }
-        valueAnimator.addListener(anonymousClass94);
+        valueAnimator.addListener(anonymousClass93);
         this.pagedownButtonAnimation.setDuration(200L);
         this.pagedownButtonAnimation.start();
     }
@@ -27379,7 +27375,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private void updateReactionsMentionButton(boolean z) {
         float f;
         ValueAnimator valueAnimator;
-        Animator.AnimatorListener anonymousClass66;
+        Animator.AnimatorListener anonymousClass65;
         if (this.reactionsMentiondownButtonCounter == null || getParentActivity() == null) {
             return;
         }
@@ -27411,8 +27407,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             });
             valueAnimator = this.reactionsMentionButtonAnimation;
-            anonymousClass66 = new AnimatorListenerAdapter() {
-                AnonymousClass65() {
+            anonymousClass65 = new AnimatorListenerAdapter() {
+                AnonymousClass64() {
                 }
 
                 @Override
@@ -27421,7 +27417,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     ChatActivity.this.contentView.invalidate();
                 }
             };
-            valueAnimator.addListener(anonymousClass66);
+            valueAnimator.addListener(anonymousClass65);
             this.reactionsMentionButtonAnimation.setDuration(200L);
             this.reactionsMentionButtonAnimation.start();
         }
@@ -27452,8 +27448,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         });
         valueAnimator = this.reactionsMentionButtonAnimation;
-        anonymousClass66 = new AnimatorListenerAdapter() {
-            AnonymousClass66() {
+        anonymousClass65 = new AnimatorListenerAdapter() {
+            AnonymousClass65() {
             }
 
             @Override
@@ -27463,7 +27459,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.contentView.invalidate();
             }
         };
-        valueAnimator.addListener(anonymousClass66);
+        valueAnimator.addListener(anonymousClass65);
         this.reactionsMentionButtonAnimation.setDuration(200L);
         this.reactionsMentionButtonAnimation.start();
     }
@@ -27559,7 +27555,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     public void updateSearchUpDownButtonVisibility(boolean z) {
         ValueAnimator valueAnimator;
-        Animator.AnimatorListener anonymousClass96;
+        Animator.AnimatorListener anonymousClass95;
         if (this.searchUpButton == null || this.searchDownButton == null) {
             return;
         }
@@ -27590,8 +27586,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 });
                 valueAnimator = this.searchUpButtonAnimation;
-                anonymousClass96 = new AnimatorListenerAdapter() {
-                    AnonymousClass96() {
+                anonymousClass95 = new AnimatorListenerAdapter() {
+                    AnonymousClass95() {
                     }
 
                     @Override
@@ -27630,8 +27626,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             });
             valueAnimator = this.searchUpButtonAnimation;
-            anonymousClass96 = new AnimatorListenerAdapter() {
-                AnonymousClass95() {
+            anonymousClass95 = new AnimatorListenerAdapter() {
+                AnonymousClass94() {
                 }
 
                 @Override
@@ -27641,7 +27637,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             };
         }
-        valueAnimator.addListener(anonymousClass96);
+        valueAnimator.addListener(anonymousClass95);
         this.searchUpButtonAnimation.setDuration(200L);
         this.searchUpButtonAnimation.start();
     }
@@ -27743,7 +27739,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public void updateTopPanel(boolean r40) {
+    public void updateTopPanel(boolean r39) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.updateTopPanel(boolean):void");
     }
 
@@ -28524,9 +28520,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ChatActivity.this.lambda$didLongPressUsername$376(makeProgressForLink, chatMessageCell, str, characterStyle, (TLObject) obj, (Boolean) obj2);
             }
         };
-        TLRPC.TL_account_checkUsername tL_account_checkUsername = new TLRPC.TL_account_checkUsername();
-        tL_account_checkUsername.username = str;
-        final int sendRequest = getConnectionsManager().sendRequest(tL_account_checkUsername, new RequestDelegate() {
+        TL_account.checkUsername checkusername = new TL_account.checkUsername();
+        checkusername.username = str;
+        final int sendRequest = getConnectionsManager().sendRequest(checkusername, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ChatActivity.this.lambda$didLongPressUsername$381(userOrChat, callback2, str, makeProgressForLink, tLObject, tL_error);
@@ -28580,6 +28576,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         });
         makeProgressForLink.init();
+    }
+
+    public void didPressReaction(final android.view.View r24, final org.telegram.tgnet.TLRPC.ReactionCount r25, boolean r26, float r27, float r28) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.didPressReaction(android.view.View, org.telegram.tgnet.TLRPC$ReactionCount, boolean, float, float):void");
     }
 
     @Override
@@ -28926,6 +28926,34 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         } else {
             showFieldPanelForWebPage(false, null, true);
         }
+    }
+
+    public View findCell(int i, boolean z) {
+        RecyclerListView recyclerListView = this.chatListView;
+        if (recyclerListView == null) {
+            return null;
+        }
+        int childCount = recyclerListView.getChildCount();
+        for (int i2 = 0; i2 < childCount; i2++) {
+            View childAt = this.chatListView.getChildAt(i2);
+            if ((childAt instanceof ChatMessageCell) && ((ChatMessageCell) childAt).getMessageObject().getId() == i) {
+                if (z) {
+                    if (childAt.getY() + childAt.getMeasuredHeight() < (this.chatListViewPaddingTop - this.chatListViewPaddingVisibleOffset) - AndroidUtilities.dp(4.0f) || childAt.getY() > this.chatListView.getMeasuredHeight() - this.blurredViewBottomOffset) {
+                        return null;
+                    }
+                }
+                return childAt;
+            }
+            if ((childAt instanceof ChatActionCell) && ((ChatActionCell) childAt).getMessageObject().getId() == i) {
+                if (z) {
+                    if (childAt.getY() + childAt.getMeasuredHeight() < (this.chatListViewPaddingTop - this.chatListViewPaddingVisibleOffset) - AndroidUtilities.dp(4.0f) || childAt.getY() > this.chatListView.getMeasuredHeight() - this.blurredViewBottomOffset) {
+                        return null;
+                    }
+                }
+                return childAt;
+            }
+        }
+        return null;
     }
 
     public ChatMessageCell findMessageCell(int i, boolean z) {
@@ -30450,7 +30478,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 updateChatListViewTopPadding();
                 AnimatorSet animatorSet = new AnimatorSet();
                 this.fragmentTransition = animatorSet;
-                animatorSet.addListener(new AnonymousClass153(chatActivity, runnable));
+                animatorSet.addListener(new AnonymousClass152(chatActivity, runnable));
                 this.fragmentTransition.setDuration(300L);
                 this.fragmentTransition.setInterpolator(CubicBezierInterpolator.DEFAULT);
                 this.fragmentTransition.playTogether(ofFloat2);
@@ -30477,7 +30505,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         baseFragment2.getFragmentView().getWidth();
         this.switchingFromTopicsProgress = z ? 0.0f : 1.0f;
         ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            AnonymousClass154() {
+            AnonymousClass153() {
             }
 
             @Override
@@ -30497,7 +30525,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         AnimatorSet animatorSet2 = new AnimatorSet();
         this.fragmentTransition = animatorSet2;
-        animatorSet2.addListener(new AnonymousClass155(z, runnable));
+        animatorSet2.addListener(new AnonymousClass154(z, runnable));
         this.fragmentTransition.setDuration(150L);
         this.fragmentTransition.playTogether(ofFloat);
         if (z) {
@@ -31000,8 +31028,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             chatActivityFragmentView.onResume();
         }
         checkChecksHint();
-        AnonymousClass124 anonymousClass124 = new Bulletin.Delegate() {
-            AnonymousClass124() {
+        AnonymousClass123 anonymousClass123 = new Bulletin.Delegate() {
+            AnonymousClass123() {
             }
 
             @Override
@@ -31057,8 +31085,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 Bulletin.Delegate.CC.$default$onShow(this, bulletin);
             }
         };
-        this.bulletinDelegate = anonymousClass124;
-        Bulletin.addDelegate(this, anonymousClass124);
+        this.bulletinDelegate = anonymousClass123;
+        Bulletin.addDelegate(this, anonymousClass123);
         checkActionBarMenu(false);
         TLRPC.PhotoSize photoSize = this.replyImageLocation;
         if (photoSize != null && (backupImageView = this.replyImageView) != null) {
@@ -31578,7 +31606,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 final boolean[] val$checked;
                 final ArrayList val$entries;
 
-                AnonymousClass103(ArrayList arrayList22, boolean[] zArr2) {
+                AnonymousClass102(ArrayList arrayList22, boolean[] zArr2) {
                     r2 = arrayList22;
                     r3 = zArr2;
                 }
@@ -31755,7 +31783,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             final ArrayList val$cameraPhoto;
             final Bitmap val$thumb;
 
-            AnonymousClass102(Bitmap createVideoThumbnail2, ArrayList arrayList2) {
+            AnonymousClass101(Bitmap createVideoThumbnail2, ArrayList arrayList2) {
                 r2 = createVideoThumbnail2;
                 r3 = arrayList2;
             }
@@ -32092,8 +32120,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.searchLinks(java.lang.CharSequence, boolean):void");
     }
 
-    public void selectReaction(org.telegram.ui.Cells.ChatMessageCell r21, org.telegram.messenger.MessageObject r22, org.telegram.ui.Components.ReactionsContainerLayout r23, android.view.View r24, float r25, float r26, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r27, boolean r28, boolean r29, boolean r30, boolean r31) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.selectReaction(org.telegram.ui.Cells.ChatMessageCell, org.telegram.messenger.MessageObject, org.telegram.ui.Components.ReactionsContainerLayout, android.view.View, float, float, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, boolean, boolean, boolean, boolean):void");
+    public void selectReaction(android.view.View r21, org.telegram.messenger.MessageObject r22, org.telegram.ui.Components.ReactionsContainerLayout r23, android.view.View r24, float r25, float r26, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r27, boolean r28, boolean r29, boolean r30, boolean r31) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.selectReaction(android.view.View, org.telegram.messenger.MessageObject, org.telegram.ui.Components.ReactionsContainerLayout, android.view.View, float, float, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, boolean, boolean, boolean, boolean):void");
     }
 
     public void sendAnimatedEmoji(TLRPC.Document document, boolean z, int i) {
@@ -32368,8 +32396,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         this.quickReplyMessage = new MessageObject(this.currentAccount, tL_message, false, false);
     }
 
-    public void setResolvedChatLink(TLRPC.TL_account_resolvedBusinessChatLinks tL_account_resolvedBusinessChatLinks) {
-        this.resolvedChatLink = tL_account_resolvedBusinessChatLinks;
+    public void setResolvedChatLink(TL_account.resolvedBusinessChatLinks resolvedbusinesschatlinks) {
+        this.resolvedChatLink = resolvedbusinesschatlinks;
     }
 
     public void setSavedDialog(long j) {
@@ -32514,7 +32542,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             this.alertViewAnimator.playTogether(ofFloat);
             this.alertViewAnimator.setDuration(200L);
             this.alertViewAnimator.addListener(new AnimatorListenerAdapter() {
-                AnonymousClass110() {
+                AnonymousClass109() {
                 }
 
                 @Override
@@ -32538,14 +32566,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             this.alertViewAnimator.start();
         }
         this.alertNameTextView.setText(str);
-        this.alertTextView.setText(Emoji.replaceEmoji((CharSequence) str2.replace('\n', ' '), this.alertTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false));
+        this.alertTextView.setText(Emoji.replaceEmoji(str2.replace('\n', ' '), this.alertTextView.getPaint().getFontMetricsInt(), false));
         Runnable runnable = this.hideAlertViewRunnable;
         if (runnable != null) {
             AndroidUtilities.cancelRunOnUIThread(runnable);
         }
-        AnonymousClass111 anonymousClass111 = new AnonymousClass111();
-        this.hideAlertViewRunnable = anonymousClass111;
-        AndroidUtilities.runOnUIThread(anonymousClass111, 3000L);
+        AnonymousClass110 anonymousClass110 = new AnonymousClass110();
+        this.hideAlertViewRunnable = anonymousClass110;
+        AndroidUtilities.runOnUIThread(anonymousClass110, 3000L);
     }
 
     public void showBottomOverlayProgress(boolean z, boolean z2) {
@@ -32612,7 +32640,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 this.bottomOverlayAnimation.addListener(new AnimatorListenerAdapter() {
                     final boolean val$show;
 
-                    AnonymousClass82(boolean z3) {
+                    AnonymousClass81(boolean z3) {
                         r2 = z3;
                     }
 
@@ -32638,7 +32666,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public void showFieldPanel(boolean r33, org.telegram.messenger.MessageObject r34, org.telegram.messenger.MessageObject r35, java.util.ArrayList r36, org.telegram.tgnet.TLRPC.WebPage r37, boolean r38, int r39, org.telegram.ui.ChatActivity.ReplyQuote r40, boolean r41, boolean r42) {
+    public void showFieldPanel(boolean r27, org.telegram.messenger.MessageObject r28, org.telegram.messenger.MessageObject r29, java.util.ArrayList r30, org.telegram.tgnet.TLRPC.WebPage r31, boolean r32, int r33, org.telegram.ui.ChatActivity.ReplyQuote r34, boolean r35, boolean r36) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.showFieldPanel(boolean, org.telegram.messenger.MessageObject, org.telegram.messenger.MessageObject, java.util.ArrayList, org.telegram.tgnet.TLRPC$WebPage, boolean, int, org.telegram.ui.ChatActivity$ReplyQuote, boolean, boolean):void");
     }
 
@@ -32857,7 +32885,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public void updateMessagesVisiblePart(boolean r60) {
+    public void updateMessagesVisiblePart(boolean r67) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.updateMessagesVisiblePart(boolean):void");
     }
 
@@ -33090,7 +33118,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 ChatAvatarContainer chatAvatarContainer3 = this.avatarContainer;
                                 String removeDiacritics = AndroidUtilities.removeDiacritics(chat2.title);
                                 TLRPC.Chat chat3 = this.currentChat;
-                                chatAvatarContainer3.setTitle(removeDiacritics, chat3.scam, chat3.fake, chat3.verified, false, chat3.emoji_status, z);
+                                chatAvatarContainer3.setTitle(removeDiacritics, chat3.scam, chat3.fake, chat3.verified, false, chat3.emoji_status, DialogObject.getBotVerificationIcon(chat3), z);
                             } else {
                                 TLRPC.User user2 = this.currentUser;
                                 if (user2 != null) {
@@ -33101,17 +33129,27 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                         ChatAvatarContainer chatAvatarContainer4 = this.avatarContainer;
                                         String removeDiacritics2 = AndroidUtilities.removeDiacritics(UserObject.getUserName(this.currentUser));
                                         TLRPC.User user3 = this.currentUser;
-                                        chatAvatarContainer4.setTitle(removeDiacritics2, user3.scam, user3.fake, user3.verified, getMessagesController().isPremiumUser(this.currentUser), MessagesController.isSupportUser(this.currentUser) ? null : this.currentUser.emoji_status, z);
+                                        chatAvatarContainer4.setTitle(removeDiacritics2, user3.scam, user3.fake, user3.verified, getMessagesController().isPremiumUser(this.currentUser), MessagesController.isSupportUser(this.currentUser) ? null : this.currentUser.emoji_status, DialogObject.getBotVerificationIcon(this.currentUser), z);
                                     } else if (TextUtils.isEmpty(this.currentUser.phone)) {
                                         ChatAvatarContainer chatAvatarContainer5 = this.avatarContainer;
                                         String removeDiacritics3 = AndroidUtilities.removeDiacritics(UserObject.getUserName(this.currentUser));
                                         TLRPC.User user4 = this.currentUser;
-                                        chatAvatarContainer5.setTitle(removeDiacritics3, user4.scam, user4.fake, user4.verified, getMessagesController().isPremiumUser(this.currentUser), this.currentUser.emoji_status, z);
+                                        boolean z2 = user4.scam;
+                                        boolean z3 = user4.fake;
+                                        boolean z4 = user4.verified;
+                                        boolean isPremiumUser = getMessagesController().isPremiumUser(this.currentUser);
+                                        TLRPC.User user5 = this.currentUser;
+                                        chatAvatarContainer5.setTitle(removeDiacritics3, z2, z3, z4, isPremiumUser, user5.emoji_status, DialogObject.getBotVerificationIcon(user5), z);
                                     } else {
                                         ChatAvatarContainer chatAvatarContainer6 = this.avatarContainer;
                                         String format = PhoneFormat.getInstance().format("+" + this.currentUser.phone);
-                                        TLRPC.User user5 = this.currentUser;
-                                        chatAvatarContainer6.setTitle(format, user5.scam, user5.fake, user5.verified, getMessagesController().isPremiumUser(this.currentUser), this.currentUser.emoji_status, z);
+                                        TLRPC.User user6 = this.currentUser;
+                                        boolean z5 = user6.scam;
+                                        boolean z6 = user6.fake;
+                                        boolean z7 = user6.verified;
+                                        boolean isPremiumUser2 = getMessagesController().isPremiumUser(this.currentUser);
+                                        TLRPC.User user7 = this.currentUser;
+                                        chatAvatarContainer6.setTitle(format, z5, z6, z7, isPremiumUser2, user7.emoji_status, DialogObject.getBotVerificationIcon(user7), z);
                                     }
                                 }
                             }

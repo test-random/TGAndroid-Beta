@@ -18,6 +18,7 @@ import android.text.Editable;
 import android.text.Layout;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -45,6 +46,7 @@ import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
@@ -61,22 +63,26 @@ import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
-import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
+import org.telegram.ui.Cells.EditEmojiTextCell;
 import org.telegram.ui.Cells.HeaderCell;
-import org.telegram.ui.Cells.PollEditTextCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.UserCell;
 import org.telegram.ui.Components.AnimatedColor;
+import org.telegram.ui.Components.AnimatedEmojiDrawable;
+import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.AnimatedTextView;
 import org.telegram.ui.Components.BottomSheetWithRecyclerListView;
 import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.CubicBezierInterpolator;
-import org.telegram.ui.Components.EditTextBoldCursor;
+import org.telegram.ui.Components.EditTextCaption;
+import org.telegram.ui.Components.EditTextEmoji;
+import org.telegram.ui.Components.EditTextSuggestionsFix;
+import org.telegram.ui.Components.EmojiView;
 import org.telegram.ui.Components.FolderBottomSheet;
 import org.telegram.ui.Components.HintView;
 import org.telegram.ui.Components.ItemOptions;
@@ -87,6 +93,9 @@ import org.telegram.ui.Components.Premium.PremiumFeatureBottomSheet;
 import org.telegram.ui.Components.QRCodeBottomSheet;
 import org.telegram.ui.Components.RLottieImageView;
 import org.telegram.ui.Components.RecyclerListView;
+import org.telegram.ui.Components.ScaleStateListAnimator;
+import org.telegram.ui.Components.SizeNotifierFrameLayout;
+import org.telegram.ui.Components.spoilers.SpoilersTextView;
 import org.telegram.ui.FilterCreateActivity;
 import org.telegram.ui.PeerColorActivity;
 import org.telegram.ui.UsersSelectActivity;
@@ -107,11 +116,14 @@ public class FilterCreateActivity extends BaseFragment {
     private RecyclerListView listView;
     private boolean loadingInvites;
     private boolean nameChangedManually;
+    private EditEmojiTextCell nameEditTextCell;
+    private HeaderCellWithRight nameHeaderCell;
     private int nameRow;
     private ArrayList newAlwaysShow;
+    private boolean newFilterAnimations;
     private int newFilterColor;
     private int newFilterFlags;
-    private String newFilterName;
+    private CharSequence newFilterName;
     private ArrayList newNeverShow;
     private LongSparseIntArray newPinned;
     private ArrayList oldItems;
@@ -137,8 +149,34 @@ public class FilterCreateActivity extends BaseFragment {
         }
     }
 
-    class AnonymousClass2 extends RecyclerListView {
+    class AnonymousClass2 extends SizeNotifierFrameLayout {
         AnonymousClass2(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void addView(View view) {
+            if (view instanceof EmojiView) {
+                ViewGroup.LayoutParams layoutParams = ((EmojiView) view).getLayoutParams();
+                if (layoutParams == null) {
+                    layoutParams = new FrameLayout.LayoutParams(-1, -2);
+                }
+                if (layoutParams instanceof FrameLayout.LayoutParams) {
+                    ((FrameLayout.LayoutParams) layoutParams).gravity = 87;
+                }
+                view.setLayoutParams(layoutParams);
+            }
+            super.addView(view);
+        }
+
+        @Override
+        public void onLayout(boolean r11, int r12, int r13, int r14, int r15) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.FilterCreateActivity.AnonymousClass2.onLayout(boolean, int, int, int, int):void");
+        }
+    }
+
+    class AnonymousClass3 extends RecyclerListView {
+        AnonymousClass3(Context context) {
             super(context);
         }
 
@@ -154,8 +192,25 @@ public class FilterCreateActivity extends BaseFragment {
         }
     }
 
-    public class AnonymousClass3 extends HintView {
-        AnonymousClass3(Context context, int i, boolean z) {
+    class AnonymousClass4 extends RecyclerView.OnScrollListener {
+        AnonymousClass4() {
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int i, int i2) {
+            if (!FilterCreateActivity.this.listView.scrollingByUser || FilterCreateActivity.this.nameEditTextCell == null || FilterCreateActivity.this.nameEditTextCell.editTextEmoji == null) {
+                return;
+            }
+            if (FilterCreateActivity.this.nameEditTextCell.editTextEmoji.isPopupShowing()) {
+                FilterCreateActivity.this.nameEditTextCell.editTextEmoji.hidePopup(true);
+            } else {
+                FilterCreateActivity.this.nameEditTextCell.editTextEmoji.closeKeyboard();
+            }
+        }
+    }
+
+    public class AnonymousClass5 extends HintView {
+        AnonymousClass5(Context context, int i, boolean z) {
             super(context, i, z);
         }
 
@@ -343,8 +398,8 @@ public class FilterCreateActivity extends BaseFragment {
         private TextView button;
         private MessagesController.DialogFilter filter;
         private ArrayList invites;
-        private ArrayList items;
-        private ArrayList oldItems;
+        private final ArrayList items;
+        private final ArrayList oldItems;
 
         public class AnonymousClass1 extends AdapterWithDiffUtils {
 
@@ -515,7 +570,7 @@ public class FilterCreateActivity extends BaseFragment {
             private final ImageView closeImageView;
             private final ImageView imageView;
             private final TextView subtitleView;
-            private final TextView titleView;
+            private final SpoilersTextView titleView;
 
             public HeaderView(Context context) {
                 super(context);
@@ -527,23 +582,24 @@ public class FilterCreateActivity extends BaseFragment {
                 imageView.setColorFilter(new PorterDuffColorFilter(-1, PorterDuff.Mode.SRC_IN));
                 imageView.setBackground(Theme.createRoundRectDrawable(AndroidUtilities.dp(22.0f), Theme.getColor(Theme.key_featuredStickers_addButton)));
                 addView(imageView, LayoutHelper.createFrame(54, 44.0f, 49, 0.0f, 22.0f, 0.0f, 0.0f));
-                TextView textView = new TextView(context);
-                this.titleView = textView;
-                textView.setText(FilterInvitesBottomSheet.this.getTitle());
-                textView.setTypeface(AndroidUtilities.bold());
-                textView.setTextSize(1, 20.0f);
+                SpoilersTextView spoilersTextView = new SpoilersTextView(context);
+                this.titleView = spoilersTextView;
+                spoilersTextView.setTypeface(AndroidUtilities.bold());
+                spoilersTextView.setTextSize(1, 20.0f);
                 int i = Theme.key_dialogTextBlack;
-                textView.setTextColor(Theme.getColor(i));
+                spoilersTextView.setTextColor(Theme.getColor(i));
+                spoilersTextView.setGravity(1);
+                spoilersTextView.setText(FilterInvitesBottomSheet.this.getTitle(spoilersTextView));
+                spoilersTextView.cacheType = (FilterInvitesBottomSheet.this.filter == null || !FilterInvitesBottomSheet.this.filter.title_noanimate) ? 0 : 26;
+                addView(spoilersTextView, LayoutHelper.createFrame(-2, -2.0f, 49, 20.0f, 84.0f, 20.0f, 0.0f));
+                TextView textView = new TextView(context);
+                this.subtitleView = textView;
+                textView.setText(LocaleController.getString(FilterInvitesBottomSheet.this.invites.isEmpty() ? R.string.FolderLinkShareSubtitleEmpty : R.string.FolderLinkShareSubtitle));
+                textView.setLines(2);
                 textView.setGravity(1);
-                addView(textView, LayoutHelper.createFrame(-2, -2.0f, 49, 20.0f, 84.0f, 20.0f, 0.0f));
-                TextView textView2 = new TextView(context);
-                this.subtitleView = textView2;
-                textView2.setText(LocaleController.getString(FilterInvitesBottomSheet.this.invites.isEmpty() ? R.string.FolderLinkShareSubtitleEmpty : R.string.FolderLinkShareSubtitle));
-                textView2.setLines(2);
-                textView2.setGravity(1);
-                textView2.setTextSize(1, 14.0f);
-                textView2.setTextColor(Theme.getColor(i));
-                addView(textView2, LayoutHelper.createFrame(-2, -2.0f, 49, 30.0f, 117.0f, 30.0f, 0.0f));
+                textView.setTextSize(1, 14.0f);
+                textView.setTextColor(Theme.getColor(i));
+                addView(textView, LayoutHelper.createFrame(-2, -2.0f, 49, 30.0f, 117.0f, 30.0f, 0.0f));
                 ImageView imageView2 = new ImageView(context);
                 this.closeImageView = imageView2;
                 imageView2.setScaleType(scaleType);
@@ -594,7 +650,12 @@ public class FilterCreateActivity extends BaseFragment {
                     FilterCreateActivity.FilterInvitesBottomSheet.this.lambda$new$2(view);
                 }
             });
-            this.containerView.addView(this.button, LayoutHelper.createFrame(-1, 48.0f, 87, 16.0f, 10.0f, 16.0f, 10.0f));
+            FrameLayout.LayoutParams createFrame = LayoutHelper.createFrame(-1, 48.0f, 87, 16.0f, 10.0f, 16.0f, 10.0f);
+            int i = createFrame.leftMargin;
+            int i2 = this.backgroundPaddingLeft;
+            createFrame.leftMargin = i + i2;
+            createFrame.rightMargin += i2;
+            this.containerView.addView(this.button, createFrame);
             FrameLayout frameLayout = new FrameLayout(getContext());
             this.bulletinContainer = frameLayout;
             this.containerView.addView(frameLayout, LayoutHelper.createFrame(-1, 100.0f, 80, 6.0f, 0.0f, 6.0f, 0.0f));
@@ -906,9 +967,18 @@ public class FilterCreateActivity extends BaseFragment {
 
         @Override
         protected CharSequence getTitle() {
-            int i = R.string.FolderLinkShareTitle;
-            MessagesController.DialogFilter dialogFilter = this.filter;
-            return LocaleController.formatString("FolderLinkShareTitle", i, dialogFilter == null ? "" : dialogFilter.name);
+            return getTitle(null);
+        }
+
+        protected CharSequence getTitle(TextView textView) {
+            CharSequence charSequence;
+            if (this.filter != null) {
+                Paint.FontMetricsInt fontMetricsInt = textView == null ? null : textView.getPaint().getFontMetricsInt();
+                charSequence = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(new SpannableStringBuilder(this.filter.name), fontMetricsInt, false), this.filter.entities, fontMetricsInt);
+            } else {
+                charSequence = "";
+            }
+            return LocaleController.formatSpannable(R.string.FolderLinkShareTitle2, charSequence);
         }
 
         @Override
@@ -1003,6 +1073,10 @@ public class FilterCreateActivity extends BaseFragment {
             addView(anonymousClass1, LayoutHelper.createFrame(-1, -1.0f, i2 | 48, f2, 16.66f, f2, this.bottomMargin));
         }
 
+        public TextPaint getPreviewTextPaint() {
+            return this.previewView.getPaint();
+        }
+
         public void setPreviewColor(int i, boolean z) {
             this.noTag.setText(LocaleController.getString(FilterCreateActivity.this.getUserConfig().isPremium() ? R.string.FolderTagNoColor : R.string.FolderTagNoColorPremium));
             int i2 = 0;
@@ -1013,8 +1087,11 @@ public class FilterCreateActivity extends BaseFragment {
                 i2 = filterCreateActivity.getThemedColor(iArr[i % iArr.length]);
             }
             this.currentColor = i2;
+            if (!z2) {
+                this.previewView.setEmojiColor(i2);
+            }
             if (!z) {
-                this.animatedColor.set(i2, true);
+                this.animatedColor.set(this.currentColor, true);
             }
             if (z2 != this.noTagShown) {
                 this.noTagShown = z2;
@@ -1025,17 +1102,63 @@ public class FilterCreateActivity extends BaseFragment {
             }
         }
 
-        public void setPreviewText(String str, boolean z) {
+        public void setPreviewText(CharSequence charSequence, boolean z) {
+            if (charSequence == null) {
+                charSequence = "";
+            }
             boolean z2 = false;
-            if (str.length() > 12) {
-                str = str.substring(0, 12);
+            if (charSequence.length() > 12) {
+                charSequence = charSequence.subSequence(0, 12);
             }
             AnimatedTextView animatedTextView = this.previewView;
-            CharSequence replaceEmoji = Emoji.replaceEmoji(str, animatedTextView.getPaint().getFontMetricsInt(), false);
+            CharSequence replaceEmoji = Emoji.replaceEmoji(charSequence, animatedTextView.getPaint().getFontMetricsInt(), false);
             if (z && !LocaleController.isRTL) {
                 z2 = true;
             }
             animatedTextView.setText(replaceEmoji, z2);
+        }
+    }
+
+    public class HeaderCellWithRight extends HeaderCell {
+        private final AnimatedTextView rightTextView;
+
+        public class AnonymousClass1 extends AnimatedTextView {
+            final FilterCreateActivity val$this$0;
+
+            AnonymousClass1(Context context, boolean z, boolean z2, boolean z3, FilterCreateActivity filterCreateActivity) {
+                super(context, z, z2, z3);
+                r6 = filterCreateActivity;
+            }
+
+            @Override
+            public void onMeasure(int i, int i2) {
+                super.onMeasure(i, i2);
+                setPivotX(getMeasuredWidth());
+            }
+        }
+
+        public HeaderCellWithRight(Context context, Theme.ResourcesProvider resourcesProvider) {
+            super(context);
+            AnonymousClass1 anonymousClass1 = new AnimatedTextView(context, true, true, true) {
+                final FilterCreateActivity val$this$0;
+
+                AnonymousClass1(Context context2, boolean z, boolean z2, boolean z3, FilterCreateActivity filterCreateActivity) {
+                    super(context2, z, z2, z3);
+                    r6 = filterCreateActivity;
+                }
+
+                @Override
+                public void onMeasure(int i, int i2) {
+                    super.onMeasure(i, i2);
+                    setPivotX(getMeasuredWidth());
+                }
+            };
+            this.rightTextView = anonymousClass1;
+            anonymousClass1.setGravity(LocaleController.isRTL ? 3 : 5);
+            anonymousClass1.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueHeader, resourcesProvider));
+            anonymousClass1.setTextSize(AndroidUtilities.dpf2(15.0f));
+            addView(anonymousClass1, LayoutHelper.createFrame(-1, 18.0f, (LocaleController.isRTL ? 3 : 5) | 48, 22.0f, 17.0f, 22.0f, 0.0f));
+            ScaleStateListAnimator.apply(anonymousClass1, 0.04f, 1.2f);
         }
     }
 
@@ -1082,10 +1205,19 @@ public class FilterCreateActivity extends BaseFragment {
         private TL_chatlists.TL_exportedChatlistInvite link;
         private boolean newSpan;
         private View.OnClickListener onClickListener;
+        private CharSequence subtext;
         private CharSequence text;
 
         public ItemInner(int i, boolean z) {
             super(i, z);
+        }
+
+        public static ItemInner asAnimatedHeader(CharSequence charSequence, CharSequence charSequence2, View.OnClickListener onClickListener) {
+            ItemInner itemInner = new ItemInner(11, false);
+            itemInner.text = charSequence;
+            itemInner.subtext = charSequence2;
+            itemInner.onClickListener = onClickListener;
+            return itemInner;
         }
 
         public static ItemInner asButton(int i, CharSequence charSequence, boolean z) {
@@ -1158,6 +1290,9 @@ public class FilterCreateActivity extends BaseFragment {
             int i = this.viewType;
             if (i != itemInner.viewType) {
                 return false;
+            }
+            if (i == 11) {
+                return TextUtils.equals(this.text, itemInner.text) && TextUtils.equals(this.subtext, itemInner.subtext);
             }
             if ((i == 0 || i == 1 || i == 3 || i == 4) && !TextUtils.equals(this.text, itemInner.text)) {
                 return false;
@@ -1506,29 +1641,41 @@ public class FilterCreateActivity extends BaseFragment {
     public class ListAdapter extends AdapterWithDiffUtils {
         private Context mContext;
 
-        class AnonymousClass1 implements TextWatcher {
-            final PollEditTextCell val$cell;
+        class AnonymousClass1 extends EditEmojiTextCell {
+            AnonymousClass1(Context context, SizeNotifierFrameLayout sizeNotifierFrameLayout, String str, boolean z, int i, int i2, Theme.ResourcesProvider resourcesProvider) {
+                super(context, sizeNotifierFrameLayout, str, z, i, i2, resourcesProvider);
+            }
 
-            AnonymousClass1(PollEditTextCell pollEditTextCell) {
-                r2 = pollEditTextCell;
+            @Override
+            public int emojiCacheType() {
+                return 25;
+            }
+        }
+
+        class AnonymousClass2 implements TextWatcher {
+            AnonymousClass2() {
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (r2.getTag() != null) {
-                    return;
-                }
-                String obj = editable.toString();
-                if (!TextUtils.equals(obj, FilterCreateActivity.this.newFilterName)) {
-                    FilterCreateActivity.this.nameChangedManually = !TextUtils.isEmpty(obj);
-                    FilterCreateActivity.this.newFilterName = obj;
+                String str;
+                if (!TextUtils.equals(editable, FilterCreateActivity.this.newFilterName)) {
+                    FilterCreateActivity.this.nameChangedManually = !TextUtils.isEmpty(editable);
+                    FilterCreateActivity.this.newFilterName = AnimatedEmojiSpan.onlyEmojiSpans(editable);
                     if (FilterCreateActivity.this.folderTagsHeader != null) {
-                        FilterCreateActivity.this.folderTagsHeader.setPreviewText((FilterCreateActivity.this.newFilterName == null ? "" : FilterCreateActivity.this.newFilterName).toUpperCase(), true);
+                        FilterCreateActivity.this.folderTagsHeader.setPreviewText(AnimatedEmojiSpan.cloneSpans(FilterCreateActivity.this.newFilterName, -1, FilterCreateActivity.this.folderTagsHeader.getPreviewTextPaint().getFontMetricsInt(), 0.5f), true);
                     }
-                }
-                RecyclerView.ViewHolder findViewHolderForAdapterPosition = FilterCreateActivity.this.listView.findViewHolderForAdapterPosition(FilterCreateActivity.this.nameRow);
-                if (findViewHolderForAdapterPosition != null) {
-                    FilterCreateActivity.this.setTextLeft(findViewHolderForAdapterPosition.itemView);
+                    if (FilterCreateActivity.this.nameHeaderCell != null) {
+                        AnimatedTextView animatedTextView = FilterCreateActivity.this.nameHeaderCell.rightTextView;
+                        FilterCreateActivity filterCreateActivity = FilterCreateActivity.this;
+                        if (filterCreateActivity.hasAnimatedEmojis(filterCreateActivity.newFilterName)) {
+                            str = LocaleController.getString(FilterCreateActivity.this.newFilterAnimations ? R.string.FilterNameAnimationsDisable : R.string.FilterNameAnimationsEnable);
+                        } else {
+                            str = null;
+                        }
+                        animatedTextView.setText(str);
+                    }
+                    ((BaseFragment) FilterCreateActivity.this).actionBar.setTitle(AnimatedEmojiSpan.cloneSpans(FilterCreateActivity.this.newFilterName, -1, ((BaseFragment) FilterCreateActivity.this).actionBar.getTitleFontMetricsInt()));
                 }
                 FilterCreateActivity.this.checkDoneButton(true);
             }
@@ -1542,8 +1689,8 @@ public class FilterCreateActivity extends BaseFragment {
             }
         }
 
-        class AnonymousClass2 extends LinkCell {
-            AnonymousClass2(Context context, BaseFragment baseFragment, int i, int i2) {
+        class AnonymousClass3 extends LinkCell {
+            AnonymousClass3(Context context, BaseFragment baseFragment, int i, int i2) {
                 super(context, baseFragment, i, i2);
             }
 
@@ -1557,7 +1704,7 @@ public class FilterCreateActivity extends BaseFragment {
             this.mContext = context;
         }
 
-        public void lambda$onBindViewHolder$1(PeerColorActivity.PeerColorGrid peerColorGrid, Integer num) {
+        public void lambda$onBindViewHolder$0(PeerColorActivity.PeerColorGrid peerColorGrid, Integer num) {
             if (!FilterCreateActivity.this.getUserConfig().isPremium()) {
                 FilterCreateActivity.this.showDialog(new PremiumFeatureBottomSheet(FilterCreateActivity.this, 35, true));
                 return;
@@ -1567,10 +1714,6 @@ public class FilterCreateActivity extends BaseFragment {
                 FilterCreateActivity.this.folderTagsHeader.setPreviewColor(!FilterCreateActivity.this.getUserConfig().isPremium() ? -1 : FilterCreateActivity.this.newFilterColor, true);
             }
             FilterCreateActivity.this.checkDoneButton(true);
-        }
-
-        public void lambda$onCreateViewHolder$0(PollEditTextCell pollEditTextCell, View view, boolean z) {
-            pollEditTextCell.getTextView2().setAlpha((z || FilterCreateActivity.this.newFilterName.length() > 12) ? 1.0f : 0.0f);
         }
 
         @Override
@@ -1590,7 +1733,7 @@ public class FilterCreateActivity extends BaseFragment {
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder viewHolder) {
             int itemViewType = viewHolder.getItemViewType();
-            return (itemViewType == 3 || itemViewType == 0 || itemViewType == 2 || itemViewType == 5 || itemViewType == 9) ? false : true;
+            return (itemViewType == 3 || itemViewType == 0 || itemViewType == 2 || itemViewType == 5 || itemViewType == 9 || itemViewType == 11) ? false : true;
         }
 
         @Override
@@ -1615,32 +1758,47 @@ public class FilterCreateActivity extends BaseFragment {
                     headerCell = userCell;
                     break;
                 case 2:
-                    final PollEditTextCell pollEditTextCell = new PollEditTextCell(this.mContext, null);
-                    pollEditTextCell.createErrorTextView();
-                    pollEditTextCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    pollEditTextCell.addTextWatcher(new TextWatcher() {
-                        final PollEditTextCell val$cell;
+                    EditEmojiTextCell editEmojiTextCell = FilterCreateActivity.this.nameEditTextCell = new EditEmojiTextCell(this.mContext, (SizeNotifierFrameLayout) FilterCreateActivity.this.fragmentView, LocaleController.getString(R.string.FilterNameHint), false, 12, 4, ((BaseFragment) FilterCreateActivity.this).resourceProvider) {
+                        AnonymousClass1(Context context, SizeNotifierFrameLayout sizeNotifierFrameLayout, String str, boolean z, int i2, int i22, Theme.ResourcesProvider resourcesProvider) {
+                            super(context, sizeNotifierFrameLayout, str, z, i2, i22, resourcesProvider);
+                        }
 
-                        AnonymousClass1(final PollEditTextCell pollEditTextCell2) {
-                            r2 = pollEditTextCell2;
+                        @Override
+                        public int emojiCacheType() {
+                            return 25;
+                        }
+                    };
+                    editEmojiTextCell.setAllowEntities(false);
+                    editEmojiTextCell.editTextEmoji.getEditText().setEmojiColor(Integer.valueOf(FilterCreateActivity.this.getThemedColor(Theme.key_featuredStickers_addButton)));
+                    editEmojiTextCell.editTextEmoji.setEmojiViewCacheType(25);
+                    editEmojiTextCell.editTextEmoji.setText(FilterCreateActivity.this.newFilterName);
+                    AnimatedEmojiDrawable.toggleAnimations(((BaseFragment) FilterCreateActivity.this).currentAccount, FilterCreateActivity.this.newFilterAnimations);
+                    EditTextCaption editText = editEmojiTextCell.editTextEmoji.getEditText();
+                    editText.addTextChangedListener(new EditTextSuggestionsFix());
+                    editText.addTextChangedListener(new TextWatcher() {
+                        AnonymousClass2() {
                         }
 
                         @Override
                         public void afterTextChanged(Editable editable) {
-                            if (r2.getTag() != null) {
-                                return;
-                            }
-                            String obj = editable.toString();
-                            if (!TextUtils.equals(obj, FilterCreateActivity.this.newFilterName)) {
-                                FilterCreateActivity.this.nameChangedManually = !TextUtils.isEmpty(obj);
-                                FilterCreateActivity.this.newFilterName = obj;
+                            String str;
+                            if (!TextUtils.equals(editable, FilterCreateActivity.this.newFilterName)) {
+                                FilterCreateActivity.this.nameChangedManually = !TextUtils.isEmpty(editable);
+                                FilterCreateActivity.this.newFilterName = AnimatedEmojiSpan.onlyEmojiSpans(editable);
                                 if (FilterCreateActivity.this.folderTagsHeader != null) {
-                                    FilterCreateActivity.this.folderTagsHeader.setPreviewText((FilterCreateActivity.this.newFilterName == null ? "" : FilterCreateActivity.this.newFilterName).toUpperCase(), true);
+                                    FilterCreateActivity.this.folderTagsHeader.setPreviewText(AnimatedEmojiSpan.cloneSpans(FilterCreateActivity.this.newFilterName, -1, FilterCreateActivity.this.folderTagsHeader.getPreviewTextPaint().getFontMetricsInt(), 0.5f), true);
                                 }
-                            }
-                            RecyclerView.ViewHolder findViewHolderForAdapterPosition = FilterCreateActivity.this.listView.findViewHolderForAdapterPosition(FilterCreateActivity.this.nameRow);
-                            if (findViewHolderForAdapterPosition != null) {
-                                FilterCreateActivity.this.setTextLeft(findViewHolderForAdapterPosition.itemView);
+                                if (FilterCreateActivity.this.nameHeaderCell != null) {
+                                    AnimatedTextView animatedTextView = FilterCreateActivity.this.nameHeaderCell.rightTextView;
+                                    FilterCreateActivity filterCreateActivity = FilterCreateActivity.this;
+                                    if (filterCreateActivity.hasAnimatedEmojis(filterCreateActivity.newFilterName)) {
+                                        str = LocaleController.getString(FilterCreateActivity.this.newFilterAnimations ? R.string.FilterNameAnimationsDisable : R.string.FilterNameAnimationsEnable);
+                                    } else {
+                                        str = null;
+                                    }
+                                    animatedTextView.setText(str);
+                                }
+                                ((BaseFragment) FilterCreateActivity.this).actionBar.setTitle(AnimatedEmojiSpan.cloneSpans(FilterCreateActivity.this.newFilterName, -1, ((BaseFragment) FilterCreateActivity.this).actionBar.getTitleFontMetricsInt()));
                             }
                             FilterCreateActivity.this.checkDoneButton(true);
                         }
@@ -1653,16 +1811,10 @@ public class FilterCreateActivity extends BaseFragment {
                         public void onTextChanged(CharSequence charSequence, int i2, int i22, int i3) {
                         }
                     });
-                    EditTextBoldCursor textView = pollEditTextCell2.getTextView();
-                    pollEditTextCell2.setShowNextButton(true);
-                    textView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                        @Override
-                        public final void onFocusChange(View view, boolean z) {
-                            FilterCreateActivity.ListAdapter.this.lambda$onCreateViewHolder$0(pollEditTextCell2, view, z);
-                        }
-                    });
-                    textView.setImeOptions(268435462);
-                    userCell = pollEditTextCell2;
+                    editText.setPadding(AndroidUtilities.dp(7.0f), editText.getPaddingTop(), editText.getPaddingRight(), editText.getPaddingBottom());
+                    editEmojiTextCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    editEmojiTextCell.editTextEmoji.getEditText().setImeOptions(268435462);
+                    userCell = editEmojiTextCell;
                     headerCell = userCell;
                     break;
                 case 3:
@@ -1683,7 +1835,7 @@ public class FilterCreateActivity extends BaseFragment {
                     Context context = this.mContext;
                     FilterCreateActivity filterCreateActivity = FilterCreateActivity.this;
                     headerCell = new LinkCell(context, filterCreateActivity, ((BaseFragment) filterCreateActivity).currentAccount, FilterCreateActivity.this.filter.id) {
-                        AnonymousClass2(Context context2, BaseFragment filterCreateActivity2, int i2, int i22) {
+                        AnonymousClass3(Context context2, BaseFragment filterCreateActivity2, int i2, int i22) {
                             super(context2, filterCreateActivity2, i2, i22);
                         }
 
@@ -1705,29 +1857,29 @@ public class FilterCreateActivity extends BaseFragment {
                     headerCell = new PeerColorActivity.PeerColorGrid(FilterCreateActivity.this.getContext(), 2, ((BaseFragment) FilterCreateActivity.this).currentAccount, ((BaseFragment) FilterCreateActivity.this).resourceProvider);
                     headerCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
+                case 11:
+                    FilterCreateActivity filterCreateActivity2 = FilterCreateActivity.this;
+                    headerCell = new HeaderCellWithRight(this.mContext, ((BaseFragment) filterCreateActivity2).resourceProvider);
+                    headerCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
             }
             return new RecyclerListView.Holder(headerCell);
         }
 
         @Override
         public void onViewAttachedToWindow(RecyclerView.ViewHolder viewHolder) {
-            if (viewHolder.getItemViewType() == 2) {
-                FilterCreateActivity.this.setTextLeft(viewHolder.itemView);
-                PollEditTextCell pollEditTextCell = (PollEditTextCell) viewHolder.itemView;
-                pollEditTextCell.setTag(1);
-                pollEditTextCell.setTextAndHint(FilterCreateActivity.this.newFilterName != null ? FilterCreateActivity.this.newFilterName : "", LocaleController.getString(R.string.FilterNameHint), false);
-                pollEditTextCell.setTag(null);
+            int itemViewType = viewHolder.getItemViewType();
+            if (itemViewType != 2 && itemViewType == 9) {
+                ((HeaderCellColorPreview) viewHolder.itemView).setPreviewText(AnimatedEmojiSpan.cloneSpans(FilterCreateActivity.this.newFilterName, -1, FilterCreateActivity.this.folderTagsHeader.getPreviewTextPaint().getFontMetricsInt(), 0.5f), true);
             }
         }
 
         @Override
         public void onViewDetachedFromWindow(RecyclerView.ViewHolder viewHolder) {
             if (viewHolder.getItemViewType() == 2) {
-                EditTextBoldCursor textView = ((PollEditTextCell) viewHolder.itemView).getTextView();
-                if (textView.isFocused()) {
-                    textView.clearFocus();
-                    AndroidUtilities.hideKeyboard(textView);
-                }
+                EditEmojiTextCell editEmojiTextCell = (EditEmojiTextCell) viewHolder.itemView;
+                editEmojiTextCell.editTextEmoji.hidePopup(true);
+                editEmojiTextCell.editTextEmoji.closeKeyboard();
             }
         }
     }
@@ -1856,6 +2008,7 @@ public class FilterCreateActivity extends BaseFragment {
 
     public FilterCreateActivity(MessagesController.DialogFilter dialogFilter, ArrayList arrayList) {
         this.nameRow = -1;
+        this.newFilterAnimations = true;
         this.invites = new ArrayList();
         this.oldItems = new ArrayList();
         this.items = new ArrayList();
@@ -1864,17 +2017,31 @@ public class FilterCreateActivity extends BaseFragment {
         if (dialogFilter == null) {
             MessagesController.DialogFilter dialogFilter2 = new MessagesController.DialogFilter();
             this.filter = dialogFilter2;
-            dialogFilter2.id = 2;
-            while (getMessagesController().dialogFiltersById.get(this.filter.id) != null) {
-                this.filter.id++;
+            int i = 2;
+            while (true) {
+                dialogFilter2.id = i;
+                if (getMessagesController().dialogFiltersById.get(this.filter.id) == null) {
+                    break;
+                }
+                dialogFilter2 = this.filter;
+                i = dialogFilter2.id + 1;
             }
             MessagesController.DialogFilter dialogFilter3 = this.filter;
             dialogFilter3.name = "";
             dialogFilter3.color = (int) (Math.random() * 8.0d);
             this.creatingNew = true;
         }
+        TextPaint textPaint = new TextPaint(1);
+        textPaint.setTextSize(AndroidUtilities.dp(17.0f));
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(this.filter.name);
+        this.newFilterName = spannableStringBuilder;
+        CharSequence replaceEmoji = Emoji.replaceEmoji(spannableStringBuilder, textPaint.getFontMetricsInt(), false);
+        this.newFilterName = replaceEmoji;
+        this.newFilterName = MessageObject.replaceAnimatedEmoji(replaceEmoji, this.filter.entities, textPaint.getFontMetricsInt());
+        boolean z = !this.filter.title_noanimate;
+        this.newFilterAnimations = z;
+        AnimatedEmojiDrawable.toggleAnimations(this.currentAccount, z);
         MessagesController.DialogFilter dialogFilter4 = this.filter;
-        this.newFilterName = dialogFilter4.name;
         this.newFilterFlags = dialogFilter4.flags;
         this.newFilterColor = dialogFilter4.color;
         ArrayList arrayList2 = new ArrayList(this.filter.alwaysShow);
@@ -1908,7 +2075,7 @@ public class FilterCreateActivity extends BaseFragment {
             onClickListener = new DialogInterface.OnClickListener() {
                 @Override
                 public final void onClick(DialogInterface dialogInterface, int i) {
-                    FilterCreateActivity.this.lambda$checkDiscard$18(dialogInterface, i);
+                    FilterCreateActivity.this.lambda$checkDiscard$19(dialogInterface, i);
                 }
             };
         } else {
@@ -1918,7 +2085,7 @@ public class FilterCreateActivity extends BaseFragment {
             onClickListener = new DialogInterface.OnClickListener() {
                 @Override
                 public final void onClick(DialogInterface dialogInterface, int i) {
-                    FilterCreateActivity.this.lambda$checkDiscard$19(dialogInterface, i);
+                    FilterCreateActivity.this.lambda$checkDiscard$20(dialogInterface, i);
                 }
             };
         }
@@ -1926,7 +2093,7 @@ public class FilterCreateActivity extends BaseFragment {
         builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
             @Override
             public final void onClick(DialogInterface dialogInterface, int i) {
-                FilterCreateActivity.this.lambda$checkDiscard$20(dialogInterface, i);
+                FilterCreateActivity.this.lambda$checkDiscard$21(dialogInterface, i);
             }
         });
         showDialog(builder.create());
@@ -1958,7 +2125,7 @@ public class FilterCreateActivity extends BaseFragment {
             FolderBottomSheet.showForDeletion(this, this.filter.id, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    FilterCreateActivity.this.lambda$deleteFolder$13((Boolean) obj);
+                    FilterCreateActivity.this.lambda$deleteFolder$14((Boolean) obj);
                 }
             });
             return;
@@ -1970,7 +2137,7 @@ public class FilterCreateActivity extends BaseFragment {
         builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
             @Override
             public final void onClick(DialogInterface dialogInterface, int i) {
-                FilterCreateActivity.this.lambda$deleteFolder$16(dialogInterface, i);
+                FilterCreateActivity.this.lambda$deleteFolder$17(dialogInterface, i);
             }
         });
         AlertDialog create = builder.create();
@@ -2043,13 +2210,11 @@ public class FilterCreateActivity extends BaseFragment {
                         }
                     }
                 }
-                if (str != null && str.length() > 12) {
-                    str = "";
-                }
-                this.newFilterName = str;
+                String str2 = (str == null || str.length() <= 12) ? str : "";
+                this.newFilterName = str2;
                 HeaderCellColorPreview headerCellColorPreview = this.folderTagsHeader;
                 if (headerCellColorPreview != null) {
-                    headerCellColorPreview.setPreviewText((str != null ? str : "").toUpperCase(), false);
+                    headerCellColorPreview.setPreviewText(AnimatedEmojiSpan.cloneSpans(str2, -1, headerCellColorPreview.getPreviewTextPaint().getFontMetricsInt(), 0.5f), false);
                 }
                 RecyclerView.ViewHolder findViewHolderForAdapterPosition = this.listView.findViewHolderForAdapterPosition(this.nameRow);
                 if (findViewHolderForAdapterPosition != null) {
@@ -2083,7 +2248,8 @@ public class FilterCreateActivity extends BaseFragment {
                 this.hasUserChanged = true;
             }
         }
-        if (TextUtils.equals(this.filter.name, this.newFilterName) && this.filter.flags == this.newFilterFlags) {
+        MessagesController.DialogFilter dialogFilter2 = this.filter;
+        if (dialogFilter2.title_noanimate == (!this.newFilterAnimations) && TextUtils.equals(dialogFilter2.name, this.newFilterName) && this.filter.flags == this.newFilterFlags) {
             return this.hasUserChanged;
         }
         return true;
@@ -2093,26 +2259,26 @@ public class FilterCreateActivity extends BaseFragment {
         MessagesController.getGlobalMainSettings().edit().putBoolean("n_" + i, true).apply();
     }
 
-    public void lambda$checkDiscard$18(DialogInterface dialogInterface, int i) {
-        processDone();
-    }
-
     public void lambda$checkDiscard$19(DialogInterface dialogInterface, int i) {
         processDone();
     }
 
     public void lambda$checkDiscard$20(DialogInterface dialogInterface, int i) {
+        processDone();
+    }
+
+    public void lambda$checkDiscard$21(DialogInterface dialogInterface, int i) {
         lambda$onBackPressed$321();
     }
 
-    public void lambda$createView$6(ItemInner itemInner) {
+    public void lambda$createView$7(ItemInner itemInner) {
         FilterChatlistActivity filterChatlistActivity = new FilterChatlistActivity(this.filter, itemInner.link);
-        filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda22(this));
-        filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda23(this));
+        filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
+        filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda25(this));
         presentFragment(filterChatlistActivity);
     }
 
-    public void lambda$createView$7(View view, int i) {
+    public void lambda$createView$8(View view, int i) {
         final ItemInner itemInner;
         if (getParentActivity() == null || (itemInner = (ItemInner) this.items.get(i)) == null) {
             return;
@@ -2131,7 +2297,7 @@ public class FilterCreateActivity extends BaseFragment {
             Runnable runnable = new Runnable() {
                 @Override
                 public final void run() {
-                    FilterCreateActivity.this.lambda$createView$6(itemInner);
+                    FilterCreateActivity.this.lambda$createView$7(itemInner);
                 }
             };
             if (this.doneItem.isEnabled()) {
@@ -2144,14 +2310,10 @@ public class FilterCreateActivity extends BaseFragment {
         }
         if (i2 == 8 || (i2 == 4 && itemInner.iconResId == R.drawable.msg2_link2)) {
             onClickCreateLink(view);
-        } else if (itemInner.viewType == 2) {
-            PollEditTextCell pollEditTextCell = (PollEditTextCell) view;
-            pollEditTextCell.getTextView().requestFocus();
-            AndroidUtilities.showKeyboard(pollEditTextCell.getTextView());
         }
     }
 
-    public boolean lambda$createView$8(View view, int i) {
+    public boolean lambda$createView$9(View view, int i) {
         ItemInner itemInner = (ItemInner) this.items.get(i);
         if (itemInner == null || !(view instanceof UserCell)) {
             return false;
@@ -2161,11 +2323,11 @@ public class FilterCreateActivity extends BaseFragment {
         return true;
     }
 
-    public void lambda$deleteFolder$13(Boolean bool) {
+    public void lambda$deleteFolder$14(Boolean bool) {
         lambda$onBackPressed$321();
     }
 
-    public void lambda$deleteFolder$14(AlertDialog alertDialog) {
+    public void lambda$deleteFolder$15(AlertDialog alertDialog) {
         if (alertDialog != null) {
             try {
                 alertDialog.dismiss();
@@ -2178,16 +2340,16 @@ public class FilterCreateActivity extends BaseFragment {
         lambda$onBackPressed$321();
     }
 
-    public void lambda$deleteFolder$15(final AlertDialog alertDialog, TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$deleteFolder$16(final AlertDialog alertDialog, TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                FilterCreateActivity.this.lambda$deleteFolder$14(alertDialog);
+                FilterCreateActivity.this.lambda$deleteFolder$15(alertDialog);
             }
         });
     }
 
-    public void lambda$deleteFolder$16(DialogInterface dialogInterface, int i) {
+    public void lambda$deleteFolder$17(DialogInterface dialogInterface, int i) {
         final AlertDialog alertDialog;
         if (getParentActivity() != null) {
             alertDialog = new AlertDialog(getParentActivity(), 3);
@@ -2201,12 +2363,12 @@ public class FilterCreateActivity extends BaseFragment {
         getConnectionsManager().sendRequest(tL_messages_updateDialogFilter, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                FilterCreateActivity.this.lambda$deleteFolder$15(alertDialog, tLObject, tL_error);
+                FilterCreateActivity.this.lambda$deleteFolder$16(alertDialog, tLObject, tL_error);
             }
         });
     }
 
-    public void lambda$getThemeDescriptions$27() {
+    public void lambda$getThemeDescriptions$28() {
         RecyclerListView recyclerListView = this.listView;
         if (recyclerListView != null) {
             int childCount = recyclerListView.getChildCount();
@@ -2241,34 +2403,38 @@ public class FilterCreateActivity extends BaseFragment {
         });
     }
 
-    public void lambda$onClickCreateLink$10(TLRPC.TL_error tL_error, TLObject tLObject) {
+    public void lambda$onClickCreateLink$10(TL_chatlists.TL_chatlists_exportedChatlistInvite tL_chatlists_exportedChatlistInvite) {
+        onEdit(tL_chatlists_exportedChatlistInvite.invite);
+    }
+
+    public void lambda$onClickCreateLink$11(TLRPC.TL_error tL_error, TLObject tLObject) {
         if (processErrors(tL_error, this, BulletinFactory.of(this)) && (tLObject instanceof TL_chatlists.TL_chatlists_exportedChatlistInvite)) {
             hideNew(0);
             getMessagesController().loadRemoteFilters(true);
             final TL_chatlists.TL_chatlists_exportedChatlistInvite tL_chatlists_exportedChatlistInvite = (TL_chatlists.TL_chatlists_exportedChatlistInvite) tLObject;
             FilterChatlistActivity filterChatlistActivity = new FilterChatlistActivity(this.filter, tL_chatlists_exportedChatlistInvite.invite);
-            filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda22(this));
-            filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda23(this));
+            filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
+            filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda25(this));
             presentFragment(filterChatlistActivity);
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    FilterCreateActivity.this.lambda$onClickCreateLink$9(tL_chatlists_exportedChatlistInvite);
+                    FilterCreateActivity.this.lambda$onClickCreateLink$10(tL_chatlists_exportedChatlistInvite);
                 }
             }, 200L);
         }
     }
 
-    public void lambda$onClickCreateLink$11(final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$onClickCreateLink$12(final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                FilterCreateActivity.this.lambda$onClickCreateLink$10(tL_error, tLObject);
+                FilterCreateActivity.this.lambda$onClickCreateLink$11(tL_error, tLObject);
             }
         });
     }
 
-    public void lambda$onClickCreateLink$12() {
+    public void lambda$onClickCreateLink$13() {
         getMessagesController().updateFilterDialogs(this.filter);
         ArrayList<TLRPC.InputPeer> arrayList = new ArrayList<>();
         for (int i = 0; i < this.filter.alwaysShow.size(); i++) {
@@ -2283,8 +2449,8 @@ public class FilterCreateActivity extends BaseFragment {
         }
         if (arrayList.isEmpty()) {
             FilterChatlistActivity filterChatlistActivity = new FilterChatlistActivity(this.filter, null);
-            filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda22(this));
-            filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda23(this));
+            filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
+            filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda25(this));
             presentFragment(filterChatlistActivity);
             return;
         }
@@ -2297,31 +2463,26 @@ public class FilterCreateActivity extends BaseFragment {
         getConnectionsManager().sendRequest(tL_chatlists_exportChatlistInvite, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                FilterCreateActivity.this.lambda$onClickCreateLink$11(tLObject, tL_error);
+                FilterCreateActivity.this.lambda$onClickCreateLink$12(tLObject, tL_error);
             }
         });
     }
 
-    public void lambda$onClickCreateLink$9(TL_chatlists.TL_chatlists_exportedChatlistInvite tL_chatlists_exportedChatlistInvite) {
-        onEdit(tL_chatlists_exportedChatlistInvite.invite);
-    }
-
-    public void lambda$onUpdate$28(boolean z, int i) {
+    public void lambda$onUpdate$29(boolean z, int i) {
         BulletinFactory.of(this).createSimpleBulletin(z ? R.raw.folder_in : R.raw.folder_out, z ? LocaleController.formatPluralString("FolderLinkAddedChats", i, new Object[0]) : LocaleController.formatPluralString("FolderLinkRemovedChats", i, new Object[0]), LocaleController.getString(R.string.FolderLinkChatlistUpdate)).setDuration(5000).show();
     }
 
-    public void lambda$processDone$22() {
+    public void lambda$processDone$23() {
         if (!this.doNotCloseWhenSave) {
             lambda$onBackPressed$321();
             return;
         }
         this.doNotCloseWhenSave = false;
-        TextPaint textPaint = new TextPaint(1);
-        textPaint.setTextSize(AndroidUtilities.dp(20.0f));
-        this.actionBar.setTitleAnimated(Emoji.replaceEmoji((CharSequence) this.filter.name, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20.0f), false), true, 220L);
+        Paint.FontMetricsInt titleFontMetricsInt = this.actionBar.getTitleFontMetricsInt();
+        this.actionBar.setTitleAnimated(MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(this.filter.name, titleFontMetricsInt, false), this.filter.entities, titleFontMetricsInt), true, 220L);
     }
 
-    public void lambda$save$23(Runnable runnable) {
+    public void lambda$save$24(Runnable runnable) {
         this.hasUserChanged = false;
         this.creatingNew = false;
         this.filter.flags = this.newFilterFlags;
@@ -2332,7 +2493,7 @@ public class FilterCreateActivity extends BaseFragment {
         }
     }
 
-    public static int lambda$saveFilterToServer$24(LongSparseIntArray longSparseIntArray, Long l, Long l2) {
+    public static int lambda$saveFilterToServer$25(LongSparseIntArray longSparseIntArray, Long l, Long l2) {
         int i = longSparseIntArray.get(l.longValue());
         int i2 = longSparseIntArray.get(l2.longValue());
         if (i > i2) {
@@ -2341,7 +2502,7 @@ public class FilterCreateActivity extends BaseFragment {
         return i < i2 ? -1 : 0;
     }
 
-    public static void lambda$saveFilterToServer$25(boolean z, AlertDialog alertDialog, MessagesController.DialogFilter dialogFilter, int i, String str, int i2, ArrayList arrayList, ArrayList arrayList2, boolean z2, boolean z3, boolean z4, boolean z5, BaseFragment baseFragment, Runnable runnable) {
+    public static void lambda$saveFilterToServer$26(boolean z, AlertDialog alertDialog, MessagesController.DialogFilter dialogFilter, int i, String str, ArrayList arrayList, boolean z2, int i2, ArrayList arrayList2, ArrayList arrayList3, boolean z3, boolean z4, boolean z5, boolean z6, BaseFragment baseFragment, Runnable runnable) {
         if (!z) {
             if (runnable != null) {
                 runnable.run();
@@ -2354,20 +2515,20 @@ public class FilterCreateActivity extends BaseFragment {
                     FileLog.e(e);
                 }
             }
-            processAddFilter(dialogFilter, i, str, i2, arrayList, arrayList2, z2, z3, z4, z5, baseFragment, runnable);
+            processAddFilter(dialogFilter, i, str, arrayList, z2, i2, arrayList2, arrayList3, z3, z4, z5, z6, baseFragment, runnable);
         }
     }
 
-    public static void lambda$saveFilterToServer$26(final boolean z, final AlertDialog alertDialog, final MessagesController.DialogFilter dialogFilter, final int i, final String str, final int i2, final ArrayList arrayList, final ArrayList arrayList2, final boolean z2, final boolean z3, final boolean z4, final boolean z5, final BaseFragment baseFragment, final Runnable runnable, TLObject tLObject, TLRPC.TL_error tL_error) {
+    public static void lambda$saveFilterToServer$27(final boolean z, final AlertDialog alertDialog, final MessagesController.DialogFilter dialogFilter, final int i, final String str, final ArrayList arrayList, final boolean z2, final int i2, final ArrayList arrayList2, final ArrayList arrayList3, final boolean z3, final boolean z4, final boolean z5, final boolean z6, final BaseFragment baseFragment, final Runnable runnable, TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                FilterCreateActivity.lambda$saveFilterToServer$25(z, alertDialog, dialogFilter, i, str, i2, arrayList, arrayList2, z2, z3, z4, z5, baseFragment, runnable);
+                FilterCreateActivity.lambda$saveFilterToServer$26(z, alertDialog, dialogFilter, i, str, arrayList, z2, i2, arrayList2, arrayList3, z3, z4, z5, z6, baseFragment, runnable);
             }
         });
     }
 
-    public void lambda$selectChatsFor$17(boolean z, ArrayList arrayList, int i) {
+    public void lambda$selectChatsFor$18(boolean z, ArrayList arrayList, int i) {
         this.newFilterFlags = i;
         if (z) {
             onUpdate(true, this.newAlwaysShow, arrayList);
@@ -2402,7 +2563,7 @@ public class FilterCreateActivity extends BaseFragment {
         updateRows();
     }
 
-    public void lambda$showRemoveAlert$21(ItemInner itemInner, boolean z, DialogInterface dialogInterface, int i) {
+    public void lambda$showRemoveAlert$22(ItemInner itemInner, boolean z, DialogInterface dialogInterface, int i) {
         if (itemInner.flags > 0) {
             this.newFilterFlags = (itemInner.flags ^ (-1)) & this.newFilterFlags;
         } else {
@@ -2417,19 +2578,45 @@ public class FilterCreateActivity extends BaseFragment {
     }
 
     public void lambda$updateRows$2(View view) {
-        selectChatsFor(true);
+        String str;
+        this.newFilterAnimations = !this.newFilterAnimations;
+        HeaderCellWithRight headerCellWithRight = this.nameHeaderCell;
+        if (headerCellWithRight != null) {
+            AnimatedTextView animatedTextView = headerCellWithRight.rightTextView;
+            if (hasAnimatedEmojis(this.newFilterName)) {
+                str = LocaleController.getString(this.newFilterAnimations ? R.string.FilterNameAnimationsDisable : R.string.FilterNameAnimationsEnable);
+            } else {
+                str = null;
+            }
+            animatedTextView.setText(str);
+        }
+        AnimatedEmojiDrawable.toggleAnimations(this.currentAccount, this.newFilterAnimations);
+        checkDoneButton(true);
+        ActionBar actionBar = this.actionBar;
+        if (actionBar != null) {
+            if (actionBar.getTitleTextView() != null) {
+                this.actionBar.getTitleTextView().setEmojiCacheType(this.newFilterAnimations ? 0 : 26);
+            }
+            if (this.actionBar.getTitleTextView2() != null) {
+                this.actionBar.getTitleTextView2().setEmojiCacheType(this.newFilterAnimations ? 0 : 26);
+            }
+        }
     }
 
     public void lambda$updateRows$3(View view) {
+        selectChatsFor(true);
+    }
+
+    public void lambda$updateRows$4(View view) {
         this.includeExpanded = true;
         updateRows();
     }
 
-    public void lambda$updateRows$4(View view) {
+    public void lambda$updateRows$5(View view) {
         selectChatsFor(false);
     }
 
-    public void lambda$updateRows$5(View view) {
+    public void lambda$updateRows$6(View view) {
         this.excludeExpanded = true;
         updateRows();
     }
@@ -2450,7 +2637,7 @@ public class FilterCreateActivity extends BaseFragment {
             save(false, new Runnable() {
                 @Override
                 public final void run() {
-                    FilterCreateActivity.this.lambda$onClickCreateLink$12();
+                    FilterCreateActivity.this.lambda$onClickCreateLink$13();
                 }
             });
             return;
@@ -2534,7 +2721,7 @@ public class FilterCreateActivity extends BaseFragment {
             this.showBulletinOnResume = new Runnable() {
                 @Override
                 public final void run() {
-                    FilterCreateActivity.this.lambda$onUpdate$28(z, i);
+                    FilterCreateActivity.this.lambda$onUpdate$29(z, i);
                 }
             };
             if (getLayoutContainer() != null) {
@@ -2582,26 +2769,28 @@ public class FilterCreateActivity extends BaseFragment {
         }
     }
 
-    private static void processAddFilter(MessagesController.DialogFilter dialogFilter, int i, String str, int i2, ArrayList arrayList, ArrayList arrayList2, boolean z, boolean z2, boolean z3, boolean z4, BaseFragment baseFragment, Runnable runnable) {
-        if (dialogFilter.flags != i || z3) {
+    private static void processAddFilter(MessagesController.DialogFilter dialogFilter, int i, String str, ArrayList arrayList, boolean z, int i2, ArrayList arrayList2, ArrayList arrayList3, boolean z2, boolean z3, boolean z4, boolean z5, BaseFragment baseFragment, Runnable runnable) {
+        if (dialogFilter.flags != i || z4) {
             dialogFilter.pendingUnreadCount = -1;
-            if (z4) {
+            if (z5) {
                 dialogFilter.unreadCount = -1;
             }
         }
         dialogFilter.flags = i;
         dialogFilter.name = str;
+        dialogFilter.entities = arrayList;
         dialogFilter.color = i2;
-        dialogFilter.neverShow = arrayList2;
-        dialogFilter.alwaysShow = arrayList;
+        dialogFilter.neverShow = arrayList3;
+        dialogFilter.alwaysShow = arrayList2;
+        dialogFilter.title_noanimate = z;
         MessagesController messagesController = baseFragment.getMessagesController();
-        if (z) {
-            messagesController.addFilter(dialogFilter, z2);
+        if (z2) {
+            messagesController.addFilter(dialogFilter, z3);
         } else {
             messagesController.onFilterUpdate(dialogFilter);
         }
-        baseFragment.getMessagesStorage().saveDialogFilter(dialogFilter, z2, true);
-        if (z2) {
+        baseFragment.getMessagesStorage().saveDialogFilter(dialogFilter, z3, true);
+        if (z3) {
             TLRPC.TL_messages_updateDialogFiltersOrder tL_messages_updateDialogFiltersOrder = new TLRPC.TL_messages_updateDialogFiltersOrder();
             ArrayList<MessagesController.DialogFilter> dialogFilters = baseFragment.getMessagesController().getDialogFilters();
             int size = dialogFilters.size();
@@ -2624,7 +2813,7 @@ public class FilterCreateActivity extends BaseFragment {
         save(true, new Runnable() {
             @Override
             public final void run() {
-                FilterCreateActivity.this.lambda$processDone$22();
+                FilterCreateActivity.this.lambda$processDone$23();
             }
         });
     }
@@ -2663,23 +2852,27 @@ public class FilterCreateActivity extends BaseFragment {
     }
 
     private void save(boolean z, final Runnable runnable) {
-        saveFilterToServer(this.filter, this.newFilterFlags, this.newFilterName, this.newFilterColor, this.newAlwaysShow, this.newNeverShow, this.newPinned, this.creatingNew, false, this.hasUserChanged, true, z, this, new Runnable() {
+        CharSequence[] charSequenceArr = {this.newFilterName};
+        saveFilterToServer(this.filter, this.newFilterFlags, charSequenceArr[0].toString(), getMediaDataController().getEntities(charSequenceArr, false), !this.newFilterAnimations, this.newFilterColor, this.newAlwaysShow, this.newNeverShow, this.newPinned, this.creatingNew, false, this.hasUserChanged, true, z, this, new Runnable() {
             @Override
             public final void run() {
-                FilterCreateActivity.this.lambda$save$23(runnable);
+                FilterCreateActivity.this.lambda$save$24(runnable);
             }
         });
     }
 
-    public static void saveFilterToServer(final MessagesController.DialogFilter dialogFilter, final int i, final String str, final int i2, final ArrayList arrayList, final ArrayList arrayList2, final LongSparseIntArray longSparseIntArray, final boolean z, final boolean z2, final boolean z3, final boolean z4, final boolean z5, final BaseFragment baseFragment, final Runnable runnable) {
+    public static void saveFilterToServer(final MessagesController.DialogFilter dialogFilter, final int i, final String str, final ArrayList arrayList, final boolean z, final int i2, final ArrayList arrayList2, final ArrayList arrayList3, LongSparseIntArray longSparseIntArray, final boolean z2, final boolean z3, final boolean z4, final boolean z5, final boolean z6, final BaseFragment baseFragment, final Runnable runnable) {
         AlertDialog alertDialog;
-        ArrayList<TLRPC.InputPeer> arrayList3;
-        ArrayList arrayList4;
+        ArrayList<TLRPC.InputPeer> arrayList4;
+        ArrayList arrayList5;
+        TLRPC.InputPeer tL_inputPeerChat;
+        final LongSparseIntArray longSparseIntArray2 = longSparseIntArray;
         if (baseFragment == null || baseFragment.getParentActivity() == null) {
             return;
         }
         int i3 = 3;
-        if (z5) {
+        int i4 = 0;
+        if (z6) {
             alertDialog = new AlertDialog(baseFragment.getParentActivity(), 3);
             alertDialog.setCanCancel(false);
             alertDialog.show();
@@ -2688,7 +2881,7 @@ public class FilterCreateActivity extends BaseFragment {
         }
         TLRPC.TL_messages_updateDialogFilter tL_messages_updateDialogFilter = new TLRPC.TL_messages_updateDialogFilter();
         tL_messages_updateDialogFilter.id = dialogFilter.id;
-        int i4 = 1;
+        int i5 = 1;
         tL_messages_updateDialogFilter.flags |= 1;
         TLRPC.TL_dialogFilter tL_dialogFilter = new TLRPC.TL_dialogFilter();
         tL_messages_updateDialogFilter.filter = tL_dialogFilter;
@@ -2701,61 +2894,65 @@ public class FilterCreateActivity extends BaseFragment {
         tL_dialogFilter.exclude_read = (i & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ) != 0;
         tL_dialogFilter.exclude_archived = (i & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED) != 0;
         tL_dialogFilter.id = dialogFilter.id;
-        tL_dialogFilter.title = str;
-        int i5 = tL_dialogFilter.flags;
+        tL_dialogFilter.title = new TLRPC.TL_textWithEntities();
+        TLRPC.TL_dialogFilter tL_dialogFilter2 = tL_messages_updateDialogFilter.filter;
+        TLRPC.TL_textWithEntities tL_textWithEntities = tL_dialogFilter2.title;
+        tL_textWithEntities.text = str;
+        tL_textWithEntities.entities = arrayList;
+        tL_dialogFilter2.title_noanimate = z;
+        int i6 = tL_dialogFilter2.flags;
         if (i2 < 0) {
-            tL_dialogFilter.flags = i5 & (-134217729);
-            tL_dialogFilter.color = 0;
+            tL_dialogFilter2.flags = i6 & (-134217729);
+            tL_dialogFilter2.color = 0;
         } else {
-            tL_dialogFilter.flags = i5 | 134217728;
-            tL_dialogFilter.color = i2;
+            tL_dialogFilter2.flags = i6 | 134217728;
+            tL_dialogFilter2.color = i2;
         }
         MessagesController messagesController = baseFragment.getMessagesController();
-        ArrayList arrayList5 = new ArrayList();
+        ArrayList arrayList6 = new ArrayList();
         if (longSparseIntArray.size() != 0) {
             int size = longSparseIntArray.size();
-            for (int i6 = 0; i6 < size; i6++) {
-                long keyAt = longSparseIntArray.keyAt(i6);
+            for (int i7 = 0; i7 < size; i7++) {
+                long keyAt = longSparseIntArray2.keyAt(i7);
                 if (!DialogObject.isEncryptedDialog(keyAt)) {
-                    arrayList5.add(Long.valueOf(keyAt));
+                    arrayList6.add(Long.valueOf(keyAt));
                 }
             }
-            Collections.sort(arrayList5, new Comparator() {
+            Collections.sort(arrayList6, new Comparator() {
                 @Override
                 public final int compare(Object obj, Object obj2) {
-                    int lambda$saveFilterToServer$24;
-                    lambda$saveFilterToServer$24 = FilterCreateActivity.lambda$saveFilterToServer$24(LongSparseIntArray.this, (Long) obj, (Long) obj2);
-                    return lambda$saveFilterToServer$24;
+                    int lambda$saveFilterToServer$25;
+                    lambda$saveFilterToServer$25 = FilterCreateActivity.lambda$saveFilterToServer$25(LongSparseIntArray.this, (Long) obj, (Long) obj2);
+                    return lambda$saveFilterToServer$25;
                 }
             });
         }
-        int i7 = 0;
-        while (i7 < i3) {
-            TLRPC.TL_dialogFilter tL_dialogFilter2 = tL_messages_updateDialogFilter.filter;
-            if (i7 == 0) {
-                arrayList3 = tL_dialogFilter2.include_peers;
-                arrayList4 = arrayList;
-            } else if (i7 == i4) {
-                arrayList3 = tL_dialogFilter2.exclude_peers;
-                arrayList4 = arrayList2;
+        int i8 = 0;
+        while (i8 < i3) {
+            TLRPC.TL_dialogFilter tL_dialogFilter3 = tL_messages_updateDialogFilter.filter;
+            if (i8 == 0) {
+                arrayList4 = tL_dialogFilter3.include_peers;
+                arrayList5 = arrayList2;
+            } else if (i8 == i5) {
+                arrayList4 = tL_dialogFilter3.exclude_peers;
+                arrayList5 = arrayList3;
             } else {
-                arrayList3 = tL_dialogFilter2.pinned_peers;
-                arrayList4 = arrayList5;
+                arrayList4 = tL_dialogFilter3.pinned_peers;
+                arrayList5 = arrayList6;
             }
-            int size2 = arrayList4.size();
-            int i8 = 0;
-            while (i8 < size2) {
-                Long l = (Long) arrayList4.get(i8);
-                ArrayList arrayList6 = arrayList5;
+            int size2 = arrayList5.size();
+            while (i4 < size2) {
+                Long l = (Long) arrayList5.get(i4);
+                ArrayList arrayList7 = arrayList5;
                 long longValue = l.longValue();
-                if ((i7 != 0 || longSparseIntArray.indexOfKey(longValue) < 0) && !DialogObject.isEncryptedDialog(longValue)) {
+                if ((i8 != 0 || longSparseIntArray2.indexOfKey(longValue) < 0) && !DialogObject.isEncryptedDialog(longValue)) {
                     if (longValue > 0) {
                         TLRPC.User user = messagesController.getUser(l);
                         if (user != null) {
-                            TLRPC.TL_inputPeerUser tL_inputPeerUser = new TLRPC.TL_inputPeerUser();
-                            tL_inputPeerUser.user_id = longValue;
-                            tL_inputPeerUser.access_hash = user.access_hash;
-                            arrayList3.add(tL_inputPeerUser);
+                            tL_inputPeerChat = new TLRPC.TL_inputPeerUser();
+                            tL_inputPeerChat.user_id = longValue;
+                            tL_inputPeerChat.access_hash = user.access_hash;
+                            arrayList4.add(tL_inputPeerChat);
                         }
                     } else {
                         long j = -longValue;
@@ -2765,33 +2962,36 @@ public class FilterCreateActivity extends BaseFragment {
                                 TLRPC.TL_inputPeerChannel tL_inputPeerChannel = new TLRPC.TL_inputPeerChannel();
                                 tL_inputPeerChannel.channel_id = j;
                                 tL_inputPeerChannel.access_hash = chat.access_hash;
-                                arrayList3.add(tL_inputPeerChannel);
+                                arrayList4.add(tL_inputPeerChannel);
                             } else {
-                                TLRPC.TL_inputPeerChat tL_inputPeerChat = new TLRPC.TL_inputPeerChat();
+                                tL_inputPeerChat = new TLRPC.TL_inputPeerChat();
                                 tL_inputPeerChat.chat_id = j;
-                                arrayList3.add(tL_inputPeerChat);
+                                arrayList4.add(tL_inputPeerChat);
                             }
                         }
                     }
                 }
-                i8++;
-                arrayList5 = arrayList6;
+                i4++;
+                longSparseIntArray2 = longSparseIntArray;
+                arrayList5 = arrayList7;
             }
-            i7++;
+            i8++;
+            longSparseIntArray2 = longSparseIntArray;
             i3 = 3;
-            i4 = 1;
+            i4 = 0;
+            i5 = 1;
         }
         final AlertDialog alertDialog2 = alertDialog;
         baseFragment.getConnectionsManager().sendRequest(tL_messages_updateDialogFilter, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                FilterCreateActivity.lambda$saveFilterToServer$26(z5, alertDialog2, dialogFilter, i, str, i2, arrayList, arrayList2, z, z2, z3, z4, baseFragment, runnable, tLObject, tL_error);
+                FilterCreateActivity.lambda$saveFilterToServer$27(z6, alertDialog2, dialogFilter, i, str, arrayList, z, i2, arrayList2, arrayList3, z2, z3, z4, z5, baseFragment, runnable, tLObject, tL_error);
             }
         });
-        if (z5) {
+        if (z6) {
             return;
         }
-        processAddFilter(dialogFilter, i, str, i2, arrayList, arrayList2, z, z2, z3, z4, baseFragment, null);
+        processAddFilter(dialogFilter, i, str, arrayList, z, i2, arrayList2, arrayList3, z2, z3, z4, z5, baseFragment, null);
     }
 
     private void selectChatsFor(final boolean z) {
@@ -2800,28 +3000,10 @@ public class FilterCreateActivity extends BaseFragment {
         usersSelectActivity.setDelegate(new UsersSelectActivity.FilterUsersActivityDelegate() {
             @Override
             public final void didSelectChats(ArrayList arrayList, int i) {
-                FilterCreateActivity.this.lambda$selectChatsFor$17(z, arrayList, i);
+                FilterCreateActivity.this.lambda$selectChatsFor$18(z, arrayList, i);
             }
         });
         presentFragment(usersSelectActivity);
-    }
-
-    public void setTextLeft(View view) {
-        if (view instanceof PollEditTextCell) {
-            PollEditTextCell pollEditTextCell = (PollEditTextCell) view;
-            String str = this.newFilterName;
-            int length = 12 - (str != null ? str.length() : 0);
-            if (length > 3.6000004f) {
-                pollEditTextCell.setText2("");
-                return;
-            }
-            pollEditTextCell.setText2(String.format("%d", Integer.valueOf(length)));
-            SimpleTextView textView2 = pollEditTextCell.getTextView2();
-            int i = length < 0 ? Theme.key_text_RedRegular : Theme.key_windowBackgroundWhiteGrayText3;
-            textView2.setTextColor(Theme.getColor(i));
-            textView2.setTag(Integer.valueOf(i));
-            textView2.setAlpha((pollEditTextCell.getTextView().isFocused() || length < 0) ? 1.0f : 0.0f);
-        }
     }
 
     private void showRemoveAlert(final ItemInner itemInner, CharSequence charSequence, Object obj, final boolean z) {
@@ -2829,17 +3011,17 @@ public class FilterCreateActivity extends BaseFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         if (z) {
             builder.setTitle(LocaleController.getString(R.string.FilterRemoveInclusionTitle));
-            formatString = obj instanceof String ? LocaleController.formatString("FilterRemoveInclusionText", R.string.FilterRemoveInclusionText, charSequence) : obj instanceof TLRPC.User ? LocaleController.formatString("FilterRemoveInclusionUserText", R.string.FilterRemoveInclusionUserText, charSequence) : LocaleController.formatString("FilterRemoveInclusionChatText", R.string.FilterRemoveInclusionChatText, charSequence);
+            formatString = obj instanceof String ? LocaleController.formatString(R.string.FilterRemoveInclusionText, charSequence) : obj instanceof TLRPC.User ? LocaleController.formatString(R.string.FilterRemoveInclusionUserText, charSequence) : LocaleController.formatString(R.string.FilterRemoveInclusionChatText, charSequence);
         } else {
             builder.setTitle(LocaleController.getString(R.string.FilterRemoveExclusionTitle));
-            formatString = obj instanceof String ? LocaleController.formatString("FilterRemoveExclusionText", R.string.FilterRemoveExclusionText, charSequence) : obj instanceof TLRPC.User ? LocaleController.formatString("FilterRemoveExclusionUserText", R.string.FilterRemoveExclusionUserText, charSequence) : LocaleController.formatString("FilterRemoveExclusionChatText", R.string.FilterRemoveExclusionChatText, charSequence);
+            formatString = obj instanceof String ? LocaleController.formatString(R.string.FilterRemoveExclusionText, charSequence) : obj instanceof TLRPC.User ? LocaleController.formatString(R.string.FilterRemoveExclusionUserText, charSequence) : LocaleController.formatString(R.string.FilterRemoveExclusionChatText, charSequence);
         }
         builder.setMessage(formatString);
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         builder.setPositiveButton(LocaleController.getString(R.string.StickersRemove), new DialogInterface.OnClickListener() {
             @Override
             public final void onClick(DialogInterface dialogInterface, int i) {
-                FilterCreateActivity.this.lambda$showRemoveAlert$21(itemInner, z, dialogInterface, i);
+                FilterCreateActivity.this.lambda$showRemoveAlert$22(itemInner, z, dialogInterface, i);
             }
         });
         AlertDialog create = builder.create();
@@ -2853,8 +3035,8 @@ public class FilterCreateActivity extends BaseFragment {
     private void showSaveHint() {
         HintView hintView = this.saveHintView;
         if (hintView == null || hintView.getVisibility() != 0) {
-            AnonymousClass3 anonymousClass3 = new HintView(getContext(), 6, true) {
-                AnonymousClass3(Context context, int i, boolean z) {
+            AnonymousClass5 anonymousClass5 = new HintView(getContext(), 6, true) {
+                AnonymousClass5(Context context, int i, boolean z) {
                     super(context, i, z);
                 }
 
@@ -2869,8 +3051,8 @@ public class FilterCreateActivity extends BaseFragment {
                     }
                 }
             };
-            this.saveHintView = anonymousClass3;
-            anonymousClass3.textView.setMaxWidth(AndroidUtilities.displaySize.x);
+            this.saveHintView = anonymousClass5;
+            anonymousClass5.textView.setMaxWidth(AndroidUtilities.displaySize.x);
             this.saveHintView.setExtraTranslationY(AndroidUtilities.dp(-16.0f));
             this.saveHintView.setText(LocaleController.getString(R.string.FilterFinishCreating));
             ViewGroup.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(-2, -2);
@@ -2890,7 +3072,12 @@ public class FilterCreateActivity extends BaseFragment {
         this.oldItems.clear();
         this.oldItems.addAll(this.items);
         this.items.clear();
-        this.items.add(new ItemInner(5, false));
+        this.items.add(ItemInner.asAnimatedHeader(LocaleController.getString(R.string.FilterNameHeader), hasAnimatedEmojis(this.newFilterName) ? LocaleController.getString(this.newFilterAnimations ? R.string.FilterNameAnimationsDisable : R.string.FilterNameAnimationsEnable) : null, new View.OnClickListener() {
+            @Override
+            public final void onClick(View view) {
+                FilterCreateActivity.this.lambda$updateRows$2(view);
+            }
+        }));
         this.nameRow = this.items.size();
         this.items.add(ItemInner.asEdit());
         this.items.add(ItemInner.asShadow(null));
@@ -2898,7 +3085,7 @@ public class FilterCreateActivity extends BaseFragment {
         this.items.add(ItemInner.asButton(R.drawable.msg2_chats_add, LocaleController.getString(R.string.FilterAddChats), false).whenClicked(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                FilterCreateActivity.this.lambda$updateRows$2(view);
+                FilterCreateActivity.this.lambda$updateRows$3(view);
             }
         }));
         if ((this.newFilterFlags & MessagesController.DIALOG_FILTER_FLAG_CONTACTS) != 0) {
@@ -2925,7 +3112,7 @@ public class FilterCreateActivity extends BaseFragment {
                 this.items.add(ItemInner.asButton(R.drawable.arrow_more, LocaleController.formatPluralString("FilterShowMoreChats", this.newAlwaysShow.size() - 5, new Object[0]), false).whenClicked(new View.OnClickListener() {
                     @Override
                     public final void onClick(View view) {
-                        FilterCreateActivity.this.lambda$updateRows$3(view);
+                        FilterCreateActivity.this.lambda$updateRows$4(view);
                     }
                 }));
             }
@@ -2936,7 +3123,7 @@ public class FilterCreateActivity extends BaseFragment {
             this.items.add(ItemInner.asButton(R.drawable.msg2_chats_add, LocaleController.getString(R.string.FilterRemoveChats), false).whenClicked(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    FilterCreateActivity.this.lambda$updateRows$4(view);
+                    FilterCreateActivity.this.lambda$updateRows$5(view);
                 }
             }));
             if ((this.newFilterFlags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_MUTED) != 0) {
@@ -2957,7 +3144,7 @@ public class FilterCreateActivity extends BaseFragment {
                     this.items.add(ItemInner.asButton(R.drawable.arrow_more, LocaleController.formatPluralString("FilterShowMoreChats", this.newNeverShow.size() - 5, new Object[0]), false).whenClicked(new View.OnClickListener() {
                         @Override
                         public final void onClick(View view) {
-                            FilterCreateActivity.this.lambda$updateRows$5(view);
+                            FilterCreateActivity.this.lambda$updateRows$6(view);
                         }
                     }));
                 }
@@ -3047,9 +3234,17 @@ public class FilterCreateActivity extends BaseFragment {
         if (this.creatingNew) {
             this.actionBar.setTitle(LocaleController.getString(R.string.FilterNew));
         } else {
-            TextPaint textPaint = new TextPaint(1);
-            textPaint.setTextSize(AndroidUtilities.dp(20.0f));
-            this.actionBar.setTitle(Emoji.replaceEmoji((CharSequence) this.filter.name, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20.0f), false));
+            Paint.FontMetricsInt titleFontMetricsInt = this.actionBar.getTitleFontMetricsInt();
+            this.actionBar.setTitle(MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(this.filter.name, titleFontMetricsInt, false), this.filter.entities, titleFontMetricsInt));
+            ActionBar actionBar = this.actionBar;
+            if (actionBar != null) {
+                if (actionBar.getTitleTextView() != null) {
+                    this.actionBar.getTitleTextView().setEmojiCacheType(this.newFilterAnimations ? 0 : 26);
+                }
+                if (this.actionBar.getTitleTextView2() != null) {
+                    this.actionBar.getTitleTextView2().setEmojiCacheType(this.newFilterAnimations ? 0 : 26);
+                }
+            }
         }
         this.actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             AnonymousClass1() {
@@ -3067,11 +3262,35 @@ public class FilterCreateActivity extends BaseFragment {
             }
         });
         this.doneItem = createMenu.addItem(1, LocaleController.getString(R.string.Save).toUpperCase());
-        FrameLayout frameLayout = new FrameLayout(context);
-        this.fragmentView = frameLayout;
-        frameLayout.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
-        AnonymousClass2 anonymousClass2 = new RecyclerListView(context) {
+        AnonymousClass2 anonymousClass2 = new SizeNotifierFrameLayout(context) {
             AnonymousClass2(Context context2) {
+                super(context2);
+            }
+
+            @Override
+            public void addView(View view) {
+                if (view instanceof EmojiView) {
+                    ViewGroup.LayoutParams layoutParams = ((EmojiView) view).getLayoutParams();
+                    if (layoutParams == null) {
+                        layoutParams = new FrameLayout.LayoutParams(-1, -2);
+                    }
+                    if (layoutParams instanceof FrameLayout.LayoutParams) {
+                        ((FrameLayout.LayoutParams) layoutParams).gravity = 87;
+                    }
+                    view.setLayoutParams(layoutParams);
+                }
+                super.addView(view);
+            }
+
+            @Override
+            public void onLayout(boolean r11, int r12, int r13, int r14, int r15) {
+                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.FilterCreateActivity.AnonymousClass2.onLayout(boolean, int, int, int, int):void");
+            }
+        };
+        this.fragmentView = anonymousClass2;
+        anonymousClass2.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
+        AnonymousClass3 anonymousClass3 = new RecyclerListView(context2) {
+            AnonymousClass3(Context context2) {
                 super(context2);
             }
 
@@ -3086,10 +3305,10 @@ public class FilterCreateActivity extends BaseFragment {
                 return false;
             }
         };
-        this.listView = anonymousClass2;
-        anonymousClass2.setLayoutManager(new LinearLayoutManager(context2, 1, false));
+        this.listView = anonymousClass3;
+        anonymousClass3.setLayoutManager(new LinearLayoutManager(context2, 1, false));
         this.listView.setVerticalScrollBarEnabled(false);
-        frameLayout.addView(this.listView, LayoutHelper.createFrame(-1, -1.0f));
+        anonymousClass2.addView(this.listView, LayoutHelper.createFrame(-1, -1.0f));
         RecyclerListView recyclerListView = this.listView;
         ListAdapter listAdapter = new ListAdapter(context2);
         this.adapter = listAdapter;
@@ -3097,15 +3316,15 @@ public class FilterCreateActivity extends BaseFragment {
         this.listView.setOnItemClickListener(new RecyclerListView.OnItemClickListener() {
             @Override
             public final void onItemClick(View view, int i) {
-                FilterCreateActivity.this.lambda$createView$7(view, i);
+                FilterCreateActivity.this.lambda$createView$8(view, i);
             }
         });
         this.listView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListener() {
             @Override
             public final boolean onItemClick(View view, int i) {
-                boolean lambda$createView$8;
-                lambda$createView$8 = FilterCreateActivity.this.lambda$createView$8(view, i);
-                return lambda$createView$8;
+                boolean lambda$createView$9;
+                lambda$createView$9 = FilterCreateActivity.this.lambda$createView$9(view, i);
+                return lambda$createView$9;
             }
         });
         DefaultItemAnimator defaultItemAnimator = new DefaultItemAnimator();
@@ -3114,6 +3333,22 @@ public class FilterCreateActivity extends BaseFragment {
         defaultItemAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
         defaultItemAnimator.setDurations(350L);
         this.listView.setItemAnimator(defaultItemAnimator);
+        this.listView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            AnonymousClass4() {
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int i, int i2) {
+                if (!FilterCreateActivity.this.listView.scrollingByUser || FilterCreateActivity.this.nameEditTextCell == null || FilterCreateActivity.this.nameEditTextCell.editTextEmoji == null) {
+                    return;
+                }
+                if (FilterCreateActivity.this.nameEditTextCell.editTextEmoji.isPopupShowing()) {
+                    FilterCreateActivity.this.nameEditTextCell.editTextEmoji.hidePopup(true);
+                } else {
+                    FilterCreateActivity.this.nameEditTextCell.editTextEmoji.closeKeyboard();
+                }
+            }
+        });
         checkDoneButton(false);
         loadInvites();
         return this.fragmentView;
@@ -3125,7 +3360,7 @@ public class FilterCreateActivity extends BaseFragment {
         ThemeDescription.ThemeDescriptionDelegate themeDescriptionDelegate = new ThemeDescription.ThemeDescriptionDelegate() {
             @Override
             public final void didSetColor() {
-                FilterCreateActivity.this.lambda$getThemeDescriptions$27();
+                FilterCreateActivity.this.lambda$getThemeDescriptions$28();
             }
 
             @Override
@@ -3133,7 +3368,7 @@ public class FilterCreateActivity extends BaseFragment {
                 ThemeDescription.ThemeDescriptionDelegate.CC.$default$onAnimationProgress(this, f);
             }
         };
-        arrayList.add(new ThemeDescription(this.listView, ThemeDescription.FLAG_CELLBACKGROUNDCOLOR, new Class[]{HeaderCell.class, TextCell.class, PollEditTextCell.class, UserCell.class}, null, null, null, Theme.key_windowBackgroundWhite));
+        arrayList.add(new ThemeDescription(this.listView, ThemeDescription.FLAG_CELLBACKGROUNDCOLOR, new Class[]{HeaderCell.class, TextCell.class, UserCell.class}, null, null, null, Theme.key_windowBackgroundWhite));
         arrayList.add(new ThemeDescription(this.fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundGray));
         ActionBar actionBar = this.actionBar;
         int i = ThemeDescription.FLAG_BACKGROUND;
@@ -3171,6 +3406,15 @@ public class FilterCreateActivity extends BaseFragment {
         return arrayList;
     }
 
+    public boolean hasAnimatedEmojis(CharSequence charSequence) {
+        if (!(charSequence instanceof Spanned)) {
+            return false;
+        }
+        Spanned spanned = (Spanned) charSequence;
+        AnimatedEmojiSpan[] animatedEmojiSpanArr = (AnimatedEmojiSpan[]) spanned.getSpans(0, spanned.length(), AnimatedEmojiSpan.class);
+        return animatedEmojiSpanArr != null && animatedEmojiSpanArr.length > 0;
+    }
+
     public void loadInvites() {
         MessagesController.DialogFilter dialogFilter;
         if (this.loadingInvites || (dialogFilter = this.filter) == null || !dialogFilter.isChatlist()) {
@@ -3191,7 +3435,13 @@ public class FilterCreateActivity extends BaseFragment {
 
     @Override
     public boolean onBackPressed() {
-        return checkDiscard();
+        EditTextEmoji editTextEmoji;
+        EditEmojiTextCell editEmojiTextCell = this.nameEditTextCell;
+        if (editEmojiTextCell == null || (editTextEmoji = editEmojiTextCell.editTextEmoji) == null || !editTextEmoji.isPopupShowing()) {
+            return checkDiscard();
+        }
+        this.nameEditTextCell.editTextEmoji.hidePopup(true);
+        return false;
     }
 
     @Override

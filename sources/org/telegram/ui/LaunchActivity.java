@@ -91,6 +91,8 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_chatlists;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.ActionBarLayout;
@@ -1639,20 +1641,20 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         handleIntent(intent, true, false, false);
     }
 
-    public void lambda$handleIntent$17(AlertDialog alertDialog, TLRPC.TL_error tL_error, String str, Bundle bundle, TLObject tLObject, TLRPC.TL_account_sendConfirmPhoneCode tL_account_sendConfirmPhoneCode) {
+    public void lambda$handleIntent$17(AlertDialog alertDialog, TLRPC.TL_error tL_error, String str, Bundle bundle, TLObject tLObject, TL_account.sendConfirmPhoneCode sendconfirmphonecode) {
         alertDialog.dismiss();
         if (tL_error == null) {
             lambda$runLinkRequest$93(new LoginActivity().cancelAccountDeletion(str, bundle, (TLRPC.TL_auth_sentCode) tLObject));
         } else {
-            AlertsCreator.processError(this.currentAccount, tL_error, getActionBarLayout().getLastFragment(), tL_account_sendConfirmPhoneCode, new Object[0]);
+            AlertsCreator.processError(this.currentAccount, tL_error, getActionBarLayout().getLastFragment(), sendconfirmphonecode, new Object[0]);
         }
     }
 
-    public void lambda$handleIntent$18(final AlertDialog alertDialog, final String str, final Bundle bundle, final TLRPC.TL_account_sendConfirmPhoneCode tL_account_sendConfirmPhoneCode, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$handleIntent$18(final AlertDialog alertDialog, final String str, final Bundle bundle, final TL_account.sendConfirmPhoneCode sendconfirmphonecode, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                LaunchActivity.this.lambda$handleIntent$17(alertDialog, tL_error, str, bundle, tLObject, tL_account_sendConfirmPhoneCode);
+                LaunchActivity.this.lambda$handleIntent$17(alertDialog, tL_error, str, bundle, tLObject, sendconfirmphonecode);
             }
         });
     }
@@ -2580,7 +2582,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     public final void accept(Object obj) {
                         runnable2.run();
                     }
-                }, null, progress != null ? new ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10(progress) : null);
+                }, null, progress != null ? new ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4(progress) : null);
                 return;
             } else if (tL_messages_botApp.request_write_access || z4) {
                 AlertsCreator.createBotLaunchAlert(baseFragment3, atomicBoolean, user, runnable2);
@@ -2799,30 +2801,30 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     public void lambda$runLinkRequest$105(TLObject tLObject) {
         long j;
         String str;
-        if (!(tLObject instanceof TLRPC.TL_account_resolvedBusinessChatLinks)) {
+        if (!(tLObject instanceof TL_account.resolvedBusinessChatLinks)) {
             showAlertDialog(AlertsCreator.createSimpleAlert(this, LocaleController.getString(R.string.BusinessLink), LocaleController.getString(R.string.BusinessLinkInvalid)));
             return;
         }
-        TLRPC.TL_account_resolvedBusinessChatLinks tL_account_resolvedBusinessChatLinks = (TLRPC.TL_account_resolvedBusinessChatLinks) tLObject;
-        MessagesController.getInstance(this.currentAccount).putUsers(tL_account_resolvedBusinessChatLinks.users, false);
-        MessagesController.getInstance(this.currentAccount).putChats(tL_account_resolvedBusinessChatLinks.chats, false);
-        MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(tL_account_resolvedBusinessChatLinks.users, tL_account_resolvedBusinessChatLinks.chats, true, true);
+        TL_account.resolvedBusinessChatLinks resolvedbusinesschatlinks = (TL_account.resolvedBusinessChatLinks) tLObject;
+        MessagesController.getInstance(this.currentAccount).putUsers(resolvedbusinesschatlinks.users, false);
+        MessagesController.getInstance(this.currentAccount).putChats(resolvedbusinesschatlinks.chats, false);
+        MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(resolvedbusinesschatlinks.users, resolvedbusinesschatlinks.chats, true, true);
         Bundle bundle = new Bundle();
-        TLRPC.Peer peer = tL_account_resolvedBusinessChatLinks.peer;
+        TLRPC.Peer peer = resolvedbusinesschatlinks.peer;
         if (!(peer instanceof TLRPC.TL_peerUser)) {
             if ((peer instanceof TLRPC.TL_peerChat) || (peer instanceof TLRPC.TL_peerChannel)) {
                 j = peer.channel_id;
                 str = "chat_id";
             }
             ChatActivity chatActivity = new ChatActivity(bundle);
-            chatActivity.setResolvedChatLink(tL_account_resolvedBusinessChatLinks);
+            chatActivity.setResolvedChatLink(resolvedbusinesschatlinks);
             presentFragment(chatActivity, false, true);
         }
         j = peer.user_id;
         str = "user_id";
         bundle.putLong(str, j);
         ChatActivity chatActivity2 = new ChatActivity(bundle);
-        chatActivity2.setResolvedChatLink(tL_account_resolvedBusinessChatLinks);
+        chatActivity2.setResolvedChatLink(resolvedbusinesschatlinks);
         presentFragment(chatActivity2, false, true);
     }
 
@@ -3135,7 +3137,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     public void lambda$runLinkRequest$66(TLRPC.TL_error tL_error, final int i, final String str, final String str2, final String str3, final String str4, final String str5, final String str6, final String str7, final String str8, final String str9, final String str10, final String str11, final String str12, final boolean z, final Integer num, final Long l, final Long l2, final Integer num2, final String str13, final HashMap hashMap, final String str14, final String str15, final String str16, final String str17, final TLRPC.TL_wallPaper tL_wallPaper, final String str18, final String str19, final String str20, final boolean z2, final String str21, final int i2, final int i3, final String str22, final String str23, final String str24, final Browser.Progress progress, final boolean z3, final int i4, final boolean z4, final String str25, final boolean z5, final boolean z6, final boolean z7, final boolean z8, final boolean z9, final String str26, TLObject tLObject, final Long l3, final String str27, final String str28, final TLRPC.User user, final Runnable runnable) {
         LaunchActivity launchActivity;
-        ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10 chatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10;
+        ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4 chatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4;
         if (tL_error != null) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
@@ -3170,13 +3172,13 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
             };
             if (progress != null) {
-                chatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10 = new ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10(progress);
+                chatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4 = new ChatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4(progress);
                 launchActivity = this;
             } else {
                 launchActivity = this;
-                chatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10 = null;
+                chatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4 = null;
             }
-            WebAppDisclaimerAlert.show(launchActivity, consumer, null, chatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda10);
+            WebAppDisclaimerAlert.show(launchActivity, consumer, null, chatActivity$ChatMessageCellDelegate$$ExternalSyntheticLambda4);
         }
     }
 
@@ -3688,23 +3690,23 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         return true;
     }
 
-    public void lambda$runLinkRequest$85(Runnable runnable, TLObject tLObject, int i, TLRPC.TL_account_authorizationForm tL_account_authorizationForm, TLRPC.TL_account_getAuthorizationForm tL_account_getAuthorizationForm, String str, String str2, String str3) {
+    public void lambda$runLinkRequest$85(Runnable runnable, TLObject tLObject, int i, TL_account.authorizationForm authorizationform, TL_account.getAuthorizationForm getauthorizationform, String str, String str2, String str3) {
         try {
             runnable.run();
         } catch (Exception e) {
             FileLog.e(e);
         }
         if (tLObject != null) {
-            MessagesController.getInstance(i).putUsers(tL_account_authorizationForm.users, false);
-            lambda$runLinkRequest$93(new PassportActivity(5, tL_account_getAuthorizationForm.bot_id, tL_account_getAuthorizationForm.scope, tL_account_getAuthorizationForm.public_key, str, str2, str3, tL_account_authorizationForm, (TLRPC.account_Password) tLObject));
+            MessagesController.getInstance(i).putUsers(authorizationform.users, false);
+            lambda$runLinkRequest$93(new PassportActivity(5, getauthorizationform.bot_id, getauthorizationform.scope, getauthorizationform.public_key, str, str2, str3, authorizationform, (TL_account.Password) tLObject));
         }
     }
 
-    public void lambda$runLinkRequest$86(final Runnable runnable, final int i, final TLRPC.TL_account_authorizationForm tL_account_authorizationForm, final TLRPC.TL_account_getAuthorizationForm tL_account_getAuthorizationForm, final String str, final String str2, final String str3, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$runLinkRequest$86(final Runnable runnable, final int i, final TL_account.authorizationForm authorizationform, final TL_account.getAuthorizationForm getauthorizationform, final String str, final String str2, final String str3, final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                LaunchActivity.this.lambda$runLinkRequest$85(runnable, tLObject, i, tL_account_authorizationForm, tL_account_getAuthorizationForm, str, str2, str3);
+                LaunchActivity.this.lambda$runLinkRequest$85(runnable, tLObject, i, authorizationform, getauthorizationform, str, str2, str3);
             }
         });
     }
@@ -3722,9 +3724,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
     }
 
-    public void lambda$runLinkRequest$88(int[] iArr, final int i, final Runnable runnable, final TLRPC.TL_account_getAuthorizationForm tL_account_getAuthorizationForm, final String str, final String str2, final String str3, TLObject tLObject, final TLRPC.TL_error tL_error) {
-        final TLRPC.TL_account_authorizationForm tL_account_authorizationForm = (TLRPC.TL_account_authorizationForm) tLObject;
-        if (tL_account_authorizationForm == null) {
+    public void lambda$runLinkRequest$88(int[] iArr, final int i, final Runnable runnable, final TL_account.getAuthorizationForm getauthorizationform, final String str, final String str2, final String str3, TLObject tLObject, final TLRPC.TL_error tL_error) {
+        final TL_account.authorizationForm authorizationform = (TL_account.authorizationForm) tLObject;
+        if (authorizationform == null) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
@@ -3732,10 +3734,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
             });
         } else {
-            iArr[0] = ConnectionsManager.getInstance(i).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+            iArr[0] = ConnectionsManager.getInstance(i).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject2, TLRPC.TL_error tL_error2) {
-                    LaunchActivity.this.lambda$runLinkRequest$86(runnable, i, tL_account_authorizationForm, tL_account_getAuthorizationForm, str, str2, str3, tLObject2, tL_error2);
+                    LaunchActivity.this.lambda$runLinkRequest$86(runnable, i, authorizationform, getauthorizationform, str, str2, str3, tLObject2, tL_error2);
                 }
             });
         }
@@ -3992,8 +3994,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     public void lambda$showLanguageAlert$160(final LocaleController.LocaleInfo[] localeInfoArr, final String str, TLObject tLObject, TLRPC.TL_error tL_error) {
         final HashMap hashMap = new HashMap();
-        if (tLObject != null) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
             for (int i = 0; i < vector.objects.size(); i++) {
                 TLRPC.LangPackString langPackString = (TLRPC.LangPackString) vector.objects.get(i);
                 hashMap.put(langPackString.key, langPackString.value);
@@ -4017,8 +4019,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     public void lambda$showLanguageAlert$162(final LocaleController.LocaleInfo[] localeInfoArr, final String str, TLObject tLObject, TLRPC.TL_error tL_error) {
         final HashMap hashMap = new HashMap();
-        if (tLObject != null) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
             for (int i = 0; i < vector.objects.size(); i++) {
                 TLRPC.LangPackString langPackString = (TLRPC.LangPackString) vector.objects.get(i);
                 hashMap.put(langPackString.key, langPackString.value);

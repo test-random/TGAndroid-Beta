@@ -17,6 +17,7 @@ import androidx.core.graphics.ColorUtils;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.CheckBox2;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
@@ -40,7 +41,7 @@ public class ActionBarMenuSubItem extends FrameLayout {
     int selectorRad;
     public TextView subtextView;
     private int textColor;
-    public TextView textView;
+    public AnimatedEmojiSpan.TextViewEmojis textView;
     boolean top;
 
     public ActionBarMenuSubItem(android.content.Context r6, int r7, boolean r8, boolean r9, org.telegram.ui.ActionBar.Theme.ResourcesProvider r10) {
@@ -89,7 +90,7 @@ public class ActionBarMenuSubItem extends FrameLayout {
         return this.rightIcon;
     }
 
-    public TextView getTextView() {
+    public AnimatedEmojiSpan.TextViewEmojis getTextView() {
         return this.textView;
     }
 
@@ -149,6 +150,10 @@ public class ActionBarMenuSubItem extends FrameLayout {
         setTextColor(i);
         setIconColor(i2);
         return this;
+    }
+
+    public void setEmojiCacheType(int i) {
+        this.textView.setCacheType(i);
     }
 
     public void setEnabledByColor(final boolean z, final int i, final int i2) {
@@ -302,7 +307,7 @@ public class ActionBarMenuSubItem extends FrameLayout {
             this.imageView.setImageResource(i);
         }
         this.imageView.setVisibility(0);
-        TextView textView = this.textView;
+        AnimatedEmojiSpan.TextViewEmojis textViewEmojis = this.textView;
         if (this.checkViewLeft) {
             dp = this.checkView != null ? AndroidUtilities.dp(43.0f) : 0;
         } else {
@@ -313,14 +318,14 @@ public class ActionBarMenuSubItem extends FrameLayout {
         } else {
             dp2 = this.checkView != null ? AndroidUtilities.dp(43.0f) : 0;
         }
-        textView.setPadding(dp, 0, dp2, 0);
+        textViewEmojis.setPadding(dp, 0, dp2, 0);
     }
 
     public void setTextColor(int i) {
         if (this.textColor != i) {
-            TextView textView = this.textView;
+            AnimatedEmojiSpan.TextViewEmojis textViewEmojis = this.textView;
             this.textColor = i;
-            textView.setTextColor(i);
+            textViewEmojis.setTextColor(i);
         }
     }
 

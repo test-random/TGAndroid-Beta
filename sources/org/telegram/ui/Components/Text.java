@@ -1,21 +1,30 @@
 package org.telegram.ui.Components;
 
 import android.graphics.Canvas;
+import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.view.View;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.AnimatedEmojiSpan;
 
 public class Text {
+    private AnimatedEmojiSpan.EmojiGroupedSpans animatedEmojis;
+    private int animatedEmojisCacheType;
+    private ColorFilter animatedEmojisColorFilter;
+    private int animatedEmojisColorFilterColor;
     private boolean doNotSave;
+    private boolean drawAnimatedEmojis;
     private LinearGradient ellipsizeGradient;
     private Matrix ellipsizeMatrix;
     private Paint ellipsizePaint;
@@ -25,6 +34,7 @@ public class Text {
     private float left;
     private float maxWidth;
     private final TextPaint paint;
+    private View parentView;
     private int vertPad;
     private float width;
 
@@ -34,6 +44,7 @@ public class Text {
 
     public Text(CharSequence charSequence, float f, Typeface typeface) {
         this.maxWidth = 9999.0f;
+        this.animatedEmojisCacheType = 0;
         this.ellipsizeWidth = -1.0f;
         TextPaint textPaint = new TextPaint(1);
         this.paint = textPaint;
@@ -44,6 +55,7 @@ public class Text {
 
     public Text(CharSequence charSequence, TextPaint textPaint) {
         this.maxWidth = 9999.0f;
+        this.animatedEmojisCacheType = 0;
         this.ellipsizeWidth = -1.0f;
         this.paint = textPaint;
         setText(charSequence);
@@ -65,6 +77,14 @@ public class Text {
             canvas.drawText(this.layout.getText().toString(), 0.0f, -this.paint.getFontMetricsInt().ascent, this.paint);
         } else {
             this.layout.draw(canvas);
+        }
+        if (this.drawAnimatedEmojis) {
+            if (this.animatedEmojisColorFilter == null || this.paint.getColor() != this.animatedEmojisColorFilterColor) {
+                int color = this.paint.getColor();
+                this.animatedEmojisColorFilterColor = color;
+                this.animatedEmojisColorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
+            }
+            AnimatedEmojiSpan.drawAnimatedEmojis(canvas, this.layout, this.animatedEmojis, 0.0f, null, 0.0f, 0.0f, 0.0f, 1.0f, this.animatedEmojisColorFilter);
         }
         canvas.restore();
         if (this.doNotSave) {
@@ -166,8 +186,20 @@ public class Text {
         return this;
     }
 
-    public void setColor(int i) {
+    public Text setColor(int i) {
         this.paint.setColor(i);
+        return this;
+    }
+
+    public Text setEmojiCacheType(int i) {
+        if (this.animatedEmojisCacheType != i) {
+            this.animatedEmojisCacheType = i;
+            if (this.drawAnimatedEmojis) {
+                AnimatedEmojiSpan.release(this.parentView, this.animatedEmojis);
+                this.animatedEmojis = AnimatedEmojiSpan.update(this.animatedEmojisCacheType, this.parentView, this.animatedEmojis, this.layout);
+            }
+        }
+        return this;
     }
 
     public Text setMaxWidth(float f) {
@@ -198,6 +230,27 @@ public class Text {
 
     public Text setVerticalClipPadding(int i) {
         this.vertPad = i;
+        return this;
+    }
+
+    public Text supportAnimatedEmojis(final View view) {
+        this.drawAnimatedEmojis = true;
+        this.parentView = view;
+        if (view.isAttachedToWindow()) {
+            this.animatedEmojis = AnimatedEmojiSpan.update(this.animatedEmojisCacheType, view, this.animatedEmojis, this.layout);
+        }
+        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View view2) {
+                Text text = Text.this;
+                text.animatedEmojis = AnimatedEmojiSpan.update(text.animatedEmojisCacheType, view, Text.this.animatedEmojis, Text.this.layout);
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View view2) {
+                AnimatedEmojiSpan.release(view, Text.this.animatedEmojis);
+            }
+        });
         return this;
     }
 }

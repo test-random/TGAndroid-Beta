@@ -57,6 +57,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.messenger.voip.VoIPService;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_phone;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuSlider;
@@ -2213,14 +2214,14 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             this.fragment.getConnectionsManager().cancelRequest(this.toggleGroupCallStartSubscriptionReqId, true);
             this.toggleGroupCallStartSubscriptionReqId = 0;
         }
-        TLRPC.TL_phone_toggleGroupCallStartSubscription tL_phone_toggleGroupCallStartSubscription = new TLRPC.TL_phone_toggleGroupCallStartSubscription();
-        tL_phone_toggleGroupCallStartSubscription.call = groupCall.getInputGroupCall();
+        TL_phone.toggleGroupCallStartSubscription togglegroupcallstartsubscription = new TL_phone.toggleGroupCallStartSubscription();
+        togglegroupcallstartsubscription.call = groupCall.getInputGroupCall();
         TLRPC.GroupCall groupCall2 = groupCall.call;
         boolean z = true ^ this.willBeNotified;
         this.willBeNotified = z;
         groupCall2.schedule_start_subscribed = z;
-        tL_phone_toggleGroupCallStartSubscription.subscribed = z;
-        this.toggleGroupCallStartSubscriptionReqId = this.fragment.getConnectionsManager().sendRequest(tL_phone_toggleGroupCallStartSubscription, null);
+        togglegroupcallstartsubscription.subscribed = z;
+        this.toggleGroupCallStartSubscriptionReqId = this.fragment.getConnectionsManager().sendRequest(togglegroupcallstartsubscription, null);
         if (this.scheduleRunnableScheduled) {
             AndroidUtilities.cancelRunOnUIThread(this.updateScheduleTimeRunnable);
             this.scheduleRunnableScheduled = false;

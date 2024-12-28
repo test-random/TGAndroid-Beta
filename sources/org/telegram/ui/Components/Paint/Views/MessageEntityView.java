@@ -537,6 +537,7 @@ public abstract class MessageEntityView extends EntityView {
                                 canvas.translate(chatActionCell.getX(), chatActionCell.getY());
                                 canvas.scale(chatActionCell.getScaleX(), chatActionCell.getScaleY(), chatActionCell.getMeasuredWidth() / 2.0f, chatActionCell.getMeasuredHeight() / 2.0f);
                                 chatActionCell.drawBackground(canvas, true);
+                                chatActionCell.drawReactions(canvas, true);
                                 canvas.restore();
                             }
                         }

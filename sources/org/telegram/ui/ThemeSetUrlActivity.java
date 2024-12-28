@@ -35,6 +35,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -233,11 +234,11 @@ public class ThemeSetUrlActivity extends BaseFragment implements NotificationCen
     }
 
     public void lambda$checkUrl$8(final String str) {
-        TLRPC.TL_account_createTheme tL_account_createTheme = new TLRPC.TL_account_createTheme();
-        tL_account_createTheme.slug = str;
-        tL_account_createTheme.title = "";
-        tL_account_createTheme.document = new TLRPC.TL_inputDocumentEmpty();
-        this.checkReqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_createTheme, new RequestDelegate() {
+        TL_account.createTheme createtheme = new TL_account.createTheme();
+        createtheme.slug = str;
+        createtheme.title = "";
+        createtheme.document = new TLRPC.TL_inputDocumentEmpty();
+        this.checkReqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(createtheme, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 ThemeSetUrlActivity.this.lambda$checkUrl$7(str, tLObject, tL_error);
@@ -328,22 +329,22 @@ public class ThemeSetUrlActivity extends BaseFragment implements NotificationCen
         lambda$onBackPressed$321();
     }
 
-    public void lambda$saveTheme$11(TLRPC.TL_error tL_error, TLRPC.TL_account_updateTheme tL_account_updateTheme) {
+    public void lambda$saveTheme$11(TLRPC.TL_error tL_error, TL_account.updateTheme updatetheme) {
         try {
             this.progressDialog.dismiss();
             this.progressDialog = null;
         } catch (Exception e) {
             FileLog.e(e);
         }
-        AlertsCreator.processError(this.currentAccount, tL_error, this, tL_account_updateTheme, new Object[0]);
+        AlertsCreator.processError(this.currentAccount, tL_error, this, updatetheme, new Object[0]);
     }
 
-    public void lambda$saveTheme$12(final TLRPC.TL_account_updateTheme tL_account_updateTheme, TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$saveTheme$12(final TL_account.updateTheme updatetheme, TLObject tLObject, final TLRPC.TL_error tL_error) {
         if (!(tLObject instanceof TLRPC.TL_theme)) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ThemeSetUrlActivity.this.lambda$saveTheme$11(tL_error, tL_account_updateTheme);
+                    ThemeSetUrlActivity.this.lambda$saveTheme$11(tL_error, updatetheme);
                 }
             });
         } else {
@@ -404,21 +405,21 @@ public class ThemeSetUrlActivity extends BaseFragment implements NotificationCen
                 return;
             }
             this.progressDialog = new AlertDialog(getParentActivity(), 3);
-            final TLRPC.TL_account_updateTheme tL_account_updateTheme = new TLRPC.TL_account_updateTheme();
+            final TL_account.updateTheme updatetheme = new TL_account.updateTheme();
             TLRPC.TL_inputTheme tL_inputTheme = new TLRPC.TL_inputTheme();
             TLRPC.TL_theme tL_theme3 = this.info;
             tL_inputTheme.id = tL_theme3.id;
             tL_inputTheme.access_hash = tL_theme3.access_hash;
-            tL_account_updateTheme.theme = tL_inputTheme;
-            tL_account_updateTheme.format = "android";
-            tL_account_updateTheme.slug = obj2;
-            int i = tL_account_updateTheme.flags;
-            tL_account_updateTheme.title = obj3;
-            tL_account_updateTheme.flags = i | 3;
-            final int sendRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_updateTheme, new RequestDelegate() {
+            updatetheme.theme = tL_inputTheme;
+            updatetheme.format = "android";
+            updatetheme.slug = obj2;
+            int i = updatetheme.flags;
+            updatetheme.title = obj3;
+            updatetheme.flags = i | 3;
+            final int sendRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(updatetheme, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    ThemeSetUrlActivity.this.lambda$saveTheme$12(tL_account_updateTheme, tLObject, tL_error);
+                    ThemeSetUrlActivity.this.lambda$saveTheme$12(updatetheme, tLObject, tL_error);
                 }
             }, 2);
             ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(sendRequest, this.classGuid);

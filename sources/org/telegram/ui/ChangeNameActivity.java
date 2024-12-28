@@ -18,6 +18,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
@@ -78,21 +79,21 @@ public class ChangeNameActivity extends BaseFragment {
         String obj2 = this.lastNameField.getText().toString();
         String str2 = currentUser.first_name;
         if (str2 == null || !str2.equals(obj) || (str = currentUser.last_name) == null || !str.equals(obj2)) {
-            TLRPC.TL_account_updateProfile tL_account_updateProfile = new TLRPC.TL_account_updateProfile();
-            tL_account_updateProfile.flags = 3;
-            tL_account_updateProfile.first_name = obj;
+            TL_account.updateProfile updateprofile = new TL_account.updateProfile();
+            updateprofile.flags = 3;
+            updateprofile.first_name = obj;
             currentUser.first_name = obj;
-            tL_account_updateProfile.last_name = obj2;
+            updateprofile.last_name = obj2;
             currentUser.last_name = obj2;
             TLRPC.User user = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(UserConfig.getInstance(this.currentAccount).getClientUserId()));
             if (user != null) {
-                user.first_name = tL_account_updateProfile.first_name;
-                user.last_name = tL_account_updateProfile.last_name;
+                user.first_name = updateprofile.first_name;
+                user.last_name = updateprofile.last_name;
             }
             UserConfig.getInstance(this.currentAccount).saveConfig(true);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.mainUserInfoChanged, new Object[0]);
             NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.updateInterfaces, Integer.valueOf(MessagesController.UPDATE_MASK_NAME));
-            ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_updateProfile, new RequestDelegate() {
+            ConnectionsManager.getInstance(this.currentAccount).sendRequest(updateprofile, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     ChangeNameActivity.lambda$saveName$3(tLObject, tL_error);

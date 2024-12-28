@@ -9,7 +9,8 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.Utilities;
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.ui.web.WebMetadataCache;
@@ -28,25 +29,25 @@ public abstract class BrowserHistory {
         public String url;
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.id = abstractSerializedData.readInt64(z);
-            this.time = abstractSerializedData.readInt64(z);
-            this.url = abstractSerializedData.readString(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.id = inputSerializedData.readInt64(z);
+            this.time = inputSerializedData.readInt64(z);
+            this.url = inputSerializedData.readString(z);
             WebMetadataCache.WebMetadata webMetadata = new WebMetadataCache.WebMetadata();
             this.meta = webMetadata;
-            webMetadata.readParams(abstractSerializedData, z);
+            webMetadata.readParams(inputSerializedData, z);
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt64(this.id);
-            abstractSerializedData.writeInt64(this.time);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt64(this.id);
+            outputSerializedData.writeInt64(this.time);
             String str = this.url;
             if (str == null) {
                 str = "";
             }
-            abstractSerializedData.writeString(str);
-            this.meta.serializeToStream(abstractSerializedData);
+            outputSerializedData.writeString(str);
+            this.meta.serializeToStream(outputSerializedData);
         }
     }
 

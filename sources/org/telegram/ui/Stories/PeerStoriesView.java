@@ -2670,7 +2670,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
             if (uploadingStory != null) {
                 CharSequence charSequence = uploadingStory.entry.caption;
                 this.caption = charSequence;
-                CharSequence replaceEmoji = Emoji.replaceEmoji(charSequence, peerStoriesView.storyCaptionView.captionTextview.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                CharSequence replaceEmoji = Emoji.replaceEmoji(charSequence, peerStoriesView.storyCaptionView.captionTextview.getPaint().getFontMetricsInt(), false);
                 this.caption = replaceEmoji;
                 SpannableStringBuilder valueOf2 = SpannableStringBuilder.valueOf(replaceEmoji);
                 TLRPC.User user = MessagesController.getInstance(PeerStoriesView.this.currentAccount).getUser(Long.valueOf(PeerStoriesView.this.dialogId));
@@ -2688,7 +2688,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                     TLRPC.TL_textWithEntities tL_textWithEntities = peerStoriesView2.currentStory.storyItem.translatedText;
                     String str = tL_textWithEntities.text;
                     this.caption = str;
-                    CharSequence replaceEmoji2 = Emoji.replaceEmoji((CharSequence) str, peerStoriesView2.storyCaptionView.captionTextview.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                    CharSequence replaceEmoji2 = Emoji.replaceEmoji(str, peerStoriesView2.storyCaptionView.captionTextview.getPaint().getFontMetricsInt(), false);
                     this.caption = replaceEmoji2;
                     if (replaceEmoji2 == null || tL_textWithEntities.entities == null) {
                         return;
@@ -2704,7 +2704,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                     PeerStoriesView peerStoriesView3 = PeerStoriesView.this;
                     String str2 = peerStoriesView3.currentStory.storyItem.caption;
                     this.caption = str2;
-                    CharSequence replaceEmoji3 = Emoji.replaceEmoji((CharSequence) str2, peerStoriesView3.storyCaptionView.captionTextview.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                    CharSequence replaceEmoji3 = Emoji.replaceEmoji(str2, peerStoriesView3.storyCaptionView.captionTextview.getPaint().getFontMetricsInt(), false);
                     this.caption = replaceEmoji3;
                     if (replaceEmoji3 == null || PeerStoriesView.this.currentStory.storyItem.entities == null) {
                         return;

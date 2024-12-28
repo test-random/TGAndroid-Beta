@@ -6,7 +6,9 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.text.Layout;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ReplacementSpan;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +24,7 @@ public class ButtonSpan extends ReplacementSpan {
     private final Text text;
 
     public static class TextViewButtons extends LinkSpanDrawable.LinksTextView {
+        ButtonSpan buttonToBeAdded;
         private ButtonSpan pressedSpan;
 
         public TextViewButtons(Context context) {
@@ -32,6 +35,10 @@ public class ButtonSpan extends ReplacementSpan {
             super(context, resourcesProvider);
         }
 
+        public void addButton(ButtonSpan buttonSpan) {
+            this.buttonToBeAdded = buttonSpan;
+        }
+
         public ButtonSpan findSpan(float f, int i) {
             Layout layout;
             if (!(getText() instanceof Spanned) || (layout = getLayout()) == null) {
@@ -40,9 +47,8 @@ public class ButtonSpan extends ReplacementSpan {
             int lineForVertical = layout.getLineForVertical(i);
             int offsetForHorizontal = layout.getOffsetForHorizontal(lineForVertical, f);
             Spanned spanned = (Spanned) getText();
-            ButtonSpan[] buttonSpanArr = (ButtonSpan[]) spanned.getSpans(layout.getLineStart(lineForVertical), layout.getLineEnd(lineForVertical), ButtonSpan.class);
-            for (ButtonSpan buttonSpan : buttonSpanArr) {
-                if (spanned.getSpanStart(buttonSpan) <= offsetForHorizontal && spanned.getSpanEnd(buttonSpan) >= offsetForHorizontal) {
+            for (ButtonSpan buttonSpan : (ButtonSpan[]) spanned.getSpans(layout.getLineStart(lineForVertical), layout.getLineEnd(lineForVertical), ButtonSpan.class)) {
+                if (spanned.getSpanStart(buttonSpan) <= offsetForHorizontal && spanned.getSpanEnd(buttonSpan) >= offsetForHorizontal && layout.getPrimaryHorizontal(spanned.getSpanStart(buttonSpan)) <= f && layout.getPrimaryHorizontal(spanned.getSpanEnd(buttonSpan)) >= f) {
                     return buttonSpan;
                 }
             }
@@ -50,10 +56,29 @@ public class ButtonSpan extends ReplacementSpan {
         }
 
         @Override
+        protected void onLayout(boolean z, int i, int i2, int i3, int i4) {
+            super.onLayout(z, i, i2, i3, i4);
+            if (this.buttonToBeAdded == null || getMeasuredWidth() <= 0) {
+                return;
+            }
+            SpannableString spannableString = new SpannableString(" btn");
+            spannableString.setSpan(this.buttonToBeAdded, 1, spannableString.length(), 33);
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(TextUtils.ellipsize(getText(), getPaint(), (((getMeasuredWidth() - getPaddingLeft()) - getPaddingRight()) - this.buttonToBeAdded.getSize()) - AndroidUtilities.dp(4.0f), TextUtils.TruncateAt.END));
+            spannableStringBuilder.append((CharSequence) spannableString);
+            setText(spannableStringBuilder);
+            this.buttonToBeAdded = null;
+        }
+
+        @Override
+        public void onMeasure(int i, int i2) {
+            super.onMeasure(i, i2);
+        }
+
+        @Override
         public boolean onTouchEvent(MotionEvent motionEvent) {
             ButtonSpan buttonSpan;
             int action = motionEvent.getAction();
-            ButtonSpan findSpan = findSpan(motionEvent.getX(), (int) motionEvent.getY());
+            ButtonSpan findSpan = findSpan(motionEvent.getX() - getPaddingLeft(), ((int) motionEvent.getY()) - getPaddingTop());
             if (action == 0) {
                 this.pressedSpan = findSpan;
                 if (findSpan != null) {
@@ -78,7 +103,7 @@ public class ButtonSpan extends ReplacementSpan {
         }
     }
 
-    private ButtonSpan(CharSequence charSequence, Runnable runnable, Theme.ResourcesProvider resourcesProvider) {
+    public ButtonSpan(CharSequence charSequence, Runnable runnable, Theme.ResourcesProvider resourcesProvider) {
         this.resourcesProvider = resourcesProvider;
         this.onClickListener = runnable;
         this.text = new Text(charSequence, 12.0f);

@@ -18,6 +18,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.SpannableString;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.transition.ChangeBounds;
 import android.transition.Fade;
@@ -123,7 +124,7 @@ public class ActionBar extends FrameLayout {
     private int titleColorToSet;
     private boolean titleOverlayShown;
     private int titleRightMargin;
-    private SimpleTextView[] titleTextView;
+    private final SimpleTextView[] titleTextView;
     private FrameLayout titlesContainer;
     private boolean useContainerForTitles;
 
@@ -206,6 +207,8 @@ public class ActionBar extends FrameLayout {
         } else {
             this.titleTextView[i].setTextColor(getThemedColor(Theme.key_actionBarDefaultTitle));
         }
+        SimpleTextView simpleTextView = this.titleTextView[i];
+        simpleTextView.setEmojiColor(simpleTextView.getTextColor());
         this.titleTextView[i].setTypeface(AndroidUtilities.bold());
         this.titleTextView[i].setDrawablePadding(AndroidUtilities.dp(4.0f));
         this.titleTextView[i].setPadding(0, AndroidUtilities.dp(8.0f), 0, AndroidUtilities.dp(8.0f));
@@ -541,6 +544,18 @@ public class ActionBar extends FrameLayout {
             return null;
         }
         return simpleTextView.getText().toString();
+    }
+
+    public Paint.FontMetricsInt getTitleFontMetricsInt() {
+        TextPaint paint;
+        SimpleTextView simpleTextView = this.titleTextView[0];
+        if (simpleTextView == null) {
+            paint = new TextPaint(1);
+            paint.setTextSize(AndroidUtilities.dp((AndroidUtilities.isTablet() || getResources().getConfiguration().orientation != 2) ? 20.0f : 18.0f));
+        } else {
+            paint = simpleTextView.getPaint();
+        }
+        return paint.getFontMetricsInt();
     }
 
     public SimpleTextView getTitleTextView() {
@@ -1389,9 +1404,11 @@ public class ActionBar extends FrameLayout {
         }
         this.titleColorToSet = i;
         this.titleTextView[0].setTextColor(i);
+        this.titleTextView[0].setEmojiColor(i);
         SimpleTextView simpleTextView = this.titleTextView[1];
         if (simpleTextView != null) {
             simpleTextView.setTextColor(i);
+            this.titleTextView[1].setEmojiColor(i);
         }
     }
 

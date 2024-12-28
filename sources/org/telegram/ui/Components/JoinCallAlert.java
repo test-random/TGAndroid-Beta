@@ -40,6 +40,7 @@ import org.telegram.messenger.voip.VoIPService;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_phone;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
@@ -552,9 +553,9 @@ public class JoinCallAlert extends BottomSheet {
             return;
         }
         final AlertDialog alertDialog = new AlertDialog(context, 3);
-        TLRPC.TL_phone_getGroupCallJoinAs tL_phone_getGroupCallJoinAs = new TLRPC.TL_phone_getGroupCallJoinAs();
-        tL_phone_getGroupCallJoinAs.peer = accountInstance.getMessagesController().getInputPeer(j);
-        final int sendRequest = accountInstance.getConnectionsManager().sendRequest(tL_phone_getGroupCallJoinAs, new RequestDelegate() {
+        TL_phone.getGroupCallJoinAs getgroupcalljoinas = new TL_phone.getGroupCallJoinAs();
+        getgroupcalljoinas.peer = accountInstance.getMessagesController().getInputPeer(j);
+        final int sendRequest = accountInstance.getConnectionsManager().sendRequest(getgroupcalljoinas, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 JoinCallAlert.lambda$checkFewUsers$1(AlertDialog.this, j, accountInstance, booleanCallback, tLObject, tL_error);
@@ -579,14 +580,14 @@ public class JoinCallAlert extends BottomSheet {
             FileLog.e(e);
         }
         if (tLObject != null) {
-            TLRPC.TL_phone_joinAsPeers tL_phone_joinAsPeers = (TLRPC.TL_phone_joinAsPeers) tLObject;
-            cachedChats = tL_phone_joinAsPeers.peers;
+            TL_phone.joinAsPeers joinaspeers = (TL_phone.joinAsPeers) tLObject;
+            cachedChats = joinaspeers.peers;
             lastCacheDid = j;
             lastCacheTime = SystemClock.elapsedRealtime();
             lastCachedAccount = accountInstance.getCurrentAccount();
-            accountInstance.getMessagesController().putChats(tL_phone_joinAsPeers.chats, false);
-            accountInstance.getMessagesController().putUsers(tL_phone_joinAsPeers.users, false);
-            booleanCallback.run(tL_phone_joinAsPeers.peers.size() == 1);
+            accountInstance.getMessagesController().putChats(joinaspeers.chats, false);
+            accountInstance.getMessagesController().putUsers(joinaspeers.users, false);
+            booleanCallback.run(joinaspeers.peers.size() == 1);
         }
     }
 
@@ -654,18 +655,18 @@ public class JoinCallAlert extends BottomSheet {
             FileLog.e(e);
         }
         if (tLObject != null) {
-            TLRPC.TL_phone_joinAsPeers tL_phone_joinAsPeers = (TLRPC.TL_phone_joinAsPeers) tLObject;
-            if (tL_phone_joinAsPeers.peers.size() == 1) {
-                joinCallAlertDelegate.didSelectChat(accountInstance.getMessagesController().getInputPeer(MessageObject.getPeerId(tL_phone_joinAsPeers.peers.get(0))), false, false, false);
+            TL_phone.joinAsPeers joinaspeers = (TL_phone.joinAsPeers) tLObject;
+            if (joinaspeers.peers.size() == 1) {
+                joinCallAlertDelegate.didSelectChat(accountInstance.getMessagesController().getInputPeer(MessageObject.getPeerId(joinaspeers.peers.get(0))), false, false, false);
                 return;
             }
-            cachedChats = tL_phone_joinAsPeers.peers;
+            cachedChats = joinaspeers.peers;
             lastCacheDid = j;
             lastCacheTime = SystemClock.elapsedRealtime();
             lastCachedAccount = accountInstance.getCurrentAccount();
-            accountInstance.getMessagesController().putChats(tL_phone_joinAsPeers.chats, false);
-            accountInstance.getMessagesController().putUsers(tL_phone_joinAsPeers.users, false);
-            showAlert(context, j, tL_phone_joinAsPeers.peers, baseFragment, i, peer, joinCallAlertDelegate);
+            accountInstance.getMessagesController().putChats(joinaspeers.chats, false);
+            accountInstance.getMessagesController().putUsers(joinaspeers.users, false);
+            showAlert(context, j, joinaspeers.peers, baseFragment, i, peer, joinCallAlertDelegate);
         }
     }
 
@@ -696,9 +697,9 @@ public class JoinCallAlert extends BottomSheet {
             }
         }
         final AlertDialog alertDialog = new AlertDialog(context, 3);
-        TLRPC.TL_phone_getGroupCallJoinAs tL_phone_getGroupCallJoinAs = new TLRPC.TL_phone_getGroupCallJoinAs();
-        tL_phone_getGroupCallJoinAs.peer = accountInstance.getMessagesController().getInputPeer(j);
-        final int sendRequest = accountInstance.getConnectionsManager().sendRequest(tL_phone_getGroupCallJoinAs, new RequestDelegate() {
+        TL_phone.getGroupCallJoinAs getgroupcalljoinas = new TL_phone.getGroupCallJoinAs();
+        getgroupcalljoinas.peer = accountInstance.getMessagesController().getInputPeer(j);
+        final int sendRequest = accountInstance.getConnectionsManager().sendRequest(getgroupcalljoinas, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 JoinCallAlert.lambda$open$4(AlertDialog.this, accountInstance, joinCallAlertDelegate, j, context, baseFragment, i, peer, tLObject, tL_error);

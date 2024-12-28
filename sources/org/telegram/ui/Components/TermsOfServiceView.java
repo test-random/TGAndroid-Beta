@@ -20,6 +20,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 
@@ -179,9 +180,9 @@ public class TermsOfServiceView extends FrameLayout {
     public void lambda$new$2(DialogInterface dialogInterface, int i) {
         final AlertDialog alertDialog = new AlertDialog(getContext(), 3);
         alertDialog.setCanCancel(false);
-        TLRPC.TL_account_deleteAccount tL_account_deleteAccount = new TLRPC.TL_account_deleteAccount();
-        tL_account_deleteAccount.reason = "Decline ToS update";
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_deleteAccount, new RequestDelegate() {
+        TL_account.deleteAccount deleteaccount = new TL_account.deleteAccount();
+        deleteaccount.reason = "Decline ToS update";
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(deleteaccount, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 TermsOfServiceView.this.lambda$new$1(alertDialog, tLObject, tL_error);

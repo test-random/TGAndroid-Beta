@@ -94,7 +94,7 @@ public class SelectorCountryCell extends BaseCell {
 
     public void setCountry(TLRPC.TL_help_country tL_help_country, boolean z) {
         this.country = tL_help_country;
-        this.titleTextView.setText(Emoji.replaceEmoji(getCountryNameWithFlag(tL_help_country), this.titleTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false));
+        this.titleTextView.setText(Emoji.replaceEmoji(getCountryNameWithFlag(tL_help_country), this.titleTextView.getPaint().getFontMetricsInt(), false));
         setDivider(z);
     }
 

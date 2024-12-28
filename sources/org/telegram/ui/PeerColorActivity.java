@@ -49,6 +49,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -1937,59 +1938,59 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
                 }
                 if (this.namePage.selectedColor != UserObject.getColorId(currentUser) || this.namePage.selectedEmoji != UserObject.getEmojiId(currentUser)) {
                     this.applyingName = true;
-                    TLRPC.TL_account_updateColor tL_account_updateColor = new TLRPC.TL_account_updateColor();
+                    TL_account.updateColor updatecolor = new TL_account.updateColor();
                     currentUser.flags2 |= 256;
                     TLRPC.TL_peerColor tL_peerColor2 = currentUser.color;
                     tL_peerColor2.flags |= 1;
-                    tL_account_updateColor.flags |= 4;
+                    updatecolor.flags |= 4;
                     int i = this.namePage.selectedColor;
                     tL_peerColor2.color = i;
-                    tL_account_updateColor.color = i;
+                    updatecolor.color = i;
                     if (this.namePage.selectedEmoji != 0) {
-                        tL_account_updateColor.flags |= 1;
+                        updatecolor.flags |= 1;
                         TLRPC.TL_peerColor tL_peerColor3 = currentUser.color;
                         tL_peerColor3.flags |= 2;
                         long j = this.namePage.selectedEmoji;
                         tL_peerColor3.background_emoji_id = j;
-                        tL_account_updateColor.background_emoji_id = j;
+                        updatecolor.background_emoji_id = j;
                     } else {
                         TLRPC.TL_peerColor tL_peerColor4 = currentUser.color;
                         tL_peerColor4.flags &= -3;
                         tL_peerColor4.background_emoji_id = 0L;
                     }
-                    getConnectionsManager().sendRequest(tL_account_updateColor, null);
+                    getConnectionsManager().sendRequest(updatecolor, null);
                 }
                 if (this.profilePage.selectedColor != UserObject.getProfileColorId(currentUser) || this.profilePage.selectedEmoji != UserObject.getProfileEmojiId(currentUser)) {
                     this.applyingProfile = true;
                     if (currentUser.profile_color == null) {
                         currentUser.profile_color = new TLRPC.TL_peerColor();
                     }
-                    TLRPC.TL_account_updateColor tL_account_updateColor2 = new TLRPC.TL_account_updateColor();
-                    tL_account_updateColor2.for_profile = true;
+                    TL_account.updateColor updatecolor2 = new TL_account.updateColor();
+                    updatecolor2.for_profile = true;
                     currentUser.flags2 |= 512;
                     if (this.profilePage.selectedColor < 0) {
                         currentUser.profile_color.flags &= -2;
                     } else {
                         TLRPC.TL_peerColor tL_peerColor5 = currentUser.profile_color;
                         tL_peerColor5.flags |= 1;
-                        tL_account_updateColor2.flags |= 4;
+                        updatecolor2.flags |= 4;
                         int i2 = this.profilePage.selectedColor;
                         tL_peerColor5.color = i2;
-                        tL_account_updateColor2.color = i2;
+                        updatecolor2.color = i2;
                     }
                     if (this.profilePage.selectedEmoji != 0) {
-                        tL_account_updateColor2.flags |= 1;
+                        updatecolor2.flags |= 1;
                         TLRPC.TL_peerColor tL_peerColor6 = currentUser.profile_color;
                         tL_peerColor6.flags |= 2;
                         long j2 = this.profilePage.selectedEmoji;
                         tL_peerColor6.background_emoji_id = j2;
-                        tL_account_updateColor2.background_emoji_id = j2;
+                        updatecolor2.background_emoji_id = j2;
                     } else {
                         TLRPC.TL_peerColor tL_peerColor7 = currentUser.profile_color;
                         tL_peerColor7.flags &= -3;
                         tL_peerColor7.background_emoji_id = 0L;
                     }
-                    getConnectionsManager().sendRequest(tL_account_updateColor2, null);
+                    getConnectionsManager().sendRequest(updatecolor2, null);
                 }
                 getMessagesController().putUser(currentUser, false);
                 getUserConfig().saveConfig(true);
@@ -2200,7 +2201,7 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
         frameLayout2.addView(this.colorBar, LayoutHelper.createFrame(-1, -2, 55));
         ViewPagerFixed viewPagerFixed = new ViewPagerFixed(context) {
             @Override
-            public void onTabAnimationUpdate(boolean z) {
+            protected void onTabAnimationUpdate(boolean z) {
                 PeerColorActivity.this.tabsView.setSelected(PeerColorActivity.this.viewPager.getPositionAnimated());
                 PeerColorActivity.this.colorBar.setProgressToGradient(PeerColorActivity.this.viewPager.getPositionAnimated());
             }

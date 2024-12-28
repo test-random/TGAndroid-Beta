@@ -14,11 +14,13 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLObject;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.AvatarsImageView;
+import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.BlurredFrameLayout;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.SizeNotifierFrameLayout;
@@ -29,6 +31,7 @@ public class DialogsHintCell extends BlurredFrameLayout {
     private final ImageView closeView;
     private final LinearLayout contentView;
     private int height;
+    public final BackupImageView imageView;
     private final TextView messageView;
     private final LinearLayout parentView;
     public final AnimatedEmojiSpan.TextViewEmojis titleView;
@@ -42,6 +45,9 @@ public class DialogsHintCell extends BlurredFrameLayout {
         avatarsImageView.setStepFactor(0.56790125f);
         avatarsImageView.setVisibility(8);
         avatarsImageView.setCount(0);
+        BackupImageView backupImageView = new BackupImageView(context);
+        this.imageView = backupImageView;
+        backupImageView.setVisibility(8);
         LinearLayout linearLayout = new LinearLayout(context);
         this.contentView = linearLayout;
         linearLayout.setOrientation(1);
@@ -71,8 +77,10 @@ public class DialogsHintCell extends BlurredFrameLayout {
         linearLayout2.setOrientation(0);
         if (LocaleController.isRTL) {
             linearLayout2.addView(linearLayout, LayoutHelper.createFrame(-1, -1.0f, 16, 7.0f, 0.0f, 7.0f, 0.0f));
-            linearLayout2.addView(avatarsImageView, LayoutHelper.createFrame(0, -1.0f, 16, 2.0f, 0.0f, 0.0f, 0.0f));
+            linearLayout2.addView(avatarsImageView, LayoutHelper.createFrame(0, -1.0f, 16, 2.0f, 0.0f, 8.0f, 0.0f));
+            linearLayout2.addView(backupImageView, LayoutHelper.createFrame(36, 36.0f, 21, 2.0f, 1.0f, 0.0f, 0.0f));
         } else {
+            linearLayout2.addView(backupImageView, LayoutHelper.createFrame(36, 36.0f, 19, 0.0f, 1.0f, 2.0f, 0.0f));
             linearLayout2.addView(avatarsImageView, LayoutHelper.createFrame(0, -1.0f, 16, 0.0f, 0.0f, 2.0f, 0.0f));
             linearLayout2.addView(linearLayout, LayoutHelper.createFrame(-1, -1.0f, 16, 7.0f, 0.0f, 7.0f, 0.0f));
         }
@@ -108,6 +116,13 @@ public class DialogsHintCell extends BlurredFrameLayout {
             return;
         }
         onClickListener.onClick(view);
+    }
+
+    public void clear() {
+        setCompact(false);
+        setAvatars(UserConfig.selectedAccount, null);
+        this.imageView.setVisibility(8);
+        this.imageView.clearImage();
     }
 
     @Override
@@ -204,6 +219,10 @@ public class DialogsHintCell extends BlurredFrameLayout {
         this.messageView.setText(charSequence2);
         this.chevronView.setVisibility(0);
         this.closeView.setVisibility(8);
+    }
+
+    public void showImage() {
+        this.imageView.setVisibility(0);
     }
 
     public void updateColors() {

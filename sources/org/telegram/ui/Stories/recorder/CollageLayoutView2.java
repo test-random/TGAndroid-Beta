@@ -13,9 +13,14 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.RecordingCanvas;
 import android.graphics.RectF;
+import android.graphics.RenderEffect;
+import android.graphics.RenderNode;
 import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
@@ -28,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BotFullscreenButtons$$ExternalSyntheticApiModelOutline2;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
@@ -42,6 +48,7 @@ import org.telegram.ui.Components.ItemOptions;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Stories.recorder.CollageLayout;
 import org.telegram.ui.Stories.recorder.CollageLayoutView2;
+import org.telegram.ui.Stories.recorder.QRScanner;
 
 public abstract class CollageLayoutView2 extends FrameLayout implements ItemOptions.ScrimView {
     private final AnimatedFloat[] animatedColumns;
@@ -49,6 +56,9 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     private final AnimatedFloat animatedRows;
     private boolean attached;
     private final BlurringShader.BlurManager blurManager;
+    private Object blurRenderNode;
+    private Drawable cameraThumbDrawable;
+    private boolean cameraThumbVisible;
     public CameraView cameraView;
     private Object cameraViewBlurRenderNode;
     private Runnable cancelGestures;
@@ -72,6 +82,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     public Part longPressedPart;
     private boolean needsBlur;
     public Part nextPart;
+    private Runnable onCameraThumbClick;
     public Runnable onLongPressPart;
     private Runnable onResetState;
     public final ArrayList parts;
@@ -80,9 +91,11 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     private boolean preview;
     private long previewStartTime;
     private PreviewView previewView;
+    public final QRScanner.QrRegionDrawer qrDrawer;
     private final float[] radii;
     private final RectF rect;
     public final ArrayList removingParts;
+    private Object renderNode;
     public boolean reordering;
     public Part reorderingPart;
     public boolean reorderingTouch;
@@ -301,6 +314,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
 
     public CollageLayoutView2(Context context, BlurringShader.BlurManager blurManager, FrameLayout frameLayout, Theme.ResourcesProvider resourcesProvider) {
         super(context);
+        this.qrDrawer = new QRScanner.QrRegionDrawer(new CollageLayoutView2$$ExternalSyntheticLambda1(this));
         this.currentLayout = new CollageLayout(".");
         ArrayList arrayList = new ArrayList();
         this.parts = arrayList;
@@ -323,6 +337,7 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         this.rights = new float[5];
         this.rect = new RectF();
         this.clipPath = new Path();
+        this.cameraThumbVisible = true;
         this.playing = true;
         this.restorePositionOnPlaying = true;
         this.syncRunnable = new Runnable() {
@@ -356,11 +371,32 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         setWillNotDraw(false);
     }
 
-    private void drawPart(android.graphics.Canvas r10, android.graphics.RectF r11, org.telegram.ui.Stories.recorder.CollageLayoutView2.Part r12) {
+    private void drawDrawable(Canvas canvas, Drawable drawable, RectF rectF, float f) {
+        if (drawable == null) {
+            return;
+        }
+        int intrinsicWidth = drawable.getIntrinsicWidth();
+        int intrinsicHeight = drawable.getIntrinsicHeight();
+        float max = Math.max(rectF.width() / intrinsicWidth, rectF.height() / intrinsicHeight);
+        canvas.save();
+        canvas.translate(rectF.centerX(), rectF.centerY());
+        canvas.clipRect((-rectF.width()) / 2.0f, (-rectF.height()) / 2.0f, rectF.width() / 2.0f, rectF.height() / 2.0f);
+        canvas.scale(max, max);
+        canvas.translate((-intrinsicWidth) / 2.0f, (-intrinsicHeight) / 2.0f);
+        drawable.setBounds(0, 0, intrinsicWidth, intrinsicHeight);
+        drawable.draw(canvas);
+        if (f > 0.0f) {
+            canvas.drawColor(Theme.multAlpha(-16777216, drawable.getAlpha() * f));
+        }
+        canvas.restore();
+    }
+
+    private void drawPart(android.graphics.Canvas r8, android.graphics.RectF r9, org.telegram.ui.Stories.recorder.CollageLayoutView2.Part r10) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.CollageLayoutView2.drawPart(android.graphics.Canvas, android.graphics.RectF, org.telegram.ui.Stories.recorder.CollageLayoutView2$Part):void");
     }
 
     private void drawView(Canvas canvas, View view, RectF rectF, float f) {
+        QRScanner.QrRegionDrawer qrRegionDrawer;
         Bitmap bitmap;
         if (view == null) {
             return;
@@ -384,6 +420,28 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
             canvas.drawColor(Theme.multAlpha(-16777216, view.getAlpha() * f));
         }
         canvas.restore();
+        if (view != this.cameraView || (qrRegionDrawer = this.qrDrawer) == null) {
+            return;
+        }
+        qrRegionDrawer.draw(canvas, rectF);
+    }
+
+    private void finishNode(Canvas canvas) {
+        RecordingCanvas beginRecording;
+        if (this.renderNode == null || Build.VERSION.SDK_INT < 29 || !canvas.isHardwareAccelerated()) {
+            return;
+        }
+        RenderNode m = BotFullscreenButtons$$ExternalSyntheticApiModelOutline2.m(this.renderNode);
+        m.endRecording();
+        canvas.drawRenderNode(m);
+        Object obj = this.blurRenderNode;
+        if (obj != null) {
+            RenderNode m2 = BotFullscreenButtons$$ExternalSyntheticApiModelOutline2.m(obj);
+            m2.setPosition(0, 0, getWidth(), getHeight());
+            beginRecording = m2.beginRecording();
+            beginRecording.drawRenderNode(m);
+            m2.endRecording();
+        }
     }
 
     public void lambda$new$0() {
@@ -712,6 +770,23 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     public void forceNotRestorePosition() {
     }
 
+    public Object getBlurRenderNode() {
+        Shader.TileMode tileMode;
+        RenderEffect createBlurEffect;
+        if (this.renderNode == null && Build.VERSION.SDK_INT >= 31) {
+            this.renderNode = new RenderNode("CameraViewRenderNode");
+            RenderNode renderNode = new RenderNode("CameraViewRenderNodeBlur");
+            this.blurRenderNode = renderNode;
+            BotFullscreenButtons$$ExternalSyntheticApiModelOutline2.m(renderNode);
+            float dp = AndroidUtilities.dp(32.0f);
+            float dp2 = AndroidUtilities.dp(32.0f);
+            tileMode = Shader.TileMode.DECAL;
+            createBlurEffect = RenderEffect.createBlurEffect(dp, dp2, tileMode);
+            renderNode.setRenderEffect(createBlurEffect);
+        }
+        return this.blurRenderNode;
+    }
+
     @Override
     public void getBounds(RectF rectF) {
         Part part = this.longPressedPart;
@@ -1031,15 +1106,20 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         updateCameraNeedsBlur();
     }
 
+    public void setCameraThumb(Drawable drawable) {
+        this.cameraThumbDrawable = drawable;
+        invalidate();
+    }
+
+    public void setCameraThumbVisible(boolean z) {
+        this.cameraThumbVisible = z;
+        invalidate();
+    }
+
     public void setCameraView(CameraView cameraView) {
         CameraView cameraView2 = this.cameraView;
         if (cameraView2 != cameraView && cameraView2 != null) {
-            cameraView2.unlistenDraw(new Runnable() {
-                @Override
-                public final void run() {
-                    CollageLayoutView2.this.invalidate();
-                }
-            });
+            cameraView2.unlistenDraw(new CollageLayoutView2$$ExternalSyntheticLambda1(this));
             AndroidUtilities.removeFromParent(this.cameraView);
             this.cameraView = null;
             updateCameraNeedsBlur();
@@ -1050,21 +1130,11 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
         }
         CameraView cameraView3 = this.cameraView;
         if (cameraView3 != null) {
-            cameraView3.unlistenDraw(new Runnable() {
-                @Override
-                public final void run() {
-                    CollageLayoutView2.this.invalidate();
-                }
-            });
+            cameraView3.unlistenDraw(new CollageLayoutView2$$ExternalSyntheticLambda1(this));
         }
         this.cameraView = cameraView;
         if (cameraView != null) {
-            cameraView.listenDraw(new Runnable() {
-                @Override
-                public final void run() {
-                    CollageLayoutView2.this.invalidate();
-                }
-            });
+            cameraView.listenDraw(new CollageLayoutView2$$ExternalSyntheticLambda1(this));
         }
         updateCameraNeedsBlur();
         invalidate();
@@ -1113,6 +1183,10 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
             return;
         }
         this.isMuted = z;
+    }
+
+    public void setOnCameraThumbClick(Runnable runnable) {
+        this.onCameraThumbClick = runnable;
     }
 
     public void setPlaying(boolean z) {

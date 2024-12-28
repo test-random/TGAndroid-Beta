@@ -1,9 +1,9 @@
 package org.telegram.messenger;
 
-public final class MessagesController$$ExternalSyntheticLambda66 implements Runnable {
+public final class MessagesController$$ExternalSyntheticLambda69 implements Runnable {
     public final MessagesController f$0;
 
-    public MessagesController$$ExternalSyntheticLambda66(MessagesController messagesController) {
+    public MessagesController$$ExternalSyntheticLambda69(MessagesController messagesController) {
         this.f$0 = messagesController;
     }
 

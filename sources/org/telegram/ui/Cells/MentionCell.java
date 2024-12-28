@@ -157,7 +157,7 @@ public class MentionCell extends LinearLayout {
         this.usernameTextView.setVisibility(0);
         this.nameTextView.setText(str);
         TextView textView = this.usernameTextView;
-        textView.setText(Emoji.replaceEmoji((CharSequence) str2, textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false));
+        textView.setText(Emoji.replaceEmoji(str2, textView.getPaint().getFontMetricsInt(), false));
     }
 
     public void setChat(TLRPC.Chat chat) {

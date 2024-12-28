@@ -26,6 +26,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.ui.ActionBar.Theme;
 
 public class ReactedHeaderView extends FrameLayout {
@@ -261,10 +262,10 @@ public class ReactedHeaderView extends FrameLayout {
         ConnectionsManager connectionsManager;
         TLRPC.TL_messages_getFullChat tL_messages_getFullChat;
         int i;
-        if (tLObject instanceof TLRPC.Vector) {
+        if (tLObject instanceof Vector) {
             final ArrayList arrayList = new ArrayList();
             final ArrayList arrayList2 = new ArrayList();
-            Iterator<Object> it = ((TLRPC.Vector) tLObject).objects.iterator();
+            Iterator it = ((Vector) tLObject).objects.iterator();
             while (it.hasNext()) {
                 Object next = it.next();
                 if (next instanceof Long) {

@@ -999,7 +999,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                 for (ImageSpan imageSpan : (ImageSpan[]) editable.getSpans(0, editable.length(), ImageSpan.class)) {
                     editable.removeSpan(imageSpan);
                 }
-                Emoji.replaceEmoji((CharSequence) editable, ChatAttachAlert.this.commentTextView.getEditText().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                Emoji.replaceEmoji(editable, ChatAttachAlert.this.commentTextView.getEditText().getPaint().getFontMetricsInt(), false);
                 this.processChange = false;
             }
             ChatAttachAlert.this.codepointCount = Character.codePointCount(editable, 0, editable.length());
@@ -1145,7 +1145,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                 for (ImageSpan imageSpan : (ImageSpan[]) editable.getSpans(0, editable.length(), ImageSpan.class)) {
                     editable.removeSpan(imageSpan);
                 }
-                Emoji.replaceEmoji((CharSequence) editable, ChatAttachAlert.this.topCommentTextView.getEditText().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                Emoji.replaceEmoji(editable, ChatAttachAlert.this.topCommentTextView.getEditText().getPaint().getFontMetricsInt(), false);
                 this.processChange = false;
             }
             ChatAttachAlert.this.codepointCount = Character.codePointCount(editable, 0, editable.length());
@@ -3942,7 +3942,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                     for (ImageSpan imageSpan : (ImageSpan[]) editable.getSpans(0, editable.length(), ImageSpan.class)) {
                         editable.removeSpan(imageSpan);
                     }
-                    Emoji.replaceEmoji((CharSequence) editable, ChatAttachAlert.this.commentTextView.getEditText().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                    Emoji.replaceEmoji(editable, ChatAttachAlert.this.commentTextView.getEditText().getPaint().getFontMetricsInt(), false);
                     this.processChange = false;
                 }
                 ChatAttachAlert.this.codepointCount = Character.codePointCount(editable, 0, editable.length());
@@ -4093,7 +4093,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                     for (ImageSpan imageSpan : (ImageSpan[]) editable.getSpans(0, editable.length(), ImageSpan.class)) {
                         editable.removeSpan(imageSpan);
                     }
-                    Emoji.replaceEmoji((CharSequence) editable, ChatAttachAlert.this.topCommentTextView.getEditText().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                    Emoji.replaceEmoji(editable, ChatAttachAlert.this.topCommentTextView.getEditText().getPaint().getFontMetricsInt(), false);
                     this.processChange = false;
                 }
                 ChatAttachAlert.this.codepointCount = Character.codePointCount(editable, 0, editable.length());
@@ -5302,7 +5302,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getCommentView().getText());
             spannableStringBuilder.replace(i, i2 + i, charSequence);
             if (z) {
-                Emoji.replaceEmoji((CharSequence) spannableStringBuilder, getCommentView().getEditText().getPaint().getFontMetricsInt(), AndroidUtilities.dp(20.0f), false);
+                Emoji.replaceEmoji(spannableStringBuilder, getCommentView().getEditText().getPaint().getFontMetricsInt(), false);
             }
             getCommentView().setText(spannableStringBuilder);
             getCommentView().setSelection(i + charSequence.length());
@@ -5402,6 +5402,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             arrayList.add(ObjectAnimator.ofFloat(this.actionBarShadow, (Property<View, Float>) property, z ? 1.0f : 0.0f));
             if (z3) {
                 arrayList.add(ObjectAnimator.ofFloat(this.selectedMenuItem, (Property<ActionBarMenuItem, Float>) property, z ? 1.0f : 0.0f));
+                arrayList.add(ObjectAnimator.ofFloat(this.selectedMenuItem, (Property<ActionBarMenuItem, Float>) View.SCALE_X, z ? 1.0f : 0.6f));
+                arrayList.add(ObjectAnimator.ofFloat(this.selectedMenuItem, (Property<ActionBarMenuItem, Float>) View.SCALE_Y, z ? 1.0f : 0.6f));
             }
             this.actionBarAnimation.playTogether(arrayList);
             this.actionBarAnimation.addListener(new AnimatorListenerAdapter() {

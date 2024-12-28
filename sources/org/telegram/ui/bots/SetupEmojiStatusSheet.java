@@ -30,6 +30,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -443,12 +444,12 @@ public abstract class SetupEmojiStatusSheet {
         });
     }
 
-    public static void lambda$show$4(TLObject tLObject, boolean[] zArr, Utilities.Callback callback, int i, TLRPC.TL_account_updateEmojiStatus tL_account_updateEmojiStatus) {
+    public static void lambda$show$4(TLObject tLObject, boolean[] zArr, Utilities.Callback callback, int i, TL_account.updateEmojiStatus updateemojistatus) {
         String str;
         if (tLObject instanceof TLRPC.TL_boolTrue) {
             TLRPC.User currentUser = UserConfig.getInstance(i).getCurrentUser();
             if (currentUser != null) {
-                currentUser.emoji_status = tL_account_updateEmojiStatus.emoji_status;
+                currentUser.emoji_status = updateemojistatus.emoji_status;
                 NotificationCenter.getInstance(i).lambda$postNotificationNameOnUIThread$1(NotificationCenter.userEmojiStatusUpdated, currentUser);
                 MessagesController.getInstance(i).updateEmojiStatusUntilUpdate(currentUser.id, currentUser.emoji_status);
             }
@@ -467,11 +468,11 @@ public abstract class SetupEmojiStatusSheet {
         callback.run(str);
     }
 
-    public static void lambda$show$5(final boolean[] zArr, final Utilities.Callback callback, final int i, final TLRPC.TL_account_updateEmojiStatus tL_account_updateEmojiStatus, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public static void lambda$show$5(final boolean[] zArr, final Utilities.Callback callback, final int i, final TL_account.updateEmojiStatus updateemojistatus, final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                SetupEmojiStatusSheet.lambda$show$4(TLObject.this, zArr, callback, i, tL_account_updateEmojiStatus);
+                SetupEmojiStatusSheet.lambda$show$4(TLObject.this, zArr, callback, i, updateemojistatus);
             }
         });
     }
@@ -498,21 +499,21 @@ public abstract class SetupEmojiStatusSheet {
             return;
         }
         zArr[0] = true;
-        final TLRPC.TL_account_updateEmojiStatus tL_account_updateEmojiStatus = new TLRPC.TL_account_updateEmojiStatus();
+        final TL_account.updateEmojiStatus updateemojistatus = new TL_account.updateEmojiStatus();
         if (i2 > 0) {
             TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = new TLRPC.TL_emojiStatusUntil();
             tL_emojiStatusUntil.until = ConnectionsManager.getInstance(i).getCurrentTime() + i2;
             tL_emojiStatusUntil.document_id = document.id;
-            tL_account_updateEmojiStatus.emoji_status = tL_emojiStatusUntil;
+            updateemojistatus.emoji_status = tL_emojiStatusUntil;
         } else {
             TLRPC.TL_emojiStatus tL_emojiStatus = new TLRPC.TL_emojiStatus();
             tL_emojiStatus.document_id = document.id;
-            tL_account_updateEmojiStatus.emoji_status = tL_emojiStatus;
+            updateemojistatus.emoji_status = tL_emojiStatus;
         }
-        ConnectionsManager.getInstance(i).sendRequest(tL_account_updateEmojiStatus, new RequestDelegate() {
+        ConnectionsManager.getInstance(i).sendRequest(updateemojistatus, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                SetupEmojiStatusSheet.lambda$show$5(zArr2, callback, i, tL_account_updateEmojiStatus, tLObject, tL_error);
+                SetupEmojiStatusSheet.lambda$show$5(zArr2, callback, i, updateemojistatus, tLObject, tL_error);
             }
         });
     }

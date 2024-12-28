@@ -427,40 +427,38 @@ public class HintView2 extends View {
         ColoredImageSpan[] coloredImageSpanArr = (ColoredImageSpan[]) spanned.getSpans(0, charSequence.length(), ColoredImageSpan.class);
         int i = 0;
         for (Emoji.EmojiSpan emojiSpan : emojiSpanArr) {
-            i += emojiSpan.size;
+            i = (int) (i + Math.max(0.0f, emojiSpan.size - textPaint.measureText(spanned, spanned.getSpanStart(emojiSpan), spanned.getSpanEnd(emojiSpan))));
         }
-        int i2 = i;
-        for (int i3 = 0; i3 < coloredImageSpanArr.length; i3++) {
-            ColoredImageSpan coloredImageSpan = coloredImageSpanArr[i3];
-            i2 += coloredImageSpan.getSize(textPaint, charSequence, spanned.getSpanStart(coloredImageSpan), spanned.getSpanEnd(coloredImageSpanArr[i3]), textPaint.getFontMetricsInt());
+        for (ColoredImageSpan coloredImageSpan : coloredImageSpanArr) {
+            i = (int) (i + Math.max(0.0f, coloredImageSpan.getSize(textPaint, charSequence, r15, r5, textPaint.getFontMetricsInt()) - textPaint.measureText(spanned, spanned.getSpanStart(coloredImageSpan), spanned.getSpanEnd(coloredImageSpan))));
         }
         for (AnimatedEmojiSpan animatedEmojiSpan : animatedEmojiSpanArr) {
-            i2 = (int) (i2 + animatedEmojiSpan.size);
+            i = (int) (i + Math.max(0.0f, animatedEmojiSpan.getSize(textPaint, charSequence, r13, r14, textPaint.getFontMetricsInt()) - textPaint.measureText(spanned, spanned.getSpanStart(animatedEmojiSpan), spanned.getSpanEnd(animatedEmojiSpan))));
         }
         if (typefaceSpanArr == null || typefaceSpanArr.length == 0) {
-            return textPaint.measureText(charSequence.toString()) + i2;
+            return textPaint.measureText(charSequence.toString()) + i;
         }
-        int i4 = 0;
-        for (int i5 = 0; i5 < typefaceSpanArr.length; i5++) {
-            int spanStart = spanned.getSpanStart(typefaceSpanArr[i5]);
-            int spanEnd = spanned.getSpanEnd(typefaceSpanArr[i5]);
-            int max = Math.max(i4, spanStart);
-            if (max - i4 > 0) {
-                f += textPaint.measureText(spanned, i4, max);
+        int i2 = 0;
+        for (int i3 = 0; i3 < typefaceSpanArr.length; i3++) {
+            int spanStart = spanned.getSpanStart(typefaceSpanArr[i3]);
+            int spanEnd = spanned.getSpanEnd(typefaceSpanArr[i3]);
+            int max = Math.max(i2, spanStart);
+            if (max - i2 > 0) {
+                f += textPaint.measureText(spanned, i2, max);
             }
-            i4 = Math.max(max, spanEnd);
-            if (i4 - max > 0) {
+            i2 = Math.max(max, spanEnd);
+            if (i2 - max > 0) {
                 Typeface typeface = textPaint.getTypeface();
-                textPaint.setTypeface(typefaceSpanArr[i5].getTypeface());
-                f += textPaint.measureText(spanned, max, i4);
+                textPaint.setTypeface(typefaceSpanArr[i3].getTypeface());
+                f += textPaint.measureText(spanned, max, i2);
                 textPaint.setTypeface(typeface);
             }
         }
-        int max2 = Math.max(i4, charSequence.length());
-        if (max2 - i4 > 0) {
-            f += textPaint.measureText(spanned, i4, max2);
+        int max2 = Math.max(i2, charSequence.length());
+        if (max2 - i2 > 0) {
+            f += textPaint.measureText(spanned, i2, max2);
         }
-        return f + i2;
+        return f + i;
     }
 
     private void prepareBlur() {

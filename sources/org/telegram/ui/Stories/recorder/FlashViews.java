@@ -229,12 +229,13 @@ public class FlashViews {
 
     private void setScreenBrightness(float f) {
         Window window;
-        WindowManager.LayoutParams layoutParams = this.windowViewParams;
-        if (layoutParams != null) {
+        WindowManager.LayoutParams layoutParams;
+        View view = this.windowView;
+        if (view != null && (layoutParams = this.windowViewParams) != null) {
             layoutParams.screenBrightness = f;
             WindowManager windowManager = this.windowManager;
             if (windowManager != null) {
-                windowManager.updateViewLayout(this.windowView, layoutParams);
+                windowManager.updateViewLayout(view, layoutParams);
                 return;
             }
             return;

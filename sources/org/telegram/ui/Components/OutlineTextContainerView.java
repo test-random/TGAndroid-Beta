@@ -19,21 +19,21 @@ import org.telegram.ui.Components.SimpleFloatPropertyCompat;
 public class OutlineTextContainerView extends FrameLayout {
     private EditText attachedEditText;
     private float errorProgress;
-    private SpringAnimation errorSpring;
+    private final SpringAnimation errorSpring;
     private boolean forceForceUseCenter;
     private boolean forceUseCenter;
     private float leftPadding;
     private String mText;
-    private Paint outlinePaint;
-    private RectF rect;
+    private final Paint outlinePaint;
+    private final RectF rect;
     private final Theme.ResourcesProvider resourcesProvider;
     private float selectionProgress;
-    private SpringAnimation selectionSpring;
+    private final SpringAnimation selectionSpring;
     private float strokeWidthRegular;
     private float strokeWidthSelected;
-    private TextPaint textPaint;
+    private final TextPaint textPaint;
     private float titleProgress;
-    private SpringAnimation titleSpring;
+    private final SpringAnimation titleSpring;
     private static final SimpleFloatPropertyCompat SELECTION_PROGRESS_PROPERTY = new SimpleFloatPropertyCompat("selectionProgress", new SimpleFloatPropertyCompat.Getter() {
         @Override
         public final float get(Object obj) {
@@ -82,8 +82,10 @@ public class OutlineTextContainerView extends FrameLayout {
         super(context);
         this.rect = new RectF();
         this.mText = "";
-        this.outlinePaint = new Paint(1);
-        this.textPaint = new TextPaint(1);
+        Paint paint = new Paint(1);
+        this.outlinePaint = paint;
+        TextPaint textPaint = new TextPaint(1);
+        this.textPaint = textPaint;
         this.selectionSpring = new SpringAnimation(this, SELECTION_PROGRESS_PROPERTY);
         this.titleSpring = new SpringAnimation(this, TITLE_PROGRESS_PROPERTY);
         this.errorSpring = new SpringAnimation(this, ERROR_PROGRESS_PROPERTY);
@@ -91,10 +93,10 @@ public class OutlineTextContainerView extends FrameLayout {
         this.strokeWidthSelected = AndroidUtilities.dp(1.6667f);
         this.resourcesProvider = resourcesProvider;
         setWillNotDraw(false);
-        this.textPaint.setTextSize(AndroidUtilities.dp(16.0f));
-        this.outlinePaint.setStyle(Paint.Style.STROKE);
-        this.outlinePaint.setStrokeCap(Paint.Cap.ROUND);
-        this.outlinePaint.setStrokeWidth(this.strokeWidthRegular);
+        textPaint.setTextSize(AndroidUtilities.dp(16.0f));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeWidth(this.strokeWidthRegular);
         updateColor();
         setPadding(0, AndroidUtilities.dp(6.0f), 0, 0);
     }

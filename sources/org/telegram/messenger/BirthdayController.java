@@ -6,12 +6,14 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 
 public class BirthdayController {
     private static volatile BirthdayController[] Instance = new BirthdayController[4];
@@ -36,8 +38,8 @@ public class BirthdayController {
             this.tomorrowKey = str3;
         }
 
-        public static BirthdayState from(TLRPC.TL_contacts_contactBirthdays tL_contacts_contactBirthdays) {
-            Iterator<TLRPC.TL_contactBirthday> it;
+        public static BirthdayState from(TL_account.contactBirthdays contactbirthdays) {
+            Iterator<TL_account.TL_contactBirthday> it;
             int i;
             Calendar calendar = Calendar.getInstance();
             int i2 = calendar.get(5);
@@ -54,25 +56,25 @@ public class BirthdayController {
             String str = i5 + "_" + i6 + "_" + i7;
             String str2 = i2 + "_" + i3 + "_" + i4;
             BirthdayState birthdayState = new BirthdayState(str, str2, i8 + "_" + i9 + "_" + calendar2.get(1));
-            Iterator<TLRPC.TL_contactBirthday> it2 = tL_contacts_contactBirthdays.contacts.iterator();
+            Iterator<TL_account.TL_contactBirthday> it2 = contactbirthdays.contacts.iterator();
             while (it2.hasNext()) {
-                TLRPC.TL_contactBirthday next = it2.next();
-                TLRPC.TL_birthday tL_birthday = next.birthday;
+                TL_account.TL_contactBirthday next = it2.next();
+                TL_account.TL_birthday tL_birthday = next.birthday;
                 int i10 = tL_birthday.day;
                 TLRPC.User user = null;
                 ArrayList<TLRPC.User> arrayList = (i10 == i2 && tL_birthday.month == i3) ? birthdayState.today : (i10 == i5 && tL_birthday.month == i6) ? birthdayState.yesterday : (i10 == i8 && tL_birthday.month == i9) ? birthdayState.tomorrow : null;
                 if (arrayList != null) {
                     int i11 = 0;
                     while (true) {
-                        if (i11 >= tL_contacts_contactBirthdays.users.size()) {
+                        if (i11 >= contactbirthdays.users.size()) {
                             it = it2;
                             i = i8;
                             break;
                         }
                         it = it2;
                         i = i8;
-                        if (tL_contacts_contactBirthdays.users.get(i11).id == next.contact_id) {
-                            user = tL_contacts_contactBirthdays.users.get(i11);
+                        if (contactbirthdays.users.get(i11).id == next.contact_id) {
+                            user = contactbirthdays.users.get(i11);
                             break;
                         }
                         i11++;
@@ -118,13 +120,13 @@ public class BirthdayController {
 
     public static class TL_birthdays extends TLObject {
         public static final int constructor = 290452237;
-        public ArrayList<TLRPC.TL_contactBirthday> contacts;
+        public ArrayList<TL_account.TL_contactBirthday> contacts;
 
         private TL_birthdays() {
             this.contacts = new ArrayList<>();
         }
 
-        public static TL_birthdays TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static TL_birthdays TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             if (i != 290452237) {
                 if (z) {
                     throw new RuntimeException(String.format("can't parse magic %x in TL_birthdays", Integer.valueOf(i)));
@@ -132,33 +134,33 @@ public class BirthdayController {
                 return null;
             }
             TL_birthdays tL_birthdays = new TL_birthdays();
-            tL_birthdays.readParams(abstractSerializedData, z);
+            tL_birthdays.readParams(inputSerializedData, z);
             return tL_birthdays;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(z);
             if (readInt32 != 481674261) {
                 if (z) {
                     throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
                 }
             } else {
-                int readInt322 = abstractSerializedData.readInt32(z);
+                int readInt322 = inputSerializedData.readInt32(z);
                 for (int i = 0; i < readInt322; i++) {
-                    this.contacts.add(TLRPC.TL_contactBirthday.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z));
+                    this.contacts.add(TL_account.TL_contactBirthday.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z));
                 }
             }
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(290452237);
-            abstractSerializedData.writeInt32(481674261);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(290452237);
+            outputSerializedData.writeInt32(481674261);
             int size = this.contacts.size();
-            abstractSerializedData.writeInt32(size);
+            outputSerializedData.writeInt32(size);
             for (int i = 0; i < size; i++) {
-                this.contacts.get(i).serializeToStream(abstractSerializedData);
+                this.contacts.get(i).serializeToStream(outputSerializedData);
             }
         }
     }
@@ -216,14 +218,6 @@ public class BirthdayController {
         return birthdayController;
     }
 
-    public static boolean isToday(TLRPC.TL_birthday tL_birthday) {
-        if (tL_birthday == null) {
-            return false;
-        }
-        Calendar calendar = Calendar.getInstance();
-        return tL_birthday.day == calendar.get(5) && tL_birthday.month == calendar.get(2) + 1;
-    }
-
     public static boolean isToday(TLRPC.UserFull userFull) {
         if (userFull == null) {
             return false;
@@ -231,17 +225,25 @@ public class BirthdayController {
         return isToday(userFull.birthday);
     }
 
+    public static boolean isToday(TL_account.TL_birthday tL_birthday) {
+        if (tL_birthday == null) {
+            return false;
+        }
+        Calendar calendar = Calendar.getInstance();
+        return tL_birthday.day == calendar.get(5) && tL_birthday.month == calendar.get(2) + 1;
+    }
+
     public void lambda$check$2(TLObject tLObject) {
-        if (tLObject instanceof TLRPC.TL_contacts_contactBirthdays) {
+        if (tLObject instanceof TL_account.contactBirthdays) {
             this.lastCheckDate = System.currentTimeMillis();
-            TLRPC.TL_contacts_contactBirthdays tL_contacts_contactBirthdays = (TLRPC.TL_contacts_contactBirthdays) tLObject;
-            this.state = BirthdayState.from(tL_contacts_contactBirthdays);
-            MessagesController.getInstance(this.currentAccount).putUsers(tL_contacts_contactBirthdays.users, false);
-            MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(tL_contacts_contactBirthdays.users, null, true, true);
+            TL_account.contactBirthdays contactbirthdays = (TL_account.contactBirthdays) tLObject;
+            this.state = BirthdayState.from(contactbirthdays);
+            MessagesController.getInstance(this.currentAccount).putUsers(contactbirthdays.users, false);
+            MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(contactbirthdays.users, null, true, true);
             SharedPreferences.Editor edit = MessagesController.getInstance(this.currentAccount).getMainSettings().edit();
             edit.putLong("bday_check", this.lastCheckDate);
             TL_birthdays tL_birthdays = new TL_birthdays();
-            tL_birthdays.contacts = tL_contacts_contactBirthdays.contacts;
+            tL_birthdays.contacts = contactbirthdays.contacts;
             SerializedData serializedData = new SerializedData(tL_birthdays.getObjectSize());
             tL_birthdays.serializeToStream(serializedData);
             edit.putString("bday_contacts", Utilities.bytesToHex(serializedData.toByteArray()));
@@ -261,10 +263,10 @@ public class BirthdayController {
     }
 
     public void lambda$new$0(TL_birthdays tL_birthdays, ArrayList arrayList) {
-        TLRPC.TL_contacts_contactBirthdays tL_contacts_contactBirthdays = new TLRPC.TL_contacts_contactBirthdays();
-        tL_contacts_contactBirthdays.contacts = tL_birthdays.contacts;
-        tL_contacts_contactBirthdays.users = arrayList;
-        this.state = BirthdayState.from(tL_contacts_contactBirthdays);
+        TL_account.contactBirthdays contactbirthdays = new TL_account.contactBirthdays();
+        contactbirthdays.contacts = tL_birthdays.contacts;
+        contactbirthdays.users = arrayList;
+        this.state = BirthdayState.from(contactbirthdays);
     }
 
     public void lambda$new$1(int i, ArrayList arrayList, final TL_birthdays tL_birthdays) {
@@ -301,7 +303,7 @@ public class BirthdayController {
         }
         if (z) {
             this.loading = true;
-            ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_getBirthdays(), new RequestDelegate() {
+            ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.getBirthdays(), new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     BirthdayController.this.lambda$check$3(tLObject, tL_error);

@@ -19,6 +19,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedColor;
+import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedTextView;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.EditTextCaption;
@@ -29,6 +30,7 @@ import org.telegram.ui.Components.TextStyleSpan;
 import org.telegram.ui.Components.TypefaceSpan;
 
 public abstract class EditEmojiTextCell extends FrameLayout {
+    private boolean allowEntities;
     public boolean autofocused;
     public final EditTextEmoji editTextEmoji;
     private boolean focused;
@@ -46,6 +48,7 @@ public abstract class EditEmojiTextCell extends FrameLayout {
         super(context);
         float f;
         this.showLimitWhenNear = -1;
+        this.allowEntities = true;
         AnimatedTextView.AnimatedTextDrawable animatedTextDrawable = new AnimatedTextView.AnimatedTextDrawable(false, true, true);
         this.limit = animatedTextDrawable;
         animatedTextDrawable.setAnimationProperties(0.2f, 0L, 160L, CubicBezierInterpolator.EASE_OUT_QUINT);
@@ -53,6 +56,16 @@ public abstract class EditEmojiTextCell extends FrameLayout {
         animatedTextDrawable.setGravity(5);
         this.maxLength = i;
         EditTextEmoji editTextEmoji = new EditTextEmoji(context, sizeNotifierFrameLayout, null, i2, true) {
+            @Override
+            public boolean allowEntities() {
+                return EditEmojiTextCell.this.allowEntities && super.allowEntities();
+            }
+
+            @Override
+            public int emojiCacheType() {
+                return EditEmojiTextCell.this.emojiCacheType();
+            }
+
             @Override
             public void extendActionMode(ActionMode actionMode, Menu menu) {
                 int i3 = R.id.menu_bold;
@@ -89,7 +102,9 @@ public abstract class EditEmojiTextCell extends FrameLayout {
                 if (animatedColor != null) {
                     editEmojiTextCell.limit.setTextColor(animatedColor.set(Theme.getColor(editEmojiTextCell.limitCount <= 0 ? Theme.key_text_RedRegular : Theme.key_dialogSearchHint, resourcesProvider)));
                 }
-                EditEmojiTextCell.this.limit.setBounds(getScrollX(), getHeight() - Math.min(AndroidUtilities.dp(48.0f), getHeight()), (getScrollX() + getWidth()) - AndroidUtilities.dp(12.0f), getHeight());
+                int min = Math.min(AndroidUtilities.dp(48.0f), getHeight());
+                float f2 = z ? 0.0f : -AndroidUtilities.dp(1.0f);
+                EditEmojiTextCell.this.limit.setBounds(getScrollX(), (getHeight() + f2) - min, (getScrollX() + getWidth()) - AndroidUtilities.dp((z ? 0 : 44) + 12), f2 + getHeight());
                 EditEmojiTextCell.this.limit.draw(canvas);
             }
 
@@ -212,6 +227,10 @@ public abstract class EditEmojiTextCell extends FrameLayout {
         animatedTextDrawable.setText(str);
     }
 
+    public int emojiCacheType() {
+        return AnimatedEmojiDrawable.getCacheTypeForEnterView();
+    }
+
     public CharSequence getText() {
         return this.editTextEmoji.getText();
     }
@@ -233,13 +252,29 @@ public abstract class EditEmojiTextCell extends FrameLayout {
         }
     }
 
-    protected abstract void onFocusChanged(boolean z);
+    protected void onFocusChanged(boolean z) {
+    }
 
-    protected abstract void onTextChanged(CharSequence charSequence);
+    @Override
+    protected void onMeasure(int i, int i2) {
+        super.onMeasure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(i), 1073741824), i2);
+    }
+
+    protected void onTextChanged(CharSequence charSequence) {
+    }
+
+    public EditEmojiTextCell setAllowEntities(boolean z) {
+        this.allowEntities = z;
+        return this;
+    }
 
     public void setDivider(boolean z) {
         this.needDivider = z;
         setWillNotDraw(!z);
+    }
+
+    public void setEmojiViewCacheType(int i) {
+        this.editTextEmoji.setEmojiViewCacheType(i);
     }
 
     public void setShowLimitOnFocus(boolean z) {

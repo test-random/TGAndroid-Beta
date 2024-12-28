@@ -16,6 +16,7 @@ import org.telegram.messenger.UserObject;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedTextView;
@@ -125,10 +126,10 @@ public class BusinessBotButton extends FrameLayout {
         this.subtitleView.setText(LocaleController.getString(this.paused ? R.string.BizBotStatusStopped : R.string.BizBotStatusManages), true);
         this.flags = this.paused ? this.flags | 1 : this.flags & (-2);
         MessagesController.getNotificationsSettings(this.currentAccount).edit().putInt("dialog_botflags" + this.dialogId, this.flags).apply();
-        TLRPC.TL_account_toggleConnectedBotPaused tL_account_toggleConnectedBotPaused = new TLRPC.TL_account_toggleConnectedBotPaused();
-        tL_account_toggleConnectedBotPaused.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
-        tL_account_toggleConnectedBotPaused.paused = this.paused;
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_toggleConnectedBotPaused, null);
+        TL_account.toggleConnectedBotPaused toggleconnectedbotpaused = new TL_account.toggleConnectedBotPaused();
+        toggleconnectedbotpaused.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
+        toggleconnectedbotpaused.paused = this.paused;
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(toggleconnectedbotpaused, null);
     }
 
     public void lambda$new$1() {
@@ -138,9 +139,9 @@ public class BusinessBotButton extends FrameLayout {
     }
 
     public void lambda$new$2() {
-        TLRPC.TL_account_disablePeerConnectedBot tL_account_disablePeerConnectedBot = new TLRPC.TL_account_disablePeerConnectedBot();
-        tL_account_disablePeerConnectedBot.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_disablePeerConnectedBot, null);
+        TL_account.disablePeerConnectedBot disablepeerconnectedbot = new TL_account.disablePeerConnectedBot();
+        disablepeerconnectedbot.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(disablepeerconnectedbot, null);
         MessagesController.getNotificationsSettings(this.currentAccount).edit().remove("dialog_botid" + this.dialogId).remove("dialog_boturl" + this.dialogId).remove("dialog_botflags" + this.dialogId).apply();
         NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.peerSettingsDidLoad, Long.valueOf(this.dialogId));
         BusinessChatbotController.getInstance(this.currentAccount).invalidate(false);

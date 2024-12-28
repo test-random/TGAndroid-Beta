@@ -23,6 +23,7 @@ public class GraySectionCell extends FrameLayout implements Theme.Colorable {
     private int layerHeight;
     private final Theme.ResourcesProvider resourcesProvider;
     private AnimatedTextView rightTextView;
+    private FrameLayout.LayoutParams rightTextViewLayoutParams;
     private AnimatedEmojiSpan.TextViewEmojis textView;
 
     public GraySectionCell(Context context) {
@@ -55,7 +56,10 @@ public class GraySectionCell extends FrameLayout implements Theme.Colorable {
         this.rightTextView.setTextSize(AndroidUtilities.dp(14.0f));
         this.rightTextView.setTextColor(getThemedColor(i));
         this.rightTextView.setGravity(LocaleController.isRTL ? 3 : 5);
-        addView(this.rightTextView, LayoutHelper.createFrame(-2, -1.0f, (LocaleController.isRTL ? 3 : 5) | 48, 16.0f, 0.0f, 16.0f, 0.0f));
+        View view = this.rightTextView;
+        FrameLayout.LayoutParams createFrame = LayoutHelper.createFrame(-2, -1.0f, (LocaleController.isRTL ? 3 : 5) | 48, 16.0f, 0.0f, 16.0f, 0.0f);
+        this.rightTextViewLayoutParams = createFrame;
+        addView(view, createFrame);
         ViewCompat.setAccessibilityHeading(this, true);
     }
 
@@ -88,6 +92,10 @@ public class GraySectionCell extends FrameLayout implements Theme.Colorable {
         requestLayout();
     }
 
+    public void setRightText(CharSequence charSequence) {
+        setRightText(charSequence, true);
+    }
+
     public void setRightText(CharSequence charSequence, View.OnClickListener onClickListener) {
         this.rightTextView.setText(charSequence, false);
         this.rightTextView.setOnClickListener(onClickListener);
@@ -105,8 +113,11 @@ public class GraySectionCell extends FrameLayout implements Theme.Colorable {
         this.rightTextView.setVisibility(0);
     }
 
-    public void setRightText(String str) {
-        setRightText((CharSequence) str, true);
+    public void setRightTextMargin(int i) {
+        float f = i;
+        this.rightTextViewLayoutParams.leftMargin = AndroidUtilities.dp(f);
+        this.rightTextViewLayoutParams.rightMargin = AndroidUtilities.dp(f);
+        this.rightTextView.setLayoutParams(this.rightTextViewLayoutParams);
     }
 
     public void setText(CharSequence charSequence) {

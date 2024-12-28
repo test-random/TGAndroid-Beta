@@ -41,6 +41,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -221,7 +222,7 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
             PrivacyControlActivity.this.presentFragment(new PremiumPreviewFragment("noncontacts"));
         }
 
-        public void lambda$onBindViewHolder$1(TLObject tLObject, TLRPC.UserFull userFull, TLRPC.TL_birthday tL_birthday, TLRPC.TL_error tL_error) {
+        public void lambda$onBindViewHolder$1(TLObject tLObject, TLRPC.UserFull userFull, TL_account.TL_birthday tL_birthday, TLRPC.TL_error tL_error) {
             Bulletin createSimpleBulletin;
             String str;
             if (tLObject instanceof TLRPC.TL_boolTrue) {
@@ -246,7 +247,7 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
             createSimpleBulletin.show();
         }
 
-        public void lambda$onBindViewHolder$2(final TLRPC.UserFull userFull, final TLRPC.TL_birthday tL_birthday, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+        public void lambda$onBindViewHolder$2(final TLRPC.UserFull userFull, final TL_account.TL_birthday tL_birthday, final TLObject tLObject, final TLRPC.TL_error tL_error) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
@@ -255,19 +256,19 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
             });
         }
 
-        public void lambda$onBindViewHolder$3(TLRPC.TL_birthday tL_birthday) {
-            TLRPC.TL_account_updateBirthday tL_account_updateBirthday = new TLRPC.TL_account_updateBirthday();
-            tL_account_updateBirthday.flags |= 1;
-            tL_account_updateBirthday.birthday = tL_birthday;
+        public void lambda$onBindViewHolder$3(TL_account.TL_birthday tL_birthday) {
+            TL_account.updateBirthday updatebirthday = new TL_account.updateBirthday();
+            updatebirthday.flags |= 1;
+            updatebirthday.birthday = tL_birthday;
             final TLRPC.UserFull userFull = PrivacyControlActivity.this.getMessagesController().getUserFull(PrivacyControlActivity.this.getUserConfig().getClientUserId());
-            final TLRPC.TL_birthday tL_birthday2 = userFull != null ? userFull.birthday : null;
+            final TL_account.TL_birthday tL_birthday2 = userFull != null ? userFull.birthday : null;
             if (userFull != null) {
                 userFull.flags2 |= 32;
                 userFull.birthday = tL_birthday;
                 PrivacyControlActivity.this.getMessagesStorage().updateUserInfo(userFull, false);
             }
             PrivacyControlActivity.this.getMessagesController().invalidateContentSettings();
-            PrivacyControlActivity.this.getConnectionsManager().sendRequest(tL_account_updateBirthday, new RequestDelegate() {
+            PrivacyControlActivity.this.getConnectionsManager().sendRequest(updatebirthday, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     PrivacyControlActivity.ListAdapter.this.lambda$onBindViewHolder$2(userFull, tL_birthday2, tLObject, tL_error);
@@ -283,7 +284,7 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
             privacyControlActivity.showDialog(AlertsCreator.createBirthdayPickerDialog(privacyControlActivity.getContext(), LocaleController.getString(R.string.EditProfileBirthdayTitle), LocaleController.getString(R.string.EditProfileBirthdayButton), null, new Utilities.Callback() {
                 @Override
                 public final void run(Object obj) {
-                    PrivacyControlActivity.ListAdapter.this.lambda$onBindViewHolder$3((TLRPC.TL_birthday) obj);
+                    PrivacyControlActivity.ListAdapter.this.lambda$onBindViewHolder$3((TL_account.TL_birthday) obj);
                 }
             }, null, PrivacyControlActivity.this.getResourceProvider()).create());
         }
@@ -1188,30 +1189,30 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
         return !this.initialMinus.equals(this.currentMinus);
     }
 
-    public void lambda$applyCurrentPrivacySettings$10(TLRPC.TL_error tL_error, TLRPC.TL_globalPrivacySettings tL_globalPrivacySettings, TLRPC.TL_account_setGlobalPrivacySettings tL_account_setGlobalPrivacySettings) {
+    public void lambda$applyCurrentPrivacySettings$10(TLRPC.TL_error tL_error, TLRPC.TL_globalPrivacySettings tL_globalPrivacySettings, TL_account.setGlobalPrivacySettings setglobalprivacysettings) {
         if (tL_error != null) {
             showErrorAlert();
             return;
         }
         if (tL_globalPrivacySettings != null) {
-            tL_globalPrivacySettings.new_noncontact_peers_require_premium = tL_account_setGlobalPrivacySettings.settings.new_noncontact_peers_require_premium;
+            tL_globalPrivacySettings.new_noncontact_peers_require_premium = setglobalprivacysettings.settings.new_noncontact_peers_require_premium;
         }
         lambda$onBackPressed$321();
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.privacyRulesUpdated, new Object[0]);
     }
 
-    public void lambda$applyCurrentPrivacySettings$11(final TLRPC.TL_globalPrivacySettings tL_globalPrivacySettings, final TLRPC.TL_account_setGlobalPrivacySettings tL_account_setGlobalPrivacySettings, TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$applyCurrentPrivacySettings$11(final TLRPC.TL_globalPrivacySettings tL_globalPrivacySettings, final TL_account.setGlobalPrivacySettings setglobalprivacysettings, TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                PrivacyControlActivity.this.lambda$applyCurrentPrivacySettings$10(tL_error, tL_globalPrivacySettings, tL_account_setGlobalPrivacySettings);
+                PrivacyControlActivity.this.lambda$applyCurrentPrivacySettings$10(tL_error, tL_globalPrivacySettings, setglobalprivacysettings);
             }
         });
     }
 
     public void lambda$applyCurrentPrivacySettings$12(TLRPC.TL_error tL_error, TLObject tLObject) {
         if (tL_error == null) {
-            ContactsController.getInstance(this.currentAccount).setPrivacyRules(((TLRPC.TL_account_privacyRules) tLObject).rules, 7);
+            ContactsController.getInstance(this.currentAccount).setPrivacyRules(((TL_account.privacyRules) tLObject).rules, 7);
         }
     }
 
@@ -1236,10 +1237,10 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
             showErrorAlert();
             return;
         }
-        TLRPC.TL_account_privacyRules tL_account_privacyRules = (TLRPC.TL_account_privacyRules) tLObject;
-        MessagesController.getInstance(this.currentAccount).putUsers(tL_account_privacyRules.users, false);
-        MessagesController.getInstance(this.currentAccount).putChats(tL_account_privacyRules.chats, false);
-        ContactsController.getInstance(this.currentAccount).setPrivacyRules(tL_account_privacyRules.rules, this.rulesType);
+        TL_account.privacyRules privacyrules = (TL_account.privacyRules) tLObject;
+        MessagesController.getInstance(this.currentAccount).putUsers(privacyrules.users, false);
+        MessagesController.getInstance(this.currentAccount).putChats(privacyrules.chats, false);
+        ContactsController.getInstance(this.currentAccount).setPrivacyRules(privacyrules.rules, this.rulesType);
         lambda$onBackPressed$321();
     }
 
@@ -1252,17 +1253,17 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
         });
     }
 
-    public void lambda$applyCurrentPrivacySettings$16(TLRPC.TL_globalPrivacySettings tL_globalPrivacySettings, TLRPC.TL_account_setGlobalPrivacySettings tL_account_setGlobalPrivacySettings) {
-        boolean z = tL_account_setGlobalPrivacySettings.settings.hide_read_marks;
+    public void lambda$applyCurrentPrivacySettings$16(TLRPC.TL_globalPrivacySettings tL_globalPrivacySettings, TL_account.setGlobalPrivacySettings setglobalprivacysettings) {
+        boolean z = setglobalprivacysettings.settings.hide_read_marks;
         this.currentReadValue = z;
         tL_globalPrivacySettings.hide_read_marks = z;
     }
 
-    public void lambda$applyCurrentPrivacySettings$17(final TLRPC.TL_globalPrivacySettings tL_globalPrivacySettings, final TLRPC.TL_account_setGlobalPrivacySettings tL_account_setGlobalPrivacySettings, TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$applyCurrentPrivacySettings$17(final TLRPC.TL_globalPrivacySettings tL_globalPrivacySettings, final TL_account.setGlobalPrivacySettings setglobalprivacysettings, TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                PrivacyControlActivity.this.lambda$applyCurrentPrivacySettings$16(tL_globalPrivacySettings, tL_account_setGlobalPrivacySettings);
+                PrivacyControlActivity.this.lambda$applyCurrentPrivacySettings$16(tL_globalPrivacySettings, setglobalprivacysettings);
             }
         });
     }

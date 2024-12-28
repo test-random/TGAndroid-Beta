@@ -20,6 +20,7 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 
 public class RingtoneDataStore {
     private static volatile long lastReloadTimeMs;
@@ -93,13 +94,13 @@ public class RingtoneDataStore {
 
     public void lambda$loadUserRingtones$1(TLObject tLObject) {
         if (tLObject != null) {
-            if (tLObject instanceof TLRPC.TL_account_savedRingtonesNotModified) {
+            if (tLObject instanceof TL_account.TL_savedRingtonesNotModified) {
                 loadFromPrefs(true);
-            } else if (tLObject instanceof TLRPC.TL_account_savedRingtones) {
-                TLRPC.TL_account_savedRingtones tL_account_savedRingtones = (TLRPC.TL_account_savedRingtones) tLObject;
-                saveTones(tL_account_savedRingtones.ringtones);
+            } else if (tLObject instanceof TL_account.TL_savedRingtones) {
+                TL_account.TL_savedRingtones tL_savedRingtones = (TL_account.TL_savedRingtones) tLObject;
+                saveTones(tL_savedRingtones.ringtones);
                 SharedPreferences.Editor edit = getSharedPreferences().edit();
-                long j = tL_account_savedRingtones.hash;
+                long j = tL_savedRingtones.hash;
                 queryHash = j;
                 SharedPreferences.Editor putLong = edit.putLong("hash", j);
                 long currentTimeMillis = System.currentTimeMillis();
@@ -275,10 +276,10 @@ public class RingtoneDataStore {
 
     public void loadUserRingtones(boolean z) {
         boolean z2 = z || System.currentTimeMillis() - lastReloadTimeMs > 86400000;
-        TLRPC.TL_account_getSavedRingtones tL_account_getSavedRingtones = new TLRPC.TL_account_getSavedRingtones();
-        tL_account_getSavedRingtones.hash = queryHash;
+        TL_account.getSavedRingtones getsavedringtones = new TL_account.getSavedRingtones();
+        getsavedringtones.hash = queryHash;
         if (z2) {
-            ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_getSavedRingtones, new RequestDelegate() {
+            ConnectionsManager.getInstance(this.currentAccount).sendRequest(getsavedringtones, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     RingtoneDataStore.this.lambda$loadUserRingtones$2(tLObject, tL_error);

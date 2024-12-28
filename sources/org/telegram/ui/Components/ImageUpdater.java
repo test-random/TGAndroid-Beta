@@ -1297,4 +1297,11 @@ public class ImageUpdater implements NotificationCenter.NotificationCenterDelega
         createChatAttachView();
         this.chatAttachAlert.getPhotoLayout().showAvatarConstructorFragment(null, videoSize);
     }
+
+    public void updateColors() {
+        ChatAttachAlert chatAttachAlert = this.chatAttachAlert;
+        if (chatAttachAlert != null) {
+            chatAttachAlert.checkColors();
+        }
+    }
 }

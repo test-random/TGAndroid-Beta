@@ -2,12 +2,15 @@ package org.telegram.ui.Adapters;
 
 import android.content.Context;
 import android.os.SystemClock;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.collection.LongSparseArray;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -48,7 +51,12 @@ import org.telegram.ui.Cells.HintDialogCell;
 import org.telegram.ui.Cells.ProfileSearchCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TopicSearchCell;
+import org.telegram.ui.Components.BackupImageView;
+import org.telegram.ui.Components.ColoredImageSpan;
 import org.telegram.ui.Components.FlickerLoadingView;
+import org.telegram.ui.Components.ItemOptions;
+import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.DialogsActivity;
 import org.telegram.ui.FilteredSearchView;
@@ -60,14 +68,18 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     public DialogsSearchAdapterDelegate delegate;
     private final DialogsActivity dialogsActivity;
     private int dialogsType;
+    private ColoredImageSpan filterArrowsIcon;
     private ArrayList filterDialogIds;
     private FilteredSearchView.Delegate filtersDelegate;
     private int folderId;
+    private boolean forceEmptyMessages;
+    private boolean forceLoadingMessages;
     private RecyclerListView innerListView;
     private DefaultItemAnimator itemAnimator;
     private int lastForumReqId;
     private int lastGlobalSearchId;
     private int lastLocalSearchId;
+    private int lastMessagesSearchFilterFlags;
     private int lastMessagesSearchId;
     private String lastMessagesSearchString;
     private int lastReqId;
@@ -76,7 +88,8 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     private long lastShowMoreUpdate;
     private boolean localMessagesSearchEndReached;
     private boolean localTipArchive;
-    private Context mContext;
+    private final Context mContext;
+    private EmptyLayout messagesEmptyLayout;
     private boolean messagesSearchEndReached;
     private int needMessagesSearch;
     private int nextSearchRate;
@@ -92,14 +105,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     private long selfUserId;
     public View showMoreHeader;
     int waitingResponseCount;
-    public final int VIEW_TYPE_DIALOG_CELL = 2;
-    public final int VIEW_TYPE_TOPIC_CELL = 3;
-    public final int VIEW_TYPE_LOADING = 4;
-    public final int VIEW_TYPE_HASHTAG_CELL = 5;
-    public final int VIEW_TYPE_CATEGORY_LIST = 6;
-    public final int VIEW_TYPE_ADD_BY_PHONE = 7;
-    public final int VIEW_TYPE_INVITE_CONTACT_CELL = 8;
-    public final int VIEW_TYPE_PUBLIC_POST = 9;
+    private Filter currentMessagesFilter = Filter.All;
     private int searchHashtagRequest = -1;
     private ArrayList searchResult = new ArrayList();
     public ArrayList publicPosts = new ArrayList();
@@ -120,6 +126,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     private String filteredRecentQuery = null;
     private LongSparseArray recentSearchObjectsById = new LongSparseArray();
     private ArrayList localTipDates = new ArrayList();
+    private int messagesSectionPosition = -1;
     boolean globalSearchCollapsed = true;
     boolean phoneCollapsed = true;
 
@@ -222,6 +229,68 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         void runResultsEnterAnimation();
 
         void searchStateChanged(boolean z, boolean z2);
+    }
+
+    public static class EmptyLayout extends LinearLayout {
+        private TextView textView;
+
+        public EmptyLayout(Context context, Theme.ResourcesProvider resourcesProvider, final Runnable runnable) {
+            super(context);
+            setOrientation(1);
+            BackupImageView backupImageView = new BackupImageView(context);
+            backupImageView.setImageDrawable(new RLottieDrawable(R.raw.utyan_empty, "utyan_empty", AndroidUtilities.dp(120.0f), AndroidUtilities.dp(120.0f)));
+            addView(backupImageView, LayoutHelper.createLinear(120, 120, 1, 0, 27, 0, 0));
+            TextView textView = new TextView(context);
+            textView.setTextSize(1, 17.0f);
+            int i = Theme.key_windowBackgroundWhiteBlackText;
+            textView.setTextColor(Theme.getColor(i, resourcesProvider));
+            textView.setTypeface(AndroidUtilities.bold());
+            textView.setText(LocaleController.getString(R.string.SearchMessagesFilterEmptyTitle));
+            textView.setGravity(17);
+            addView(textView, LayoutHelper.createLinear(-1, -2, 1, 0, 8, 0, 9));
+            TextView textView2 = new TextView(context);
+            this.textView = textView2;
+            textView2.setTextSize(1, 14.0f);
+            this.textView.setTextColor(Theme.getColor(i, resourcesProvider));
+            this.textView.setText(LocaleController.formatString(R.string.SearchMessagesFilterEmptyText, ""));
+            this.textView.setGravity(17);
+            addView(this.textView, LayoutHelper.createLinear(-1, -2, 1, 0, 0, 0, 14));
+            TextView textView3 = new TextView(context);
+            textView3.setPadding(AndroidUtilities.dp(12.0f), AndroidUtilities.dp(4.0f), AndroidUtilities.dp(12.0f), AndroidUtilities.dp(4.0f));
+            textView3.setTextSize(1, 14.0f);
+            textView3.setText(LocaleController.getString(R.string.SearchMessagesFilterEmptySearchAll));
+            int i2 = Theme.key_featuredStickers_addButton;
+            textView3.setTextColor(Theme.getColor(i2, resourcesProvider));
+            textView3.setBackground(Theme.createSimpleSelectorRoundRectDrawable(6, 0, Theme.multAlpha(Theme.getColor(i2, resourcesProvider), 0.15f)));
+            textView3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public final void onClick(View view) {
+                    runnable.run();
+                }
+            });
+            addView(textView3, LayoutHelper.createLinear(-2, -2, 1, 0, 0, 0, 38));
+        }
+
+        public void setQuery(String str) {
+            this.textView.setText(LocaleController.formatString(R.string.SearchMessagesFilterEmptyText, str));
+        }
+    }
+
+    public enum Filter {
+        All(0, R.string.SearchMessagesFilterAll, R.string.SearchMessagesFilterAllFrom),
+        Private(8, R.string.SearchMessagesFilterPrivate, R.string.SearchMessagesFilterPrivateFrom),
+        Groups(4, R.string.SearchMessagesFilterGroup, R.string.SearchMessagesFilterGroupFrom),
+        Channels(2, R.string.SearchMessagesFilterChannels, R.string.SearchMessagesFilterChannelsFrom);
+
+        public final int flags;
+        public final int strFromResId;
+        public final int strResId;
+
+        Filter(int i, int i2, int i3) {
+            this.flags = i;
+            this.strResId = i2;
+            this.strFromResId = i3;
+        }
     }
 
     public interface OnRecentSearchLoaded {
@@ -327,6 +396,15 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
         DialogsActivity dialogsActivity2 = this.dialogsActivity;
         return dialogsActivity2.allowGroups || dialogsActivity2.allowLegacyGroups;
+    }
+
+    private CharSequence getFilterFromString(Filter filter) {
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(LocaleController.getString(filter.strFromResId));
+        spannableStringBuilder.append((CharSequence) "v");
+        ColoredImageSpan coloredImageSpan = new ColoredImageSpan(R.drawable.arrows_select);
+        this.filterArrowsIcon = coloredImageSpan;
+        spannableStringBuilder.setSpan(coloredImageSpan, spannableStringBuilder.length() - 1, spannableStringBuilder.length(), 33);
+        return spannableStringBuilder;
     }
 
     private boolean hasHints() {
@@ -455,22 +533,15 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
     }
 
-    public void lambda$onBindViewHolder$23(View view) {
+    public void lambda$onBindViewHolder$24(View view) {
         DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
         if (dialogsSearchAdapterDelegate != null) {
             dialogsSearchAdapterDelegate.needClearList();
         }
-    }
-
-    public void lambda$onBindViewHolder$24(View view) {
-        openPublicPosts();
     }
 
     public void lambda$onBindViewHolder$25(View view) {
-        DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
-        if (dialogsSearchAdapterDelegate != null) {
-            dialogsSearchAdapterDelegate.needClearList();
-        }
+        openPublicPosts();
     }
 
     public void lambda$onBindViewHolder$26(View view) {
@@ -480,18 +551,25 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
     }
 
-    public void lambda$onBindViewHolder$27(GraySectionCell graySectionCell) {
+    public void lambda$onBindViewHolder$27(View view) {
+        DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
+        if (dialogsSearchAdapterDelegate != null) {
+            dialogsSearchAdapterDelegate.needClearList();
+        }
+    }
+
+    public void lambda$onBindViewHolder$28(GraySectionCell graySectionCell) {
         boolean z = !this.phoneCollapsed;
         this.phoneCollapsed = z;
         graySectionCell.setRightText(LocaleController.getString(z ? R.string.ShowMore : R.string.ShowLess));
         notifyDataSetChanged();
     }
 
-    public void lambda$onBindViewHolder$28(int i) {
+    public void lambda$onBindViewHolder$29(int i) {
         notifyItemChanged(i + 3);
     }
 
-    public void lambda$onBindViewHolder$29(View view) {
+    public void lambda$onBindViewHolder$30(View view) {
         this.showMoreAnimation = false;
         this.showMoreHeader = null;
         if (view != null) {
@@ -499,7 +577,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
     }
 
-    public void lambda$onBindViewHolder$30(ArrayList arrayList, final int i, GraySectionCell graySectionCell) {
+    public void lambda$onBindViewHolder$31(ArrayList arrayList, final int i, GraySectionCell graySectionCell) {
         long elapsedRealtime = SystemClock.elapsedRealtime();
         if (elapsedRealtime - this.lastShowMoreUpdate < 300) {
             return;
@@ -513,9 +591,9 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             this.itemAnimator.setRemoveDuration(z ? 80L : 200L);
             this.itemAnimator.setRemoveDelay(z ? 270L : 0L);
         }
-        boolean z2 = !this.globalSearchCollapsed;
-        this.globalSearchCollapsed = z2;
-        graySectionCell.setRightText(LocaleController.getString(z2 ? R.string.ShowMore : R.string.ShowLess), this.globalSearchCollapsed);
+        this.globalSearchCollapsed = !this.globalSearchCollapsed;
+        graySectionCell.setRightTextMargin(16);
+        graySectionCell.setRightText(LocaleController.getString(this.globalSearchCollapsed ? R.string.ShowMore : R.string.ShowLess), this.globalSearchCollapsed);
         this.showMoreHeader = null;
         final View view = (View) graySectionCell.getParent();
         if (view instanceof RecyclerView) {
@@ -540,7 +618,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public final void run() {
-                        DialogsSearchAdapter.this.lambda$onBindViewHolder$28(i);
+                        DialogsSearchAdapter.this.lambda$onBindViewHolder$29(i);
                     }
                 }, 350L);
             } else {
@@ -562,11 +640,39 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         Runnable runnable2 = new Runnable() {
             @Override
             public final void run() {
-                DialogsSearchAdapter.this.lambda$onBindViewHolder$29(view);
+                DialogsSearchAdapter.this.lambda$onBindViewHolder$30(view);
             }
         };
         this.cancelShowMoreAnimation = runnable2;
         AndroidUtilities.runOnUIThread(runnable2, 400L);
+    }
+
+    public void lambda$onBindViewHolder$32(boolean z, GraySectionCell graySectionCell, Filter filter) {
+        if (z) {
+            return;
+        }
+        this.currentMessagesFilter = filter;
+        graySectionCell.setRightText(getFilterFromString(filter));
+        graySectionCell.setRightTextMargin(6);
+        this.searchResultMessages.clear();
+        this.forceEmptyMessages = true;
+        this.forceLoadingMessages = true;
+        notifyDataSetChanged();
+        loadMoreSearchMessages();
+    }
+
+    public void lambda$onBindViewHolder$33(final GraySectionCell graySectionCell) {
+        ItemOptions makeOptions = ItemOptions.makeOptions(this.dialogsActivity, graySectionCell);
+        for (final Filter filter : Filter.values()) {
+            final boolean z = filter.flags == this.currentMessagesFilter.flags;
+            makeOptions.addChecked(z, LocaleController.getString(filter.strResId), new Runnable() {
+                @Override
+                public final void run() {
+                    DialogsSearchAdapter.this.lambda$onBindViewHolder$32(z, graySectionCell, filter);
+                }
+            });
+        }
+        makeOptions.setGravity(5).setOnTopOfScrim().setDrawScrim(false).setDimAlpha(0).show();
     }
 
     public void lambda$onCreateViewHolder$21(View view, int i) {
@@ -594,6 +700,16 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
         dialogsSearchAdapterDelegate.needRemoveHint(((Long) view.getTag()).longValue());
         return true;
+    }
+
+    public void lambda$onCreateViewHolder$23() {
+        this.currentMessagesFilter = Filter.All;
+        this.searchResultMessages.clear();
+        int i = this.messagesSectionPosition;
+        if (i >= 0 && i < getItemCount()) {
+            notifyItemChanged(this.messagesSectionPosition);
+        }
+        loadMoreSearchMessages();
     }
 
     public void lambda$putRecentSearch$9(long j) {
@@ -862,6 +978,14 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 }
                 this.globalSearchCollapsed = true;
                 this.phoneCollapsed = true;
+                this.forceLoadingMessages = false;
+                EmptyLayout emptyLayout = this.messagesEmptyLayout;
+                if (emptyLayout != null) {
+                    emptyLayout.setQuery(this.lastMessagesSearchString);
+                }
+                if (!this.searchResultMessages.isEmpty()) {
+                    this.forceEmptyMessages = false;
+                }
                 notifyDataSetChanged();
             }
         }
@@ -1115,6 +1239,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 this.searchForumResultMessages.clear();
                 this.lastReqId = 0;
                 this.lastMessagesSearchString = null;
+                this.lastMessagesSearchFilterFlags = 0;
                 this.searchWas = false;
                 notifyDataSetChanged();
                 return;
@@ -1133,12 +1258,20 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 return;
             }
             final TLRPC.TL_messages_searchGlobal tL_messages_searchGlobal = new TLRPC.TL_messages_searchGlobal();
+            int i3 = this.currentMessagesFilter.flags;
+            tL_messages_searchGlobal.broadcasts_only = (i3 & 2) != 0;
+            tL_messages_searchGlobal.groups_only = (i3 & 4) != 0;
+            tL_messages_searchGlobal.users_only = (i3 & 8) != 0;
             tL_messages_searchGlobal.limit = 20;
             tL_messages_searchGlobal.q = str;
             tL_messages_searchGlobal.filter = new TLRPC.TL_inputMessagesFilterEmpty();
             tL_messages_searchGlobal.flags |= 1;
             tL_messages_searchGlobal.folder_id = this.folderId;
-            if (str.equals(this.lastMessagesSearchString) && !this.searchResultMessages.isEmpty() && this.lastMessagesSearchId == this.lastSearchId) {
+            if (!str.equals(this.lastMessagesSearchString)) {
+                this.forceEmptyMessages = false;
+                this.forceLoadingMessages = false;
+            }
+            if (str.equals(this.lastMessagesSearchString) && this.lastMessagesSearchFilterFlags == this.currentMessagesFilter.flags && !this.searchResultMessages.isEmpty() && this.lastMessagesSearchId == this.lastSearchId) {
                 ArrayList arrayList = this.searchResultMessages;
                 MessageObject messageObject = (MessageObject) arrayList.get(arrayList.size() - 1);
                 tL_messages_searchGlobal.offset_id = messageObject.getId();
@@ -1151,12 +1284,13 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             }
             tL_messages_searchGlobal.offset_peer = tL_inputPeerEmpty;
             this.lastMessagesSearchString = str;
-            final int i3 = this.lastReqId + 1;
-            this.lastReqId = i3;
+            this.lastMessagesSearchFilterFlags = this.currentMessagesFilter.flags;
+            final int i4 = this.lastReqId + 1;
+            this.lastReqId = i4;
             this.reqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_searchGlobal, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    DialogsSearchAdapter.this.lambda$searchMessagesInternal$4(str, i3, i, tL_messages_searchGlobal, tLObject, tL_error);
+                    DialogsSearchAdapter.this.lambda$searchMessagesInternal$4(str, i4, i, tL_messages_searchGlobal, tLObject, tL_error);
                 }
             }, 2);
         }
@@ -1429,6 +1563,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
 
     @Override
     public int getItemCount() {
+        int i = 3;
         if (this.waitingResponseCount == 3) {
             return 0;
         }
@@ -1450,38 +1585,46 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
         int size2 = this.searchResult.size();
         int size3 = this.searchAdapterHelper.getLocalServerSearch().size();
-        int i = size + size2 + size3;
+        int i2 = size + size2 + size3;
         int size4 = this.searchAdapterHelper.getGlobalSearch().size();
         if (size4 > 3 && this.globalSearchCollapsed) {
             size4 = 3;
         }
         int size5 = this.searchAdapterHelper.getPhoneSearch().size();
-        int i2 = (size5 <= 3 || !this.phoneCollapsed) ? size5 : 3;
+        if (size5 > 3 && this.phoneCollapsed) {
+            size5 = 3;
+        }
         if (size2 + size3 > 0 && (getRecentItemsCount() > 0 || !this.searchTopics.isEmpty() || !this.publicPosts.isEmpty())) {
-            i++;
+            i2++;
         }
         if (size4 != 0) {
-            i += size4 + 1;
+            i2 += size4 + 1;
         }
-        if (i2 != 0) {
-            i += i2;
+        if (size5 != 0) {
+            i2 += size5;
         }
         int size6 = this.searchForumResultMessages.size();
         if (size6 != 0) {
-            i += size6 + 1 + (!this.localMessagesSearchEndReached ? 1 : 0);
+            i2 += size6 + 1 + (!this.localMessagesSearchEndReached ? 1 : 0);
         }
         if (!this.localMessagesSearchEndReached) {
-            this.localMessagesLoadingRow = i;
+            this.localMessagesLoadingRow = i2;
         }
-        int size7 = (this.searchForumResultMessages.isEmpty() || this.localMessagesSearchEndReached) ? this.searchResultMessages.size() : 0;
-        if (size7 != 0) {
-            i += size7 + 1 + (!this.messagesSearchEndReached ? 1 : 0);
+        int size7 = this.searchResultMessages.size();
+        if ((!this.forceEmptyMessages && !this.forceLoadingMessages) || !this.searchResultMessages.isEmpty()) {
+            i = size7;
+        } else if (!this.forceLoadingMessages) {
+            i = 1;
+        }
+        int i3 = (this.searchForumResultMessages.isEmpty() || this.localMessagesSearchEndReached) ? i : 0;
+        if (i3 != 0) {
+            i2 += i3 + 1 + (!this.messagesSearchEndReached ? 1 : 0);
         }
         if (this.localMessagesSearchEndReached) {
-            this.localMessagesLoadingRow = i;
+            this.localMessagesLoadingRow = i2;
         }
-        this.currentItemCount = i;
-        return i;
+        this.currentItemCount = i2;
+        return i2;
     }
 
     @Override
@@ -1490,7 +1633,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     }
 
     @Override
-    public int getItemViewType(int r10) {
+    public int getItemViewType(int r11) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.DialogsSearchAdapter.getItemViewType(int):int");
     }
 
@@ -1518,7 +1661,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     @Override
     public boolean isEnabled(RecyclerView.ViewHolder viewHolder) {
         int itemViewType = viewHolder.getItemViewType();
-        return (itemViewType == 1 || itemViewType == 4) ? false : true;
+        return (itemViewType == 1 || itemViewType == 4 || itemViewType == 10) ? false : true;
     }
 
     public boolean isGlobalSearch(int i) {
@@ -1578,8 +1721,14 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         }
         int i5 = i4 - size4;
         int size6 = this.searchForumResultMessages.isEmpty() ? 0 : this.searchForumResultMessages.size() + 1;
-        if ((i5 <= 0 || i5 >= size6) && !this.searchResultMessages.isEmpty()) {
+        if (i5 > 0 && i5 < size6) {
+            return false;
+        }
+        if (!this.searchResultMessages.isEmpty()) {
             this.searchResultMessages.size();
+        }
+        if (this.forceEmptyMessages || this.forceLoadingMessages) {
+            this.searchResultMessages.isEmpty();
         }
         return false;
     }
@@ -1629,7 +1778,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     }
 
     @Override
-    public void onBindViewHolder(androidx.recyclerview.widget.RecyclerView.ViewHolder r23, int r24) {
+    public void onBindViewHolder(androidx.recyclerview.widget.RecyclerView.ViewHolder r26, int r27) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.DialogsSearchAdapter.onBindViewHolder(androidx.recyclerview.widget.RecyclerView$ViewHolder, int):void");
     }
 
@@ -1716,6 +1865,17 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             case 8:
                 view = new ProfileSearchCell(this.mContext);
                 break;
+            case 10:
+                EmptyLayout emptyLayout = new EmptyLayout(this.mContext, this.resourcesProvider, new Runnable() {
+                    @Override
+                    public final void run() {
+                        DialogsSearchAdapter.this.lambda$onCreateViewHolder$23();
+                    }
+                });
+                this.messagesEmptyLayout = emptyLayout;
+                emptyLayout.setQuery(this.lastMessagesSearchString);
+                view = emptyLayout;
+                break;
         }
         view.setLayoutParams(i == 5 ? new RecyclerView.LayoutParams(-1, AndroidUtilities.dp(86.0f)) : new RecyclerView.LayoutParams(-1, -2));
         return new RecyclerListView.Holder(view);
@@ -1764,6 +1924,10 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 DialogsSearchAdapter.this.lambda$removeRecentSearch$11(j);
             }
         });
+    }
+
+    public void resetFilter() {
+        this.currentMessagesFilter = Filter.All;
     }
 
     public void searchDialogs(final String str, int i, boolean z) {

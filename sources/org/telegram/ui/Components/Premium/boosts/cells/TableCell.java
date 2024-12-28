@@ -283,7 +283,7 @@ public class TableCell extends FrameLayout {
                 }
             }, this.resourcesProvider);
             TextView textView2 = this.fromTextView;
-            textView2.setText(Emoji.replaceEmoji((CharSequence) replaceSingleTag, textView2.getPaint().getFontMetricsInt(), AndroidUtilities.dp(12.0f), false));
+            textView2.setText(Emoji.replaceEmoji(replaceSingleTag, textView2.getPaint().getFontMetricsInt(), false));
             this.fromImageView.setForUserOrChat(chat, new AvatarDrawable(chat));
             frameLayout = this.fromFrameLayout;
             onClickListener2 = new View.OnClickListener() {
@@ -294,7 +294,7 @@ public class TableCell extends FrameLayout {
             };
         } else {
             final TLRPC.User user = MessagesController.getInstance(UserConfig.selectedAccount).getUser(Long.valueOf(tL_payments_checkedGiftCode.from_id.user_id));
-            this.fromTextView.setText(Emoji.replaceEmoji((CharSequence) UserObject.getFirstName(user), this.fromTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(12.0f), false));
+            this.fromTextView.setText(Emoji.replaceEmoji(UserObject.getFirstName(user), this.fromTextView.getPaint().getFontMetricsInt(), false));
             this.fromImageView.setForUserOrChat(user, new AvatarDrawable(user));
             frameLayout = this.fromFrameLayout;
             onClickListener2 = new View.OnClickListener() {
@@ -335,7 +335,7 @@ public class TableCell extends FrameLayout {
                     }
                 }, this.resourcesProvider);
                 TextView textView3 = this.toTextView;
-                textView3.setText(Emoji.replaceEmoji((CharSequence) replaceSingleTag2, textView3.getPaint().getFontMetricsInt(), AndroidUtilities.dp(12.0f), false));
+                textView3.setText(Emoji.replaceEmoji(replaceSingleTag2, textView3.getPaint().getFontMetricsInt(), false));
                 this.toImageView.setForUserOrChat(user2, new AvatarDrawable(user2));
                 this.toFrameLayout.setOnClickListener(new View.OnClickListener() {
                     @Override

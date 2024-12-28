@@ -61,7 +61,7 @@ public class BotCommandsMenuView extends View {
             TextView textView = new TextView(context) {
                 @Override
                 public void setText(CharSequence charSequence, TextView.BufferType bufferType) {
-                    super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false), bufferType);
+                    super.setText(Emoji.replaceEmoji(charSequence, getPaint().getFontMetricsInt(), false), bufferType);
                 }
             };
             this.description = textView;

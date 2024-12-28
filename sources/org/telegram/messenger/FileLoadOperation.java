@@ -15,6 +15,7 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.Storage.CacheModel;
@@ -1101,39 +1102,41 @@ public class FileLoadOperation {
             onFail(false, 0);
             return;
         }
-        this.requestingCdnOffsets = false;
-        TLRPC.Vector vector = (TLRPC.Vector) tLObject;
-        if (!vector.objects.isEmpty()) {
-            if (this.cdnHashes == null) {
-                this.cdnHashes = new HashMap<>();
-            }
-            for (int i = 0; i < vector.objects.size(); i++) {
-                TLRPC.TL_fileHash tL_fileHash = (TLRPC.TL_fileHash) vector.objects.get(i);
-                this.cdnHashes.put(Long.valueOf(tL_fileHash.offset), tL_fileHash);
-            }
-        }
-        for (int i2 = 0; i2 < this.delayedRequestInfos.size(); i2++) {
-            RequestInfo requestInfo = this.delayedRequestInfos.get(i2);
-            if (this.notLoadedBytesRanges != null || this.downloadedBytes == requestInfo.offset) {
-                this.delayedRequestInfos.remove(i2);
-                if (processRequestResult(requestInfo, null)) {
-                    return;
+        if (tLObject instanceof Vector) {
+            this.requestingCdnOffsets = false;
+            Vector vector = (Vector) tLObject;
+            if (!vector.objects.isEmpty()) {
+                if (this.cdnHashes == null) {
+                    this.cdnHashes = new HashMap<>();
                 }
-                if (requestInfo.response != null) {
-                    requestInfo.response.disableFree = false;
-                    requestInfo.response.freeResources();
-                    return;
-                } else if (requestInfo.responseWeb != null) {
-                    requestInfo.responseWeb.disableFree = false;
-                    requestInfo.responseWeb.freeResources();
-                    return;
-                } else {
-                    if (requestInfo.responseCdn != null) {
-                        requestInfo.responseCdn.disableFree = false;
-                        requestInfo.responseCdn.freeResources();
+                for (int i = 0; i < vector.objects.size(); i++) {
+                    TLRPC.TL_fileHash tL_fileHash = (TLRPC.TL_fileHash) vector.objects.get(i);
+                    this.cdnHashes.put(Long.valueOf(tL_fileHash.offset), tL_fileHash);
+                }
+            }
+            for (int i2 = 0; i2 < this.delayedRequestInfos.size(); i2++) {
+                RequestInfo requestInfo = this.delayedRequestInfos.get(i2);
+                if (this.notLoadedBytesRanges != null || this.downloadedBytes == requestInfo.offset) {
+                    this.delayedRequestInfos.remove(i2);
+                    if (processRequestResult(requestInfo, null)) {
                         return;
                     }
-                    return;
+                    if (requestInfo.response != null) {
+                        requestInfo.response.disableFree = false;
+                        requestInfo.response.freeResources();
+                        return;
+                    } else if (requestInfo.responseWeb != null) {
+                        requestInfo.responseWeb.disableFree = false;
+                        requestInfo.responseWeb.freeResources();
+                        return;
+                    } else {
+                        if (requestInfo.responseCdn != null) {
+                            requestInfo.responseCdn.disableFree = false;
+                            requestInfo.responseCdn.freeResources();
+                            return;
+                        }
+                        return;
+                    }
                 }
             }
         }
@@ -1248,8 +1251,8 @@ public class FileLoadOperation {
 
     public void lambda$startDownloadRequest$28(int i, RequestInfo requestInfo, TLObject tLObject, TLRPC.TL_error tL_error) {
         this.reuploadingCdn = false;
-        if (tL_error == null) {
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        if (tLObject instanceof Vector) {
+            Vector vector = (Vector) tLObject;
             if (!vector.objects.isEmpty()) {
                 if (this.cdnHashes == null) {
                     this.cdnHashes = new HashMap<>();
@@ -1259,12 +1262,17 @@ public class FileLoadOperation {
                     this.cdnHashes.put(Long.valueOf(tL_fileHash.offset), tL_fileHash);
                 }
             }
-        } else if (!tL_error.text.equals("FILE_TOKEN_INVALID") && !tL_error.text.equals("REQUEST_TOKEN_INVALID")) {
-            onFail(false, 0);
-            return;
         } else {
-            this.isCdn = false;
-            clearOperation(requestInfo, false, false);
+            if (tL_error == null) {
+                return;
+            }
+            if (!tL_error.text.equals("FILE_TOKEN_INVALID") && !tL_error.text.equals("REQUEST_TOKEN_INVALID")) {
+                onFail(false, 0);
+                return;
+            } else {
+                this.isCdn = false;
+                clearOperation(requestInfo, false, false);
+            }
         }
         startDownloadRequest(i);
     }

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.telephony.TelephonyManager;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Xml;
@@ -31,6 +32,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.ui.RestrictedLanguagesSelectActivity;
 import org.xmlpull.v1.XmlPullParser;
 
@@ -1112,6 +1114,19 @@ public class LocaleController {
         return sb.toString();
     }
 
+    public static CharSequence formatPluralSpannable(String str, int i, CharSequence... charSequenceArr) {
+        if (str == null || str.length() == 0 || getInstance().currentPluralRules == null) {
+            return "LOC_ERR:" + str;
+        }
+        String str2 = str + "_" + getInstance().stringForQuantity(getInstance().currentPluralRules.quantityForNumber(i));
+        int identifier = ApplicationLoader.applicationContext.getResources().getIdentifier(str2, "string", ApplicationLoader.applicationContext.getPackageName());
+        int identifier2 = ApplicationLoader.applicationContext.getResources().getIdentifier(str + "_other", "string", ApplicationLoader.applicationContext.getPackageName());
+        Object[] objArr = new Object[charSequenceArr.length + 1];
+        objArr[0] = Integer.valueOf(i);
+        System.arraycopy(charSequenceArr, 0, objArr, 1, charSequenceArr.length);
+        return formatSpannable(str2, str + "_other", identifier, identifier2, objArr);
+    }
+
     public static String formatPluralString(String str, int i, Object... objArr) {
         if (str == null || str.length() == 0 || getInstance().currentPluralRules == null) {
             return "LOC_ERR:" + str;
@@ -1331,6 +1346,89 @@ public class LocaleController {
         } catch (Exception e) {
             FileLog.e(e);
             return "LOC_ERR: formatDateChat";
+        }
+    }
+
+    public static CharSequence formatSpannable(int i, CharSequence... charSequenceArr) {
+        String str = resourcesCacheMap.get(Integer.valueOf(i));
+        if (str == null) {
+            HashMap<Integer, String> hashMap = resourcesCacheMap;
+            Integer valueOf = Integer.valueOf(i);
+            String resourceEntryName = ApplicationLoader.applicationContext.getResources().getResourceEntryName(i);
+            hashMap.put(valueOf, resourceEntryName);
+            str = resourceEntryName;
+        }
+        return formatSpannable(str, i, charSequenceArr);
+    }
+
+    public static CharSequence formatSpannable(String str, int i, CharSequence... charSequenceArr) {
+        return formatSpannable(str, null, i, 0, charSequenceArr);
+    }
+
+    public static CharSequence formatSpannable(String str, String str2, int i, int i2, Object... objArr) {
+        String str3;
+        int length;
+        String string;
+        try {
+            String str4 = BuildVars.USE_CLOUD_STRINGS ? getInstance().localeValues.get(str) : null;
+            if (str4 == null) {
+                if (BuildVars.USE_CLOUD_STRINGS && str2 != null) {
+                    str4 = getInstance().localeValues.get(str2);
+                }
+                if (str4 == null) {
+                    try {
+                        if (i != 0) {
+                            try {
+                                string = ApplicationLoader.applicationContext.getString(i);
+                            } catch (Exception unused) {
+                                if (i2 != 0) {
+                                    str4 = ApplicationLoader.applicationContext.getString(i2);
+                                }
+                            }
+                        } else if (i2 != 0) {
+                            string = ApplicationLoader.applicationContext.getString(i2);
+                        }
+                        str4 = string;
+                    } catch (Exception unused2) {
+                    }
+                }
+            }
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(str4);
+            int i3 = 0;
+            while (i3 < objArr.length) {
+                String str5 = "s";
+                Object obj = objArr[i3];
+                if (obj instanceof CharSequence) {
+                    str3 = (CharSequence) obj;
+                } else if (obj instanceof Integer) {
+                    str5 = "d";
+                    str3 = "" + ((Integer) objArr[i3]);
+                } else {
+                    str3 = obj == null ? "null" : "";
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append("%");
+                i3++;
+                sb.append(i3);
+                sb.append("$");
+                sb.append(str5);
+                String sb2 = sb.toString();
+                int indexOf = spannableStringBuilder.toString().indexOf(sb2);
+                if (indexOf != -1) {
+                    length = sb2.length();
+                } else {
+                    String str6 = "%" + str5;
+                    indexOf = spannableStringBuilder.toString().indexOf(str6);
+                    if (indexOf != -1) {
+                        length = str6.length();
+                    }
+                }
+                spannableStringBuilder.replace(indexOf, length + indexOf, str3);
+            }
+            return spannableStringBuilder;
+        } catch (Exception e) {
+            FileLog.e(e);
+            return "LOC_ERR: " + str;
         }
     }
 
@@ -2288,7 +2386,7 @@ public class LocaleController {
 
     public void lambda$loadRemoteLanguages$11(TLObject tLObject, boolean z, int i) {
         this.loadingRemoteLanguages = false;
-        TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+        Vector vector = (Vector) tLObject;
         int size = this.remoteLanguages.size();
         for (int i2 = 0; i2 < size; i2++) {
             this.remoteLanguages.get(i2).serverIndex = Integer.MAX_VALUE;
@@ -2350,7 +2448,7 @@ public class LocaleController {
     }
 
     public void lambda$loadRemoteLanguages$12(final boolean z, final int i, final TLObject tLObject, TLRPC.TL_error tL_error) {
-        if (tLObject != null) {
+        if (tLObject instanceof Vector) {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {

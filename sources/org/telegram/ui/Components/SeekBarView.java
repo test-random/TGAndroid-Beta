@@ -596,7 +596,7 @@ public class SeekBarView extends FrameLayout {
                 if (uRLSpanNoUnderline != null && uRLSpanNoUnderline.getURL() != null && uRLSpanNoUnderline.label != null && uRLSpanNoUnderline.getURL().startsWith("audio?") && (parseInt = Utilities.parseInt((CharSequence) uRLSpanNoUnderline.getURL().substring(6))) != null && parseInt.intValue() >= 0) {
                     float intValue = ((float) (parseInt.intValue() * 1000)) / ((float) l.longValue());
                     SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(uRLSpanNoUnderline.label);
-                    Emoji.replaceEmoji((CharSequence) spannableStringBuilder, this.timestampLabelPaint.getFontMetricsInt(), AndroidUtilities.dp(14.0f), false);
+                    Emoji.replaceEmoji(spannableStringBuilder, this.timestampLabelPaint.getFontMetricsInt(), false);
                     this.timestamps.add(new Pair(Float.valueOf(intValue), spannableStringBuilder));
                 }
             }

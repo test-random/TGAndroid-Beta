@@ -286,7 +286,7 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
             }
 
             @Override
-            public void openBotApp(TLRPC.User user) {
+            protected void openBotApp(TLRPC.User user) {
                 if (user == null) {
                     return;
                 }
@@ -1257,6 +1257,13 @@ public abstract class SearchViewPager extends ViewPagerFixed implements Filtered
         DialogsSearchAdapter dialogsSearchAdapter = this.dialogsSearchAdapter;
         if (dialogsSearchAdapter != null) {
             dialogsSearchAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void onShown() {
+        DialogsSearchAdapter dialogsSearchAdapter = this.dialogsSearchAdapter;
+        if (dialogsSearchAdapter != null) {
+            dialogsSearchAdapter.resetFilter();
         }
     }
 

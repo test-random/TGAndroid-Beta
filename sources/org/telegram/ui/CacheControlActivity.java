@@ -409,10 +409,10 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
             if (z) {
                 if (f < 0.01f) {
                     textView = this.subtitle[1];
-                    formatString = LocaleController.formatString("StorageUsageTelegramLess", R.string.StorageUsageTelegramLess, CacheControlActivity.this.formatPercent(f));
+                    formatString = LocaleController.formatString(R.string.StorageUsageTelegramLess, CacheControlActivity.this.formatPercent(f));
                 } else {
                     textView = this.subtitle[1];
-                    formatString = LocaleController.formatString("StorageUsageTelegram", R.string.StorageUsageTelegram, CacheControlActivity.this.formatPercent(f));
+                    formatString = LocaleController.formatString(R.string.StorageUsageTelegram, CacheControlActivity.this.formatPercent(f));
                 }
                 textView.setText(formatString);
             } else {
@@ -1521,7 +1521,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
         }
 
         public void setTextAndValue(CharSequence charSequence, CharSequence charSequence2, boolean z, boolean z2) {
-            this.textView.setText(Emoji.replaceEmoji(charSequence, this.textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(16.0f), false));
+            this.textView.setText(Emoji.replaceEmoji(charSequence, this.textView.getPaint().getFontMetricsInt(), false));
             AnimatedTextView animatedTextView = this.valueTextView;
             if (charSequence2 != null) {
                 animatedTextView.setText(charSequence2, z);

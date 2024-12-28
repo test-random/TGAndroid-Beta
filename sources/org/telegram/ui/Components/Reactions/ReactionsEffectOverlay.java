@@ -3,13 +3,16 @@ package org.telegram.ui.Components.Reactions;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ImageReceiver;
+import org.telegram.messenger.MessageObject;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.Cells.ChatActionCell;
 import org.telegram.ui.Cells.ChatMessageCell;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
@@ -26,7 +29,7 @@ public class ReactionsEffectOverlay {
     float animateInProgress;
     float animateOutProgress;
     private final int animationType;
-    private ChatMessageCell cell;
+    private View cell;
     private final FrameLayout container;
     private final int currentAccount;
     private ViewGroup decorView;
@@ -57,7 +60,7 @@ public class ReactionsEffectOverlay {
 
     public class AnonymousClass1 extends FrameLayout {
         final int val$animationType;
-        final ChatMessageCell val$cell;
+        final View val$cell;
         final ChatActivity val$chatActivity;
         final int val$emojiSize;
         final BaseFragment val$fragment;
@@ -66,13 +69,15 @@ public class ReactionsEffectOverlay {
         final float val$fromX;
         final float val$fromY;
         final boolean val$isStories;
+        final MessageObject val$messageObject;
         final ReactionsLayoutInBubble.VisibleReaction val$visibleReaction;
 
-        AnonymousClass1(Context context, BaseFragment baseFragment, ChatMessageCell chatMessageCell, boolean z, ChatActivity chatActivity, int i, int i2, boolean z2, float f, float f2, float f3, ReactionsLayoutInBubble.VisibleReaction visibleReaction) {
+        AnonymousClass1(Context context, BaseFragment baseFragment, View view, boolean z, MessageObject messageObject, ChatActivity chatActivity, int i, int i2, boolean z2, float f, float f2, float f3, ReactionsLayoutInBubble.VisibleReaction visibleReaction) {
             super(context);
             this.val$fragment = baseFragment;
-            this.val$cell = chatMessageCell;
+            this.val$cell = view;
             this.val$isStories = z;
+            this.val$messageObject = messageObject;
             this.val$chatActivity = chatActivity;
             this.val$emojiSize = i;
             this.val$animationType = i2;
@@ -92,7 +97,7 @@ public class ReactionsEffectOverlay {
         }
 
         @Override
-        protected void dispatchDraw(android.graphics.Canvas r21) {
+        protected void dispatchDraw(android.graphics.Canvas r20) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsEffectOverlay.AnonymousClass1.dispatchDraw(android.graphics.Canvas):void");
         }
 
@@ -222,8 +227,8 @@ public class ReactionsEffectOverlay {
         }
     }
 
-    public ReactionsEffectOverlay(android.content.Context r36, org.telegram.ui.ActionBar.BaseFragment r37, org.telegram.ui.Components.ReactionsContainerLayout r38, org.telegram.ui.Cells.ChatMessageCell r39, android.view.View r40, float r41, float r42, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r43, int r44, int r45, boolean r46) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsEffectOverlay.<init>(android.content.Context, org.telegram.ui.ActionBar.BaseFragment, org.telegram.ui.Components.ReactionsContainerLayout, org.telegram.ui.Cells.ChatMessageCell, android.view.View, float, float, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, int, int, boolean):void");
+    public ReactionsEffectOverlay(android.content.Context r37, org.telegram.ui.ActionBar.BaseFragment r38, org.telegram.ui.Components.ReactionsContainerLayout r39, android.view.View r40, android.view.View r41, float r42, float r43, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r44, int r45, int r46, boolean r47) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsEffectOverlay.<init>(android.content.Context, org.telegram.ui.ActionBar.BaseFragment, org.telegram.ui.Components.ReactionsContainerLayout, android.view.View, android.view.View, float, float, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, int, int, boolean):void");
     }
 
     static float access$216(ReactionsEffectOverlay reactionsEffectOverlay, float f) {
@@ -298,8 +303,8 @@ public class ReactionsEffectOverlay {
         }
     }
 
-    public static void show(org.telegram.ui.ActionBar.BaseFragment r17, org.telegram.ui.Components.ReactionsContainerLayout r18, org.telegram.ui.Cells.ChatMessageCell r19, android.view.View r20, float r21, float r22, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r23, int r24, int r25) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsEffectOverlay.show(org.telegram.ui.ActionBar.BaseFragment, org.telegram.ui.Components.ReactionsContainerLayout, org.telegram.ui.Cells.ChatMessageCell, android.view.View, float, float, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, int, int):void");
+    public static void show(org.telegram.ui.ActionBar.BaseFragment r18, org.telegram.ui.Components.ReactionsContainerLayout r19, android.view.View r20, android.view.View r21, float r22, float r23, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble.VisibleReaction r24, int r25, int r26) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Reactions.ReactionsEffectOverlay.show(org.telegram.ui.ActionBar.BaseFragment, org.telegram.ui.Components.ReactionsContainerLayout, android.view.View, android.view.View, float, float, org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble$VisibleReaction, int, int):void");
     }
 
     public static int sizeForAroundReaction() {
@@ -313,23 +318,31 @@ public class ReactionsEffectOverlay {
     }
 
     public static void startAnimation() {
+        ReactionsLayoutInBubble reactionsLayoutInBubble;
         ReactionsEffectOverlay reactionsEffectOverlay = currentOverlay;
-        if (reactionsEffectOverlay == null) {
-            startShortAnimation();
-            ReactionsEffectOverlay reactionsEffectOverlay2 = currentShortOverlay;
-            if (reactionsEffectOverlay2 != null) {
-                reactionsEffectOverlay2.cell.reactionsLayoutInBubble.animateReaction(reactionsEffectOverlay2.reaction);
+        if (reactionsEffectOverlay != null) {
+            reactionsEffectOverlay.started = true;
+            reactionsEffectOverlay.startTime = System.currentTimeMillis();
+            if (currentOverlay.animationType != 0 || System.currentTimeMillis() - lastHapticTime <= 200) {
                 return;
             }
+            lastHapticTime = System.currentTimeMillis();
+            currentOverlay.cell.performHapticFeedback(3);
             return;
         }
-        reactionsEffectOverlay.started = true;
-        reactionsEffectOverlay.startTime = System.currentTimeMillis();
-        if (currentOverlay.animationType != 0 || System.currentTimeMillis() - lastHapticTime <= 200) {
-            return;
+        startShortAnimation();
+        ReactionsEffectOverlay reactionsEffectOverlay2 = currentShortOverlay;
+        if (reactionsEffectOverlay2 != null) {
+            View view = reactionsEffectOverlay2.cell;
+            if (view instanceof ChatMessageCell) {
+                reactionsLayoutInBubble = ((ChatMessageCell) view).reactionsLayoutInBubble;
+            } else if (!(view instanceof ChatActionCell)) {
+                return;
+            } else {
+                reactionsLayoutInBubble = ((ChatActionCell) view).reactionsLayoutInBubble;
+            }
+            reactionsLayoutInBubble.animateReaction(reactionsEffectOverlay2.reaction);
         }
-        lastHapticTime = System.currentTimeMillis();
-        currentOverlay.cell.performHapticFeedback(3);
     }
 
     public static void startShortAnimation() {

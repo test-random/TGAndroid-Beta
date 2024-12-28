@@ -473,7 +473,7 @@ public class SeekBar {
                 try {
                     if (uRLSpanNoUnderline != null && uRLSpanNoUnderline.getURL() != null && uRLSpanNoUnderline.label != null && uRLSpanNoUnderline.getURL().startsWith("audio?") && (parseInt = Utilities.parseInt((CharSequence) uRLSpanNoUnderline.getURL().substring(6))) != null && parseInt.intValue() >= 0) {
                         float intValue = ((float) (parseInt.intValue() * 1000)) / ((float) l.longValue());
-                        Emoji.replaceEmoji((CharSequence) new SpannableStringBuilder(uRLSpanNoUnderline.label), this.timestampLabelPaint.getFontMetricsInt(), AndroidUtilities.dp(14.0f), false);
+                        Emoji.replaceEmoji(new SpannableStringBuilder(uRLSpanNoUnderline.label), this.timestampLabelPaint.getFontMetricsInt(), false);
                         this.timestamps.add(new Pair(Float.valueOf(intValue), uRLSpanNoUnderline));
                     }
                 } catch (Exception e) {

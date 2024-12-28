@@ -2,17 +2,19 @@ package org.telegram.ui.Components;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
-import android.text.Layout;
-import android.text.StaticLayout;
+import android.text.SpannableStringBuilder;
+import android.view.View;
 import java.util.ArrayList;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.ui.ActionBar.Theme;
 
 public class DialogCellTags {
+    private final View parentView;
     private final ArrayList filters = new ArrayList();
     private final ArrayList tags = new ArrayList();
     private Tag moreTags = null;
@@ -21,27 +23,24 @@ public class DialogCellTags {
         int color;
         public int colorId;
         public int filterId;
-        StaticLayout layout;
-        int left;
+        Text text;
         private int textHeight;
         int width;
 
         private Tag() {
         }
 
-        public static Tag asMore(int i) {
+        public static Tag asMore(View view, int i) {
             Tag tag = new Tag();
             tag.filterId = i;
-            StaticLayout staticLayout = new StaticLayout("+" + i, Theme.dialogs_tagTextPaint, AndroidUtilities.displaySize.x, Layout.Alignment.ALIGN_NORMAL, 0.0f, 1.0f, false);
-            tag.layout = staticLayout;
-            tag.left = (int) (staticLayout.getLineCount() >= 1 ? tag.layout.getLineLeft(0) : 0.0f);
-            tag.width = AndroidUtilities.dp(9.32f) + ((int) (tag.layout.getLineCount() >= 1 ? tag.layout.getLineWidth(0) : 0.0f));
-            tag.textHeight = tag.layout.getHeight();
+            tag.text = new Text("+" + i, 10.0f, AndroidUtilities.bold()).supportAnimatedEmojis(view);
+            tag.width = AndroidUtilities.dp(9.32f) + ((int) tag.text.getCurrentWidth());
+            tag.textHeight = (int) tag.text.getHeight();
             tag.color = Theme.getColor(Theme.key_avatar_nameInMessageBlue);
             return tag;
         }
 
-        public static Tag fromFilter(int i, MessagesController.DialogFilter dialogFilter) {
+        public static Tag fromFilter(View view, int i, MessagesController.DialogFilter dialogFilter) {
             Tag tag = new Tag();
             tag.filterId = dialogFilter.id;
             tag.colorId = dialogFilter.color;
@@ -49,11 +48,13 @@ public class DialogCellTags {
             if (str == null) {
                 str = "";
             }
-            StaticLayout staticLayout = new StaticLayout(Emoji.replaceEmoji(str.toUpperCase(), Theme.dialogs_tagTextPaint.getFontMetricsInt(), false), Theme.dialogs_tagTextPaint, AndroidUtilities.displaySize.x, Layout.Alignment.ALIGN_NORMAL, 0.0f, 1.0f, false);
-            tag.layout = staticLayout;
-            tag.left = (int) (staticLayout.getLineCount() >= 1 ? tag.layout.getLineLeft(0) : 0.0f);
-            tag.width = AndroidUtilities.dp(9.32f) + ((int) (tag.layout.getLineCount() >= 1 ? tag.layout.getLineWidth(0) : 0.0f));
-            tag.textHeight = tag.layout.getHeight();
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(str.toUpperCase());
+            Text supportAnimatedEmojis = new Text(spannableStringBuilder, 10.0f, AndroidUtilities.bold()).supportAnimatedEmojis(view);
+            tag.text = supportAnimatedEmojis;
+            tag.text.setText(MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(spannableStringBuilder, supportAnimatedEmojis.getFontMetricsInt(), false), dialogFilter.entities, tag.text.getFontMetricsInt()));
+            tag.text.setEmojiCacheType(26);
+            tag.width = AndroidUtilities.dp(9.32f) + ((int) tag.text.getCurrentWidth());
+            tag.textHeight = (int) tag.text.getHeight();
             int[] iArr = Theme.keys_avatar_nameInMessage;
             tag.color = Theme.getColor(iArr[dialogFilter.color % iArr.length]);
             return tag;
@@ -61,15 +62,15 @@ public class DialogCellTags {
 
         public void draw(Canvas canvas) {
             Theme.dialogs_tagPaint.setColor(Theme.multAlpha(this.color, Theme.isCurrentThemeDark() ? 0.2f : 0.1f));
-            Theme.dialogs_tagTextPaint.setColor(this.color);
             RectF rectF = AndroidUtilities.rectTmp;
             rectF.set(0.0f, 0.0f, this.width, AndroidUtilities.dp(14.66f));
             canvas.drawRoundRect(rectF, AndroidUtilities.dp(4.0f), AndroidUtilities.dp(4.0f), Theme.dialogs_tagPaint);
-            canvas.save();
-            canvas.translate(AndroidUtilities.dp(4.66f) - this.left, (AndroidUtilities.dp(14.66f) - this.textHeight) / 2.0f);
-            this.layout.draw(canvas);
-            canvas.restore();
+            this.text.draw(canvas, AndroidUtilities.dp(4.66f), AndroidUtilities.dp(14.66f) / 2.0f, this.color, 1.0f);
         }
+    }
+
+    public DialogCellTags(View view) {
+        this.parentView = view;
     }
 
     public void draw(Canvas canvas, int i) {
@@ -106,7 +107,7 @@ public class DialogCellTags {
             int size = this.tags.size() - i2;
             Tag tag2 = this.moreTags;
             if (tag2 == null || tag2.filterId != size) {
-                this.moreTags = Tag.asMore(size);
+                this.moreTags = Tag.asMore(this.parentView, size);
             }
             if (LocaleController.isRTL) {
                 canvas.translate(-this.moreTags.width, 0.0f);
@@ -167,8 +168,8 @@ public class DialogCellTags {
                 this.tags.remove(i4);
                 i4--;
             } else {
-                if (dialogFilter.color != tag2.colorId || ((str = dialogFilter.name) != null && tag2.layout != null && str.length() != tag2.layout.getText().length())) {
-                    this.tags.set(i4, Tag.fromFilter(i, dialogFilter));
+                if (dialogFilter.color != tag2.colorId || ((str = dialogFilter.name) != null && tag2.text != null && str.length() != tag2.text.getText().length())) {
+                    this.tags.set(i4, Tag.fromFilter(this.parentView, i, dialogFilter));
                 }
                 i4++;
             }
@@ -190,7 +191,7 @@ public class DialogCellTags {
                 i7++;
             }
             if (tag == null) {
-                this.tags.add(i6, Tag.fromFilter(i, dialogFilter4));
+                this.tags.add(i6, Tag.fromFilter(this.parentView, i, dialogFilter4));
                 z = true;
             }
         }

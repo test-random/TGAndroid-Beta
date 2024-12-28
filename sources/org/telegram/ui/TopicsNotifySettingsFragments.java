@@ -19,6 +19,7 @@ import org.telegram.messenger.R;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BackDrawable;
@@ -270,13 +271,13 @@ public class TopicsNotifySettingsFragments extends BaseFragment {
 
     public void removeException(int i) {
         getNotificationsController().getNotificationsSettingsFacade().clearPreference(this.dialogId, i);
-        TLRPC.TL_account_updateNotifySettings tL_account_updateNotifySettings = new TLRPC.TL_account_updateNotifySettings();
-        tL_account_updateNotifySettings.settings = new TLRPC.TL_inputPeerNotifySettings();
+        TL_account.updateNotifySettings updatenotifysettings = new TL_account.updateNotifySettings();
+        updatenotifysettings.settings = new TLRPC.TL_inputPeerNotifySettings();
         TLRPC.TL_inputNotifyForumTopic tL_inputNotifyForumTopic = new TLRPC.TL_inputNotifyForumTopic();
         tL_inputNotifyForumTopic.peer = getMessagesController().getInputPeer(this.dialogId);
         tL_inputNotifyForumTopic.top_msg_id = i;
-        tL_account_updateNotifySettings.peer = tL_inputNotifyForumTopic;
-        getConnectionsManager().sendRequest(tL_account_updateNotifySettings, new RequestDelegate() {
+        updatenotifysettings.peer = tL_inputNotifyForumTopic;
+        getConnectionsManager().sendRequest(updatenotifysettings, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 TopicsNotifySettingsFragments.lambda$removeException$0(tLObject, tL_error);

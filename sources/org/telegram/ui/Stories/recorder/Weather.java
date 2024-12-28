@@ -24,6 +24,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -80,11 +81,11 @@ public abstract class Weather {
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeDouble(this.lat);
-            abstractSerializedData.writeDouble(this.lng);
-            abstractSerializedData.writeString(this.emoji);
-            abstractSerializedData.writeFloat(this.temperature);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeDouble(this.lat);
+            outputSerializedData.writeDouble(this.lng);
+            outputSerializedData.writeString(this.emoji);
+            outputSerializedData.writeFloat(this.temperature);
         }
     }
 

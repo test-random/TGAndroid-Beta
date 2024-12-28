@@ -91,7 +91,7 @@ import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.MessagesController$$ExternalSyntheticLambda92;
+import org.telegram.messenger.MessagesController$$ExternalSyntheticLambda96;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
@@ -104,6 +104,8 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.BaseCell;
 import org.telegram.ui.ChatActivity;
@@ -708,6 +710,8 @@ public abstract class Theme {
     public static final int key_chat_outVoiceSeekbarSelected;
     public static final int key_chat_previewDurationText;
     public static final int key_chat_previewGameText;
+    public static final int key_chat_reactionServiceButtonBackgroundSelected;
+    public static final int key_chat_reactionServiceButtonTextSelected;
     public static final int key_chat_recordTime;
     public static final int key_chat_recordVoiceCancel;
     public static final int key_chat_recordedVoiceBackground;
@@ -2587,8 +2591,8 @@ public abstract class Theme {
         }
 
         public void lambda$new$0(ArrayList arrayList, TLObject tLObject, TLRPC.TL_error tL_error) {
-            if (tLObject instanceof TLRPC.Vector) {
-                TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+            if (tLObject instanceof Vector) {
+                Vector vector = (Vector) tLObject;
                 int size = vector.objects.size();
                 Bitmap bitmap = null;
                 ArrayList arrayList2 = null;
@@ -2673,14 +2677,14 @@ public abstract class Theme {
             if (arrayList2 == null) {
                 return;
             }
-            TLRPC.TL_account_getMultiWallPapers tL_account_getMultiWallPapers = new TLRPC.TL_account_getMultiWallPapers();
+            TL_account.getMultiWallPapers getmultiwallpapers = new TL_account.getMultiWallPapers();
             int size2 = arrayList2.size();
             for (int i2 = 0; i2 < size2; i2++) {
                 TLRPC.TL_inputWallPaperSlug tL_inputWallPaperSlug = new TLRPC.TL_inputWallPaperSlug();
                 tL_inputWallPaperSlug.slug = (String) arrayList2.get(i2);
-                tL_account_getMultiWallPapers.wallpapers.add(tL_inputWallPaperSlug);
+                getmultiwallpapers.wallpapers.add(tL_inputWallPaperSlug);
             }
-            ConnectionsManager.getInstance(this.account).sendRequest(tL_account_getMultiWallPapers, new RequestDelegate() {
+            ConnectionsManager.getInstance(this.account).sendRequest(getmultiwallpapers, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     Theme.PatternsLoader.this.lambda$new$0(arrayList, tLObject, tL_error);
@@ -3946,11 +3950,11 @@ public abstract class Theme {
                         this.isBlured = fillThemeValues.isBlured;
                         this.patternIntensity = fillThemeValues.patternIntensity;
                         this.newPathToWallpaper = fillThemeValues.pathToWallpaper;
-                        TLRPC.TL_account_getWallPaper tL_account_getWallPaper = new TLRPC.TL_account_getWallPaper();
+                        TL_account.getWallPaper getwallpaper = new TL_account.getWallPaper();
                         TLRPC.TL_inputWallPaperSlug tL_inputWallPaperSlug = new TLRPC.TL_inputWallPaperSlug();
                         tL_inputWallPaperSlug.slug = fillThemeValues.slug;
-                        tL_account_getWallPaper.wallpaper = tL_inputWallPaperSlug;
-                        ConnectionsManager.getInstance(fillThemeValues.account).sendRequest(tL_account_getWallPaper, new RequestDelegate() {
+                        getwallpaper.wallpaper = tL_inputWallPaperSlug;
+                        ConnectionsManager.getInstance(fillThemeValues.account).sendRequest(getwallpaper, new RequestDelegate() {
                             @Override
                             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                                 Theme.ThemeInfo.this.lambda$didReceivedNotification$2(fillThemeValues, tLObject, tL_error);
@@ -5103,14 +5107,14 @@ public abstract class Theme {
                         }
                         if (tL_theme.document != null) {
                             loadingCurrentTheme++;
-                            TLRPC.TL_account_getTheme tL_account_getTheme = new TLRPC.TL_account_getTheme();
-                            tL_account_getTheme.document_id = tL_theme.document.id;
-                            tL_account_getTheme.format = "android";
+                            TL_account.getTheme gettheme = new TL_account.getTheme();
+                            gettheme.document_id = tL_theme.document.id;
+                            gettheme.format = "android";
                             TLRPC.TL_inputTheme tL_inputTheme = new TLRPC.TL_inputTheme();
                             tL_inputTheme.access_hash = tL_theme.access_hash;
                             tL_inputTheme.id = tL_theme.id;
-                            tL_account_getTheme.theme = tL_inputTheme;
-                            ConnectionsManager.getInstance(i).sendRequest(tL_account_getTheme, new RequestDelegate() {
+                            gettheme.theme = tL_inputTheme;
+                            ConnectionsManager.getInstance(i).sendRequest(gettheme, new RequestDelegate() {
                                 @Override
                                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                                     Theme.lambda$checkCurrentRemoteTheme$7(Theme.ThemeAccent.this, themeInfo, tL_theme, tLObject, tL_error);
@@ -7146,7 +7150,7 @@ public abstract class Theme {
                 if (isCurrentThemeNight()) {
                     switchNightThemeDelay = 2000;
                     lastDelayUpdateTime = SystemClock.elapsedRealtime();
-                    AndroidUtilities.runOnUIThread(new MessagesController$$ExternalSyntheticLambda92(), 2100L);
+                    AndroidUtilities.runOnUIThread(new MessagesController$$ExternalSyntheticLambda96(), 2100L);
                 }
             }
             currentTheme = themeInfo;
@@ -7279,15 +7283,15 @@ public abstract class Theme {
         }
         if ((z || Math.abs((System.currentTimeMillis() / 1000) - lastLoadingThemesTime[i]) >= 3600) && UserConfig.getInstance(i).isClientActivated()) {
             loadingRemoteThemes[i] = true;
-            TLRPC.TL_account_getThemes tL_account_getThemes = new TLRPC.TL_account_getThemes();
-            tL_account_getThemes.format = "android";
+            TL_account.getThemes getthemes = new TL_account.getThemes();
+            getthemes.format = "android";
             if (!MediaDataController.getInstance(i).defaultEmojiThemes.isEmpty()) {
-                tL_account_getThemes.hash = remoteThemesHash[i];
+                getthemes.hash = remoteThemesHash[i];
             }
             if (BuildVars.LOGS_ENABLED) {
-                Log.i("theme", "loading remote themes, hash " + tL_account_getThemes.hash);
+                Log.i("theme", "loading remote themes, hash " + getthemes.hash);
             }
-            ConnectionsManager.getInstance(i).sendRequest(tL_account_getThemes, new RequestDelegate() {
+            ConnectionsManager.getInstance(i).sendRequest(getthemes, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     Theme.lambda$loadRemoteThemes$9(i, tLObject, tL_error);

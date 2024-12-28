@@ -124,6 +124,7 @@ import org.telegram.messenger.camera.CameraController;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -261,7 +262,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
     private Paint dotPaint;
     private CharSequence draftMessage;
     private boolean draftSearchWebpage;
-    private TLRPC.TL_businessChatLink editingBusinessLink;
+    private TL_account.TL_businessChatLink editingBusinessLink;
     private boolean editingCaption;
     private MessageObject editingMessageObject;
     private long effectId;
@@ -12229,8 +12230,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         }
     }
 
-    public void setEditingBusinessLink(org.telegram.tgnet.TLRPC.TL_businessChatLink r7) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ChatActivityEnterView.setEditingBusinessLink(org.telegram.tgnet.TLRPC$TL_businessChatLink):void");
+    public void setEditingBusinessLink(org.telegram.tgnet.tl.TL_account.TL_businessChatLink r7) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ChatActivityEnterView.setEditingBusinessLink(org.telegram.tgnet.tl.TL_account$TL_businessChatLink):void");
     }
 
     public void setEditingMessageObject(final MessageObject messageObject, final MessageObject.GroupedMessages groupedMessages, boolean z) {

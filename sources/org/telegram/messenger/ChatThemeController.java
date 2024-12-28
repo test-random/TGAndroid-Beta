@@ -18,6 +18,7 @@ import org.telegram.tgnet.ResultCallback;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.EmojiThemes;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatBackgroundDrawable;
@@ -496,9 +497,9 @@ public class ChatThemeController extends BaseController {
         boolean z2 = System.currentTimeMillis() - this.lastReloadTimeMs > 7200000;
         List<EmojiThemes> list = this.allChatThemes;
         if (list == null || list.isEmpty() || z2) {
-            TLRPC.TL_account_getChatThemes tL_account_getChatThemes = new TLRPC.TL_account_getChatThemes();
-            tL_account_getChatThemes.hash = this.themesHash;
-            ConnectionsManager.getInstance(UserConfig.selectedAccount).sendRequest(tL_account_getChatThemes, new RequestDelegate() {
+            TL_account.getChatThemes getchatthemes = new TL_account.getChatThemes();
+            getchatthemes.hash = this.themesHash;
+            ConnectionsManager.getInstance(UserConfig.selectedAccount).sendRequest(getchatthemes, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     ChatThemeController.this.lambda$requestAllChatThemes$3(resultCallback, z, tLObject, tL_error);

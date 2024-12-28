@@ -1,7 +1,8 @@
 package org.telegram.messenger;
 
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
 import org.telegram.tgnet.NativeByteBuffer;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 
@@ -27,52 +28,52 @@ public class MessageCustomParamsHelper {
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            int readInt32 = abstractSerializedData.readInt32(true);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            int readInt32 = inputSerializedData.readInt32(true);
             this.flags = readInt32;
             if ((readInt32 & 1) != 0) {
-                this.message.voiceTranscription = abstractSerializedData.readString(z);
+                this.message.voiceTranscription = inputSerializedData.readString(z);
             }
             TLRPC.Message message = this.message;
             message.voiceTranscriptionForce = (this.flags & 2) != 0;
-            message.voiceTranscriptionOpen = abstractSerializedData.readBool(z);
-            this.message.voiceTranscriptionFinal = abstractSerializedData.readBool(z);
-            this.message.voiceTranscriptionRated = abstractSerializedData.readBool(z);
-            this.message.voiceTranscriptionId = abstractSerializedData.readInt64(z);
-            this.message.premiumEffectWasPlayed = abstractSerializedData.readBool(z);
+            message.voiceTranscriptionOpen = inputSerializedData.readBool(z);
+            this.message.voiceTranscriptionFinal = inputSerializedData.readBool(z);
+            this.message.voiceTranscriptionRated = inputSerializedData.readBool(z);
+            this.message.voiceTranscriptionId = inputSerializedData.readInt64(z);
+            this.message.premiumEffectWasPlayed = inputSerializedData.readBool(z);
             if ((this.flags & 4) != 0) {
-                this.message.originalLanguage = abstractSerializedData.readString(z);
+                this.message.originalLanguage = inputSerializedData.readString(z);
             }
             if ((this.flags & 8) != 0) {
-                this.message.translatedToLanguage = abstractSerializedData.readString(z);
+                this.message.translatedToLanguage = inputSerializedData.readString(z);
             }
             if ((this.flags & 16) != 0) {
-                this.message.translatedText = TLRPC.TL_textWithEntities.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                this.message.translatedText = TLRPC.TL_textWithEntities.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             }
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(1);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1);
             int i = this.message.voiceTranscriptionForce ? this.flags | 2 : this.flags & (-3);
             this.flags = i;
-            abstractSerializedData.writeInt32(i);
+            outputSerializedData.writeInt32(i);
             if ((1 & this.flags) != 0) {
-                abstractSerializedData.writeString(this.message.voiceTranscription);
+                outputSerializedData.writeString(this.message.voiceTranscription);
             }
-            abstractSerializedData.writeBool(this.message.voiceTranscriptionOpen);
-            abstractSerializedData.writeBool(this.message.voiceTranscriptionFinal);
-            abstractSerializedData.writeBool(this.message.voiceTranscriptionRated);
-            abstractSerializedData.writeInt64(this.message.voiceTranscriptionId);
-            abstractSerializedData.writeBool(this.message.premiumEffectWasPlayed);
+            outputSerializedData.writeBool(this.message.voiceTranscriptionOpen);
+            outputSerializedData.writeBool(this.message.voiceTranscriptionFinal);
+            outputSerializedData.writeBool(this.message.voiceTranscriptionRated);
+            outputSerializedData.writeInt64(this.message.voiceTranscriptionId);
+            outputSerializedData.writeBool(this.message.premiumEffectWasPlayed);
             if ((this.flags & 4) != 0) {
-                abstractSerializedData.writeString(this.message.originalLanguage);
+                outputSerializedData.writeString(this.message.originalLanguage);
             }
             if ((this.flags & 8) != 0) {
-                abstractSerializedData.writeString(this.message.translatedToLanguage);
+                outputSerializedData.writeString(this.message.translatedToLanguage);
             }
             if ((this.flags & 16) != 0) {
-                this.message.translatedText.serializeToStream(abstractSerializedData);
+                this.message.translatedText.serializeToStream(outputSerializedData);
             }
         }
     }

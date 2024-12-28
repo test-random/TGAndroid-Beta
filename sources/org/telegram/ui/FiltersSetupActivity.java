@@ -147,6 +147,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
             addView(view, LayoutHelper.createFrame(20, 20.0f, (LocaleController.isRTL ? 5 : 3) | 16, 22.0f, 0.0f, 22.0f, 0.0f));
             SimpleTextView simpleTextView = new SimpleTextView(context);
             this.textView = simpleTextView;
+            simpleTextView.setPadding(0, AndroidUtilities.dp(4.0f), 0, AndroidUtilities.dp(4.0f));
             simpleTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
             simpleTextView.setTextSize(16);
             simpleTextView.setMaxLines(1);
@@ -154,8 +155,9 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
             Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.other_lockedfolders2);
             drawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(i), mode));
             simpleTextView.setRightDrawable(drawable);
+            simpleTextView.setEmojiColor(Theme.getColor(Theme.key_featuredStickers_addButton, ((BaseFragment) FiltersSetupActivity.this).resourceProvider));
             boolean z = LocaleController.isRTL;
-            addView(simpleTextView, LayoutHelper.createFrame(-1, -2.0f, (z ? 5 : 3) | 48, z ? 80.0f : 64.0f, 14.0f, z ? 64.0f : 80.0f, 0.0f));
+            addView(simpleTextView, LayoutHelper.createFrame(-1, -2.0f, (z ? 5 : 3) | 48, z ? 80.0f : 64.0f, 10.0f, z ? 64.0f : 80.0f, 0.0f));
             TextView textView = new TextView(context);
             this.valueTextView = textView;
             textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2));
@@ -571,7 +573,9 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         public void lambda$onCreateViewHolder$9(SuggestedFilterCell suggestedFilterCell, View view) {
             final TLRPC.TL_dialogFilterSuggested suggestedFilter = suggestedFilterCell.getSuggestedFilter();
             MessagesController.DialogFilter dialogFilter = new MessagesController.DialogFilter();
-            dialogFilter.name = suggestedFilter.filter.title;
+            TLRPC.TL_textWithEntities tL_textWithEntities = suggestedFilter.filter.title;
+            dialogFilter.name = tL_textWithEntities.text;
+            dialogFilter.entities = tL_textWithEntities.entities;
             dialogFilter.id = 2;
             while (FiltersSetupActivity.this.getMessagesController().dialogFiltersById.get(dialogFilter.id) != null) {
                 dialogFilter.id++;
@@ -621,7 +625,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
             if (dialogFilter3.exclude_muted) {
                 dialogFilter.flags |= MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_MUTED;
             }
-            FilterCreateActivity.saveFilterToServer(dialogFilter, dialogFilter.flags, dialogFilter.name, dialogFilter.color, dialogFilter.alwaysShow, dialogFilter.neverShow, dialogFilter.pinnedDialogs, true, true, true, true, true, FiltersSetupActivity.this, new Runnable() {
+            FilterCreateActivity.saveFilterToServer(dialogFilter, dialogFilter.flags, dialogFilter.name, dialogFilter.entities, dialogFilter.title_noanimate, dialogFilter.color, dialogFilter.alwaysShow, dialogFilter.neverShow, dialogFilter.pinnedDialogs, true, true, true, true, true, FiltersSetupActivity.this, new Runnable() {
                 @Override
                 public final void run() {
                     FiltersSetupActivity.ListAdapter.this.lambda$onCreateViewHolder$8(suggestedFilter);
@@ -869,7 +873,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
             this.needDivider = z;
             this.suggestedFilter = tL_dialogFilterSuggested;
             setWillNotDraw(!z);
-            this.textView.setText(tL_dialogFilterSuggested.filter.title);
+            this.textView.setText(tL_dialogFilterSuggested.filter.title.text);
             this.valueTextView.setText(tL_dialogFilterSuggested.description);
         }
     }

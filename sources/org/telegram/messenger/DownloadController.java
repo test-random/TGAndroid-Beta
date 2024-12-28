@@ -18,6 +18,7 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.LaunchActivity;
 
@@ -318,22 +319,22 @@ public class DownloadController extends BaseController implements NotificationCe
         getUserConfig().autoDownloadConfigLoadTime = System.currentTimeMillis();
         getUserConfig().saveConfig(false);
         if (tLObject != null) {
-            TLRPC.TL_account_autoDownloadSettings tL_account_autoDownloadSettings = (TLRPC.TL_account_autoDownloadSettings) tLObject;
-            this.lowPreset.set(tL_account_autoDownloadSettings.low);
+            TL_account.autoDownloadSettings autodownloadsettings = (TL_account.autoDownloadSettings) tLObject;
+            this.lowPreset.set(autodownloadsettings.low);
             this.lowPreset.preloadStories = false;
-            this.mediumPreset.set(tL_account_autoDownloadSettings.medium);
-            this.highPreset.set(tL_account_autoDownloadSettings.high);
+            this.mediumPreset.set(autodownloadsettings.medium);
+            this.highPreset.set(autodownloadsettings.high);
             int i = 0;
             while (i < 3) {
                 Preset preset = i == 0 ? this.mobilePreset : i == 1 ? this.wifiPreset : this.roamingPreset;
                 if (preset.equals(this.lowPreset)) {
-                    preset.set(tL_account_autoDownloadSettings.low);
+                    preset.set(autodownloadsettings.low);
                     preset.preloadStories = false;
                 } else {
                     if (preset.equals(this.mediumPreset)) {
-                        tL_autoDownloadSettings = tL_account_autoDownloadSettings.medium;
+                        tL_autoDownloadSettings = autodownloadsettings.medium;
                     } else if (preset.equals(this.highPreset)) {
-                        tL_autoDownloadSettings = tL_account_autoDownloadSettings.high;
+                        tL_autoDownloadSettings = autodownloadsettings.high;
                     }
                     preset.set(tL_autoDownloadSettings);
                 }
@@ -1145,7 +1146,7 @@ public class DownloadController extends BaseController implements NotificationCe
         }
         if (z || Math.abs(System.currentTimeMillis() - getUserConfig().autoDownloadConfigLoadTime) >= 86400000) {
             this.loadingAutoDownloadConfig = true;
-            getConnectionsManager().sendRequest(new TLRPC.TL_account_getAutoDownloadSettings(), new RequestDelegate() {
+            getConnectionsManager().sendRequest(new TL_account.getAutoDownloadSettings(), new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     DownloadController.this.lambda$loadAutoDownloadConfig$2(tLObject, tL_error);
@@ -1244,7 +1245,7 @@ public class DownloadController extends BaseController implements NotificationCe
     public void savePresetToServer(int i) {
         Preset currentRoamingPreset;
         Preset preset;
-        TLRPC.TL_account_saveAutoDownloadSettings tL_account_saveAutoDownloadSettings = new TLRPC.TL_account_saveAutoDownloadSettings();
+        TL_account.saveAutoDownloadSettings saveautodownloadsettings = new TL_account.saveAutoDownloadSettings();
         if (i == 0) {
             currentRoamingPreset = getCurrentMobilePreset();
             preset = this.mobilePreset;
@@ -1257,7 +1258,7 @@ public class DownloadController extends BaseController implements NotificationCe
         }
         boolean z = preset.enabled;
         TLRPC.TL_autoDownloadSettings tL_autoDownloadSettings = new TLRPC.TL_autoDownloadSettings();
-        tL_account_saveAutoDownloadSettings.settings = tL_autoDownloadSettings;
+        saveautodownloadsettings.settings = tL_autoDownloadSettings;
         tL_autoDownloadSettings.audio_preload_next = currentRoamingPreset.preloadMusic;
         tL_autoDownloadSettings.video_preload_large = currentRoamingPreset.preloadVideo;
         tL_autoDownloadSettings.phonecalls_less_data = currentRoamingPreset.lessCallData;
@@ -1288,11 +1289,11 @@ public class DownloadController extends BaseController implements NotificationCe
                 i2++;
             }
         }
-        TLRPC.TL_autoDownloadSettings tL_autoDownloadSettings2 = tL_account_saveAutoDownloadSettings.settings;
+        TLRPC.TL_autoDownloadSettings tL_autoDownloadSettings2 = saveautodownloadsettings.settings;
         tL_autoDownloadSettings2.photo_size_max = z2 ? (int) currentRoamingPreset.sizes[0] : 0;
         tL_autoDownloadSettings2.video_size_max = z3 ? currentRoamingPreset.sizes[1] : 0L;
         tL_autoDownloadSettings2.file_size_max = z4 ? currentRoamingPreset.sizes[2] : 0L;
-        getConnectionsManager().sendRequest(tL_account_saveAutoDownloadSettings, new RequestDelegate() {
+        getConnectionsManager().sendRequest(saveautodownloadsettings, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 DownloadController.lambda$savePresetToServer$3(tLObject, tL_error);

@@ -401,12 +401,12 @@ public class PollVotesAlert extends BottomSheet {
                 NotificationCenter.listenEmojiLoading(this.textView);
                 SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(charSequence);
                 MediaDataController.addTextStyleRuns((ArrayList<TLRPC.MessageEntity>) arrayList, charSequence, spannableStringBuilder);
-                replaceEmoji = Emoji.replaceEmoji((CharSequence) spannableStringBuilder, this.textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false);
+                replaceEmoji = Emoji.replaceEmoji(spannableStringBuilder, this.textView.getPaint().getFontMetricsInt(), false);
                 MessageObject.replaceAnimatedEmoji(replaceEmoji, arrayList, this.textView.getPaint().getFontMetricsInt());
                 textViewEmojis = this.textView;
             } else {
                 textViewEmojis = this.textView;
-                replaceEmoji = Emoji.replaceEmoji(charSequence, textViewEmojis.getPaint().getFontMetricsInt(), AndroidUtilities.dp(14.0f), false);
+                replaceEmoji = Emoji.replaceEmoji(charSequence, textViewEmojis.getPaint().getFontMetricsInt(), false);
             }
             textViewEmojis.setText(replaceEmoji);
             String format = String.format("%d", Integer.valueOf(i));
@@ -578,6 +578,8 @@ public class PollVotesAlert extends BottomSheet {
 
     public PollVotesAlert(final ChatActivity chatActivity, MessageObject messageObject) {
         super(chatActivity.getParentActivity(), true);
+        AnimatedEmojiSpan.TextViewEmojis textViewEmojis;
+        CharSequence replaceEmoji;
         ActionBar actionBar;
         String formatPluralString;
         int i;
@@ -867,28 +869,29 @@ public class PollVotesAlert extends BottomSheet {
                 PollVotesAlert.this.updateLayout(true);
             }
         });
-        AnimatedEmojiSpan.TextViewEmojis textViewEmojis = new AnimatedEmojiSpan.TextViewEmojis(parentActivity);
-        this.titleTextView = textViewEmojis;
-        textViewEmojis.setTextSize(1, 18.0f);
+        AnimatedEmojiSpan.TextViewEmojis textViewEmojis2 = new AnimatedEmojiSpan.TextViewEmojis(parentActivity);
+        this.titleTextView = textViewEmojis2;
+        textViewEmojis2.setTextSize(1, 18.0f);
         this.titleTextView.setTypeface(AndroidUtilities.bold());
         this.titleTextView.setPadding(AndroidUtilities.dp(21.0f), AndroidUtilities.dp(5.0f), AndroidUtilities.dp(14.0f), AndroidUtilities.dp(21.0f));
-        AnimatedEmojiSpan.TextViewEmojis textViewEmojis2 = this.titleTextView;
+        AnimatedEmojiSpan.TextViewEmojis textViewEmojis3 = this.titleTextView;
         int i11 = Theme.key_dialogTextBlack;
-        textViewEmojis2.setTextColor(Theme.getColor(i11));
+        textViewEmojis3.setTextColor(Theme.getColor(i11));
         this.titleTextView.setLayoutParams(new RecyclerView.LayoutParams(-1, -2));
         TLRPC.TL_textWithEntities tL_textWithEntities = this.poll.question;
         if (tL_textWithEntities == null || tL_textWithEntities.entities == null) {
-            AnimatedEmojiSpan.TextViewEmojis textViewEmojis3 = this.titleTextView;
-            textViewEmojis3.setText(Emoji.replaceEmoji((CharSequence) (tL_textWithEntities == null ? "" : tL_textWithEntities.text), textViewEmojis3.getPaint().getFontMetricsInt(), AndroidUtilities.dp(18.0f), false));
+            textViewEmojis = this.titleTextView;
+            replaceEmoji = Emoji.replaceEmoji(tL_textWithEntities == null ? "" : tL_textWithEntities.text, textViewEmojis.getPaint().getFontMetricsInt(), false);
         } else {
             NotificationCenter.listenEmojiLoading(this.titleTextView);
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(this.poll.question.text);
             TLRPC.TL_textWithEntities tL_textWithEntities2 = this.poll.question;
             MediaDataController.addTextStyleRuns(tL_textWithEntities2.entities, tL_textWithEntities2.text, spannableStringBuilder);
-            CharSequence replaceEmoji = Emoji.replaceEmoji(spannableStringBuilder, this.titleTextView.getPaint().getFontMetricsInt(), false);
+            replaceEmoji = Emoji.replaceEmoji(spannableStringBuilder, this.titleTextView.getPaint().getFontMetricsInt(), false);
             MessageObject.replaceAnimatedEmoji(replaceEmoji, this.poll.question.entities, this.titleTextView.getPaint().getFontMetricsInt());
-            this.titleTextView.setText(replaceEmoji);
+            textViewEmojis = this.titleTextView;
         }
+        textViewEmojis.setText(replaceEmoji);
         ActionBar actionBar2 = new ActionBar(parentActivity) {
             @Override
             public void setAlpha(float f) {

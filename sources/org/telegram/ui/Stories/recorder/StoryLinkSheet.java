@@ -30,6 +30,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.EditTextCell;
@@ -490,9 +491,9 @@ public class StoryLinkSheet extends BottomSheetWithRecyclerListView implements N
     }
 
     public void lambda$new$7() {
-        TLRPC.TL_messages_getWebPagePreview tL_messages_getWebPagePreview = new TLRPC.TL_messages_getWebPagePreview();
-        tL_messages_getWebPagePreview.message = this.urlEditText.editText.getText().toString();
-        this.reqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_getWebPagePreview, new RequestDelegate() {
+        TL_account.getWebPagePreview getwebpagepreview = new TL_account.getWebPagePreview();
+        getwebpagepreview.message = this.urlEditText.editText.getText().toString();
+        this.reqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(getwebpagepreview, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 StoryLinkSheet.this.lambda$new$6(tLObject, tL_error);

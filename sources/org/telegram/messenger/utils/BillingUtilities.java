@@ -14,7 +14,8 @@ import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.Utilities;
-import org.telegram.tgnet.AbstractSerializedData;
+import org.telegram.tgnet.InputSerializedData;
+import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -26,33 +27,33 @@ public abstract class BillingUtilities {
         public long id;
         public TLRPC.InputStorePaymentPurpose purpose;
 
-        public static TL_savedPurpose TLdeserialize(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+        public static TL_savedPurpose TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             TL_savedPurpose tL_savedPurpose = i != 495638674 ? null : new TL_savedPurpose();
             if (tL_savedPurpose == null && z) {
                 throw new RuntimeException(String.format("can't parse magic %x in TL_savedPurpose", Integer.valueOf(i)));
             }
             if (tL_savedPurpose != null) {
-                tL_savedPurpose.readParams(abstractSerializedData, z);
+                tL_savedPurpose.readParams(inputSerializedData, z);
             }
             return tL_savedPurpose;
         }
 
         @Override
-        public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
-            this.flags = abstractSerializedData.readInt32(z);
-            this.id = abstractSerializedData.readInt64(z);
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.flags = inputSerializedData.readInt32(z);
+            this.id = inputSerializedData.readInt64(z);
             if ((this.flags & 1) != 0) {
-                this.purpose = TLRPC.InputStorePaymentPurpose.TLdeserialize(abstractSerializedData, abstractSerializedData.readInt32(z), z);
+                this.purpose = TLRPC.InputStorePaymentPurpose.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             }
         }
 
         @Override
-        public void serializeToStream(AbstractSerializedData abstractSerializedData) {
-            abstractSerializedData.writeInt32(495638674);
-            abstractSerializedData.writeInt32(this.flags);
-            abstractSerializedData.writeInt64(this.id);
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(495638674);
+            outputSerializedData.writeInt32(this.flags);
+            outputSerializedData.writeInt64(this.id);
             if ((this.flags & 1) != 0) {
-                this.purpose.serializeToStream(abstractSerializedData);
+                this.purpose.serializeToStream(outputSerializedData);
             }
         }
     }

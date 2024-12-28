@@ -34,11 +34,13 @@ public abstract class EditTextEffects extends EditText {
     private boolean clipToPadding;
     public boolean drawAnimatedEmojiDrawables;
     private boolean editedWhileQuoteUpdating;
+    private Integer emojiColor;
     private boolean isSpoilersRevealed;
     private Layout lastLayout;
     private float lastRippleX;
     private float lastRippleY;
     private int lastText2Length;
+    private int lastTextColor;
     private int lastTextLength;
     protected float offsetY;
     private Path path;
@@ -429,6 +431,12 @@ public abstract class EditTextEffects extends EditText {
         this.clipToPadding = z;
     }
 
+    public void setEmojiColor(Integer num) {
+        this.emojiColor = num;
+        this.animatedEmojiColorFilter = new PorterDuffColorFilter(num == null ? this.lastTextColor : num.intValue(), PorterDuff.Mode.SRC_IN);
+        invalidate();
+    }
+
     public void setOffsetY(float f) {
         this.offsetY = f;
         invalidate();
@@ -471,7 +479,12 @@ public abstract class EditTextEffects extends EditText {
 
     @Override
     public void setTextColor(int i) {
+        this.lastTextColor = i;
         super.setTextColor(i);
+        Integer num = this.emojiColor;
+        if (num != null) {
+            i = num.intValue();
+        }
         this.animatedEmojiColorFilter = new PorterDuffColorFilter(i, PorterDuff.Mode.SRC_IN);
     }
 

@@ -24,10 +24,11 @@ public class TextInfoPrivacyCell extends FrameLayout {
     private int fixedSize;
     private boolean isRTL;
     private int linkTextColorKey;
+    private Integer linkTextRippleColor;
     private LinkSpanDrawable.LinkCollector links;
     private final Theme.ResourcesProvider resourcesProvider;
     private CharSequence text;
-    private TextView textView;
+    private LinkSpanDrawable.LinksTextView textView;
     private int topPadding;
 
     public TextInfoPrivacyCell(Context context) {
@@ -49,13 +50,21 @@ public class TextInfoPrivacyCell extends FrameLayout {
                 super.onDraw(canvas);
                 TextInfoPrivacyCell.this.afterTextDraw();
             }
+
+            @Override
+            public int overrideColor() {
+                return TextInfoPrivacyCell.this.linkTextRippleColor != null ? TextInfoPrivacyCell.this.linkTextRippleColor.intValue() : super.overrideColor();
+            }
         };
         this.textView = linksTextView;
         linksTextView.setTextSize(1, 14.0f);
         this.textView.setGravity(LocaleController.isRTL ? 5 : 3);
         this.textView.setPadding(0, AndroidUtilities.dp(10.0f), 0, AndroidUtilities.dp(17.0f));
         this.textView.setMovementMethod(LinkMovementMethod.getInstance());
-        this.textView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText4));
+        LinkSpanDrawable.LinksTextView linksTextView2 = this.textView;
+        int i2 = Theme.key_windowBackgroundWhiteGrayText4;
+        linksTextView2.setTextColor(getThemedColor(i2));
+        this.textView.setEmojiColor(getThemedColor(i2));
         this.textView.setLinkTextColor(getThemedColor(this.linkTextColorKey));
         this.textView.setImportantForAccessibility(2);
         float f = i;
@@ -79,7 +88,7 @@ public class TextInfoPrivacyCell extends FrameLayout {
         return this.textView.getText();
     }
 
-    public TextView getTextView() {
+    public LinkSpanDrawable.LinksTextView getTextView() {
         return this.textView;
     }
 
@@ -122,7 +131,7 @@ public class TextInfoPrivacyCell extends FrameLayout {
 
     public void setEnabled(boolean z, ArrayList arrayList) {
         if (arrayList != null) {
-            arrayList.add(ObjectAnimator.ofFloat(this.textView, (Property<TextView, Float>) View.ALPHA, z ? 1.0f : 0.5f));
+            arrayList.add(ObjectAnimator.ofFloat(this.textView, (Property<LinkSpanDrawable.LinksTextView, Float>) View.ALPHA, z ? 1.0f : 0.5f));
         } else {
             this.textView.setAlpha(z ? 1.0f : 0.5f);
         }
@@ -136,16 +145,20 @@ public class TextInfoPrivacyCell extends FrameLayout {
         this.linkTextColorKey = i;
     }
 
+    public void setLinkTextRippleColor(Integer num) {
+        this.linkTextRippleColor = num;
+    }
+
     public void setText(CharSequence charSequence) {
         if (TextUtils.equals(charSequence, this.text)) {
             return;
         }
         this.text = charSequence;
-        TextView textView = this.textView;
+        LinkSpanDrawable.LinksTextView linksTextView = this.textView;
         if (charSequence == null) {
-            textView.setPadding(0, AndroidUtilities.dp(2.0f), 0, 0);
+            linksTextView.setPadding(0, AndroidUtilities.dp(2.0f), 0, 0);
         } else {
-            textView.setPadding(0, AndroidUtilities.dp(this.topPadding), 0, AndroidUtilities.dp(this.bottomPadding));
+            linksTextView.setPadding(0, AndroidUtilities.dp(this.topPadding), 0, AndroidUtilities.dp(this.bottomPadding));
         }
         SpannableString spannableString = null;
         if (charSequence != null) {
@@ -162,11 +175,11 @@ public class TextInfoPrivacyCell extends FrameLayout {
                 }
             }
         }
-        TextView textView2 = this.textView;
+        LinkSpanDrawable.LinksTextView linksTextView2 = this.textView;
         if (spannableString != null) {
             charSequence = spannableString;
         }
-        textView2.setText(charSequence);
+        linksTextView2.setText(charSequence);
     }
 
     public void setTextColor(int i) {

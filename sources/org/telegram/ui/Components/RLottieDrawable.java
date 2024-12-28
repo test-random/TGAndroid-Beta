@@ -1026,6 +1026,10 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
         return -2;
     }
 
+    public float getProgress() {
+        return this.currentFrame / this.metaData[0];
+    }
+
     public boolean hasBaseDice() {
         return this.nativePtr != 0 || this.loadingInBackground;
     }

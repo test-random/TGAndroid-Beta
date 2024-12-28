@@ -35,6 +35,7 @@ public class AvatarDrawable extends Drawable {
     private int avatarType;
     private int color;
     private int color2;
+    private Drawable customIconDrawable;
     private boolean drawAvatarBackground;
     private boolean drawDeleted;
     private LinearGradient gradient;
@@ -192,7 +193,6 @@ public class AvatarDrawable extends Drawable {
     @Override
     public void draw(Canvas canvas) {
         Drawable drawable;
-        Drawable drawable2;
         GradientTools gradientTools;
         android.graphics.Rect bounds = getBounds();
         if (bounds == null) {
@@ -271,8 +271,11 @@ public class AvatarDrawable extends Drawable {
             Theme.dialogs_archiveAvatarDrawable.setBounds(i3, i4, intrinsicWidth + i3, intrinsicHeight + i4);
             Theme.dialogs_archiveAvatarDrawable.draw(canvas);
             canvas.restore();
-        } else if (i != 0) {
-            drawable2 = i == 1 ? Theme.avatarDrawables[0] : i == 4 ? Theme.avatarDrawables[2] : i == 5 ? Theme.avatarDrawables[3] : i == 6 ? Theme.avatarDrawables[4] : i == 7 ? Theme.avatarDrawables[5] : i == 8 ? Theme.avatarDrawables[6] : i == 9 ? Theme.avatarDrawables[7] : i == 10 ? Theme.avatarDrawables[8] : i == 3 ? Theme.avatarDrawables[10] : i == 12 ? Theme.avatarDrawables[11] : i == 14 ? Theme.avatarDrawables[12] : i == 15 ? Theme.avatarDrawables[13] : i == 16 ? Theme.avatarDrawables[14] : i == 19 ? Theme.avatarDrawables[15] : i == 18 ? Theme.avatarDrawables[16] : i == 20 ? Theme.avatarDrawables[17] : i == 21 ? Theme.avatarDrawables[18] : i == 22 ? Theme.avatarDrawables[19] : i == 23 ? Theme.avatarDrawables[21] : i == 24 ? Theme.avatarDrawables[20] : i == 25 ? Theme.avatarDrawables[22] : i == 26 ? Theme.avatarDrawables[23] : Theme.avatarDrawables[9];
+        } else if (i != 0 || this.customIconDrawable != null) {
+            Drawable drawable2 = this.customIconDrawable;
+            if (drawable2 == null) {
+                drawable2 = i == 1 ? Theme.avatarDrawables[0] : i == 4 ? Theme.avatarDrawables[2] : i == 5 ? Theme.avatarDrawables[3] : i == 6 ? Theme.avatarDrawables[4] : i == 7 ? Theme.avatarDrawables[5] : i == 8 ? Theme.avatarDrawables[6] : i == 9 ? Theme.avatarDrawables[7] : i == 10 ? Theme.avatarDrawables[8] : i == 3 ? Theme.avatarDrawables[10] : i == 12 ? Theme.avatarDrawables[11] : i == 14 ? Theme.avatarDrawables[12] : i == 15 ? Theme.avatarDrawables[13] : i == 16 ? Theme.avatarDrawables[14] : i == 19 ? Theme.avatarDrawables[15] : i == 18 ? Theme.avatarDrawables[16] : i == 20 ? Theme.avatarDrawables[17] : i == 21 ? Theme.avatarDrawables[18] : i == 22 ? Theme.avatarDrawables[19] : i == 23 ? Theme.avatarDrawables[21] : i == 24 ? Theme.avatarDrawables[20] : i == 25 ? Theme.avatarDrawables[22] : i == 26 ? Theme.avatarDrawables[23] : Theme.avatarDrawables[9];
+            }
             if (drawable2 != null) {
                 int intrinsicWidth2 = (int) (drawable2.getIntrinsicWidth() * this.scaleSize);
                 int intrinsicHeight2 = (int) (drawable2.getIntrinsicHeight() * this.scaleSize);
@@ -284,14 +287,15 @@ public class AvatarDrawable extends Drawable {
                     drawable2.setAlpha(i7);
                     drawable2.draw(canvas);
                     drawable2.setAlpha(255);
+                } else {
+                    drawable2.draw(canvas);
                 }
-                drawable2.draw(canvas);
             }
         } else if (!this.drawDeleted || (drawable = Theme.avatarDrawables[1]) == null) {
             if (this.invalidateTextLayout) {
                 this.invalidateTextLayout = false;
                 if (this.stringBuilder.length() > 0) {
-                    CharSequence replaceEmoji = Emoji.replaceEmoji((CharSequence) this.stringBuilder.toString().toUpperCase(), this.namePaint.getFontMetricsInt(), AndroidUtilities.dp(16.0f), true);
+                    CharSequence replaceEmoji = Emoji.replaceEmoji(this.stringBuilder.toString().toUpperCase(), this.namePaint.getFontMetricsInt(), true);
                     StaticLayout staticLayout = this.textLayout;
                     if (staticLayout == null || !TextUtils.equals(replaceEmoji, staticLayout.getText())) {
                         try {
@@ -329,8 +333,7 @@ public class AvatarDrawable extends Drawable {
             int i8 = (width - intrinsicWidth3) / 2;
             int i9 = (width - intrinsicHeight3) / 2;
             Theme.avatarDrawables[1].setBounds(i8, i9, intrinsicWidth3 + i8, intrinsicHeight3 + i9);
-            drawable2 = Theme.avatarDrawables[1];
-            drawable2.draw(canvas);
+            Theme.avatarDrawables[1].draw(canvas);
         }
         canvas.restore();
     }
@@ -395,6 +398,10 @@ public class AvatarDrawable extends Drawable {
     public void setColorFilter(ColorFilter colorFilter) {
     }
 
+    public void setCustomIcon(Drawable drawable) {
+        this.customIconDrawable = drawable;
+    }
+
     public void setDrawAvatarBackground(boolean z) {
         this.drawAvatarBackground = z;
     }
@@ -428,6 +435,17 @@ public class AvatarDrawable extends Drawable {
             setInfo(user.id, user.first_name, user.last_name, null, user.color != null ? Integer.valueOf(UserObject.getColorId(user)) : null, UserObject.getPeerColorForAvatar(i, user));
             this.drawDeleted = UserObject.isDeleted(user);
         }
+    }
+
+    public void setInfo(long j) {
+        this.invalidateTextLayout = true;
+        this.hasGradient = true;
+        this.hasAdvancedGradient = false;
+        this.color = getThemedColor(Theme.keys_avatar_background[getColorIndex(j)]);
+        this.color2 = getThemedColor(Theme.keys_avatar_background2[getColorIndex(j)]);
+        this.avatarType = 0;
+        this.drawDeleted = false;
+        getAvatarSymbols("", "", "", this.stringBuilder);
     }
 
     public void setInfo(long j, String str, String str2) {

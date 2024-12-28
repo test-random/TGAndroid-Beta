@@ -89,6 +89,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -132,7 +133,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     private String countryName;
     private String currentBotName;
     private String currentItemName;
-    private TLRPC.account_Password currentPassword;
+    private TL_account.Password currentPassword;
     private int currentStep;
     private PaymentFormActivityDelegate delegate;
     private TextDetailSettingsCell[] detailSettingsCell;
@@ -484,7 +485,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     public interface PaymentFormActivityDelegate {
 
         public abstract class CC {
-            public static void $default$currentPasswordUpdated(PaymentFormActivityDelegate paymentFormActivityDelegate, TLRPC.account_Password account_password) {
+            public static void $default$currentPasswordUpdated(PaymentFormActivityDelegate paymentFormActivityDelegate, TL_account.Password password) {
             }
 
             public static void $default$didSelectNewAddress(PaymentFormActivityDelegate paymentFormActivityDelegate, TLRPC.TL_payments_validateRequestedInfo tL_payments_validateRequestedInfo) {
@@ -498,7 +499,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
             }
         }
 
-        void currentPasswordUpdated(TLRPC.account_Password account_password);
+        void currentPasswordUpdated(TL_account.Password password);
 
         void didSelectNewAddress(TLRPC.TL_payments_validateRequestedInfo tL_payments_validateRequestedInfo);
 
@@ -658,11 +659,11 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         final String obj = this.inputFields[1].getText().toString();
         showEditDoneProgress(true, true);
         setDonePressed(true);
-        final TLRPC.TL_account_getPassword tL_account_getPassword = new TLRPC.TL_account_getPassword();
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_getPassword, new RequestDelegate() {
+        final TL_account.getPassword getpassword = new TL_account.getPassword();
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(getpassword, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                PaymentFormActivity.this.lambda$checkPassword$74(obj, tL_account_getPassword, tLObject, tL_error);
+                PaymentFormActivity.this.lambda$checkPassword$74(obj, getpassword, tLObject, tL_error);
             }
         }, 2);
     }
@@ -867,8 +868,8 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                 paymentFormActivity3.setCurrentPassword(this.currentPassword);
                 this.passwordFragment.setDelegate(new PaymentFormActivityDelegate() {
                     @Override
-                    public void currentPasswordUpdated(TLRPC.account_Password account_password) {
-                        PaymentFormActivity.this.currentPassword = account_password;
+                    public void currentPasswordUpdated(TL_account.Password password) {
+                        PaymentFormActivity.this.currentPassword = password;
                     }
 
                     @Override
@@ -989,18 +990,18 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         }
     }
 
-    public void lambda$checkPassword$70(TLObject tLObject, TLRPC.TL_error tL_error, TLRPC.TL_account_getTmpPassword tL_account_getTmpPassword) {
+    public void lambda$checkPassword$70(TLObject tLObject, TLRPC.TL_error tL_error, TL_account.getTmpPassword gettmppassword) {
         showEditDoneProgress(true, false);
         setDonePressed(false);
         if (tLObject != null) {
             this.passwordOk = true;
-            UserConfig.getInstance(this.currentAccount).tmpPassword = (TLRPC.TL_account_tmpPassword) tLObject;
+            UserConfig.getInstance(this.currentAccount).tmpPassword = (TL_account.tmpPassword) tLObject;
             UserConfig.getInstance(this.currentAccount).saveConfig(false);
             goToNextStep();
             return;
         }
         if (!tL_error.text.equals("PASSWORD_HASH_INVALID")) {
-            AlertsCreator.processError(this.currentAccount, tL_error, this, tL_account_getTmpPassword, new Object[0]);
+            AlertsCreator.processError(this.currentAccount, tL_error, this, gettmppassword, new Object[0]);
             return;
         }
         try {
@@ -1011,37 +1012,37 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         this.inputFields[1].setText("");
     }
 
-    public void lambda$checkPassword$71(final TLRPC.TL_account_getTmpPassword tL_account_getTmpPassword, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$checkPassword$71(final TL_account.getTmpPassword gettmppassword, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                PaymentFormActivity.this.lambda$checkPassword$70(tLObject, tL_error, tL_account_getTmpPassword);
+                PaymentFormActivity.this.lambda$checkPassword$70(tLObject, tL_error, gettmppassword);
             }
         });
     }
 
-    public void lambda$checkPassword$72(TLRPC.account_Password account_password, byte[] bArr) {
-        TLRPC.PasswordKdfAlgo passwordKdfAlgo = account_password.current_algo;
+    public void lambda$checkPassword$72(TL_account.Password password, byte[] bArr) {
+        TLRPC.PasswordKdfAlgo passwordKdfAlgo = password.current_algo;
         byte[] x = passwordKdfAlgo instanceof TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow ? SRPHelper.getX(bArr, (TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow) passwordKdfAlgo) : null;
-        final TLRPC.TL_account_getTmpPassword tL_account_getTmpPassword = new TLRPC.TL_account_getTmpPassword();
-        tL_account_getTmpPassword.period = 1800;
+        final TL_account.getTmpPassword gettmppassword = new TL_account.getTmpPassword();
+        gettmppassword.period = 1800;
         RequestDelegate requestDelegate = new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                PaymentFormActivity.this.lambda$checkPassword$71(tL_account_getTmpPassword, tLObject, tL_error);
+                PaymentFormActivity.this.lambda$checkPassword$71(gettmppassword, tLObject, tL_error);
             }
         };
-        TLRPC.PasswordKdfAlgo passwordKdfAlgo2 = account_password.current_algo;
+        TLRPC.PasswordKdfAlgo passwordKdfAlgo2 = password.current_algo;
         if (!(passwordKdfAlgo2 instanceof TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow)) {
             TLRPC.TL_error tL_error = new TLRPC.TL_error();
             tL_error.text = "PASSWORD_HASH_INVALID";
             requestDelegate.run(null, tL_error);
             return;
         }
-        TLRPC.TL_inputCheckPasswordSRP startCheck = SRPHelper.startCheck(x, account_password.srp_id, account_password.srp_B, (TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow) passwordKdfAlgo2);
-        tL_account_getTmpPassword.password = startCheck;
+        TLRPC.TL_inputCheckPasswordSRP startCheck = SRPHelper.startCheck(x, password.srp_id, password.srp_B, (TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow) passwordKdfAlgo2);
+        gettmppassword.password = startCheck;
         if (startCheck != null) {
-            ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_getTmpPassword, requestDelegate, 10);
+            ConnectionsManager.getInstance(this.currentAccount).sendRequest(gettmppassword, requestDelegate, 10);
             return;
         }
         TLRPC.TL_error tL_error2 = new TLRPC.TL_error();
@@ -1049,22 +1050,22 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         requestDelegate.run(null, tL_error2);
     }
 
-    public void lambda$checkPassword$73(TLRPC.TL_error tL_error, TLObject tLObject, String str, TLRPC.TL_account_getPassword tL_account_getPassword) {
+    public void lambda$checkPassword$73(TLRPC.TL_error tL_error, TLObject tLObject, String str, TL_account.getPassword getpassword) {
         if (tL_error != null) {
-            AlertsCreator.processError(this.currentAccount, tL_error, this, tL_account_getPassword, new Object[0]);
+            AlertsCreator.processError(this.currentAccount, tL_error, this, getpassword, new Object[0]);
             showEditDoneProgress(true, false);
             setDonePressed(false);
             return;
         }
-        final TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-        if (!TwoStepVerificationActivity.canHandleCurrentPassword(account_password, false)) {
+        final TL_account.Password password = (TL_account.Password) tLObject;
+        if (!TwoStepVerificationActivity.canHandleCurrentPassword(password, false)) {
             AlertsCreator.showUpdateAppAlert(getParentActivity(), LocaleController.getString(R.string.UpdateAppAlert), true);
-        } else if (account_password.has_password) {
+        } else if (password.has_password) {
             final byte[] stringBytes = AndroidUtilities.getStringBytes(str);
             Utilities.globalQueue.postRunnable(new Runnable() {
                 @Override
                 public final void run() {
-                    PaymentFormActivity.this.lambda$checkPassword$72(account_password, stringBytes);
+                    PaymentFormActivity.this.lambda$checkPassword$72(password, stringBytes);
                 }
             });
         } else {
@@ -1073,11 +1074,11 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         }
     }
 
-    public void lambda$checkPassword$74(final String str, final TLRPC.TL_account_getPassword tL_account_getPassword, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$checkPassword$74(final String str, final TL_account.getPassword getpassword, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                PaymentFormActivity.this.lambda$checkPassword$73(tL_error, tLObject, str, tL_account_getPassword);
+                PaymentFormActivity.this.lambda$checkPassword$73(tL_error, tLObject, str, getpassword);
             }
         });
     }
@@ -1217,8 +1218,8 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         PaymentFormActivity paymentFormActivity = new PaymentFormActivity(this.invoiceInput, this.paymentForm, this.messageObject, this.invoiceSlug, 0, this.requestedInfo, this.shippingOption, this.tipAmount, null, this.cardName, this.validateRequest, this.saveCardInfo, null, this.parentFragment);
         paymentFormActivity.setDelegate(new PaymentFormActivityDelegate() {
             @Override
-            public void currentPasswordUpdated(TLRPC.account_Password account_password) {
-                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, account_password);
+            public void currentPasswordUpdated(TL_account.Password password) {
+                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, password);
             }
 
             @Override
@@ -1245,8 +1246,8 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         PaymentFormActivity paymentFormActivity = new PaymentFormActivity(this.invoiceInput, this.paymentForm, this.messageObject, this.invoiceSlug, 0, this.requestedInfo, this.shippingOption, this.tipAmount, null, this.cardName, this.validateRequest, this.saveCardInfo, null, this.parentFragment);
         paymentFormActivity.setDelegate(new PaymentFormActivityDelegate() {
             @Override
-            public void currentPasswordUpdated(TLRPC.account_Password account_password) {
-                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, account_password);
+            public void currentPasswordUpdated(TL_account.Password password) {
+                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, password);
             }
 
             @Override
@@ -1273,8 +1274,8 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         PaymentFormActivity paymentFormActivity = new PaymentFormActivity(this.invoiceInput, this.paymentForm, this.messageObject, this.invoiceSlug, 0, this.requestedInfo, this.shippingOption, this.tipAmount, null, this.cardName, this.validateRequest, this.saveCardInfo, null, this.parentFragment);
         paymentFormActivity.setDelegate(new PaymentFormActivityDelegate() {
             @Override
-            public void currentPasswordUpdated(TLRPC.account_Password account_password) {
-                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, account_password);
+            public void currentPasswordUpdated(TL_account.Password password) {
+                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, password);
             }
 
             @Override
@@ -1325,8 +1326,8 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         PaymentFormActivity paymentFormActivity = new PaymentFormActivity(this.invoiceInput, this.paymentForm, this.messageObject, this.invoiceSlug, 0, this.requestedInfo, this.shippingOption, this.tipAmount, null, this.cardName, this.validateRequest, this.saveCardInfo, null, this.parentFragment);
         paymentFormActivity.setDelegate(new PaymentFormActivityDelegate() {
             @Override
-            public void currentPasswordUpdated(TLRPC.account_Password account_password) {
-                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, account_password);
+            public void currentPasswordUpdated(TL_account.Password password) {
+                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, password);
             }
 
             @Override
@@ -1384,7 +1385,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     }
 
     public void lambda$createView$27(View view) {
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_resendPasswordEmail(), new RequestDelegate() {
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.resendPasswordEmail(), new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 PaymentFormActivity.lambda$createView$26(tLObject, tL_error);
@@ -1561,9 +1562,9 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     public void lambda$loadPasswordInfo$34(TLRPC.TL_error tL_error, TLObject tLObject) {
         this.loadingPasswordInfo = false;
         if (tL_error == null) {
-            TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-            this.currentPassword = account_password;
-            if (!TwoStepVerificationActivity.canHandleCurrentPassword(account_password, false)) {
+            TL_account.Password password = (TL_account.Password) tLObject;
+            this.currentPassword = password;
+            if (!TwoStepVerificationActivity.canHandleCurrentPassword(password, false)) {
                 AlertsCreator.showUpdateAppAlert(getParentActivity(), LocaleController.getString(R.string.UpdateAppAlert), true);
                 return;
             }
@@ -2209,9 +2210,9 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
 
     public void lambda$sendSavePassword$43(TLRPC.TL_error tL_error, TLObject tLObject, boolean z) {
         if (tL_error == null) {
-            TLRPC.account_Password account_password = (TLRPC.account_Password) tLObject;
-            this.currentPassword = account_password;
-            TwoStepVerificationActivity.initPasswordNewAlgo(account_password);
+            TL_account.Password password = (TL_account.Password) tLObject;
+            this.currentPassword = password;
+            TwoStepVerificationActivity.initPasswordNewAlgo(password);
             sendSavePassword(z);
         }
     }
@@ -2235,7 +2236,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         String string;
         String str2;
         if (tL_error != null && "SRP_ID_INVALID".equals(tL_error.text)) {
-            ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+            ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject2, TLRPC.TL_error tL_error2) {
                     PaymentFormActivity.this.lambda$sendSavePassword$44(z, tLObject2, tL_error2);
@@ -2245,10 +2246,10 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         }
         showEditDoneProgress(true, false);
         if (z) {
-            TLRPC.account_Password account_password = this.currentPassword;
-            account_password.has_password = false;
-            account_password.current_algo = null;
-            this.delegate.currentPasswordUpdated(account_password);
+            TL_account.Password password = this.currentPassword;
+            password.has_password = false;
+            password.current_algo = null;
+            this.delegate.currentPasswordUpdated(password);
             lambda$onBackPressed$321();
             return;
         }
@@ -2305,7 +2306,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         });
     }
 
-    public void lambda$sendSavePassword$48(final boolean z, final String str, String str2, TLRPC.TL_account_updatePasswordSettings tL_account_updatePasswordSettings) {
+    public void lambda$sendSavePassword$48(final boolean z, final String str, String str2, TL_account.updatePasswordSettings updatepasswordsettings) {
         RequestDelegate requestDelegate = new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -2321,15 +2322,15 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                 requestDelegate.run(null, tL_error);
                 return;
             } else {
-                tL_account_updatePasswordSettings.new_settings.new_password_hash = SRPHelper.getVBytes(stringBytes, (TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow) passwordKdfAlgo);
-                if (tL_account_updatePasswordSettings.new_settings.new_password_hash == null) {
+                updatepasswordsettings.new_settings.new_password_hash = SRPHelper.getVBytes(stringBytes, (TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow) passwordKdfAlgo);
+                if (updatepasswordsettings.new_settings.new_password_hash == null) {
                     TLRPC.TL_error tL_error2 = new TLRPC.TL_error();
                     tL_error2.text = "ALGO_INVALID";
                     requestDelegate.run(null, tL_error2);
                 }
             }
         }
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_updatePasswordSettings, requestDelegate, 10);
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(updatepasswordsettings, requestDelegate, 10);
     }
 
     public void lambda$sendSavedForm$49(TLObject tLObject, Runnable runnable) {
@@ -2368,8 +2369,8 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     public void lambda$showChoosePaymentMethod$31(final Runnable runnable, List list, List list2, DialogInterface dialogInterface, int i) {
         PaymentFormActivityDelegate paymentFormActivityDelegate = new PaymentFormActivityDelegate() {
             @Override
-            public void currentPasswordUpdated(TLRPC.account_Password account_password) {
-                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, account_password);
+            public void currentPasswordUpdated(TL_account.Password password) {
+                PaymentFormActivityDelegate.CC.$default$currentPasswordUpdated(this, password);
             }
 
             @Override
@@ -2446,7 +2447,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
             return;
         }
         this.loadingPasswordInfo = true;
-        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_account_getPassword(), new RequestDelegate() {
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_account.getPassword(), new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 PaymentFormActivity.this.lambda$loadPasswordInfo$35(tLObject, tL_error);
@@ -2709,9 +2710,9 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                 return;
             }
             showEditDoneProgress(true, true);
-            TLRPC.TL_account_confirmPasswordEmail tL_account_confirmPasswordEmail = new TLRPC.TL_account_confirmPasswordEmail();
-            tL_account_confirmPasswordEmail.code = text;
-            ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_confirmPasswordEmail, new RequestDelegate() {
+            TL_account.confirmPasswordEmail confirmpasswordemail = new TL_account.confirmPasswordEmail();
+            confirmpasswordemail.code = text;
+            ConnectionsManager.getInstance(this.currentAccount).sendRequest(confirmpasswordemail, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                     PaymentFormActivity.this.lambda$sendSavePassword$42(tLObject, tL_error);
@@ -2719,14 +2720,14 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
             }, 10);
             return;
         }
-        final TLRPC.TL_account_updatePasswordSettings tL_account_updatePasswordSettings = new TLRPC.TL_account_updatePasswordSettings();
+        final TL_account.updatePasswordSettings updatepasswordsettings = new TL_account.updatePasswordSettings();
         if (z) {
             this.doneItem.setVisibility(0);
-            TLRPC.TL_account_passwordInputSettings tL_account_passwordInputSettings = new TLRPC.TL_account_passwordInputSettings();
-            tL_account_updatePasswordSettings.new_settings = tL_account_passwordInputSettings;
-            tL_account_passwordInputSettings.flags = 2;
-            tL_account_passwordInputSettings.email = "";
-            tL_account_updatePasswordSettings.password = new TLRPC.TL_inputCheckPasswordEmpty();
+            TL_account.passwordInputSettings passwordinputsettings = new TL_account.passwordInputSettings();
+            updatepasswordsettings.new_settings = passwordinputsettings;
+            passwordinputsettings.flags = 2;
+            passwordinputsettings.email = "";
+            updatepasswordsettings.password = new TLRPC.TL_inputCheckPasswordEmpty();
             str = null;
             str2 = null;
         } else {
@@ -2755,15 +2756,15 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                 shakeField(2);
                 return;
             }
-            tL_account_updatePasswordSettings.password = new TLRPC.TL_inputCheckPasswordEmpty();
-            TLRPC.TL_account_passwordInputSettings tL_account_passwordInputSettings2 = new TLRPC.TL_account_passwordInputSettings();
-            tL_account_updatePasswordSettings.new_settings = tL_account_passwordInputSettings2;
-            int i = tL_account_passwordInputSettings2.flags;
-            tL_account_passwordInputSettings2.flags = i | 1;
-            tL_account_passwordInputSettings2.hint = "";
-            tL_account_passwordInputSettings2.new_algo = this.currentPassword.new_algo;
-            tL_account_passwordInputSettings2.flags = i | 3;
-            tL_account_passwordInputSettings2.email = obj2.trim();
+            updatepasswordsettings.password = new TLRPC.TL_inputCheckPasswordEmpty();
+            TL_account.passwordInputSettings passwordinputsettings2 = new TL_account.passwordInputSettings();
+            updatepasswordsettings.new_settings = passwordinputsettings2;
+            int i = passwordinputsettings2.flags;
+            passwordinputsettings2.flags = i | 1;
+            passwordinputsettings2.hint = "";
+            passwordinputsettings2.new_algo = this.currentPassword.new_algo;
+            passwordinputsettings2.flags = i | 3;
+            passwordinputsettings2.email = obj2.trim();
             str = obj2;
             str2 = obj;
         }
@@ -2771,7 +2772,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         Utilities.globalQueue.postRunnable(new Runnable() {
             @Override
             public final void run() {
-                PaymentFormActivity.this.lambda$sendSavePassword$48(z, str, str2, tL_account_updatePasswordSettings);
+                PaymentFormActivity.this.lambda$sendSavePassword$48(z, str, str2, updatepasswordsettings);
             }
         });
     }
@@ -2833,10 +2834,10 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         this.detailSettingsCell[5].setVisibility(tL_paymentRequestedInfo.email == null ? 8 : 0);
     }
 
-    private void setCurrentPassword(TLRPC.account_Password account_password) {
-        if (account_password == null || !account_password.has_password) {
-            this.currentPassword = account_password;
-            this.waitingForEmail = (account_password == null || TextUtils.isEmpty(account_password.email_unconfirmed_pattern)) ? false : true;
+    private void setCurrentPassword(TL_account.Password password) {
+        if (password == null || !password.has_password) {
+            this.currentPassword = password;
+            this.waitingForEmail = (password == null || TextUtils.isEmpty(password.email_unconfirmed_pattern)) ? false : true;
             updatePasswordFields();
         } else {
             if (getParentActivity() == null) {

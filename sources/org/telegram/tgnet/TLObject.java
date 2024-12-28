@@ -10,7 +10,7 @@ public class TLObject {
     public boolean disableFree = false;
     public int networkType;
 
-    public TLObject deserializeResponse(AbstractSerializedData abstractSerializedData, int i, boolean z) {
+    public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
         return null;
     }
 
@@ -25,9 +25,9 @@ public class TLObject {
         return nativeByteBuffer.length();
     }
 
-    public void readParams(AbstractSerializedData abstractSerializedData, boolean z) {
+    public void readParams(InputSerializedData inputSerializedData, boolean z) {
     }
 
-    public void serializeToStream(AbstractSerializedData abstractSerializedData) {
+    public void serializeToStream(OutputSerializedData outputSerializedData) {
     }
 }

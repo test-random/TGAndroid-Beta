@@ -53,6 +53,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_bots;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -144,16 +145,16 @@ public class ChangeUsernameActivity extends BaseFragment {
             final String str = tL_username.username;
             final boolean z2 = !z;
             if (ChangeUsernameActivity.this.botId == 0) {
-                TLRPC.TL_account_toggleUsername tL_account_toggleUsername = new TLRPC.TL_account_toggleUsername();
-                tL_account_toggleUsername.username = str;
-                tL_account_toggleUsername.active = z2;
-                toggleusername = tL_account_toggleUsername;
-            } else {
-                TL_bots.toggleUsername toggleusername2 = new TL_bots.toggleUsername();
-                toggleusername2.bot = MessagesController.getInstance(((BaseFragment) ChangeUsernameActivity.this).currentAccount).getInputUser(ChangeUsernameActivity.this.botId);
+                TL_account.toggleUsername toggleusername2 = new TL_account.toggleUsername();
                 toggleusername2.username = str;
                 toggleusername2.active = z2;
                 toggleusername = toggleusername2;
+            } else {
+                TL_bots.toggleUsername toggleusername3 = new TL_bots.toggleUsername();
+                toggleusername3.bot = MessagesController.getInstance(((BaseFragment) ChangeUsernameActivity.this).currentAccount).getInputUser(ChangeUsernameActivity.this.botId);
+                toggleusername3.username = str;
+                toggleusername3.active = z2;
+                toggleusername = toggleusername3;
             }
             ChangeUsernameActivity.this.getConnectionsManager().sendRequest(toggleusername, new RequestDelegate() {
                 @Override
@@ -1094,26 +1095,26 @@ public class ChangeUsernameActivity extends BaseFragment {
         return j != 0 ? j : UserConfig.getInstance(this.currentAccount).getClientUserId();
     }
 
-    public void lambda$checkUserName$3(java.lang.String r4, org.telegram.tgnet.TLRPC.TL_error r5, org.telegram.tgnet.TLObject r6, org.telegram.tgnet.TLRPC.TL_account_checkUsername r7) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChangeUsernameActivity.lambda$checkUserName$3(java.lang.String, org.telegram.tgnet.TLRPC$TL_error, org.telegram.tgnet.TLObject, org.telegram.tgnet.TLRPC$TL_account_checkUsername):void");
+    public void lambda$checkUserName$3(java.lang.String r4, org.telegram.tgnet.TLRPC.TL_error r5, org.telegram.tgnet.TLObject r6, org.telegram.tgnet.tl.TL_account.checkUsername r7) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChangeUsernameActivity.lambda$checkUserName$3(java.lang.String, org.telegram.tgnet.TLRPC$TL_error, org.telegram.tgnet.TLObject, org.telegram.tgnet.tl.TL_account$checkUsername):void");
     }
 
-    public void lambda$checkUserName$4(final String str, final TLRPC.TL_account_checkUsername tL_account_checkUsername, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$checkUserName$4(final String str, final TL_account.checkUsername checkusername, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                ChangeUsernameActivity.this.lambda$checkUserName$3(str, tL_error, tLObject, tL_account_checkUsername);
+                ChangeUsernameActivity.this.lambda$checkUserName$3(str, tL_error, tLObject, checkusername);
             }
         });
     }
 
     public void lambda$checkUserName$5(final String str) {
-        final TLRPC.TL_account_checkUsername tL_account_checkUsername = new TLRPC.TL_account_checkUsername();
-        tL_account_checkUsername.username = str;
-        this.checkReqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_checkUsername, new RequestDelegate() {
+        final TL_account.checkUsername checkusername = new TL_account.checkUsername();
+        checkusername.username = str;
+        this.checkReqId = ConnectionsManager.getInstance(this.currentAccount).sendRequest(checkusername, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                ChangeUsernameActivity.this.lambda$checkUserName$4(str, tL_account_checkUsername, tLObject, tL_error);
+                ChangeUsernameActivity.this.lambda$checkUserName$4(str, checkusername, tLObject, tL_error);
             }
         }, 2);
     }
@@ -1131,7 +1132,7 @@ public class ChangeUsernameActivity extends BaseFragment {
         }
     }
 
-    public void lambda$saveName$10(final AlertDialog alertDialog, final TLRPC.TL_account_updateUsername tL_account_updateUsername, TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$saveName$10(final AlertDialog alertDialog, final TL_account.updateUsername updateusername, TLObject tLObject, final TLRPC.TL_error tL_error) {
         Runnable runnable;
         if (tL_error == null) {
             final TLRPC.User user = (TLRPC.User) tLObject;
@@ -1153,7 +1154,7 @@ public class ChangeUsernameActivity extends BaseFragment {
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public final void run() {
-                        ChangeUsernameActivity.this.lambda$saveName$9(alertDialog, tL_error, tL_account_updateUsername);
+                        ChangeUsernameActivity.this.lambda$saveName$9(alertDialog, tL_error, updateusername);
                     }
                 });
                 return;
@@ -1204,13 +1205,13 @@ public class ChangeUsernameActivity extends BaseFragment {
         shakeIfOff();
     }
 
-    public void lambda$saveName$9(AlertDialog alertDialog, TLRPC.TL_error tL_error, TLRPC.TL_account_updateUsername tL_account_updateUsername) {
+    public void lambda$saveName$9(AlertDialog alertDialog, TLRPC.TL_error tL_error, TL_account.updateUsername updateusername) {
         try {
             alertDialog.dismiss();
         } catch (Exception e) {
             FileLog.e(e);
         }
-        AlertsCreator.processError(this.currentAccount, tL_error, this, tL_account_updateUsername, new Object[0]);
+        AlertsCreator.processError(this.currentAccount, tL_error, this, updateusername, new Object[0]);
         shakeIfOff();
     }
 
@@ -1243,13 +1244,13 @@ public class ChangeUsernameActivity extends BaseFragment {
             return;
         }
         final AlertDialog alertDialog = new AlertDialog(getParentActivity(), 3);
-        final TLRPC.TL_account_updateUsername tL_account_updateUsername = new TLRPC.TL_account_updateUsername();
-        tL_account_updateUsername.username = this.username;
+        final TL_account.updateUsername updateusername = new TL_account.updateUsername();
+        updateusername.username = this.username;
         NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.updateInterfaces, Integer.valueOf(MessagesController.UPDATE_MASK_NAME));
-        final int sendRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_account_updateUsername, new RequestDelegate() {
+        final int sendRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(updateusername, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                ChangeUsernameActivity.this.lambda$saveName$10(alertDialog, tL_account_updateUsername, tLObject, tL_error);
+                ChangeUsernameActivity.this.lambda$saveName$10(alertDialog, updateusername, tLObject, tL_error);
             }
         }, 2);
         ConnectionsManager.getInstance(this.currentAccount).bindRequestToGuid(sendRequest, this.classGuid);
@@ -1278,14 +1279,14 @@ public class ChangeUsernameActivity extends BaseFragment {
                 }
             }
             if (this.botId == 0) {
-                TLRPC.TL_account_reorderUsernames tL_account_reorderUsernames = new TLRPC.TL_account_reorderUsernames();
-                tL_account_reorderUsernames.order = arrayList;
-                reorderusernames = tL_account_reorderUsernames;
-            } else {
-                TL_bots.reorderUsernames reorderusernames2 = new TL_bots.reorderUsernames();
-                reorderusernames2.bot = MessagesController.getInstance(this.currentAccount).getInputUser(this.botId);
+                TL_account.reorderUsernames reorderusernames2 = new TL_account.reorderUsernames();
                 reorderusernames2.order = arrayList;
                 reorderusernames = reorderusernames2;
+            } else {
+                TL_bots.reorderUsernames reorderusernames3 = new TL_bots.reorderUsernames();
+                reorderusernames3.bot = MessagesController.getInstance(this.currentAccount).getInputUser(this.botId);
+                reorderusernames3.order = arrayList;
+                reorderusernames = reorderusernames3;
             }
             getConnectionsManager().sendRequest(reorderusernames, new RequestDelegate() {
                 @Override

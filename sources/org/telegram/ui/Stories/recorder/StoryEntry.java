@@ -42,6 +42,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.Vector;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedFileDrawable;
@@ -67,6 +68,7 @@ public class StoryEntry {
     public ArrayList collageContent;
     public Bitmap coverBitmap;
     public boolean coverSet;
+    public MediaController.CropState crop;
     public long draftDate;
     public long draftId;
     public File draftThumbFile;
@@ -526,9 +528,9 @@ public class StoryEntry {
 
     public void lambda$checkStickers$14(TLObject tLObject) {
         this.checkStickersReqId = 0;
-        if (tLObject instanceof TLRPC.Vector) {
+        if (tLObject instanceof Vector) {
             this.editStickers = new ArrayList();
-            TLRPC.Vector vector = (TLRPC.Vector) tLObject;
+            Vector vector = (Vector) tLObject;
             for (int i = 0; i < vector.objects.size(); i++) {
                 TLRPC.StickerSetCovered stickerSetCovered = (TLRPC.StickerSetCovered) vector.objects.get(i);
                 TLRPC.Document document = stickerSetCovered.cover;
@@ -838,7 +840,7 @@ public class StoryEntry {
         return null;
     }
 
-    public android.graphics.Bitmap buildBitmap(float r26, android.graphics.Bitmap r27) {
+    public android.graphics.Bitmap buildBitmap(float r29, android.graphics.Bitmap r30) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.StoryEntry.buildBitmap(float, android.graphics.Bitmap):android.graphics.Bitmap");
     }
 

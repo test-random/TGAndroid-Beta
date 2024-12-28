@@ -263,7 +263,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     private boolean waitingForKeyboardOpen;
     private boolean wasKeyboardVisible;
     private PaintWeightChooserView weightChooserView;
-    private PaintWeightChooserView.ValueOverride weightDefaultValueOverride;
+    private final PaintWeightChooserView.ValueOverride weightDefaultValueOverride;
     private LinearLayout zoomOutButton;
     private ImageView zoomOutImage;
     private TextView zoomOutText;
@@ -484,7 +484,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
                 try {
                     try {
                         this.innerTextChange = 2;
-                        CharSequence replaceEmoji = Emoji.replaceEmoji((CharSequence) str, textPaintView.getFontMetricsInt(), (int) (textPaintView.getFontSize() * 0.8f), false);
+                        CharSequence replaceEmoji = Emoji.replaceEmoji(str, textPaintView.getFontMetricsInt(), false);
                         if ((replaceEmoji instanceof Spanned) && (emojiSpanArr = (Emoji.EmojiSpan[]) ((Spanned) replaceEmoji).getSpans(0, replaceEmoji.length(), Emoji.EmojiSpan.class)) != null) {
                             for (Emoji.EmojiSpan emojiSpan : emojiSpanArr) {
                                 emojiSpan.scale = 0.85f;
@@ -774,7 +774,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         int i5;
         this.tabsSelectedIndex = 0;
         this.tabsNewSelectedIndex = -1;
-        this.weightDefaultValueOverride = new PaintWeightChooserView.ValueOverride() {
+        PaintWeightChooserView.ValueOverride valueOverride = new PaintWeightChooserView.ValueOverride() {
             @Override
             public float get() {
                 Brush currentBrush = PaintView.this.renderView.getCurrentBrush();
@@ -789,6 +789,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
                 paintView.setCurrentSwatch(paintView.colorSwatch, true);
             }
         };
+        this.weightDefaultValueOverride = valueOverride;
         this.typefaceMenuOutlinePaint = new Paint(1);
         this.typefaceMenuBackgroundPaint = new Paint(1);
         this.colorPickerRainbowPaint = new Paint(1);
@@ -971,8 +972,8 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             bitmap4 = bitmap6;
             blurManager2 = blurManager;
         } else {
-            bitmap4 = bitmap6;
             blurManager2 = null;
+            bitmap4 = bitmap6;
         }
         RenderView renderView = new RenderView(context, painting, bitmap5, bitmap4, blurManager2) {
             @Override
@@ -998,7 +999,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             @Override
             public void onBeganDrawing() {
                 if (PaintView.this.currentEntityView != null) {
-                    PaintView.this.lambda$createRound$61(null);
+                    PaintView.this.lambda$createRound$62(null);
                 }
                 PaintView.this.weightChooserView.setViewHidden(true);
             }
@@ -1031,7 +1032,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             public boolean shouldDraw() {
                 boolean z4 = PaintView.this.currentEntityView == null;
                 if (!z4) {
-                    PaintView.this.lambda$createRound$61(null);
+                    PaintView.this.lambda$createRound$62(null);
                 }
                 return z4;
             }
@@ -1053,7 +1054,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         this.entitiesView = new EntitiesContainerView(context, new EntitiesContainerView.EntitiesContainerViewDelegate() {
             @Override
             public void onEntityDeselect() {
-                PaintView.this.lambda$createRound$61(null);
+                PaintView.this.lambda$createRound$62(null);
                 PaintView paintView = PaintView.this;
                 if (paintView.enteredThroughText) {
                     paintView.dismiss();
@@ -1446,8 +1447,8 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         this.weightChooserView = paintWeightChooserView;
         paintWeightChooserView.setColorSwatch(this.colorSwatch);
         this.weightChooserView.setRenderView(this.renderView);
-        this.weightChooserView.setValueOverride(this.weightDefaultValueOverride);
-        this.colorSwatch.brushWeight = this.weightDefaultValueOverride.get();
+        this.weightChooserView.setValueOverride(valueOverride);
+        this.colorSwatch.brushWeight = valueOverride.get();
         this.weightChooserView.setOnUpdate(new Runnable() {
             @Override
             public final void run() {
@@ -1710,7 +1711,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         checkEntitiesIsVideo();
         if (z) {
             registerRemovalUndo(reactionWidgetEntityView);
-            lambda$createRound$61(reactionWidgetEntityView);
+            lambda$createRound$62(reactionWidgetEntityView);
         }
         return reactionWidgetEntityView;
     }
@@ -1732,7 +1733,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         checkEntitiesIsVideo();
         if (z) {
             registerRemovalUndo(stickerView);
-            lambda$createRound$61(stickerView);
+            lambda$createRound$62(stickerView);
         }
         return stickerView;
     }
@@ -1846,7 +1847,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         }
         checkEntitiesIsVideo();
         registerRemovalUndo(entityView2);
-        lambda$createRound$61(null);
+        lambda$createRound$62(null);
         appearAnimation(entityView2);
     }
 
@@ -1928,7 +1929,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    PaintView.this.lambda$hideEmojiPopup$64(valueAnimator);
+                    PaintView.this.lambda$hideEmojiPopup$65(valueAnimator);
                 }
             });
             this.isAnimatePopupClosing = true;
@@ -1999,11 +2000,11 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         return false;
     }
 
-    public void lambda$appearAnimation$59(View view) {
+    public void lambda$appearAnimation$60(View view) {
         if (view instanceof EntityView) {
             EntityView entityView = (EntityView) view;
             entityView.updateSelectionView();
-            lambda$createRound$61(entityView);
+            lambda$createRound$62(entityView);
         }
     }
 
@@ -2057,7 +2058,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         }
     }
 
-    public void lambda$hideEmojiPopup$64(ValueAnimator valueAnimator) {
+    public void lambda$hideEmojiPopup$65(ValueAnimator valueAnimator) {
         this.emojiView.setTranslationY(((Float) valueAnimator.getAnimatedValue()).floatValue());
     }
 
@@ -2186,12 +2187,12 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         if (this.emojiViewVisible) {
             hideEmojiPopup(false);
         }
-        lambda$registerRemovalUndo$62(this.currentEntityView);
-        lambda$createRound$61(null);
+        lambda$registerRemovalUndo$63(this.currentEntityView);
+        lambda$createRound$62(null);
     }
 
     public void lambda$new$5(View view) {
-        lambda$createRound$61(null);
+        lambda$createRound$62(null);
     }
 
     public void lambda$new$6(int i) {
@@ -2220,7 +2221,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             return;
         }
         if (this.editingText) {
-            lambda$createRound$61(null);
+            lambda$createRound$62(null);
             return;
         }
         Runnable runnable = this.onCancelButtonClickedListener;
@@ -2438,7 +2439,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
 
     public void lambda$setupTabsLayout$17(View view) {
         if (this.editingText) {
-            lambda$createRound$61(null);
+            lambda$createRound$62(null);
         } else {
             switchTab(0);
         }
@@ -2504,7 +2505,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         }
     }
 
-    public void lambda$showEmojiPopup$63(ValueAnimator valueAnimator) {
+    public void lambda$showEmojiPopup$64(ValueAnimator valueAnimator) {
         this.emojiView.setTranslationY(((Float) valueAnimator.getAnimatedValue()).floatValue());
     }
 
@@ -2529,7 +2530,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         if (entityView instanceof RoundView) {
             onTryDeleteRound();
         } else {
-            lambda$registerRemovalUndo$62(entityView);
+            lambda$registerRemovalUndo$63(entityView);
         }
         ActionBarPopupWindow actionBarPopupWindow = this.popupWindow;
         if (actionBarPopupWindow == null || !actionBarPopupWindow.isShowing()) {
@@ -2552,7 +2553,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     }
 
     public void lambda$showMenuForEntity$47(EntityView entityView, View view) {
-        lambda$createRound$61(entityView);
+        lambda$createRound$62(entityView);
         editSelectedTextEntity();
         ActionBarPopupWindow actionBarPopupWindow = this.popupWindow;
         if (actionBarPopupWindow == null || !actionBarPopupWindow.isShowing()) {
@@ -2567,7 +2568,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     }
 
     public void lambda$showMenuForEntity$49(final EntityView entityView, View view) {
-        lambda$createRound$61(null);
+        lambda$createRound$62(null);
         showLocationAlert((LocationView) entityView, new Utilities.Callback2() {
             @Override
             public final void run(Object obj, Object obj2) {
@@ -2582,7 +2583,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     }
 
     public void lambda$showMenuForEntity$50(EntityView entityView, View view) {
-        lambda$createRound$61(null);
+        lambda$createRound$62(null);
         showLinkAlert((LinkView) entityView);
         ActionBarPopupWindow actionBarPopupWindow = this.popupWindow;
         if (actionBarPopupWindow == null || !actionBarPopupWindow.isShowing()) {
@@ -2592,6 +2593,15 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     }
 
     public void lambda$showMenuForEntity$51(EntityView entityView, View view) {
+        onPhotoEntityCropClick((PhotoView) entityView);
+        ActionBarPopupWindow actionBarPopupWindow = this.popupWindow;
+        if (actionBarPopupWindow == null || !actionBarPopupWindow.isShowing()) {
+            return;
+        }
+        this.popupWindow.dismiss(true);
+    }
+
+    public void lambda$showMenuForEntity$52(EntityView entityView, View view) {
         if (entityView instanceof StickerView) {
             ((StickerView) entityView).mirror(true);
         } else if (entityView instanceof ReactionWidgetEntityView) {
@@ -2608,7 +2618,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         this.popupWindow.dismiss(true);
     }
 
-    public void lambda$showMenuForEntity$52(PhotoView photoView, View view) {
+    public void lambda$showMenuForEntity$53(PhotoView photoView, View view) {
         photoView.toggleSegmented(true);
         if (photoView.isSegmented()) {
             onSwitchSegmentedAnimation(photoView);
@@ -2620,7 +2630,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         this.popupWindow.dismiss(true);
     }
 
-    public void lambda$showMenuForEntity$53(EntityView entityView, View view) {
+    public void lambda$showMenuForEntity$54(EntityView entityView, View view) {
         entityView.bringToFront();
         ActionBarPopupWindow actionBarPopupWindow = this.popupWindow;
         if (actionBarPopupWindow == null || !actionBarPopupWindow.isShowing()) {
@@ -2629,7 +2639,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         this.popupWindow.dismiss(true);
     }
 
-    public void lambda$showMenuForEntity$54(EntityView entityView, View view) {
+    public void lambda$showMenuForEntity$55(EntityView entityView, View view) {
         duplicateEntity(entityView);
         ActionBarPopupWindow actionBarPopupWindow = this.popupWindow;
         if (actionBarPopupWindow == null || !actionBarPopupWindow.isShowing()) {
@@ -2638,11 +2648,11 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         this.popupWindow.dismiss(true);
     }
 
-    public void lambda$showMenuForEntity$55(final org.telegram.ui.Components.Paint.Views.EntityView r13) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.PaintView.lambda$showMenuForEntity$55(org.telegram.ui.Components.Paint.Views.EntityView):void");
+    public void lambda$showMenuForEntity$56(final org.telegram.ui.Components.Paint.Views.EntityView r13) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.PaintView.lambda$showMenuForEntity$56(org.telegram.ui.Components.Paint.Views.EntityView):void");
     }
 
-    public boolean lambda$showPopup$56(View view, MotionEvent motionEvent) {
+    public boolean lambda$showPopup$57(View view, MotionEvent motionEvent) {
         ActionBarPopupWindow actionBarPopupWindow;
         if (motionEvent.getActionMasked() != 0 || (actionBarPopupWindow = this.popupWindow) == null || !actionBarPopupWindow.isShowing()) {
             return false;
@@ -2655,14 +2665,14 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         return false;
     }
 
-    public void lambda$showPopup$57(KeyEvent keyEvent) {
+    public void lambda$showPopup$58(KeyEvent keyEvent) {
         ActionBarPopupWindow actionBarPopupWindow;
         if (keyEvent.getKeyCode() == 4 && keyEvent.getRepeatCount() == 0 && (actionBarPopupWindow = this.popupWindow) != null && actionBarPopupWindow.isShowing()) {
             this.popupWindow.dismiss();
         }
     }
 
-    public void lambda$showPopup$58() {
+    public void lambda$showPopup$59() {
         this.popupLayout.removeInnerViews();
     }
 
@@ -2725,7 +2735,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         view2.setAlpha(1.0f - (Math.min(f, 0.25f) / 0.25f));
     }
 
-    public void lambda$updateTextDim$65(boolean z) {
+    public void lambda$updateTextDim$66(boolean z) {
         if (z) {
             return;
         }
@@ -2846,16 +2856,16 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         this.undoStore.registerUndo(entityView.getUUID(), new Runnable() {
             @Override
             public final void run() {
-                PaintView.this.lambda$registerRemovalUndo$62(entityView);
+                PaintView.this.lambda$registerRemovalUndo$63(entityView);
             }
         });
     }
 
-    public void lambda$registerRemovalUndo$62(EntityView entityView) {
+    public void lambda$registerRemovalUndo$63(EntityView entityView) {
         EntityView entityView2 = this.currentEntityView;
         if (entityView == entityView2 && entityView2 != null) {
             entityView2.deselect();
-            lambda$createRound$61(null);
+            lambda$createRound$62(null);
             if (entityView instanceof TextPaintView) {
                 ValueAnimator valueAnimator = this.tabsSelectionAnimator;
                 if (valueAnimator != null && this.tabsNewSelectedIndex != 0) {
@@ -2973,7 +2983,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         EntityView entityView5 = this.currentEntityView;
         this.currentEntityView = entityView;
         if ((entityView5 instanceof TextPaintView) && TextUtils.isEmpty(((TextPaintView) entityView5).getText())) {
-            lambda$registerRemovalUndo$62(entityView5);
+            lambda$registerRemovalUndo$63(entityView5);
         }
         EntityView entityView6 = this.currentEntityView;
         if (entityView5 != entityView6 && (entityView6 instanceof RoundView)) {
@@ -3415,7 +3425,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
                     ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            PaintView.this.lambda$showEmojiPopup$63(valueAnimator);
+                            PaintView.this.lambda$showEmojiPopup$64(valueAnimator);
                         }
                     });
                     ofFloat.addListener(new AnimatorListenerAdapter() {
@@ -3543,7 +3553,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             showPopup(new Runnable() {
                 @Override
                 public final void run() {
-                    PaintView.this.lambda$showMenuForEntity$55(entityView);
+                    PaintView.this.lambda$showMenuForEntity$56(entityView);
                 }
             }, this, 51, centerLocationInWindow[0], centerLocationInWindow[1] - AndroidUtilities.dp(32.0f), true);
             return;
@@ -3569,15 +3579,15 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             this.popupLayout.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public final boolean onTouch(View view2, MotionEvent motionEvent) {
-                    boolean lambda$showPopup$56;
-                    lambda$showPopup$56 = PaintView.this.lambda$showPopup$56(view2, motionEvent);
-                    return lambda$showPopup$56;
+                    boolean lambda$showPopup$57;
+                    lambda$showPopup$57 = PaintView.this.lambda$showPopup$57(view2, motionEvent);
+                    return lambda$showPopup$57;
                 }
             });
             this.popupLayout.setDispatchKeyEventListener(new ActionBarPopupWindow.OnDispatchKeyEventListener() {
                 @Override
                 public final void onDispatchKeyEvent(KeyEvent keyEvent) {
-                    PaintView.this.lambda$showPopup$57(keyEvent);
+                    PaintView.this.lambda$showPopup$58(keyEvent);
                 }
             });
             this.popupLayout.setShownFromBottom(true);
@@ -3599,7 +3609,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             this.popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
                 @Override
                 public final void onDismiss() {
-                    PaintView.this.lambda$showPopup$58();
+                    PaintView.this.lambda$showPopup$59();
                 }
             });
         }
@@ -3909,7 +3919,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         this.textDim.animate().alpha(z ? 1.0f : 0.0f).withEndAction(new Runnable() {
             @Override
             public final void run() {
-                PaintView.this.lambda$updateTextDim$65(z);
+                PaintView.this.lambda$updateTextDim$66(z);
             }
         }).start();
     }
@@ -3928,7 +3938,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         view.animate().scaleX(scaleX).scaleY(scaleY).alpha(1.0f).setInterpolator(new OvershootInterpolator(3.0f)).setDuration(240L).withEndAction(new Runnable() {
             @Override
             public final void run() {
-                PaintView.this.lambda$appearAnimation$59(view);
+                PaintView.this.lambda$appearAnimation$60(view);
             }
         }).start();
     }
@@ -3953,7 +3963,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     }
 
     public void clearSelection() {
-        lambda$createRound$61(null);
+        lambda$createRound$62(null);
     }
 
     protected void createEmojiView() {
@@ -3990,7 +4000,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         checkEntitiesIsVideo();
         if (z) {
             registerRemovalUndo(messageEntityView);
-            lambda$createRound$61(messageEntityView);
+            lambda$createRound$62(messageEntityView);
         }
         return messageEntityView;
     }
@@ -4005,13 +4015,12 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             basePhotoSize.height = f;
         }
         PhotoView photoView = new PhotoView(getContext(), centerPositionForEntity(), 0.0f, 1.0f, basePhotoSize, str, ((Integer) imageOrientation.first).intValue(), ((Integer) imageOrientation.second).intValue());
-        photoView.centerImage.setLayerNum(12);
         photoView.setDelegate(this);
         this.entitiesView.addView(photoView);
         checkEntitiesIsVideo();
         if (z) {
             registerRemovalUndo(photoView);
-            lambda$createRound$61(photoView);
+            lambda$createRound$62(photoView);
         }
         return photoView;
     }
@@ -4019,13 +4028,12 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     public PhotoView createPhoto(TLObject tLObject, boolean z) {
         this.forceChanges = true;
         PhotoView photoView = new PhotoView(getContext(), centerPositionForEntity(), 0.0f, 1.0f, basePhotoSize(tLObject), tLObject);
-        photoView.centerImage.setLayerNum(12);
         photoView.setDelegate(this);
         this.entitiesView.addView(photoView);
         checkEntitiesIsVideo();
         if (z) {
             registerRemovalUndo(photoView);
-            lambda$createRound$61(photoView);
+            lambda$createRound$62(photoView);
         }
         return photoView;
     }
@@ -4050,7 +4058,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             post(new Runnable() {
                 @Override
                 public final void run() {
-                    PaintView.this.lambda$createRound$61(roundView);
+                    PaintView.this.lambda$createRound$62(roundView);
                 }
             });
         }
@@ -4063,12 +4071,12 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             final View childAt = this.entitiesView.getChildAt(i);
             if (childAt instanceof RoundView) {
                 if (this.currentEntityView == childAt) {
-                    lambda$createRound$61(null);
+                    lambda$createRound$62(null);
                 }
                 childAt.animate().scaleX(0.0f).scaleY(0.0f).setDuration(280L).setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT).withEndAction(new Runnable() {
                     @Override
                     public final void run() {
-                        PaintView.this.lambda$deleteRound$60(childAt);
+                        PaintView.this.lambda$deleteRound$61(childAt);
                     }
                 }).start();
             }
@@ -4382,7 +4390,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             return false;
         }
         if (!this.enteredThroughText) {
-            lambda$createRound$61(null);
+            lambda$createRound$62(null);
             return true;
         }
         this.enteredThroughText = false;
@@ -4467,7 +4475,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
 
     @Override
     public boolean onEntitySelected(EntityView entityView) {
-        return lambda$createRound$61(entityView);
+        return lambda$createRound$62(entityView);
     }
 
     protected abstract void onGalleryClick();
@@ -4542,6 +4550,8 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     public void onParentPreDraw() {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.PaintView.onParentPreDraw():void");
     }
+
+    protected abstract void onPhotoEntityCropClick(PhotoView photoView);
 
     @Override
     public void onResume() {
@@ -4642,7 +4652,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             return false;
         }
         if (this.currentEntityView != null) {
-            lambda$createRound$61(null);
+            lambda$createRound$62(null);
         }
         float x = motionEvent.getX();
         float y = motionEvent.getY();
@@ -4687,7 +4697,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
     public void removeCurrentEntity() {
         EntityView entityView = this.currentEntityView;
         if (entityView != null) {
-            lambda$registerRemovalUndo$62(entityView);
+            lambda$registerRemovalUndo$63(entityView);
         }
     }
 
@@ -4699,7 +4709,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         super.requestLayout();
     }
 
-    public boolean lambda$createRound$61(EntityView entityView) {
+    public boolean lambda$createRound$62(EntityView entityView) {
         return selectEntity(entityView, true);
     }
 
@@ -4711,7 +4721,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         if (this.isCoverPreview != z) {
             this.isCoverPreview = z;
             if (z) {
-                lambda$createRound$61(null);
+                lambda$createRound$62(null);
             }
             setCoverPause(z);
         }
