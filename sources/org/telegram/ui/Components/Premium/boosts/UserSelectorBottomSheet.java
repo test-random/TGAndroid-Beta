@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BirthdayController;
-import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaDataController;
@@ -1018,7 +1017,7 @@ public class UserSelectorBottomSheet extends BottomSheetWithRecyclerListView imp
                 i = AndroidUtilities.dp(50.0f);
                 this.items.add(SelectorAdapter.Item.asButton(1, R.drawable.menu_birthday, LocaleController.getString(R.string.GiftsBirthdaySetup)));
             }
-            if (this.type == 0 && BuildVars.DEBUG_PRIVATE_VERSION && (currentUser = UserConfig.getInstance(this.currentAccount).getCurrentUser()) != null) {
+            if (this.type == 0 && (currentUser = UserConfig.getInstance(this.currentAccount).getCurrentUser()) != null) {
                 this.items.add(SelectorAdapter.Item.asTopSection(LocaleController.getString(R.string.Gift2MyselfSection)));
                 SelectorAdapter.Item asUser = SelectorAdapter.Item.asUser(currentUser, this.selectedIds.contains(Long.valueOf(currentUser.id)));
                 asUser.subtext = LocaleController.getString(R.string.Gift2Myself);
