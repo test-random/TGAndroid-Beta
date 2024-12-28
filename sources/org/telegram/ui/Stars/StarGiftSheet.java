@@ -1376,7 +1376,10 @@ public class StarGiftSheet extends BottomSheet {
             return;
         }
         StarsController.getInstance(this.currentAccount).invalidateProfileGifts(UserConfig.getInstance(this.currentAccount).getClientUserId());
-        applyNewGiftFromUpdates((TLRPC.Updates) tLObject);
+        if (!applyNewGiftFromUpdates((TLRPC.Updates) tLObject)) {
+            dismiss();
+            return;
+        }
         this.button.setLoading(false);
         this.fireworksOverlay.start(true);
         switchPage(false, true);
@@ -1457,7 +1460,10 @@ public class StarGiftSheet extends BottomSheet {
         StarsController.getInstance(this.currentAccount).invalidateTransactions(false);
         StarsController.getInstance(this.currentAccount).invalidateProfileGifts(UserConfig.getInstance(this.currentAccount).getClientUserId());
         StarsController.getInstance(this.currentAccount).invalidateBalance();
-        applyNewGiftFromUpdates(tL_payments_paymentResult.updates);
+        if (!applyNewGiftFromUpdates(tL_payments_paymentResult.updates)) {
+            dismiss();
+            return;
+        }
         this.button.setLoading(false);
         this.fireworksOverlay.start(true);
         switchPage(false, true);
