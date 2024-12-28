@@ -228,7 +228,7 @@ public class MessagesController extends BaseController implements NotificationCe
     public SparseArray<MessageObject> dialogMessagesByIds;
     public LongSparseArray dialogMessagesByRandomIds;
     private LongSparseArray dialogPhotos;
-    public SparseArray<ArrayList<TLRPC.Dialog>> dialogsByFolder;
+    public final SparseArray<ArrayList<TLRPC.Dialog>> dialogsByFolder;
     public ArrayList<TLRPC.Dialog> dialogsCanAddUsers;
     public ArrayList<TLRPC.Dialog> dialogsChannelsOnly;
     private SparseBooleanArray dialogsEndReached;

@@ -79,25 +79,30 @@ public class UserNameResolver {
         }, 2L);
     }
 
-    public int resolve(String str, Consumer consumer) {
+    public void lambda$resolve$2(String str, int i) {
+        this.resolvingConsumers.remove(str);
+        ConnectionsManager.getInstance(this.currentAccount).cancelRequest(i, true);
+    }
+
+    public Runnable resolve(String str, Consumer consumer) {
         return resolve(str, null, consumer);
     }
 
-    public int resolve(final String str, String str2, Consumer consumer) {
+    public Runnable resolve(final String str, String str2, Consumer consumer) {
         TLRPC.TL_contacts_resolveUsername tL_contacts_resolveUsername;
         CachedPeer cachedPeer;
         if (TextUtils.isEmpty(str2) && (cachedPeer = this.resolvedCache.get(str)) != null) {
             if (System.currentTimeMillis() - cachedPeer.time < 3600000) {
                 consumer.accept(Long.valueOf(cachedPeer.peerId));
                 FileLog.d("resolve username from cache " + str + " " + cachedPeer.peerId);
-                return -1;
+                return null;
             }
             this.resolvedCache.remove(str);
         }
         ArrayList<Consumer> arrayList = this.resolvingConsumers.get(str);
         if (arrayList != null) {
             arrayList.add(consumer);
-            return -1;
+            return null;
         }
         ArrayList<Consumer> arrayList2 = new ArrayList<>();
         arrayList2.add(consumer);
@@ -115,12 +120,18 @@ public class UserNameResolver {
             }
             tL_contacts_resolveUsername = tL_contacts_resolveUsername2;
         }
-        return ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_contacts_resolveUsername, new RequestDelegate() {
+        final int sendRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_contacts_resolveUsername, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
                 UserNameResolver.this.lambda$resolve$1(str, tLObject, tL_error);
             }
         });
+        return new Runnable() {
+            @Override
+            public final void run() {
+                UserNameResolver.this.lambda$resolve$2(str, sendRequest);
+            }
+        };
     }
 
     public void update(TLRPC.Chat chat, TLRPC.Chat chat2) {

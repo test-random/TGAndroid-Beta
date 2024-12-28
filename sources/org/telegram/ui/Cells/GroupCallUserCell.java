@@ -55,6 +55,7 @@ public class GroupCallUserCell extends FrameLayout {
     private int lastMuteColor;
     private boolean lastMuted;
     private boolean lastRaisedHand;
+    public final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable leftDrawable;
     private RLottieImageView muteButton;
     private RLottieDrawable muteDrawable;
     private SimpleTextView nameTextView;
@@ -63,7 +64,7 @@ public class GroupCallUserCell extends FrameLayout {
     private Drawable premiumDrawable;
     private float progressToAvatarPreview;
     private Runnable raiseHandCallback;
-    public AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable rightDrawable;
+    public final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable rightDrawable;
     private long selfId;
     private Runnable shakeHandCallback;
     private RLottieDrawable shakeHandDrawable;
@@ -445,6 +446,10 @@ public class GroupCallUserCell extends FrameLayout {
         if (swapAnimatedEmojiDrawable != null) {
             swapAnimatedEmojiDrawable.attach();
         }
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.leftDrawable;
+        if (swapAnimatedEmojiDrawable2 != null) {
+            swapAnimatedEmojiDrawable2.attach();
+        }
     }
 
     @Override
@@ -465,6 +470,10 @@ public class GroupCallUserCell extends FrameLayout {
         AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = this.rightDrawable;
         if (swapAnimatedEmojiDrawable != null) {
             swapAnimatedEmojiDrawable.detach();
+        }
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.leftDrawable;
+        if (swapAnimatedEmojiDrawable2 != null) {
+            swapAnimatedEmojiDrawable2.detach();
         }
     }
 
@@ -521,7 +530,7 @@ public class GroupCallUserCell extends FrameLayout {
         this.updateRunnableScheduled = true;
     }
 
-    public void setData(org.telegram.messenger.AccountInstance r6, org.telegram.tgnet.TLRPC.TL_groupCallParticipant r7, org.telegram.messenger.ChatObject.Call r8, long r9, org.telegram.tgnet.TLRPC.FileLocation r11, boolean r12) {
+    public void setData(org.telegram.messenger.AccountInstance r9, org.telegram.tgnet.TLRPC.TL_groupCallParticipant r10, org.telegram.messenger.ChatObject.Call r11, long r12, org.telegram.tgnet.TLRPC.FileLocation r14, boolean r15) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.GroupCallUserCell.setData(org.telegram.messenger.AccountInstance, org.telegram.tgnet.TLRPC$TL_groupCallParticipant, org.telegram.messenger.ChatObject$Call, long, org.telegram.tgnet.TLRPC$FileLocation, boolean):void");
     }
 

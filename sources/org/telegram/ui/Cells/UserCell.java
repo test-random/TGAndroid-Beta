@@ -40,6 +40,7 @@ public class UserCell extends FrameLayout implements NotificationCenter.Notifica
     private TextView adminTextView;
     protected AvatarDrawable avatarDrawable;
     public BackupImageView avatarImageView;
+    private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable botVerification;
     private CheckBox2 checkBox;
     private ImageView checkBox3;
     private CheckBoxSquare checkBoxBig;
@@ -51,7 +52,7 @@ public class UserCell extends FrameLayout implements NotificationCenter.Notifica
     private Object currentObject;
     private CharSequence currentStatus;
     protected long dialogId;
-    private AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable emojiStatus;
+    private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable emojiStatus;
     private TLRPC.EncryptedChat encryptedChat;
     private ImageView imageView;
     private TLRPC.FileLocation lastAvatar;
@@ -122,6 +123,7 @@ public class UserCell extends FrameLayout implements NotificationCenter.Notifica
         super.onAttachedToWindow();
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
         this.emojiStatus.attach();
+        this.botVerification.attach();
     }
 
     @Override
@@ -129,6 +131,7 @@ public class UserCell extends FrameLayout implements NotificationCenter.Notifica
         super.onDetachedFromWindow();
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
         this.emojiStatus.detach();
+        this.botVerification.detach();
         this.storyParams.onDetachFromWindow();
     }
 

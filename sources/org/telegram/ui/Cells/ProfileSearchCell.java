@@ -51,6 +51,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
     private AvatarDrawable avatarDrawable;
     public ImageReceiver avatarImage;
     public StoriesUtilities.AvatarStoryParams avatarStoryParams;
+    private AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable botVerificationDrawable;
     private TLRPC.Chat chat;
     CheckBox2 checkBox;
     private ContactsController.Contact contact;
@@ -130,8 +131,11 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
         this.checkBox.setDrawBackgroundAsArc(3);
         addView(this.checkBox);
         AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(20.0f));
-        this.statusDrawable = swapAnimatedEmojiDrawable;
+        this.botVerificationDrawable = swapAnimatedEmojiDrawable;
         swapAnimatedEmojiDrawable.setCallback(this);
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(20.0f));
+        this.statusDrawable = swapAnimatedEmojiDrawable2;
+        swapAnimatedEmojiDrawable2.setCallback(this);
     }
 
     public void lambda$buildLayout$0() {
@@ -310,6 +314,20 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
                 this.statusLeft += dp4;
             } else {
                 this.countLeft = (getMeasuredWidth() - this.countWidth) - AndroidUtilities.dp(19.0f);
+            }
+        }
+        if (!this.botVerificationDrawable.isEmpty()) {
+            if (LocaleController.isRTL) {
+                this.nameWidth -= this.botVerificationDrawable.getIntrinsicWidth();
+            } else {
+                this.nameLeft += this.botVerificationDrawable.getIntrinsicWidth();
+            }
+        }
+        if (!this.statusDrawable.isEmpty()) {
+            if (LocaleController.isRTL) {
+                this.nameLeft += this.statusDrawable.getIntrinsicWidth();
+            } else {
+                this.nameWidth -= this.statusDrawable.getIntrinsicWidth();
             }
         }
         if (this.nameWidth < 0) {
@@ -530,6 +548,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
             NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.userIsPremiumBlockedUpadted);
         }
         this.statusDrawable.attach();
+        this.botVerificationDrawable.attach();
     }
 
     @Override
@@ -541,6 +560,7 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
             NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.userIsPremiumBlockedUpadted);
         }
         this.statusDrawable.detach();
+        this.botVerificationDrawable.detach();
     }
 
     @Override
@@ -820,25 +840,31 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
         if (z) {
             swapAnimatedEmojiDrawable2.set(new CombinedDrawable(Theme.dialogs_verifiedDrawable, Theme.dialogs_verifiedCheckDrawable, 0, 0), z2);
             this.statusDrawable.setColor(null);
-            return;
-        }
-        if (user != null && !this.savedMessages && DialogObject.getEmojiStatusDocumentId(user.emoji_status) != 0) {
-            swapAnimatedEmojiDrawable = this.statusDrawable;
-            emojiStatus = user.emoji_status;
         } else {
-            if (chat == null || this.savedMessages || DialogObject.getEmojiStatusDocumentId(chat.emoji_status) == 0) {
+            if (user != null && !this.savedMessages && DialogObject.getEmojiStatusDocumentId(user.emoji_status) != 0) {
+                swapAnimatedEmojiDrawable = this.statusDrawable;
+                emojiStatus = user.emoji_status;
+            } else if (chat == null || this.savedMessages || DialogObject.getEmojiStatusDocumentId(chat.emoji_status) == 0) {
                 if (user == null || this.savedMessages || !MessagesController.getInstance(this.currentAccount).isPremiumUser(user)) {
                     this.statusDrawable.set((Drawable) null, z2);
                 } else {
                     this.statusDrawable.set(PremiumGradient.getInstance().premiumStarDrawableMini, z2);
                 }
                 this.statusDrawable.setColor(Integer.valueOf(Theme.getColor(Theme.key_chats_verifiedBackground, this.resourcesProvider)));
+            } else {
+                swapAnimatedEmojiDrawable = this.statusDrawable;
+                emojiStatus = chat.emoji_status;
             }
-            swapAnimatedEmojiDrawable = this.statusDrawable;
-            emojiStatus = chat.emoji_status;
+            swapAnimatedEmojiDrawable.set(DialogObject.getEmojiStatusDocumentId(emojiStatus), z2);
+            this.statusDrawable.setColor(Integer.valueOf(Theme.getColor(Theme.key_chats_verifiedBackground, this.resourcesProvider)));
         }
-        swapAnimatedEmojiDrawable.set(DialogObject.getEmojiStatusDocumentId(emojiStatus), z2);
-        this.statusDrawable.setColor(Integer.valueOf(Theme.getColor(Theme.key_chats_verifiedBackground, this.resourcesProvider)));
+        long botVerificationIcon = user != null ? DialogObject.getBotVerificationIcon(user) : chat != null ? DialogObject.getBotVerificationIcon(chat) : 0L;
+        if (botVerificationIcon == 0) {
+            this.botVerificationDrawable.set((Drawable) null, z2);
+        } else {
+            this.botVerificationDrawable.set(botVerificationIcon, z2);
+        }
+        this.botVerificationDrawable.setColor(Integer.valueOf(Theme.getColor(Theme.key_chats_verifiedBackground, this.resourcesProvider)));
     }
 
     public ProfileSearchCell useCustomPaints() {
@@ -848,6 +874,6 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
 
     @Override
     protected boolean verifyDrawable(Drawable drawable) {
-        return this.statusDrawable == drawable || super.verifyDrawable(drawable);
+        return this.statusDrawable == drawable || this.botVerificationDrawable == drawable || super.verifyDrawable(drawable);
     }
 }

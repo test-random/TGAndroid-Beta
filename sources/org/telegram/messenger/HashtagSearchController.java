@@ -53,6 +53,7 @@ public class HashtagSearchController {
     }
 
     public static class SearchResult {
+        public Runnable cancel;
         public int count;
         private final int currentAccount;
         public boolean endReached;
@@ -75,6 +76,11 @@ public class HashtagSearchController {
             if (this.reqId >= 0) {
                 ConnectionsManager.getInstance(this.currentAccount).cancelRequest(this.reqId, true);
                 this.reqId = -1;
+            }
+            Runnable runnable = this.cancel;
+            if (runnable != null) {
+                runnable.run();
+                this.cancel = null;
             }
             this.messages.clear();
             this.generatedIds.clear();
@@ -128,14 +134,14 @@ public class HashtagSearchController {
         return hashtagSearchController;
     }
 
-    public void lambda$searchHashtag$0(SearchResult searchResult, String str, String str2, int[] iArr, int i, int i2, int i3, Long l) {
+    public void lambda$searchHashtag$0(SearchResult searchResult, String str, String str2, Runnable[] runnableArr, int i, int i2, int i3, Long l) {
         if (TextUtils.equals(searchResult.lastHashtag, str)) {
             if (MessagesController.getInstance(this.currentAccount).getUserOrChat(str2) != null) {
                 searchHashtag(str, i, i2, i3);
                 return;
             }
-            if (iArr[0] == searchResult.reqId) {
-                searchResult.reqId = -1;
+            if (runnableArr[0] == searchResult.cancel) {
+                searchResult.cancel = null;
                 searchResult.loading = false;
                 searchResult.endReached = true;
                 searchResult.count = 0;
@@ -332,17 +338,16 @@ public class HashtagSearchController {
                 str3 = str5;
             }
             searchResult.loading = true;
-            final int[] iArr = new int[1];
             if (!TextUtils.isEmpty(str2) && (tLObject = MessagesController.getInstance(this.currentAccount).getUserOrChat(str2)) == null) {
                 final String str6 = str2;
-                int resolve = MessagesController.getInstance(this.currentAccount).getUserNameResolver().resolve(str2, new Consumer() {
+                Runnable resolve = MessagesController.getInstance(this.currentAccount).getUserNameResolver().resolve(str2, new Consumer() {
                     @Override
                     public final void accept(Object obj) {
-                        HashtagSearchController.this.lambda$searchHashtag$0(searchResult, str5, str6, iArr, i, i2, i3, (Long) obj);
+                        HashtagSearchController.this.lambda$searchHashtag$0(searchResult, str5, str6, r5, i, i2, i3, (Long) obj);
                     }
                 });
-                searchResult.reqId = resolve;
-                iArr[0] = resolve;
+                searchResult.cancel = resolve;
+                final Runnable[] runnableArr = {resolve};
                 return;
             }
             final int i4 = 21;
@@ -374,11 +379,11 @@ public class HashtagSearchController {
                     int sendRequest = ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_channels_searchPosts, new RequestDelegate() {
                         @Override
                         public final void run(TLObject tLObject2, TLRPC.TL_error tL_error) {
-                            HashtagSearchController.this.lambda$searchHashtag$2(i2, str5, iArr, searchResult, i4, i, i3, tLObject2, tL_error);
+                            HashtagSearchController.this.lambda$searchHashtag$2(i2, str5, r4, searchResult, i4, i, i3, tLObject2, tL_error);
                         }
                     });
                     searchResult.reqId = sendRequest;
-                    iArr[0] = sendRequest;
+                    final int[] iArr = {sendRequest};
                 }
                 TLRPC.TL_channels_searchPosts tL_channels_searchPosts3 = new TLRPC.TL_channels_searchPosts();
                 tL_channels_searchPosts3.limit = 21;
@@ -400,7 +405,7 @@ public class HashtagSearchController {
                 }
             });
             searchResult.reqId = sendRequest2;
-            iArr[0] = sendRequest2;
+            final int[] iArr2 = {sendRequest2};
         }
     }
 }

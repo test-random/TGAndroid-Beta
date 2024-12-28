@@ -2147,6 +2147,30 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         }
     }
 
+    public void onSurfaceTextureUpdatedInternal() {
+        boolean hasDisplayList;
+        CameraSessionWrapper cameraSessionWrapper;
+        if (!this.inited && (cameraSessionWrapper = this.cameraSession[0]) != null && cameraSessionWrapper.isInitiated()) {
+            CameraViewDelegate cameraViewDelegate = this.delegate;
+            if (cameraViewDelegate != null) {
+                cameraViewDelegate.onCameraInit();
+            }
+            this.inited = true;
+            if (this.lazy) {
+                this.textureView.setAlpha(0.0f);
+                showTexture(true, true);
+            }
+        }
+        Object obj = this.renderNode;
+        if (obj != null) {
+            hasDisplayList = BotFullscreenButtons$$ExternalSyntheticApiModelOutline2.m(obj).hasDisplayList();
+            if (hasDisplayList) {
+                return;
+            }
+            invalidate();
+        }
+    }
+
     private void updateCameraInfoSize(int r10) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.camera.CameraView.updateCameraInfoSize(int):void");
     }
@@ -2613,24 +2637,25 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
     public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
         boolean hasDisplayList;
         CameraSessionWrapper cameraSessionWrapper;
-        if (!this.inited && (cameraSessionWrapper = this.cameraSession[0]) != null && cameraSessionWrapper.isInitiated()) {
-            CameraViewDelegate cameraViewDelegate = this.delegate;
-            if (cameraViewDelegate != null) {
-                cameraViewDelegate.onCameraInit();
+        if (this.inited || (cameraSessionWrapper = this.cameraSession[0]) == null || !cameraSessionWrapper.isInitiated()) {
+            Object obj = this.renderNode;
+            if (obj == null) {
+                return;
             }
-            this.inited = true;
-            if (this.lazy) {
-                this.textureView.setAlpha(0.0f);
-                showTexture(true, true);
-            }
-        }
-        Object obj = this.renderNode;
-        if (obj != null) {
             hasDisplayList = BotFullscreenButtons$$ExternalSyntheticApiModelOutline2.m(obj).hasDisplayList();
             if (hasDisplayList) {
                 return;
             }
-            invalidate();
+        }
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    CameraView.this.onSurfaceTextureUpdatedInternal();
+                }
+            });
+        } else {
+            onSurfaceTextureUpdatedInternal();
         }
     }
 
