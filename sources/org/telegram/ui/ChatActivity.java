@@ -1930,7 +1930,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
                 messageObject = ((ChatActionCell) view).getMessageObject();
             }
-            return (messageObject == null || messageObject.isSending() || !messageObject.canSetReaction() || messageObject.isEditing() || messageObject.type == 16 || ((BaseFragment) ChatActivity.this).actionBar.isActionModeShowed() || ChatActivity.this.isSecretChat() || ChatActivity.this.isInScheduleMode() || messageObject.isSponsored()) ? false : true;
+            return (messageObject == null || messageObject.isSending() || !messageObject.canSetReaction() || messageObject.isEditing() || ((BaseFragment) ChatActivity.this).actionBar.isActionModeShowed() || ChatActivity.this.isSecretChat() || ChatActivity.this.isInScheduleMode() || messageObject.isSponsored()) ? false : true;
         }
 
         @Override

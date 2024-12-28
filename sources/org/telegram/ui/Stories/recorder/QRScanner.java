@@ -169,8 +169,8 @@ public class QRScanner {
                 }
                 this.qrPaint.setAlpha((int) (f * 255.0f));
                 canvas.drawPath(this.qrPath, this.qrPaint);
-                canvas.restore();
             }
+            canvas.restore();
         }
 
         public boolean hasNoDraw() {
@@ -321,8 +321,10 @@ public class QRScanner {
         if (!z) {
             Utilities.globalQueue.cancelRunnable(this.process);
             Utilities.globalQueue.postRunnable(this.process, getTimeout());
-        } else {
-            Utilities.globalQueue.cancelRunnable(this.process);
+            return;
+        }
+        Utilities.globalQueue.cancelRunnable(this.process);
+        if (this.lastDetected != null) {
             this.lastDetected = null;
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override

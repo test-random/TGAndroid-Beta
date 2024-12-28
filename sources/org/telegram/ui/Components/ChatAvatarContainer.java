@@ -969,6 +969,7 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
         if (j != 0) {
             this.botVerificationDrawable.set(j, z5);
             this.botVerificationDrawable.setColor(Integer.valueOf(getThemedColor(Theme.key_profile_verifiedBackground)));
+            this.botVerificationDrawable.offset(0, AndroidUtilities.dp(1.0f));
             this.titleTextView.setLeftDrawableOutside(true);
             this.titleTextView.setLeftDrawable(this.botVerificationDrawable);
         } else {

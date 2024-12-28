@@ -1187,6 +1187,8 @@ public abstract class PreviewView extends FrameLayout {
     public abstract boolean additionalTouchEvent(MotionEvent motionEvent);
 
     public void applyMatrix() {
+        this.invertMatrix.reset();
+        this.entry.matrix.invert(this.invertMatrix);
         StoryEntry storyEntry = this.entry;
         if (storyEntry == null || storyEntry.isRepostMessage) {
             return;
@@ -1701,54 +1703,28 @@ public abstract class PreviewView extends FrameLayout {
     }
 
     public void setTextureViewTransform(TextureView textureView) {
-        this.invertMatrix.reset();
-        this.entry.matrix.invert(this.invertMatrix);
-        this.transformMatrix.reset();
-        Matrix matrix = this.transformMatrix;
-        float width = 1.0f / getWidth();
-        int i = this.entry.width;
-        if (i < 0) {
-            i = this.videoWidth;
-        }
-        float f = width * i;
-        float height = 1.0f / getHeight();
-        int i2 = this.entry.height;
-        if (i2 < 0) {
-            i2 = this.videoHeight;
-        }
-        matrix.postScale(f, height * i2);
-        if (this.entry.crop != null) {
-            this.transformMatrix.postTranslate((-r0.width) / 2.0f, (-r0.height) / 2.0f);
-            this.transformMatrix.postRotate(-this.entry.orientation);
-            StoryEntry storyEntry = this.entry;
-            int i3 = storyEntry.width;
-            int i4 = storyEntry.height;
-            int i5 = storyEntry.orientation;
-            MediaController.CropState cropState = storyEntry.crop;
-            if (((i5 + cropState.transformRotation) / 90) % 2 == 1) {
-                i4 = i3;
-                i3 = i4;
+        if (textureView != null) {
+            this.matrix.set(this.entry.matrix);
+            Matrix matrix = this.matrix;
+            float width = 1.0f / getWidth();
+            int i = this.entry.width;
+            if (i < 0) {
+                i = this.videoWidth;
             }
-            if (cropState.mirrored) {
-                this.transformMatrix.postScale(-1.0f, 1.0f);
+            float f = width * i;
+            float height = 1.0f / getHeight();
+            int i2 = this.entry.height;
+            if (i2 < 0) {
+                i2 = this.videoHeight;
             }
-            this.transformMatrix.postRotate(this.entry.crop.cropRotate + r2.transformRotation);
-            Matrix matrix2 = this.transformMatrix;
-            MediaController.CropState cropState2 = this.entry.crop;
-            matrix2.postTranslate(cropState2.cropPx * i3, cropState2.cropPy * i4);
-            Matrix matrix3 = this.transformMatrix;
-            float f2 = this.entry.crop.cropScale;
-            matrix3.postScale(f2, f2);
-            this.transformMatrix.postRotate(this.entry.orientation);
-            Matrix matrix4 = this.transformMatrix;
-            StoryEntry storyEntry2 = this.entry;
-            matrix4.postTranslate(storyEntry2.width / 2.0f, storyEntry2.height / 2.0f);
+            matrix.preScale(f, height * i2);
+            this.matrix.postScale(getWidth() / this.entry.resultWidth, getHeight() / this.entry.resultHeight);
+            this.transformBackMatrix.reset();
+            this.matrix.invert(this.transformBackMatrix);
+            this.transformBackMatrix.postScale(this.entry.width / getWidth(), this.entry.height / getHeight());
+            textureView.setTransform(this.matrix);
+            textureView.invalidate();
         }
-        this.transformMatrix.postConcat(this.entry.matrix);
-        this.transformMatrix.postScale(getWidth() / this.entry.resultWidth, getHeight() / this.entry.resultHeight);
-        this.transformBackMatrix.reset();
-        this.transformMatrix.invert(this.transformBackMatrix);
-        textureView.setTransform(this.transformMatrix);
     }
 
     public void setVideoTimelineView(TimelineView timelineView) {

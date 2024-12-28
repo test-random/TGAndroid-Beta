@@ -8342,7 +8342,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private Drawable getBotVerificationDrawable(long j, boolean z, int i) {
         AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[] swapAnimatedEmojiDrawableArr = this.botVerificationDrawable;
         if (swapAnimatedEmojiDrawableArr[i] == null) {
-            swapAnimatedEmojiDrawableArr[i] = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this.nameTextView[i], AndroidUtilities.dp(18.0f), i == 0 ? 7 : 2);
+            swapAnimatedEmojiDrawableArr[i] = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this.nameTextView[i], AndroidUtilities.dp(17.0f), i == 0 ? 7 : 2);
+            this.botVerificationDrawable[i].offset(0, AndroidUtilities.dp(1.0f));
             if (this.fragmentViewAttached) {
                 this.botVerificationDrawable[i].attach();
             }

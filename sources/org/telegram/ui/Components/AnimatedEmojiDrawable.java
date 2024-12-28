@@ -378,6 +378,7 @@ public class AnimatedEmojiDrawable extends Drawable {
     public static class SwapAnimatedEmojiDrawable extends Drawable implements AnimatedEmojiSpan.InvalidateHolder {
         private int alpha;
         boolean attached;
+        private final android.graphics.Rect bounds;
         private int cacheType;
         public boolean center;
         private AnimatedFloat changeProgress;
@@ -386,6 +387,8 @@ public class AnimatedEmojiDrawable extends Drawable {
         private Drawable[] drawables;
         private boolean invalidateParent;
         private Integer lastColor;
+        private int offsetX;
+        private int offsetY;
         private OvershootInterpolator overshootInterpolator;
         private View parentView;
         private View secondParent;
@@ -406,10 +409,11 @@ public class AnimatedEmojiDrawable extends Drawable {
         public SwapAnimatedEmojiDrawable(View view, boolean z, int i, int i2) {
             this.center = false;
             this.overshootInterpolator = new OvershootInterpolator(2.0f);
-            AnimatedFloat animatedFloat = new AnimatedFloat((View) null, 300L, CubicBezierInterpolator.EASE_OUT);
-            this.changeProgress = animatedFloat;
+            this.changeProgress = new AnimatedFloat((View) null, 300L, CubicBezierInterpolator.EASE_OUT);
             this.drawables = new Drawable[2];
             this.alpha = 255;
+            this.bounds = new android.graphics.Rect();
+            AnimatedFloat animatedFloat = this.changeProgress;
             this.parentView = view;
             animatedFloat.setParent(view);
             this.size = i;
@@ -448,39 +452,28 @@ public class AnimatedEmojiDrawable extends Drawable {
 
         @Override
         public void draw(Canvas canvas) {
-            Drawable drawable;
-            int i;
-            int i2;
-            int centerY;
-            int i3;
-            int i4;
-            int i5;
-            int centerY2;
-            int i6;
             float f = this.changeProgress.set(1.0f);
-            android.graphics.Rect bounds = getBounds();
-            Drawable drawable2 = this.drawables[1];
-            if (drawable2 != null && f < 1.0f) {
-                drawable2.setAlpha((int) (this.alpha * (1.0f - f)));
+            this.bounds.set(getBounds());
+            this.bounds.offset(this.offsetX, this.offsetY);
+            Drawable drawable = this.drawables[1];
+            if (drawable != null && f < 1.0f) {
+                drawable.setAlpha((int) (this.alpha * (1.0f - f)));
                 int intrinsicWidth = this.drawables[1].getIntrinsicWidth() < 0 ? getIntrinsicWidth() : this.drawables[1].getIntrinsicWidth();
                 int intrinsicHeight = this.drawables[1].getIntrinsicHeight() < 0 ? getIntrinsicHeight() : this.drawables[1].getIntrinsicHeight();
-                Drawable drawable3 = this.drawables[1];
-                if (drawable3 instanceof AnimatedEmojiDrawable) {
-                    drawable3.setBounds(bounds);
+                Drawable drawable2 = this.drawables[1];
+                if (drawable2 instanceof AnimatedEmojiDrawable) {
+                    drawable2.setBounds(this.bounds);
+                } else if (this.center) {
+                    int i = intrinsicWidth / 2;
+                    int i2 = intrinsicHeight / 2;
+                    drawable2.setBounds(this.bounds.centerX() - i, this.bounds.centerY() - i2, this.bounds.centerX() + i, this.bounds.centerY() + i2);
                 } else {
-                    if (this.center) {
-                        intrinsicWidth /= 2;
-                        i4 = bounds.centerX() - intrinsicWidth;
-                        i5 = intrinsicHeight / 2;
-                        centerY2 = bounds.centerY() - i5;
-                        i6 = bounds.centerX();
-                    } else {
-                        i4 = bounds.left;
-                        i5 = intrinsicHeight / 2;
-                        centerY2 = bounds.centerY() - i5;
-                        i6 = bounds.left;
-                    }
-                    drawable3.setBounds(i4, centerY2, i6 + intrinsicWidth, bounds.centerY() + i5);
+                    android.graphics.Rect rect = this.bounds;
+                    int i3 = rect.left;
+                    int i4 = intrinsicHeight / 2;
+                    int centerY = rect.centerY() - i4;
+                    android.graphics.Rect rect2 = this.bounds;
+                    drawable2.setBounds(i3, centerY, rect2.left + intrinsicWidth, rect2.centerY() + i4);
                 }
                 this.drawables[1].setColorFilter(this.colorFilter);
                 this.drawables[1].draw(canvas);
@@ -490,40 +483,37 @@ public class AnimatedEmojiDrawable extends Drawable {
                 canvas.save();
                 int intrinsicWidth2 = this.drawables[0].getIntrinsicWidth() < 0 ? getIntrinsicWidth() : this.drawables[0].getIntrinsicWidth();
                 int intrinsicHeight2 = this.drawables[0].getIntrinsicHeight() < 0 ? getIntrinsicHeight() : this.drawables[0].getIntrinsicHeight();
-                Drawable drawable4 = this.drawables[0];
-                if (drawable4 instanceof AnimatedEmojiDrawable) {
-                    if (((AnimatedEmojiDrawable) drawable4).imageReceiver != null) {
+                Drawable drawable3 = this.drawables[0];
+                if (drawable3 instanceof AnimatedEmojiDrawable) {
+                    if (((AnimatedEmojiDrawable) drawable3).imageReceiver != null) {
                         ((AnimatedEmojiDrawable) this.drawables[0]).imageReceiver.setRoundRadius(AndroidUtilities.dp(4.0f));
                     }
                     if (f < 1.0f) {
                         float interpolation = this.overshootInterpolator.getInterpolation(f);
-                        canvas.scale(interpolation, interpolation, bounds.centerX(), bounds.centerY());
+                        canvas.scale(interpolation, interpolation, this.bounds.centerX(), this.bounds.centerY());
                     }
-                    this.drawables[0].setBounds(bounds);
+                    this.drawables[0].setBounds(this.bounds);
+                } else if (this.center) {
+                    if (f < 1.0f) {
+                        float interpolation2 = this.overshootInterpolator.getInterpolation(f);
+                        canvas.scale(interpolation2, interpolation2, this.bounds.centerX(), this.bounds.centerY());
+                    }
+                    int i5 = intrinsicWidth2 / 2;
+                    int i6 = intrinsicHeight2 / 2;
+                    this.drawables[0].setBounds(this.bounds.centerX() - i5, this.bounds.centerY() - i6, this.bounds.centerX() + i5, this.bounds.centerY() + i6);
                 } else {
-                    if (this.center) {
-                        if (f < 1.0f) {
-                            float interpolation2 = this.overshootInterpolator.getInterpolation(f);
-                            canvas.scale(interpolation2, interpolation2, bounds.centerX(), bounds.centerY());
-                        }
-                        drawable = this.drawables[0];
-                        intrinsicWidth2 /= 2;
-                        i = bounds.centerX() - intrinsicWidth2;
-                        i2 = intrinsicHeight2 / 2;
-                        centerY = bounds.centerY() - i2;
-                        i3 = bounds.centerX();
-                    } else {
-                        if (f < 1.0f) {
-                            float interpolation3 = this.overshootInterpolator.getInterpolation(f);
-                            canvas.scale(interpolation3, interpolation3, bounds.left + (intrinsicWidth2 / 2.0f), bounds.centerY());
-                        }
-                        drawable = this.drawables[0];
-                        i = bounds.left;
-                        i2 = intrinsicHeight2 / 2;
-                        centerY = bounds.centerY() - i2;
-                        i3 = bounds.left;
+                    if (f < 1.0f) {
+                        float interpolation3 = this.overshootInterpolator.getInterpolation(f);
+                        android.graphics.Rect rect3 = this.bounds;
+                        canvas.scale(interpolation3, interpolation3, rect3.left + (intrinsicWidth2 / 2.0f), rect3.centerY());
                     }
-                    drawable.setBounds(i, centerY, i3 + intrinsicWidth2, bounds.centerY() + i2);
+                    Drawable drawable4 = this.drawables[0];
+                    android.graphics.Rect rect4 = this.bounds;
+                    int i7 = rect4.left;
+                    int i8 = intrinsicHeight2 / 2;
+                    int centerY2 = rect4.centerY() - i8;
+                    android.graphics.Rect rect5 = this.bounds;
+                    drawable4.setBounds(i7, centerY2, rect5.left + intrinsicWidth2, rect5.centerY() + i8);
                 }
                 this.drawables[0].setAlpha(this.alpha);
                 this.drawables[0].setColorFilter(this.colorFilter);
@@ -575,6 +565,11 @@ public class AnimatedEmojiDrawable extends Drawable {
 
         public float isNotEmpty() {
             return (this.drawables[1] != null ? 1.0f - this.changeProgress.get() : 0.0f) + (this.drawables[0] != null ? this.changeProgress.get() : 0.0f);
+        }
+
+        public void offset(int i, int i2) {
+            this.offsetX = i;
+            this.offsetY = i2;
         }
 
         public void play() {

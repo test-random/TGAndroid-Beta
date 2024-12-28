@@ -571,7 +571,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 this.useForceThreeLines = z2;
                 this.currentAccount = i;
                 this.emojiStatus = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(22.0f));
-                this.botVerification = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(22.0f));
+                this.botVerification = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(17.0f));
                 this.avatarImage.setAllowLoadingOnAttachedOnly(true);
                 return;
             }
@@ -1355,7 +1355,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     }
 
     @Override
-    public void onDraw(android.graphics.Canvas r56) {
+    public void onDraw(android.graphics.Canvas r58) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.DialogCell.onDraw(android.graphics.Canvas):void");
     }
 

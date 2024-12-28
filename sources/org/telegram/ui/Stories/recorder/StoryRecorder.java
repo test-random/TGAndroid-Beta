@@ -3492,12 +3492,21 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
     }
 
     public void applyFilterMatrix() {
-        PreviewView previewView;
-        TextureView textureView;
-        if (this.outputEntry == null || (previewView = this.previewView) == null || (textureView = this.photoFilterViewTextureView) == null) {
+        if (this.outputEntry == null || this.photoFilterViewTextureView == null || this.previewContainer.getMeasuredWidth() <= 0 || this.previewContainer.getMeasuredHeight() <= 0) {
             return;
         }
-        previewView.setTextureViewTransform(textureView);
+        Matrix matrix = new Matrix();
+        matrix.reset();
+        if (this.outputEntry.orientation != 0) {
+            matrix.postRotate(-r1, this.previewContainer.getMeasuredWidth() / 2.0f, this.previewContainer.getMeasuredHeight() / 2.0f);
+            if ((this.outputEntry.orientation / 90) % 2 == 1) {
+                matrix.postScale(this.previewContainer.getMeasuredWidth() / this.previewContainer.getMeasuredHeight(), this.previewContainer.getMeasuredHeight() / this.previewContainer.getMeasuredWidth(), this.previewContainer.getMeasuredWidth() / 2.0f, this.previewContainer.getMeasuredHeight() / 2.0f);
+            }
+        }
+        matrix.postScale((1.0f / this.previewContainer.getMeasuredWidth()) * this.outputEntry.width, (1.0f / this.previewContainer.getMeasuredHeight()) * this.outputEntry.height);
+        matrix.postConcat(this.outputEntry.matrix);
+        matrix.postScale(this.previewContainer.getMeasuredWidth() / this.outputEntry.resultWidth, this.previewContainer.getMeasuredHeight() / this.outputEntry.resultHeight);
+        this.photoFilterViewTextureView.setTransform(matrix);
         this.photoFilterViewTextureView.invalidate();
     }
 
