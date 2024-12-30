@@ -4635,8 +4635,13 @@ public class MessageObject {
     }
 
     public int getApproximateHeight() {
+        return getApproximateHeight(false);
+    }
+
+    public int getApproximateHeight(boolean z) {
         int i;
         int min;
+        TLRPC.PhotoSize closestPhotoSizeWithSize;
         int min2;
         int i2 = this.type;
         int i3 = 0;
@@ -4678,68 +4683,74 @@ public class MessageObject {
         if (i2 == 19) {
             return textHeight() + AndroidUtilities.dp(30.0f);
         }
-        if (i2 != 13 && i2 != 15) {
+        if (i2 == 13 || i2 == 15) {
+            float f = AndroidUtilities.displaySize.y * 0.4f;
+            float minTabletSide = (AndroidUtilities.isTablet() ? AndroidUtilities.getMinTabletSide() : AndroidUtilities.displaySize.x) * 0.5f;
+            TLRPC.Document document = getDocument();
+            if (document != null) {
+                int size = document.attributes.size();
+                for (int i5 = 0; i5 < size; i5++) {
+                    TLRPC.DocumentAttribute documentAttribute = document.attributes.get(i5);
+                    if (documentAttribute instanceof TLRPC.TL_documentAttributeImageSize) {
+                        i3 = documentAttribute.w;
+                        i = documentAttribute.h;
+                        break;
+                    }
+                }
+            }
+            i = 0;
+            if (i3 == 0) {
+                i = (int) f;
+                i3 = AndroidUtilities.dp(100.0f) + i;
+            }
+            float f2 = i;
+            if (f2 > f) {
+                i3 = (int) (i3 * (f / f2));
+                i = (int) f;
+            }
+            float f3 = i3;
+            if (f3 > minTabletSide) {
+                i = (int) (i * (minTabletSide / f3));
+            }
+        } else {
             if (AndroidUtilities.isTablet()) {
                 min = AndroidUtilities.getMinTabletSide();
             } else {
                 Point point = AndroidUtilities.displaySize;
                 min = Math.min(point.x, point.y);
             }
-            int i5 = (int) (min * 0.7f);
-            int dp = AndroidUtilities.dp(100.0f) + i5;
-            if (i5 > AndroidUtilities.getPhotoSize()) {
-                i5 = AndroidUtilities.getPhotoSize();
+            int i6 = (int) (min * 0.7f);
+            i = AndroidUtilities.dp(100.0f) + i6;
+            if (i6 > AndroidUtilities.getPhotoSize()) {
+                i6 = AndroidUtilities.getPhotoSize();
             }
-            if (dp > AndroidUtilities.getPhotoSize()) {
-                dp = AndroidUtilities.getPhotoSize();
+            if (i > AndroidUtilities.getPhotoSize()) {
+                i = AndroidUtilities.getPhotoSize();
             }
-            if (FileLoader.getClosestPhotoSizeWithSize(this.photoThumbs, AndroidUtilities.getPhotoSize()) != null) {
-                int i6 = (int) (r3.h / (r3.w / i5));
-                if (i6 == 0) {
-                    i6 = AndroidUtilities.dp(100.0f);
+            if (z) {
+                ArrayList<TLRPC.PhotoSize> arrayList = this.photoThumbs;
+                closestPhotoSizeWithSize = (arrayList == null || arrayList.isEmpty()) ? null : this.photoThumbs.get(0);
+            } else {
+                closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(this.photoThumbs, AndroidUtilities.getPhotoSize());
+            }
+            if (closestPhotoSizeWithSize != null) {
+                int i7 = (int) (closestPhotoSizeWithSize.h / (closestPhotoSizeWithSize.w / i6));
+                if (i7 == 0) {
+                    i7 = AndroidUtilities.dp(100.0f);
                 }
-                if (i6 <= dp) {
-                    dp = i6 < AndroidUtilities.dp(120.0f) ? AndroidUtilities.dp(120.0f) : i6;
+                if (i7 <= i) {
+                    i = i7 < AndroidUtilities.dp(120.0f) ? AndroidUtilities.dp(120.0f) : i7;
                 }
-                if (needDrawBluredPreview()) {
+                if (!z && needDrawBluredPreview()) {
                     if (AndroidUtilities.isTablet()) {
                         min2 = AndroidUtilities.getMinTabletSide();
                     } else {
                         Point point2 = AndroidUtilities.displaySize;
                         min2 = Math.min(point2.x, point2.y);
                     }
-                    dp = (int) (min2 * 0.5f);
+                    i = (int) (min2 * 0.5f);
                 }
             }
-            return dp + AndroidUtilities.dp(14.0f);
-        }
-        float f = AndroidUtilities.displaySize.y * 0.4f;
-        float minTabletSide = (AndroidUtilities.isTablet() ? AndroidUtilities.getMinTabletSide() : AndroidUtilities.displaySize.x) * 0.5f;
-        TLRPC.Document document = getDocument();
-        if (document != null) {
-            int size = document.attributes.size();
-            for (int i7 = 0; i7 < size; i7++) {
-                TLRPC.DocumentAttribute documentAttribute = document.attributes.get(i7);
-                if (documentAttribute instanceof TLRPC.TL_documentAttributeImageSize) {
-                    i3 = documentAttribute.w;
-                    i = documentAttribute.h;
-                    break;
-                }
-            }
-        }
-        i = 0;
-        if (i3 == 0) {
-            i = (int) f;
-            i3 = AndroidUtilities.dp(100.0f) + i;
-        }
-        float f2 = i;
-        if (f2 > f) {
-            i3 = (int) (i3 * (f / f2));
-            i = (int) f;
-        }
-        float f3 = i3;
-        if (f3 > minTabletSide) {
-            i = (int) (i * (minTabletSide / f3));
         }
         return i + AndroidUtilities.dp(14.0f);
     }
@@ -5644,6 +5655,12 @@ public class MessageObject {
         ArrayList<TLRPC.PhotoSize> arrayList;
         int i;
         return getGroupId() != 0 && (!((arrayList = this.photoThumbs) == null || arrayList.isEmpty()) || (i = this.type) == 3 || i == 1 || isMusic() || isDocument());
+    }
+
+    public boolean hasValidGroupIdFast() {
+        ArrayList<TLRPC.PhotoSize> arrayList;
+        int i;
+        return getGroupId() != 0 && (!((arrayList = this.photoThumbs) == null || arrayList.isEmpty()) || (i = this.type) == 3 || i == 1 || i == 14 || i == 9);
     }
 
     public boolean hasValidReplyMessageObject() {

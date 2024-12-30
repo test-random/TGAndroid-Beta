@@ -533,7 +533,6 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             }
         };
         this.storyParams = avatarStoryParams;
-        this.thumbSpoiler = new SpoilerEffect();
         this.visibleOnScreen = true;
         this.collapseOffset = 0.0f;
         this.hasUnmutedTopics = false;

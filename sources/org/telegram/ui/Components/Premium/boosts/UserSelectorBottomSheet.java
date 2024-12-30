@@ -978,10 +978,10 @@ public class UserSelectorBottomSheet extends BottomSheetWithRecyclerListView imp
 
     public void updateItems(boolean z, boolean z2) {
         int i;
+        TLRPC.User currentUser;
         int i2;
         BirthdayController.BirthdayState birthdayState;
         BirthdayController.BirthdayState birthdayState2;
-        TLRPC.User currentUser;
         SelectorAdapter selectorAdapter;
         this.oldItems.clear();
         this.oldItems.addAll(this.items);
@@ -1017,7 +1017,8 @@ public class UserSelectorBottomSheet extends BottomSheetWithRecyclerListView imp
                 i = AndroidUtilities.dp(50.0f);
                 this.items.add(SelectorAdapter.Item.asButton(1, R.drawable.menu_birthday, LocaleController.getString(R.string.GiftsBirthdaySetup)));
             }
-            if (this.type == 0 && (currentUser = UserConfig.getInstance(this.currentAccount).getCurrentUser()) != null) {
+            int i4 = this.type;
+            if ((i4 == 0 || i4 == 2) && (currentUser = UserConfig.getInstance(this.currentAccount).getCurrentUser()) != null) {
                 this.items.add(SelectorAdapter.Item.asTopSection(LocaleController.getString(R.string.Gift2MyselfSection)));
                 SelectorAdapter.Item asUser = SelectorAdapter.Item.asUser(currentUser, this.selectedIds.contains(Long.valueOf(currentUser.id)));
                 asUser.subtext = LocaleController.getString(R.string.Gift2Myself);

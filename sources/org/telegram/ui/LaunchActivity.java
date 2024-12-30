@@ -6051,7 +6051,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     public void showPasscodeActivity(boolean z, boolean z2, int i, int i2, final Runnable runnable, Runnable runnable2) {
-        if (this.drawerLayoutContainer == null) {
+        if (this.drawerLayoutContainer == null || isFinishing()) {
             return;
         }
         if (this.passcodeDialog == null) {

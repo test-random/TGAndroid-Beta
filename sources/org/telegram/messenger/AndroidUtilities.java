@@ -1216,13 +1216,20 @@ public class AndroidUtilities {
     }
 
     public static void doOnLayout(final View view, final Runnable runnable) {
-        view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View view2, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
-                view.removeOnLayoutChangeListener(this);
-                runnable.run();
-            }
-        });
+        if (runnable == null) {
+            return;
+        }
+        if (view == null) {
+            runnable.run();
+        } else {
+            view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View view2, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
+                    view.removeOnLayoutChangeListener(this);
+                    runnable.run();
+                }
+            });
+        }
     }
 
     public static boolean doSafe(Utilities.Callback0Return<Boolean> callback0Return) {

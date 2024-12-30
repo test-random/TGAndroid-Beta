@@ -257,9 +257,11 @@ public class QRScanner {
                 width = (int) (f * min);
                 height = (int) (f2 * min);
             }
+            int max = Math.max(1, width);
+            int max2 = Math.max(1, height);
             Bitmap bitmap = this.cacheBitmap;
-            if (bitmap == null || width != bitmap.getWidth() || height != this.cacheBitmap.getHeight()) {
-                this.cacheBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            if (bitmap == null || max != bitmap.getWidth() || max2 != this.cacheBitmap.getHeight()) {
+                this.cacheBitmap = Bitmap.createBitmap(max, max2, Bitmap.Config.ARGB_8888);
             }
             textureView.getBitmap(this.cacheBitmap);
             final Detected detect = detect(this.cacheBitmap);
