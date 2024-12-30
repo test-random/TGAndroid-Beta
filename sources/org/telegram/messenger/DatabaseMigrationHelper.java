@@ -1401,12 +1401,18 @@ public class DatabaseMigrationHelper {
             sQLiteDatabase.executeFast("PRAGMA user_version = 160").stepThis().dispose();
             i7 = 160;
         }
-        if (i7 != 160) {
+        if (i7 == 160) {
+            sQLiteDatabase.executeFast("ALTER TABLE dialog_filter ADD COLUMN noanimate INTEGER").stepThis().dispose();
+            sQLiteDatabase.executeFast("PRAGMA user_version = 161").stepThis().dispose();
+            i7 = 161;
+        }
+        if (i7 != 161) {
             return i7;
         }
-        sQLiteDatabase.executeFast("ALTER TABLE dialog_filter ADD COLUMN noanimate INTEGER").stepThis().dispose();
-        sQLiteDatabase.executeFast("PRAGMA user_version = 161").stepThis().dispose();
-        return 161;
+        sQLiteDatabase.executeFast("DELETE FROM popular_bots").stepThis().dispose();
+        sQLiteDatabase.executeFast("ALTER TABLE popular_bots ADD COLUMN pos INTEGER").stepThis().dispose();
+        sQLiteDatabase.executeFast("PRAGMA user_version = 162").stepThis().dispose();
+        return 162;
     }
 
     public static boolean recoverDatabase(java.io.File r21, java.io.File r22, java.io.File r23, int r24) {

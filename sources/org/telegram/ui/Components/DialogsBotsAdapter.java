@@ -76,7 +76,7 @@ public class DialogsBotsAdapter extends UniversalAdapter {
         public void lambda$load$4() {
             this.loading = false;
             this.whenUpdated.run();
-            if (System.currentTimeMillis() - this.cacheTime > 3600000) {
+            if (this.bots.isEmpty() || System.currentTimeMillis() - this.cacheTime > 3600000) {
                 this.bots.clear();
                 this.lastOffset = null;
                 load();
@@ -121,61 +121,81 @@ public class DialogsBotsAdapter extends UniversalAdapter {
         }
 
         public void lambda$loadCache$1(MessagesStorage messagesStorage, final Runnable runnable) {
-            String str;
+            final String str;
+            SQLiteCursor sQLiteCursor;
+            TLRPC.User user;
             final ArrayList arrayList = new ArrayList();
             ArrayList<Long> arrayList2 = new ArrayList<>();
             final long j = 0;
-            SQLiteCursor sQLiteCursor = null;
-            final String str2 = null;
-            sQLiteCursor = null;
+            SQLiteCursor sQLiteCursor2 = null;
             try {
                 try {
-                    SQLiteCursor queryFinalized = messagesStorage.getDatabase().queryFinalized("SELECT uid, time, offset FROM popular_bots", new Object[0]);
-                    while (queryFinalized.next()) {
+                    sQLiteCursor = messagesStorage.getDatabase().queryFinalized("SELECT uid, time, offset FROM popular_bots ORDER BY pos", new Object[0]);
+                    str = null;
+                    while (sQLiteCursor.next()) {
                         try {
-                            arrayList2.add(Long.valueOf(queryFinalized.longValue(0)));
-                            j = Math.max(j, queryFinalized.longValue(1));
-                            str2 = queryFinalized.stringValue(2);
+                            arrayList2.add(Long.valueOf(sQLiteCursor.longValue(0)));
+                            j = Math.max(j, sQLiteCursor.longValue(1));
+                            str = sQLiteCursor.stringValue(2);
                         } catch (Exception e) {
                             e = e;
-                            str = str2;
-                            sQLiteCursor = queryFinalized;
+                            sQLiteCursor2 = sQLiteCursor;
                             FileLog.e(e);
-                            if (sQLiteCursor != null) {
+                            if (sQLiteCursor2 != null) {
+                                sQLiteCursor = sQLiteCursor2;
                                 sQLiteCursor.dispose();
                             }
-                            str2 = str;
                             AndroidUtilities.runOnUIThread(new Runnable() {
                                 @Override
                                 public final void run() {
-                                    DialogsBotsAdapter.PopularBots.this.lambda$loadCache$0(arrayList, j, str2, runnable);
+                                    DialogsBotsAdapter.PopularBots.this.lambda$loadCache$0(arrayList, j, str, runnable);
                                 }
                             });
                         } catch (Throwable th) {
                             th = th;
-                            sQLiteCursor = queryFinalized;
-                            if (sQLiteCursor != null) {
-                                sQLiteCursor.dispose();
+                            sQLiteCursor2 = sQLiteCursor;
+                            if (sQLiteCursor2 != null) {
+                                sQLiteCursor2.dispose();
                             }
                             throw th;
                         }
                     }
-                    queryFinalized.dispose();
-                    arrayList.addAll(messagesStorage.getUsers(arrayList2));
-                    queryFinalized.dispose();
-                } catch (Exception e2) {
-                    e = e2;
-                    str = null;
-                }
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    @Override
-                    public final void run() {
-                        DialogsBotsAdapter.PopularBots.this.lambda$loadCache$0(arrayList, j, str2, runnable);
+                    sQLiteCursor.dispose();
+                    ArrayList<TLRPC.User> users = messagesStorage.getUsers(arrayList2);
+                    if (users != null) {
+                        Iterator<Long> it = arrayList2.iterator();
+                        while (it.hasNext()) {
+                            long longValue = it.next().longValue();
+                            Iterator<TLRPC.User> it2 = users.iterator();
+                            while (true) {
+                                if (!it2.hasNext()) {
+                                    user = null;
+                                    break;
+                                }
+                                user = it2.next();
+                                if (user != null && user.id == longValue) {
+                                    break;
+                                }
+                            }
+                            if (user != null) {
+                                arrayList.add(user);
+                            }
+                        }
                     }
-                });
-            } catch (Throwable th2) {
-                th = th2;
+                } catch (Throwable th2) {
+                    th = th2;
+                }
+            } catch (Exception e2) {
+                e = e2;
+                str = null;
             }
+            sQLiteCursor.dispose();
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    DialogsBotsAdapter.PopularBots.this.lambda$loadCache$0(arrayList, j, str, runnable);
+                }
+            });
         }
 
         public void lambda$saveCache$2() {
