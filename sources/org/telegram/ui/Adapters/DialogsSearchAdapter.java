@@ -72,7 +72,6 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     private ArrayList filterDialogIds;
     private FilteredSearchView.Delegate filtersDelegate;
     private int folderId;
-    private boolean forceEmptyMessages;
     private boolean forceLoadingMessages;
     private RecyclerListView innerListView;
     private DefaultItemAnimator itemAnimator;
@@ -655,7 +654,6 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         graySectionCell.setRightText(getFilterFromString(filter));
         graySectionCell.setRightTextMargin(6);
         this.searchResultMessages.clear();
-        this.forceEmptyMessages = true;
         this.forceLoadingMessages = true;
         notifyDataSetChanged();
         loadMoreSearchMessages();
@@ -983,9 +981,6 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                 if (emptyLayout != null) {
                     emptyLayout.setQuery(this.lastMessagesSearchString);
                 }
-                if (!this.searchResultMessages.isEmpty()) {
-                    this.forceEmptyMessages = false;
-                }
                 notifyDataSetChanged();
             }
         }
@@ -1117,7 +1112,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
                     }
                 });
             }
-            if (resentSearchAvailable() && !(obj instanceof TLRPC.EncryptedChat)) {
+            if (recentSearchAvailable() && !(obj instanceof TLRPC.EncryptedChat)) {
                 DialogsSearchAdapterDelegate dialogsSearchAdapterDelegate = this.delegate;
                 boolean z = dialogsSearchAdapterDelegate != null && dialogsSearchAdapterDelegate.getSearchForumDialogId() == j;
                 for (int i4 = 0; !z && i4 < size; i4++) {
@@ -1155,7 +1150,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         });
     }
 
-    private boolean resentSearchAvailable() {
+    private boolean recentSearchAvailable() {
         int i = this.dialogsType;
         return (i == 2 || i == 4 || i == 5 || i == 6 || i == 1 || i == 11 || i == 15) ? false : true;
     }
@@ -1268,7 +1263,6 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             tL_messages_searchGlobal.flags |= 1;
             tL_messages_searchGlobal.folder_id = this.folderId;
             if (!str.equals(this.lastMessagesSearchString)) {
-                this.forceEmptyMessages = false;
                 this.forceLoadingMessages = false;
             }
             if (str.equals(this.lastMessagesSearchString) && this.lastMessagesSearchFilterFlags == this.currentMessagesFilter.flags && !this.searchResultMessages.isEmpty() && this.lastMessagesSearchId == this.lastSearchId) {
@@ -1611,7 +1605,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
             this.localMessagesLoadingRow = i2;
         }
         int size7 = this.searchResultMessages.size();
-        if ((!this.forceEmptyMessages && !this.forceLoadingMessages) || !this.searchResultMessages.isEmpty()) {
+        if ((this.currentMessagesFilter == Filter.All && !this.forceLoadingMessages) || !this.searchResultMessages.isEmpty()) {
             i = size7;
         } else if (!this.forceLoadingMessages) {
             i = 1;
@@ -1633,7 +1627,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     }
 
     @Override
-    public int getItemViewType(int r11) {
+    public int getItemViewType(int r12) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Adapters.DialogsSearchAdapter.getItemViewType(int):int");
     }
 
@@ -1655,7 +1649,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
     }
 
     public boolean hasRecentSearch() {
-        return resentSearchAvailable() && getRecentItemsCount() > 0;
+        return recentSearchAvailable() && getRecentItemsCount() > 0;
     }
 
     @Override
@@ -1727,7 +1721,7 @@ public abstract class DialogsSearchAdapter extends RecyclerListView.SelectionAda
         if (!this.searchResultMessages.isEmpty()) {
             this.searchResultMessages.size();
         }
-        if (this.forceEmptyMessages || this.forceLoadingMessages) {
+        if (this.currentMessagesFilter != Filter.All || this.forceLoadingMessages) {
             this.searchResultMessages.isEmpty();
         }
         return false;

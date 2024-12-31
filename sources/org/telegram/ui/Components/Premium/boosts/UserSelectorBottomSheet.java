@@ -941,6 +941,9 @@ public class UserSelectorBottomSheet extends BottomSheetWithRecyclerListView imp
     }
 
     public View.OnClickListener openOptions(final TLRPC.User user) {
+        if (this.type == 3) {
+            return null;
+        }
         return new View.OnClickListener() {
             @Override
             public final void onClick(View view) {

@@ -1259,6 +1259,7 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
             setMessageObject(messageObject, true);
         }
         this.starGiftLayout.attach();
+        this.reactionsLayoutInBubble.onAttachToWindow();
     }
 
     @Override
@@ -1279,6 +1280,7 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         this.avatarStoryParams.onDetachFromWindow();
         this.transitionParams.onDetach();
         this.starGiftLayout.detach();
+        this.reactionsLayoutInBubble.onDetachFromWindow();
     }
 
     @Override

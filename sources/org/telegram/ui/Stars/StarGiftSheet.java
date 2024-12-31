@@ -815,6 +815,71 @@ public class StarGiftSheet extends BottomSheet {
         }
     }
 
+    public static class UpgradeIcon extends CompatDrawable {
+        private final Path arrow;
+        private final long start;
+        private final Paint strokePaint;
+        private final View view;
+
+        public UpgradeIcon(View view, int i) {
+            super(view);
+            Paint paint = new Paint(1);
+            this.strokePaint = paint;
+            Path path = new Path();
+            this.arrow = path;
+            this.start = System.currentTimeMillis();
+            this.view = view;
+            if (view.isAttachedToWindow()) {
+                onAttachedToWindow();
+            }
+            this.paint.setColor(-1);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setColor(i);
+            path.rewind();
+            path.moveTo(-AndroidUtilities.dpf2(2.91f), AndroidUtilities.dpf2(1.08f));
+            path.lineTo(0.0f, -AndroidUtilities.dpf2(1.08f));
+            path.lineTo(AndroidUtilities.dpf2(2.91f), AndroidUtilities.dpf2(1.08f));
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            canvas.drawCircle(getBounds().centerX(), getBounds().centerY(), getBounds().width() / 2.0f, this.paint);
+            float currentTimeMillis = ((float) ((System.currentTimeMillis() - this.start) % 400)) / 400.0f;
+            this.strokePaint.setStrokeWidth(AndroidUtilities.dpf2(1.33f));
+            canvas.save();
+            canvas.translate(getBounds().centerX(), getBounds().centerY() - (((AndroidUtilities.dpf2(2.16f) * 3.0f) + (AndroidUtilities.dpf2(1.166f) * 2.0f)) / 2.0f));
+            int i = 0;
+            while (i < 4) {
+                float f = i == 0 ? 1.0f - currentTimeMillis : i == 3 ? currentTimeMillis : 1.0f;
+                this.strokePaint.setAlpha((int) (255.0f * f));
+                canvas.save();
+                float lerp = AndroidUtilities.lerp(0.5f, 1.0f, f);
+                canvas.scale(lerp, lerp);
+                canvas.drawPath(this.arrow, this.strokePaint);
+                canvas.restore();
+                canvas.translate(0.0f, AndroidUtilities.dpf2(3.3260002f) * f);
+                i++;
+            }
+            canvas.restore();
+            View view = this.view;
+            if (view != null) {
+                view.invalidate();
+            }
+        }
+
+        @Override
+        public int getIntrinsicHeight() {
+            return AndroidUtilities.dp(18.0f);
+        }
+
+        @Override
+        public int getIntrinsicWidth() {
+            return AndroidUtilities.dp(18.0f);
+        }
+    }
+
     public StarGiftSheet(Context context, int i, long j, Theme.ResourcesProvider resourcesProvider) {
         super(context, false, resourcesProvider);
         this.firstSet = true;
@@ -2035,7 +2100,7 @@ public class StarGiftSheet extends BottomSheet {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftSheet.set(org.telegram.messenger.MessageObject):org.telegram.ui.Stars.StarGiftSheet");
     }
 
-    public org.telegram.ui.Stars.StarGiftSheet set(boolean r36, org.telegram.tgnet.tl.TL_stars.UserStarGift r37) {
+    public org.telegram.ui.Stars.StarGiftSheet set(boolean r39, org.telegram.tgnet.tl.TL_stars.UserStarGift r40) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftSheet.set(boolean, org.telegram.tgnet.tl.TL_stars$UserStarGift):org.telegram.ui.Stars.StarGiftSheet");
     }
 

@@ -780,8 +780,8 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
         super(context, null, false, false, false, null);
         this.premiumTiers = new ArrayList();
         this.TAB_ALL = 0;
-        this.TAB_IN_STOCK = 1;
-        this.TAB_LIMITED = 2;
+        this.TAB_LIMITED = 1;
+        this.TAB_IN_STOCK = 2;
         this.tabs = new ArrayList();
         this.currentAccount = i;
         this.dialogId = j;
@@ -1190,8 +1190,8 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
         }
         ArrayList arrayList4 = new ArrayList();
         arrayList4.add(LocaleController.getString(R.string.Gift2TabAll));
-        arrayList4.add(LocaleController.getString(R.string.Gift2TabInStock));
         arrayList4.add(LocaleController.getString(R.string.Gift2TabLimited));
+        arrayList4.add(LocaleController.getString(R.string.Gift2TabInStock));
         Iterator it2 = treeSet.iterator();
         ArrayList arrayList5 = new ArrayList();
         while (it2.hasNext()) {
@@ -1210,7 +1210,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
         for (int i3 = 0; i3 < arrayList3.size(); i3++) {
             TL_stars.StarGift starGift = (TL_stars.StarGift) arrayList3.get(i3);
             int i4 = this.selectedTab;
-            if (i4 == 0 || ((i4 == 2 && starGift.limited) || ((i4 == 1 && !starGift.sold_out) || (i4 >= 3 && starGift.stars == longValue)))) {
+            if (i4 == 0 || ((i4 == 1 && starGift.limited) || ((i4 == 2 && !starGift.sold_out) || (i4 >= 3 && starGift.stars == longValue)))) {
                 arrayList.add(GiftCell.Factory.asStarGift(i4, starGift));
             }
         }

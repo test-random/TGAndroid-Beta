@@ -12607,17 +12607,19 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         for (int i = 0; i < 2; i++) {
             MessagesController.PeerColor peerColor = this.peerColor;
             int offsetColor = (peerColor == null || i != 1) ? AndroidUtilities.getOffsetColor(getThemedColor(Theme.key_profile_verifiedBackground), getThemedColor(Theme.key_player_actionBarTitle), this.mediaHeaderAnimationProgress, 1.0f) : ColorUtils.blendARGB(peerColor.getColor2(), this.peerColor.hasColor6(Theme.isCurrentThemeDark()) ? this.peerColor.getColor5() : this.peerColor.getColor3(), 0.5f);
-            int blendARGB = ColorUtils.blendARGB(ColorUtils.blendARGB(offsetColor, -1, f), getThemedColor(Theme.key_player_actionBarTitle), this.mediaHeaderAnimationProgress);
+            int blendARGB = ColorUtils.blendARGB(offsetColor, -1, f);
+            int i2 = Theme.key_player_actionBarTitle;
+            int blendARGB2 = ColorUtils.blendARGB(blendARGB, getThemedColor(i2), this.mediaHeaderAnimationProgress);
             AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = this.emojiStatusDrawable[i];
             if (swapAnimatedEmojiDrawable != null) {
-                swapAnimatedEmojiDrawable.setColor(Integer.valueOf(blendARGB));
+                swapAnimatedEmojiDrawable.setColor(Integer.valueOf(blendARGB2));
             }
             AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.botVerificationDrawable[i];
             if (swapAnimatedEmojiDrawable2 != null) {
-                swapAnimatedEmojiDrawable2.setColor(Integer.valueOf(ColorUtils.blendARGB(ColorUtils.blendARGB(offsetColor, -1711276033, f), -1711276033, this.mediaHeaderAnimationProgress)));
+                swapAnimatedEmojiDrawable2.setColor(Integer.valueOf(ColorUtils.blendARGB(ColorUtils.blendARGB(offsetColor, -1711276033, f), getThemedColor(i2), this.mediaHeaderAnimationProgress)));
             }
             if (i == 1) {
-                this.animatedStatusView.setColor(blendARGB);
+                this.animatedStatusView.setColor(blendARGB2);
             }
         }
         this.lastEmojiStatusProgress = f;
