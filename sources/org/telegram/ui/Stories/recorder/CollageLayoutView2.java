@@ -660,7 +660,8 @@ public abstract class CollageLayoutView2 extends FrameLayout implements ItemOpti
     public boolean dispatchTouchEvent(MotionEvent motionEvent) {
         Runnable runnable;
         if (!hasLayout() || this.preview) {
-            return super.dispatchTouchEvent(motionEvent);
+            cancelTouch();
+            return false;
         }
         if (motionEvent.getPointerCount() > 1) {
             cancelTouch();

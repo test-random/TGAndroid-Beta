@@ -8456,7 +8456,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         switchToEditMode(i, false, z);
     }
 
-    public void switchToEditMode(int r18, boolean r19, boolean r20) {
+    public void switchToEditMode(int r17, boolean r18, boolean r19) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.StoryRecorder.switchToEditMode(int, boolean, boolean):void");
     }
 
