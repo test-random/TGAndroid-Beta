@@ -1188,15 +1188,29 @@ public abstract class PreviewView extends FrameLayout {
     public abstract boolean additionalTouchEvent(MotionEvent motionEvent);
 
     public void applyMatrix() {
-        this.invertMatrix.reset();
-        this.entry.matrix.invert(this.invertMatrix);
         StoryEntry storyEntry = this.entry;
         if (storyEntry == null || storyEntry.isRepostMessage) {
             return;
         }
-        VideoEditTextureView videoEditTextureView = this.textureView;
-        if (videoEditTextureView != null) {
-            setTextureViewTransform(false, videoEditTextureView);
+        if (this.textureView != null) {
+            this.matrix.set(storyEntry.matrix);
+            Matrix matrix = this.matrix;
+            float width = 1.0f / getWidth();
+            int i = this.entry.width;
+            if (i < 0) {
+                i = this.videoWidth;
+            }
+            float f = width * i;
+            float height = 1.0f / getHeight();
+            int i2 = this.entry.height;
+            if (i2 < 0) {
+                i2 = this.videoHeight;
+            }
+            matrix.preScale(f, height * i2);
+            this.matrix.postScale(getWidth() / this.entry.resultWidth, getHeight() / this.entry.resultHeight);
+            this.transformBackMatrix.reset();
+            this.transformMatrix.invert(this.transformBackMatrix);
+            this.textureView.setTransform(this.matrix);
             this.textureView.invalidate();
         }
         invalidate();
@@ -1711,59 +1725,6 @@ public abstract class PreviewView extends FrameLayout {
 
     public void setOnTapListener(Runnable runnable) {
         this.onTap = runnable;
-    }
-
-    public void setTextureViewTransform(boolean z, TextureView textureView) {
-        if (this.entry == null || textureView == null) {
-            return;
-        }
-        invalidate();
-        this.transformMatrix.reset();
-        Matrix matrix = this.transformMatrix;
-        float width = 1.0f / getWidth();
-        int i = this.entry.width;
-        if (i < 0) {
-            i = this.videoWidth;
-        }
-        float f = width * i;
-        float height = 1.0f / getHeight();
-        int i2 = this.entry.height;
-        if (i2 < 0) {
-            i2 = this.videoHeight;
-        }
-        matrix.postScale(f, height * i2);
-        if (this.entry.crop != null) {
-            this.transformMatrix.preTranslate(r8.width / 2.0f, r8.height / 2.0f);
-            this.transformMatrix.preRotate(-this.entry.orientation);
-            StoryEntry storyEntry = this.entry;
-            int i3 = storyEntry.width;
-            int i4 = storyEntry.height;
-            int i5 = storyEntry.orientation;
-            MediaController.CropState cropState = storyEntry.crop;
-            if (((i5 + cropState.transformRotation) / 90) % 2 == 1) {
-                i4 = i3;
-                i3 = i4;
-            }
-            Matrix matrix2 = this.transformMatrix;
-            float f2 = cropState.cropScale;
-            matrix2.preScale(f2, f2);
-            Matrix matrix3 = this.transformMatrix;
-            MediaController.CropState cropState2 = this.entry.crop;
-            matrix3.preTranslate(cropState2.cropPx * i3, cropState2.cropPy * i4);
-            this.transformMatrix.preRotate(this.entry.crop.cropRotate + r0.transformRotation);
-            if (this.entry.crop.mirrored) {
-                this.transformMatrix.preScale(-1.0f, 1.0f);
-            }
-            this.transformMatrix.preRotate(this.entry.orientation);
-            Matrix matrix4 = this.transformMatrix;
-            StoryEntry storyEntry2 = this.entry;
-            matrix4.preTranslate((-storyEntry2.width) / 2.0f, (-storyEntry2.height) / 2.0f);
-        }
-        this.transformMatrix.preConcat(this.entry.matrix);
-        this.transformMatrix.preScale(getWidth() / this.entry.resultWidth, getHeight() / this.entry.resultHeight);
-        this.transformBackMatrix.reset();
-        this.transformMatrix.invert(this.transformBackMatrix);
-        textureView.setTransform(this.transformMatrix);
     }
 
     public void setVideoTimelineView(TimelineView timelineView) {

@@ -780,7 +780,7 @@ public abstract class CaptionContainerView extends FrameLayout {
         float f2;
         float f3;
         int min;
-        if (!this.hasReply || this.replyBackgroundBlur == null || this.replyTextBlur == null || customBlur()) {
+        if (!this.hasReply || this.replyBackgroundBlur == null || this.replyTextBlur == null) {
             return;
         }
         if (this.collapsed) {
