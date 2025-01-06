@@ -45,6 +45,7 @@ public class DialogsBotsAdapter extends UniversalAdapter {
     public boolean loadingBots;
     public boolean loadingMessages;
     private int nextRate;
+    private final Utilities.Callback openBotCallback;
     private final PopularBots popular;
     public String query;
     private final Theme.ResourcesProvider resourcesProvider;
@@ -278,6 +279,12 @@ public class DialogsBotsAdapter extends UniversalAdapter {
             }
         };
         this.first = true;
+        this.openBotCallback = new Utilities.Callback() {
+            @Override
+            public final void run(Object obj) {
+                DialogsBotsAdapter.this.openBot((TLRPC.User) obj);
+            }
+        };
         this.fillItems = new Utilities.Callback2() {
             @Override
             public final void run(Object obj, Object obj2) {
@@ -547,10 +554,11 @@ public class DialogsBotsAdapter extends UniversalAdapter {
                     TLRPC.User user2 = (TLRPC.User) arrayList3.get(i3);
                     if (!hashSet.contains(Long.valueOf(user2.id))) {
                         hashSet.add(Long.valueOf(user2.id));
-                        arrayList.add(UItem.asProfileCell(user2).accent());
+                        arrayList.add(UItem.asProfileCell(user2).accent().withOpenButton(this.openBotCallback));
                     }
                 }
             }
+            hashSet.clear();
             this.topPeersEnd = arrayList.size();
             if (!this.popular.bots.isEmpty()) {
                 if (!this.showOnlyPopular) {
@@ -561,7 +569,7 @@ public class DialogsBotsAdapter extends UniversalAdapter {
                     TLRPC.User user3 = (TLRPC.User) this.popular.bots.get(i);
                     if (!hashSet.contains(Long.valueOf(user3.id))) {
                         hashSet.add(Long.valueOf(user3.id));
-                        arrayList.add(UItem.asProfileCell(user3).accent().red());
+                        arrayList.add(UItem.asProfileCell(user3).accent().red().withOpenButton(this.openBotCallback));
                         i4 = 1;
                     }
                     i++;
@@ -602,7 +610,7 @@ public class DialogsBotsAdapter extends UniversalAdapter {
                     size = Math.min(5, size);
                 }
                 while (i < size) {
-                    arrayList.add(UItem.asProfileCell((TLObject) arrayList4.get(i)));
+                    arrayList.add(UItem.asProfileCell((TLObject) arrayList4.get(i)).withOpenButton(this.openBotCallback));
                     i++;
                 }
             }
@@ -633,6 +641,10 @@ public class DialogsBotsAdapter extends UniversalAdapter {
 
     public Object getTopPeerObject(int i) {
         return (i < this.topPeersStart || i >= this.topPeersEnd) ? Boolean.FALSE : getObject(i);
+    }
+
+    public void openBot(TLRPC.User user) {
+        MessagesController.getInstance(this.currentAccount).openApp(user, 0);
     }
 
     public void search(String str) {

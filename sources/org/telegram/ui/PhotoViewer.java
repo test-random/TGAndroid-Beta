@@ -14404,7 +14404,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         paintingOverlay.setData(str, arrayList, z, false, this.sendPhotoType != 11);
     }
 
-    private void setIsAboutToSwitchToIndex(final int r41, boolean r42, boolean r43) {
+    private void setIsAboutToSwitchToIndex(final int r40, boolean r41, boolean r42) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.setIsAboutToSwitchToIndex(int, boolean, boolean):void");
     }
 

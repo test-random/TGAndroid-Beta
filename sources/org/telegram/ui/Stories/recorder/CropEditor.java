@@ -46,8 +46,11 @@ public abstract class CropEditor extends FrameLayout {
     public final CropRotationWheel wheel;
 
     public class ContentView extends View {
+        private final Matrix clipMatrix;
+        private final Matrix cropMatrix;
         private final Paint dimPaint;
         private final Matrix identityMatrix;
+        private final Matrix invertedClipMatrix;
         private final Matrix matrix;
         private final Path previewClipPath;
         private final RectF previewClipRect;
@@ -58,48 +61,16 @@ public abstract class CropEditor extends FrameLayout {
             this.dimPaint = new Paint(1);
             this.previewClipPath = new Path();
             this.previewClipRect = new RectF();
-            this.previewMatrix = new Matrix();
             this.identityMatrix = new Matrix();
             this.matrix = new Matrix();
+            this.previewMatrix = new Matrix();
+            this.cropMatrix = new Matrix();
+            this.clipMatrix = new Matrix();
+            this.invertedClipMatrix = new Matrix();
         }
 
-        private void applyCrop(Canvas canvas, float f, float f2) {
-            float f3;
-            int currentWidth = CropEditor.this.getCurrentWidth();
-            int currentHeight = CropEditor.this.getCurrentHeight();
-            int orientation = CropEditor.this.cropTransform.getOrientation();
-            if (orientation == 90 || orientation == 270) {
-                currentHeight = currentWidth;
-                currentWidth = currentHeight;
-            }
-            float trueCropScale = ((CropEditor.this.cropTransform.getTrueCropScale() - 1.0f) * (1.0f - f)) + 1.0f;
-            float f4 = currentWidth;
-            float containerWidth = getContainerWidth() / f4;
-            float f5 = currentHeight;
-            if (containerWidth * f5 > getContainerHeight()) {
-                containerWidth = getContainerHeight() / f5;
-            }
-            boolean z = (CropEditor.this.entry.orientation / 90) % 2 == 1;
-            canvas.translate(CropEditor.this.cropTransform.getCropAreaX() * f2, CropEditor.this.cropTransform.getCropAreaY() * f2);
-            float scale = (CropEditor.this.cropTransform.getScale() / trueCropScale) * containerWidth;
-            float lerp = (CropEditor.this.entry == null || CropEditor.this.entry.crop == null) ? AndroidUtilities.lerp(1.0f, scale, f) : AndroidUtilities.lerp(CropEditor.this.entry.crop.cropScale, scale, f);
-            canvas.scale(lerp, lerp);
-            float cropPx = CropEditor.this.cropTransform.getCropPx();
-            float cropPy = CropEditor.this.cropTransform.getCropPy();
-            CropEditor cropEditor = CropEditor.this;
-            if (cropEditor.closing) {
-                if (cropEditor.entry.crop == null) {
-                    f3 = 0.0f;
-                } else {
-                    MediaController.CropState cropState = CropEditor.this.entry.crop;
-                    f3 = !z ? cropState.cropPx : cropState.cropPy;
-                }
-                cropPx = AndroidUtilities.lerp(f3, cropPx, CropEditor.this.appearProgress);
-                cropPy = AndroidUtilities.lerp(CropEditor.this.entry.crop == null ? 0.0f : !z ? CropEditor.this.entry.crop.cropPy : CropEditor.this.entry.crop.cropPx, cropPy, CropEditor.this.appearProgress);
-            }
-            canvas.translate(cropPx * f4, cropPy * f5);
-            float rotation = CropEditor.this.entry.orientation + CropEditor.this.cropTransform.getRotation() + CropEditor.this.animatedOrientation.set(((CropEditor.this.lastOrientation / 360) * 360) + orientation);
-            canvas.rotate(CropEditor.this.entry.crop == null ? AndroidUtilities.lerp(0.0f, rotation, CropEditor.this.appearProgress) : AndroidUtilities.lerp(CropEditor.this.entry.crop.cropRotate + CropEditor.this.entry.crop.transformRotation, rotation, CropEditor.this.appearProgress));
+        private void applyCrop(android.graphics.Matrix r12, boolean r13) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.CropEditor.ContentView.applyCrop(android.graphics.Matrix, boolean):void");
         }
 
         private float getContainerHeight() {
@@ -115,12 +86,23 @@ public abstract class CropEditor extends FrameLayout {
             if (CropEditor.this.entry == null) {
                 return;
             }
+            drawImage(canvas, false);
+        }
+
+        public void drawImage(Canvas canvas, boolean z) {
+            boolean z2 = true;
+            if (z) {
+                if (CropEditor.this.appearProgress >= 1.0f) {
+                    return;
+                }
+                canvas.saveLayerAlpha(0.0f, 0.0f, CropEditor.this.previewView.getWidth(), CropEditor.this.previewView.getHeight(), (int) (Math.min(1.0f, (1.0f - CropEditor.this.appearProgress) * 2.0f) * 255.0f), 31);
+                canvas.translate(CropEditor.this.thisLocation[0] - CropEditor.this.previewLocation[0], CropEditor.this.thisLocation[1] - CropEditor.this.previewLocation[1]);
+            }
             canvas.save();
             this.dimPaint.setColor(-16777216);
             this.dimPaint.setAlpha((int) (CropEditor.this.appearProgress * 255.0f));
             canvas.drawRect(0.0f, 0.0f, getWidth(), getHeight(), this.dimPaint);
-            boolean z = true;
-            if (CropEditor.this.appearProgress < 1.0f) {
+            if (CropEditor.this.appearProgress < 1.0f && !z) {
                 this.previewClipPath.rewind();
                 this.previewClipRect.set(0.0f, 0.0f, CropEditor.this.previewView.getWidth(), CropEditor.this.previewView.getHeight());
                 this.previewClipRect.offset(CropEditor.this.previewLocation[0], CropEditor.this.previewLocation[1]);
@@ -131,47 +113,61 @@ public abstract class CropEditor extends FrameLayout {
                 this.previewClipPath.addRoundRect(this.previewClipRect, lerp, lerp, Path.Direction.CW);
                 canvas.clipPath(this.previewClipPath);
             }
-            float f = 1.0f - CropEditor.this.appearProgress;
-            float f2 = CropEditor.this.appearProgress;
-            canvas.translate((-CropEditor.this.thisLocation[0]) * f, (-CropEditor.this.thisLocation[1]) * f);
-            canvas.translate(CropEditor.this.previewLocation[0] * f, CropEditor.this.previewLocation[1] * f);
-            if (f > 0.0f) {
-                canvas.scale(AndroidUtilities.lerp(1.0f, CropEditor.this.previewView.getWidth() / CropEditor.this.entry.resultWidth, f), AndroidUtilities.lerp(1.0f, CropEditor.this.previewView.getHeight() / CropEditor.this.entry.resultHeight, f));
-                AndroidUtilities.lerp(this.identityMatrix, CropEditor.this.entry.matrix, f, this.matrix);
-                canvas.concat(this.matrix);
-                canvas.translate((CropEditor.this.previewView.getContentWidth() / 2.0f) * f, (CropEditor.this.previewView.getContentHeight() / 2.0f) * f);
-            }
-            canvas.translate((AndroidUtilities.dp(16.0f) + (getContainerWidth() / 2.0f)) * f2, (((Build.VERSION.SDK_INT < 21 || (getContext() instanceof BubbleActivity)) ? 0 : AndroidUtilities.statusBarHeight) + ((getContainerHeight() + AndroidUtilities.dp(32.0f)) / 2.0f)) * f2);
-            if (f > 0.0f) {
-                canvas.rotate(-CropEditor.this.entry.orientation);
-                boolean z2 = ((CropEditor.this.entry.orientation + (CropEditor.this.entry.crop != null ? CropEditor.this.entry.crop.transformRotation : 0)) / 90) % 2 == 1;
-                float contentWidth = CropEditor.this.previewView.getContentWidth();
-                float contentHeight = CropEditor.this.previewView.getContentHeight();
-                float f3 = CropEditor.this.entry.crop != null ? CropEditor.this.entry.crop.cropPw : 1.0f;
-                float f4 = CropEditor.this.entry.crop != null ? CropEditor.this.entry.crop.cropPh : 1.0f;
-                float lerp2 = ((z2 ? contentHeight : contentWidth) * AndroidUtilities.lerp(1.0f, f3, f)) / 2.0f;
-                if (!z2) {
-                    contentWidth = contentHeight;
+            float unused = CropEditor.this.appearProgress;
+            float f = CropEditor.this.appearProgress;
+            this.previewMatrix.reset();
+            this.cropMatrix.reset();
+            this.previewMatrix.preTranslate(-CropEditor.this.thisLocation[0], -CropEditor.this.thisLocation[1]);
+            this.previewMatrix.preTranslate(CropEditor.this.previewLocation[0], CropEditor.this.previewLocation[1]);
+            this.previewMatrix.preScale(CropEditor.this.previewView.getWidth() / CropEditor.this.entry.resultWidth, CropEditor.this.previewView.getHeight() / CropEditor.this.entry.resultHeight);
+            this.previewMatrix.preConcat(CropEditor.this.entry.matrix);
+            this.previewMatrix.preTranslate(CropEditor.this.previewView.getContentWidth() / 2.0f, CropEditor.this.previewView.getContentHeight() / 2.0f);
+            this.cropMatrix.preTranslate(AndroidUtilities.dp(16.0f) + (getContainerWidth() / 2.0f), ((Build.VERSION.SDK_INT < 21 || (getContext() instanceof BubbleActivity)) ? 0 : AndroidUtilities.statusBarHeight) + ((getContainerHeight() + AndroidUtilities.dp(32.0f)) / 2.0f));
+            if (z) {
+                AndroidUtilities.lerp(this.previewMatrix, this.identityMatrix, CropEditor.this.appearProgress, this.clipMatrix);
+                this.clipMatrix.preRotate(-CropEditor.this.entry.orientation);
+                if (this.clipMatrix.invert(this.invertedClipMatrix)) {
+                    boolean z3 = ((CropEditor.this.entry.orientation + (CropEditor.this.entry.crop != null ? CropEditor.this.entry.crop.transformRotation : 0)) / 90) % 2 == 1;
+                    float contentWidth = CropEditor.this.previewView.getContentWidth();
+                    float contentHeight = CropEditor.this.previewView.getContentHeight();
+                    float f2 = CropEditor.this.entry.crop != null ? CropEditor.this.entry.crop.cropPw : 1.0f;
+                    float f3 = CropEditor.this.entry.crop != null ? CropEditor.this.entry.crop.cropPh : 1.0f;
+                    float f4 = ((z3 ? contentHeight : contentWidth) * f2) / 2.0f;
+                    if (!z3) {
+                        contentWidth = contentHeight;
+                    }
+                    float f5 = (contentWidth * f3) / 2.0f;
+                    float lerp2 = AndroidUtilities.lerp(1.0f, 4.0f, f);
+                    canvas.concat(this.clipMatrix);
+                    canvas.clipRect((-f4) * lerp2, (-f5) * lerp2, f4 * lerp2, f5 * lerp2);
+                    canvas.concat(this.invertedClipMatrix);
                 }
-                float lerp3 = (contentWidth * AndroidUtilities.lerp(1.0f, f4, f)) / 2.0f;
-                float lerp4 = AndroidUtilities.lerp(1.0f, 4.0f, f2);
-                canvas.clipRect((-lerp2) * lerp4, (-lerp3) * lerp4, lerp2 * lerp4, lerp3 * lerp4);
-                canvas.rotate(CropEditor.this.entry.orientation);
             }
-            applyCrop(canvas, f2, 1.0f);
+            applyCrop(this.previewMatrix, true);
+            applyCrop(this.cropMatrix, false);
             AnimatedFloat animatedFloat = CropEditor.this.animatedMirror;
             CropEditor cropEditor = CropEditor.this;
             if (!cropEditor.closing) {
-                z = cropEditor.cropView.isMirrored();
+                z2 = cropEditor.cropView.isMirrored();
             } else if (cropEditor.entry.crop == null || !CropEditor.this.entry.crop.mirrored) {
-                z = false;
+                z2 = false;
             }
-            float f5 = animatedFloat.set(z);
-            canvas.scale(1.0f - (f5 * 2.0f), 1.0f);
-            canvas.skew(0.0f, 4.0f * f5 * (1.0f - f5) * 0.25f);
-            canvas.translate((-CropEditor.this.previewView.getContentWidth()) / 2.0f, (-CropEditor.this.previewView.getContentHeight()) / 2.0f);
+            float f6 = animatedFloat.set(z2);
+            float f7 = 1.0f - (f6 * 2.0f);
+            this.cropMatrix.preScale(f7, 1.0f);
+            this.previewMatrix.preScale(f7, 1.0f);
+            float f8 = 4.0f * f6 * (1.0f - f6) * 0.25f;
+            this.cropMatrix.preSkew(0.0f, f8);
+            this.previewMatrix.preSkew(0.0f, f8);
+            this.cropMatrix.preTranslate((-CropEditor.this.previewView.getContentWidth()) / 2.0f, (-CropEditor.this.previewView.getContentHeight()) / 2.0f);
+            this.previewMatrix.preTranslate((-CropEditor.this.previewView.getContentWidth()) / 2.0f, (-CropEditor.this.previewView.getContentHeight()) / 2.0f);
+            AndroidUtilities.lerp(this.previewMatrix, this.cropMatrix, CropEditor.this.appearProgress, this.matrix);
+            canvas.concat(this.matrix);
             CropEditor.this.previewView.drawContent(canvas);
             canvas.restore();
+            if (z) {
+                canvas.restore();
+            }
         }
     }
 
@@ -361,7 +357,7 @@ public abstract class CropEditor extends FrameLayout {
     protected abstract void close();
 
     public void disappearStarts() {
-        this.previewView.setDraw(false);
+        this.previewView.setCropEditorDrawing(this);
         this.closing = true;
     }
 
@@ -385,10 +381,12 @@ public abstract class CropEditor extends FrameLayout {
             return;
         }
         this.appearProgress = f;
+        this.contentView.setAlpha(f);
         this.contentView.invalidate();
         this.cropView.areaView.setDimAlpha(0.5f * f);
         this.cropView.areaView.setFrameAlpha(f);
         this.cropView.areaView.invalidate();
+        this.previewView.invalidate();
     }
 
     public void setEntry(StoryEntry storyEntry) {
@@ -422,14 +420,14 @@ public abstract class CropEditor extends FrameLayout {
         this.animatedOrientation.set(((this.lastOrientation / 360) * 360) + this.cropTransform.getOrientation(), true);
         this.contentView.setVisibility(0);
         this.contentView.invalidate();
-        this.previewView.setDraw(false);
+        this.previewView.setCropEditorDrawing(this);
     }
 
     public void stop() {
-        this.previewView.setDraw(true);
         this.entry = null;
         this.cropView.stop();
         this.cropView.onHide();
         this.contentView.setVisibility(8);
+        this.previewView.setCropEditorDrawing(null);
     }
 }

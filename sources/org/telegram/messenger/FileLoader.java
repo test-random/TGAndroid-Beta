@@ -934,6 +934,19 @@ public class FileLoader extends BaseController {
         return i2 + i3;
     }
 
+    public static TLRPC.TL_photoStrippedSize getStrippedPhotoSize(ArrayList<TLRPC.PhotoSize> arrayList) {
+        if (arrayList == null) {
+            return null;
+        }
+        for (int i = 0; i < arrayList.size(); i++) {
+            TLRPC.PhotoSize photoSize = arrayList.get(i);
+            if (photoSize instanceof TLRPC.TL_photoStrippedSize) {
+                return (TLRPC.TL_photoStrippedSize) photoSize;
+            }
+        }
+        return null;
+    }
+
     public static TLRPC.VideoSize getVectorMarkupVideoSize(TLRPC.Photo photo) {
         if (photo != null && photo.video_sizes != null) {
             for (int i = 0; i < photo.video_sizes.size(); i++) {

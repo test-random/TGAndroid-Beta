@@ -614,6 +614,12 @@ public class UItem extends AdapterWithDiffUtils.Item {
         return this;
     }
 
+    public UItem withOpenButton(Utilities.Callback callback) {
+        this.checked = true;
+        this.object2 = callback;
+        return this;
+    }
+
     public UItem withUsername(boolean z) {
         this.withUsername = z;
         return this;

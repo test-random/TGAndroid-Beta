@@ -2948,7 +2948,7 @@ public class StarsController {
     }
 
     public long getBalance(boolean z) {
-        return getBalance(z, null).amount;
+        return getBalance(z, null, false).amount;
     }
 
     public TL_stars.StarsAmount getBalance() {
@@ -2956,11 +2956,11 @@ public class StarsController {
     }
 
     public TL_stars.StarsAmount getBalance(Runnable runnable) {
-        return getBalance(true, runnable);
+        return getBalance(true, runnable, false);
     }
 
-    public TL_stars.StarsAmount getBalance(boolean z, final Runnable runnable) {
-        if ((!this.balanceLoaded || System.currentTimeMillis() - this.lastBalanceLoaded > 60000) && !this.balanceLoading) {
+    public TL_stars.StarsAmount getBalance(boolean z, final Runnable runnable, boolean z2) {
+        if (((!this.balanceLoaded || System.currentTimeMillis() - this.lastBalanceLoaded > 60000) && !this.balanceLoading) || z2) {
             this.balanceLoading = true;
             TL_stars.TL_payments_getStarsStatus tL_payments_getStarsStatus = new TL_stars.TL_payments_getStarsStatus();
             tL_payments_getStarsStatus.peer = new TLRPC.TL_inputPeerSelf();
@@ -3179,6 +3179,12 @@ public class StarsController {
     public void invalidateBalance() {
         this.balanceLoaded = false;
         getBalance();
+        this.balanceLoaded = true;
+    }
+
+    public void invalidateBalance(Runnable runnable) {
+        this.balanceLoaded = false;
+        getBalance(false, runnable, true);
         this.balanceLoaded = true;
     }
 

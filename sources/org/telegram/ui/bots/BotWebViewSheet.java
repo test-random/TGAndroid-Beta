@@ -1533,7 +1533,7 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
     public void lambda$openOptions$34() {
         Activity activity = this.parentActivity;
         if (activity instanceof LaunchActivity) {
-            ((LaunchActivity) activity).lambda$runLinkRequest$93(ChatActivity.of(this.botId));
+            ((LaunchActivity) activity).lambda$runLinkRequest$95(ChatActivity.of(this.botId));
         }
         dismiss(true);
     }

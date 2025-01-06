@@ -57,6 +57,7 @@ import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.CompatDrawable;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.ExtendedGridLayoutManager;
+import org.telegram.ui.Components.ItemOptions;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.LinkSpanDrawable;
 import org.telegram.ui.Components.Premium.GiftPremiumBottomSheet$GiftTier;
@@ -177,8 +178,8 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
             this.clipPath.rewind();
             this.clipPath.addRoundRect(this.rect, AndroidUtilities.dp(11.0f), AndroidUtilities.dp(11.0f), Path.Direction.CW);
             canvas.clipPath(this.clipPath);
-            canvas.translate(bounds.centerX(), Math.min(AndroidUtilities.dp(50.0f), bounds.centerY()));
-            StarGiftPatterns.drawPatterns(canvas, this.pattern, bounds.width(), bounds.height(), 1.0f, 0.65f);
+            canvas.translate(bounds.centerX(), bounds.centerY());
+            StarGiftPatterns.drawPatterns(canvas, 2, this.pattern, bounds.width(), bounds.height(), 1.0f, 1.0f);
             canvas.restore();
         }
 
@@ -221,12 +222,13 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
         }
     }
 
-    public static class GiftCell extends FrameLayout {
+    public static class GiftCell extends FrameLayout implements ItemOptions.ScrimView {
         private final AvatarDrawable avatarDrawable;
         private final BackupImageView avatarView;
         private Runnable cancel;
         private final FrameLayout card;
         private final CardBackground cardBackground;
+        private final Rect cardBackgroundPadding;
         private final int currentAccount;
         private final BackupImageView imageView;
         private final FrameLayout.LayoutParams imageViewLayoutParams;
@@ -315,6 +317,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
 
         public GiftCell(Context context, int i, Theme.ResourcesProvider resourcesProvider) {
             super(context);
+            this.cardBackgroundPadding = new Rect();
             this.currentAccount = i;
             this.resourcesProvider = resourcesProvider;
             ScaleStateListAnimator.apply(this, 0.04f, 1.5f);
@@ -330,7 +333,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
             BackupImageView backupImageView = new BackupImageView(context);
             this.imageView = backupImageView;
             backupImageView.getImageReceiver().setAutoRepeat(0);
-            FrameLayout.LayoutParams createFrame = LayoutHelper.createFrame(100, 100.0f, 49, 0.0f, 0.0f, 0.0f, 0.0f);
+            FrameLayout.LayoutParams createFrame = LayoutHelper.createFrame(96, 96.0f, 49, 0.0f, 2.0f, 0.0f, 2.0f);
             this.imageViewLayoutParams = createFrame;
             frameLayout.addView(backupImageView, createFrame);
             PremiumLockIconView premiumLockIconView = new PremiumLockIconView(context, PremiumLockIconView.TYPE_GIFT_LOCK, resourcesProvider);
@@ -382,6 +385,18 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
                 TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(document.thumbs, AndroidUtilities.dp(100.0f));
                 this.imageView.setImage(ImageLocation.getForDocument(document), "100_100", ImageLocation.getForDocument(closestPhotoSizeWithSize, document), "100_100", DocumentObject.getSvgThumb(document, Theme.key_windowBackgroundGray, 0.3f), obj);
             }
+        }
+
+        @Override
+        public void drawScrim(Canvas canvas, float f) {
+            ItemOptions.ScrimView.CC.$default$drawScrim(this, canvas, f);
+        }
+
+        @Override
+        public void getBounds(RectF rectF) {
+            this.cardBackground.getPadding(this.cardBackgroundPadding);
+            Rect rect = this.cardBackgroundPadding;
+            rectF.set(rect.left, rect.top, getWidth() - this.cardBackgroundPadding.right, getHeight() - this.cardBackgroundPadding.bottom);
         }
 
         public void setPremiumGift(GiftPremiumBottomSheet$GiftTier giftPremiumBottomSheet$GiftTier) {

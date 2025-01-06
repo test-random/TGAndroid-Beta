@@ -477,7 +477,7 @@ public class StoryLinkSheet extends BottomSheetWithRecyclerListView implements N
         storyLinkPreviewDialog.show();
     }
 
-    public void lambda$new$5(org.telegram.tgnet.TLObject r7) {
+    public void lambda$new$5(org.telegram.tgnet.TLObject r8) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.StoryLinkSheet.lambda$new$5(org.telegram.tgnet.TLObject):void");
     }
 

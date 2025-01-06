@@ -3381,7 +3381,7 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
             if (groupCallInvitedCell.hasAvatarSet()) {
                 bundle.putBoolean("expandPhoto", true);
             }
-            this.parentActivity.lambda$runLinkRequest$93(new ProfileActivity(bundle));
+            this.parentActivity.lambda$runLinkRequest$95(new ProfileActivity(bundle));
             dismiss();
             return;
         }
@@ -4396,7 +4396,7 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
             launchActivity = this.parentActivity;
             chatActivity = new ChatActivity(bundle2);
         }
-        launchActivity.lambda$runLinkRequest$93(chatActivity);
+        launchActivity.lambda$runLinkRequest$95(chatActivity);
         dismiss();
     }
 

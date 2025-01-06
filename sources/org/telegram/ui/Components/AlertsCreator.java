@@ -4249,7 +4249,7 @@ public abstract class AlertsCreator {
     }
 
     public static void lambda$createFreeSpaceDialog$143(LaunchActivity launchActivity, DialogInterface dialogInterface, int i) {
-        launchActivity.lambda$runLinkRequest$93(new CacheControlActivity());
+        launchActivity.lambda$runLinkRequest$95(new CacheControlActivity());
     }
 
     public static void lambda$createImportDialogAlert$25(Runnable runnable, DialogInterface dialogInterface, int i) {
@@ -4259,7 +4259,7 @@ public abstract class AlertsCreator {
     }
 
     public static void lambda$createLanguageAlert$8(LaunchActivity launchActivity, DialogInterface dialogInterface, int i) {
-        launchActivity.lambda$runLinkRequest$93(new LanguageSelectActivity());
+        launchActivity.lambda$runLinkRequest$95(new LanguageSelectActivity());
     }
 
     public static void lambda$createLanguageAlert$9(TLRPC.TL_langPackLanguage tL_langPackLanguage, LaunchActivity launchActivity, DialogInterface dialogInterface, int i) {

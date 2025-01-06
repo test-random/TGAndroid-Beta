@@ -628,7 +628,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
                 this.cryptoAmountView[i].setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));
                 this.amountContainer[i].addView(this.cryptoAmountView[i], LayoutHelper.createLinear(-2, -2, 80, 0, 0, 5, 0));
                 this.amountView[i] = new AnimatedEmojiSpan.TextViewEmojis(context);
-                this.amountView[i].setTextSize(1, 13.0f);
+                this.amountView[i].setTextSize(1, 11.5f);
                 this.amountView[i].setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
                 this.amountContainer[i].addView(this.amountView[i], LayoutHelper.createLinear(-2, -2, 80));
             }

@@ -840,7 +840,7 @@ public class StoryEntry {
         return null;
     }
 
-    public android.graphics.Bitmap buildBitmap(float r29, android.graphics.Bitmap r30) {
+    public android.graphics.Bitmap buildBitmap(float r27, android.graphics.Bitmap r28) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.StoryEntry.buildBitmap(float, android.graphics.Bitmap):android.graphics.Bitmap");
     }
 
@@ -1397,7 +1397,13 @@ public class StoryEntry {
 
     public boolean wouldBeVideo(ArrayList arrayList) {
         ArrayList<VideoEditedInfo.EmojiEntity> arrayList2;
+        MessageObject messageObject;
+        TLRPC.Message message;
         if (this.isVideo || this.audioPath != null || this.round != null) {
+            return true;
+        }
+        ArrayList arrayList3 = this.messageObjects;
+        if (arrayList3 != null && arrayList3.size() == 1 && (messageObject = (MessageObject) this.messageObjects.get(0)) != null && (message = messageObject.messageOwner) != null && (message.action instanceof TLRPC.TL_messageActionStarGiftUnique)) {
             return true;
         }
         if (arrayList != null && !arrayList.isEmpty()) {

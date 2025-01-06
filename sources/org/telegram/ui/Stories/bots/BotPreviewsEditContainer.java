@@ -1788,7 +1788,7 @@ public abstract class BotPreviewsEditContainer extends FrameLayout implements No
 
             @Override
             public void doOnIdle(Runnable runnable) {
-                ChatAttachAlert.ChatAttachViewDelegate.CC.$default$doOnIdle(this, runnable);
+                runnable.run();
             }
 
             @Override

@@ -1005,6 +1005,7 @@ public class ContentPreviewViewer {
     }
 
     public void lambda$prepareBlurBitmap$10(Bitmap bitmap) {
+        this.centerImage.setVisible(true, false);
         this.blurrBitmap = bitmap;
         this.preparingBitmap = false;
         FrameLayoutDrawer frameLayoutDrawer = this.containerView;
@@ -1072,7 +1073,7 @@ public class ContentPreviewViewer {
             if (launchActivity.getActionBarLayout() != null && launchActivity.getActionBarLayout().getLastFragment() != null) {
                 launchActivity.getActionBarLayout().getLastFragment().dismissCurrentDialog();
             }
-            launchActivity.lambda$runLinkRequest$93(new PremiumPreviewFragment(PremiumPreviewFragment.featureTypeToServerString(5)));
+            launchActivity.lambda$runLinkRequest$95(new PremiumPreviewFragment(PremiumPreviewFragment.featureTypeToServerString(5)));
         }
         this.menuVisible = false;
         this.containerView.invalidate();
@@ -1274,6 +1275,7 @@ public class ContentPreviewViewer {
             return;
         }
         this.preparingBitmap = true;
+        this.centerImage.setVisible(false, false);
         AndroidUtilities.makeGlobalBlurBitmap(new Utilities.Callback() {
             @Override
             public final void run(Object obj) {

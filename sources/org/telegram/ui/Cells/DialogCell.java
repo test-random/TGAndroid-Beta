@@ -949,13 +949,16 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 }
             }
         }
-        TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(arrayList, 40);
-        TLRPC.PhotoSize closestPhotoSizeWithSize2 = FileLoader.getClosestPhotoSizeWithSize(arrayList, AndroidUtilities.getPhotoSize(), false, null, true);
-        TLRPC.PhotoSize photoSize = closestPhotoSizeWithSize != closestPhotoSizeWithSize2 ? closestPhotoSizeWithSize2 : null;
-        if (photoSize == null || !DownloadController.getInstance(this.currentAccount).canDownloadMedia(1, photoSize.size)) {
-            photoSize = closestPhotoSizeWithSize;
+        TLRPC.PhotoSize strippedPhotoSize = FileLoader.getStrippedPhotoSize(arrayList);
+        if (strippedPhotoSize == null) {
+            strippedPhotoSize = FileLoader.getClosestPhotoSizeWithSize(arrayList, 40);
         }
-        if (closestPhotoSizeWithSize != null) {
+        TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(arrayList, AndroidUtilities.getPhotoSize(), false, null, true);
+        TLRPC.PhotoSize photoSize = strippedPhotoSize != closestPhotoSizeWithSize ? closestPhotoSizeWithSize : null;
+        if (photoSize == null || !DownloadController.getInstance(this.currentAccount).canDownloadMedia(messageObject)) {
+            photoSize = strippedPhotoSize;
+        }
+        if (strippedPhotoSize != null) {
             this.hasVideoThumb = this.hasVideoThumb || messageObject.isVideo() || messageObject.isRoundVideo();
             int i2 = this.thumbsCount;
             if (i2 < 3) {
@@ -964,7 +967,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 this.drawSpoiler[i] = messageObject.hasMediaSpoilers();
                 int i3 = (messageObject.type != 1 || photoSize == null) ? 0 : photoSize.size;
                 String str = messageObject.hasMediaSpoilers() ? "5_5_b" : "20_20";
-                this.thumbImage[i].setImage(ImageLocation.getForObject(photoSize, tLObject), str, ImageLocation.getForObject(closestPhotoSizeWithSize, tLObject), str, i3, null, messageObject, 0);
+                this.thumbImage[i].setImage(ImageLocation.getForObject(photoSize, tLObject), str, ImageLocation.getForObject(strippedPhotoSize, tLObject), str, i3, null, messageObject, 0);
                 this.thumbImage[i].setRoundRadius(AndroidUtilities.dp(messageObject.isRoundVideo() ? 18.0f : 2.0f));
                 this.needEmoji = false;
             }

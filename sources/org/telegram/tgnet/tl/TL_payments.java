@@ -5,6 +5,9 @@ import org.telegram.tgnet.InputSerializedData;
 import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1;
+import org.telegram.tgnet.Vector;
+import org.telegram.tgnet.tl.TL_payments;
 import org.telegram.tgnet.tl.TL_stars;
 
 public class TL_payments {
@@ -106,46 +109,21 @@ public class TL_payments {
         @Override
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.count = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
+            this.connected_bots = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_payments.connectedBotStarRef.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                this.connected_bots.add(connectedBotStarRef.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z));
-            }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-            } else {
-                int readInt324 = inputSerializedData.readInt32(z);
-                for (int i2 = 0; i2 < readInt324; i2++) {
-                    this.users.add(TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z));
-                }
-            }
+            }, z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
         }
 
         @Override
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-1730811363);
             outputSerializedData.writeInt32(this.count);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.connected_bots.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.connected_bots.get(i).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.users.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.users.get(i2).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.connected_bots);
+            Vector.serialize(outputSerializedData, this.users);
         }
     }
 
@@ -323,28 +301,13 @@ public class TL_payments {
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.flags = inputSerializedData.readInt32(z);
             this.count = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
+            this.suggested_bots = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_payments.starRefProgram.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                this.suggested_bots.add(starRefProgram.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z));
-            }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                this.users.add(TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z));
-            }
+            }, z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
             if ((this.flags & 1) != 0) {
                 this.next_offset = inputSerializedData.readString(z);
             }
@@ -354,18 +317,8 @@ public class TL_payments {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-1261053863);
             outputSerializedData.writeInt32(this.count);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.suggested_bots.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.suggested_bots.get(i).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.users.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.users.get(i2).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.suggested_bots);
+            Vector.serialize(outputSerializedData, this.users);
             if ((this.flags & 1) != 0) {
                 outputSerializedData.writeString(this.next_offset);
             }

@@ -1214,7 +1214,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 FragmentContextView.lambda$openSharingLocation$14(LocationController.SharingLocationInfo.this, dialogId, messageMedia, i, z, i2);
             }
         });
-        launchActivity.lambda$runLinkRequest$93(locationActivity);
+        launchActivity.lambda$runLinkRequest$95(locationActivity);
     }
 
     private void playbackSpeedChanged(boolean r8, float r9, float r10) {

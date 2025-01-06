@@ -2333,7 +2333,7 @@ public class ChannelColorActivity extends BaseFragment implements NotificationCe
     public void updateButton(boolean z) {
         SpannableStringBuilder spannableStringBuilder;
         ButtonWithCounterView buttonWithCounterView;
-        if (this.boostsStatus == null) {
+        if (this.button == null || this.boostsStatus == null) {
             return;
         }
         int minLevelRequired = minLevelRequired();

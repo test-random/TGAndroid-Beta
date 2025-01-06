@@ -85,6 +85,7 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     private int adaptiveEmojiColor;
     private ColorFilter adaptiveEmojiColorFilter;
     private AnimatedEmojiSpan.EmojiGroupedSpans animatedEmojiStack;
+    private boolean attachedToWindow;
     private AvatarDrawable avatarDrawable;
     StoriesUtilities.AvatarStoryParams avatarStoryParams;
     private int backgroundButtonTop;
@@ -140,6 +141,7 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     private boolean imagePressed;
     private ImageReceiver imageReceiver;
     private boolean invalidateColors;
+    private Runnable invalidateListener;
     private boolean invalidatePath;
     private View invalidateWithParent;
     private boolean invalidatesParent;
@@ -170,8 +172,8 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     public List spoilers;
     private Stack spoilersPool;
     public final StarGiftUniqueActionLayout starGiftLayout;
-    private float starGiftLayoutX;
-    private float starGiftLayoutY;
+    public float starGiftLayoutX;
+    public float starGiftLayoutY;
     private StarParticlesView.Drawable starParticlesDrawable;
     private Path starsPath;
     private int starsSize;
@@ -658,24 +660,27 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         this.animatedEmojiStack = AnimatedEmojiSpan.update(0, this, (!this.canDrawInParent || (chatActionCellDelegate = this.delegate) == null || chatActionCellDelegate.canDrawOutboundsContent()) ? false : true, this.animatedEmojiStack, this.textLayout);
         this.textHeight = 0;
         this.textWidth = 0;
-        try {
-            int lineCount = this.textLayout.getLineCount();
-            for (int i3 = 0; i3 < lineCount; i3++) {
-                try {
-                    float lineWidth = this.textLayout.getLineWidth(i3);
-                    float f = dp;
-                    if (lineWidth > f) {
-                        lineWidth = f;
+        MessageObject messageObject2 = this.currentMessageObject;
+        if (messageObject2 == null || !messageObject2.isRepostPreview) {
+            try {
+                int lineCount = this.textLayout.getLineCount();
+                for (int i3 = 0; i3 < lineCount; i3++) {
+                    try {
+                        float lineWidth = this.textLayout.getLineWidth(i3);
+                        float f = dp;
+                        if (lineWidth > f) {
+                            lineWidth = f;
+                        }
+                        this.textHeight = (int) Math.max(this.textHeight, Math.ceil(this.textLayout.getLineBottom(i3)));
+                        this.textWidth = (int) Math.max(this.textWidth, Math.ceil(lineWidth));
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                        return;
                     }
-                    this.textHeight = (int) Math.max(this.textHeight, Math.ceil(this.textLayout.getLineBottom(i3)));
-                    this.textWidth = (int) Math.max(this.textWidth, Math.ceil(lineWidth));
-                } catch (Exception e) {
-                    FileLog.e(e);
-                    return;
                 }
+            } catch (Exception e2) {
+                FileLog.e(e2);
             }
-        } catch (Exception e2) {
-            FileLog.e(e2);
         }
         this.textX = (i - this.textWidth) / 2;
         this.textY = AndroidUtilities.dp(7.0f);
@@ -1021,14 +1026,13 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         canvas.restore();
         if (this.starGiftLayout.has()) {
             canvas.save();
-            canvas.translate((getWidth() - this.starGiftLayout.getWidth()) / 2.0f, this.textY + this.textHeight + AndroidUtilities.dp(16.0f));
+            canvas.translate((getWidth() - this.starGiftLayout.getWidth()) / 2.0f, this.starGiftLayout.repost ? AndroidUtilities.dp(4.0f) : this.textY + this.textHeight + AndroidUtilities.dp(16.0f));
             this.starGiftLayout.drawOutbounds(canvas);
             canvas.restore();
         }
     }
 
-    public void drawReactions(Canvas canvas, boolean z) {
-        float alpha = z ? getAlpha() : 1.0f;
+    public void drawReactions(Canvas canvas, boolean z, Integer num) {
         if (this.canDrawInParent) {
             if (hasGradientService() && !z) {
                 return;
@@ -1037,6 +1041,11 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
                 return;
             }
         }
+        drawReactionsLayout(canvas, z, num);
+    }
+
+    public void drawReactionsLayout(Canvas canvas, boolean z, Integer num) {
+        float alpha = z ? getAlpha() : 1.0f;
         Theme.ResourcesProvider resourcesProvider = this.themeDelegate;
         if (resourcesProvider != null) {
             resourcesProvider.applyServiceShaderMatrix(getMeasuredWidth(), this.backgroundHeight, this.viewTranslationX, this.viewTop + AndroidUtilities.dp(4.0f));
@@ -1055,7 +1064,34 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
             }
             ReactionsLayoutInBubble reactionsLayoutInBubble2 = this.reactionsLayoutInBubble;
             TransitionParams transitionParams = this.transitionParams;
-            reactionsLayoutInBubble2.draw(canvas, transitionParams.animateChange ? transitionParams.animateChangeProgress : 1.0f, null);
+            reactionsLayoutInBubble2.draw(canvas, transitionParams.animateChange ? transitionParams.animateChangeProgress : 1.0f, num);
+            if (alpha < 1.0f) {
+                canvas.restore();
+            }
+        }
+    }
+
+    public void drawReactionsLayoutOverlay(Canvas canvas, boolean z) {
+        float alpha = z ? getAlpha() : 1.0f;
+        Theme.ResourcesProvider resourcesProvider = this.themeDelegate;
+        if (resourcesProvider != null) {
+            resourcesProvider.applyServiceShaderMatrix(getMeasuredWidth(), this.backgroundHeight, this.viewTranslationX, this.viewTop + AndroidUtilities.dp(4.0f));
+        } else {
+            Theme.applyServiceShaderMatrix(getMeasuredWidth(), this.backgroundHeight, this.viewTranslationX, this.viewTop + AndroidUtilities.dp(4.0f));
+        }
+        MessageObject messageObject = this.currentMessageObject;
+        if (messageObject == null || !messageObject.shouldDrawReactions()) {
+            return;
+        }
+        ReactionsLayoutInBubble reactionsLayoutInBubble = this.reactionsLayoutInBubble;
+        if (!reactionsLayoutInBubble.isSmall || (this.transitionParams.animateChange && reactionsLayoutInBubble.animateHeight)) {
+            reactionsLayoutInBubble.drawServiceShaderBackground = 1.0f;
+            if (alpha < 1.0f) {
+                canvas.saveLayerAlpha(0.0f, 0.0f, getWidth(), getHeight(), (int) (255.0f * alpha), 31);
+            }
+            ReactionsLayoutInBubble reactionsLayoutInBubble2 = this.reactionsLayoutInBubble;
+            TransitionParams transitionParams = this.transitionParams;
+            reactionsLayoutInBubble2.drawOverlay(canvas, transitionParams.animateChange ? transitionParams.animateChangeProgress : 1.0f);
             if (alpha < 1.0f) {
                 canvas.restore();
             }
@@ -1092,34 +1128,30 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
 
     @Override
     public int getBoundsLeft() {
-        int width;
         if (this.starGiftLayout.has()) {
-            width = (int) (getWidth() - (this.starGiftLayout.getWidth() + AndroidUtilities.dp(12.0f)));
-        } else {
-            if (!isButtonLayout(this.currentMessageObject)) {
-                int i = this.backgroundLeft;
-                ImageReceiver imageReceiver = this.imageReceiver;
-                return (imageReceiver == null || !imageReceiver.getVisible()) ? i : Math.min((int) this.imageReceiver.getImageX(), i);
-            }
-            width = getWidth() - this.giftRectSize;
+            int width = ((int) (getWidth() - (this.starGiftLayout.getWidth() + AndroidUtilities.dp(8.0f)))) / 2;
+            return this.starGiftLayout.repost ? width : Math.min(this.backgroundLeft, width);
         }
-        return width / 2;
+        if (isButtonLayout(this.currentMessageObject)) {
+            return (getWidth() - this.giftRectSize) / 2;
+        }
+        int i = this.backgroundLeft;
+        ImageReceiver imageReceiver = this.imageReceiver;
+        return (imageReceiver == null || !imageReceiver.getVisible()) ? i : Math.min((int) this.imageReceiver.getImageX(), i);
     }
 
     @Override
     public int getBoundsRight() {
-        int width;
         if (this.starGiftLayout.has()) {
-            width = (int) (getWidth() + this.starGiftLayout.getWidth() + AndroidUtilities.dp(12.0f));
-        } else {
-            if (!isButtonLayout(this.currentMessageObject)) {
-                int i = this.backgroundRight;
-                ImageReceiver imageReceiver = this.imageReceiver;
-                return (imageReceiver == null || !imageReceiver.getVisible()) ? i : Math.max((int) this.imageReceiver.getImageX2(), i);
-            }
-            width = getWidth() + this.giftRectSize;
+            int width = ((int) (getWidth() + (this.starGiftLayout.getWidth() + AndroidUtilities.dp(8.0f)))) / 2;
+            return this.starGiftLayout.repost ? width : Math.max(this.backgroundRight, width);
         }
-        return width / 2;
+        if (isButtonLayout(this.currentMessageObject)) {
+            return (getWidth() + this.giftRectSize) / 2;
+        }
+        int i = this.backgroundRight;
+        ImageReceiver imageReceiver = this.imageReceiver;
+        return (imageReceiver == null || !imageReceiver.getVisible()) ? i : Math.max((int) this.imageReceiver.getImageX2(), i);
     }
 
     public int getCustomDate() {
@@ -1147,7 +1179,7 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         return this.reactionsLayoutInBubble.getReactionButton(visibleReaction);
     }
 
-    protected Paint getThemedPaint(String str) {
+    public Paint getThemedPaint(String str) {
         Theme.ResourcesProvider resourcesProvider = this.themeDelegate;
         Paint paint = resourcesProvider != null ? resourcesProvider.getPaint(str) : null;
         return paint != null ? paint : Theme.getThemePaint(str);
@@ -1173,6 +1205,10 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         View view = this.invalidateWithParent;
         if (view != null) {
             view.invalidate();
+        }
+        Runnable runnable = this.invalidateListener;
+        if (runnable != null) {
+            runnable.run();
         }
         if (!this.invalidatesParent || getParent() == null) {
             return;
@@ -1227,6 +1263,10 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         }
     }
 
+    public boolean isCellAttachedToWindow() {
+        return this.attachedToWindow;
+    }
+
     public boolean isFloating() {
         return false;
     }
@@ -1244,6 +1284,7 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     protected void onAttachedToWindow() {
         ChatActionCellDelegate chatActionCellDelegate;
         super.onAttachedToWindow();
+        this.attachedToWindow = true;
         this.imageReceiver.onAttachedToWindow();
         setStarsPaused(false);
         this.animatedEmojiStack = AnimatedEmojiSpan.update(0, this, (!this.canDrawInParent || (chatActionCellDelegate = this.delegate) == null || chatActionCellDelegate.canDrawOutboundsContent()) ? false : true, this.animatedEmojiStack, this.textLayout);
@@ -1265,6 +1306,7 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        this.attachedToWindow = false;
         DownloadController.getInstance(this.currentAccount).removeLoadingFileObserver(this);
         this.imageReceiver.onDetachedFromWindow();
         setStarsPaused(true);
@@ -1421,6 +1463,10 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         }
         this.invalidateColors = z;
         invalidate();
+    }
+
+    public void setInvalidateListener(Runnable runnable) {
+        this.invalidateListener = runnable;
     }
 
     public void setInvalidateWithParent(View view) {

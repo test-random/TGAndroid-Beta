@@ -37,10 +37,11 @@ public class StarGiftUniqueActionLayout {
     private RadialGradient gradient;
     private int gradientRadius;
     int height;
-    private final ImageReceiver imageReceiver;
+    public final ImageReceiver imageReceiver;
     private TL_stars.starGiftAttributeModel model;
     private float nameWidth;
     private TL_stars.starGiftAttributePattern pattern;
+    public boolean repost;
     private final Theme.ResourcesProvider resourcesProvider;
     private final GiftSheet.RibbonDrawable ribbon;
     private Text subtitle;
@@ -156,24 +157,29 @@ public class StarGiftUniqueActionLayout {
             text3.draw(canvas, (f2 + this.nameWidth) - text3.getCurrentWidth(), row.y, i, 1.0f);
             row.value.draw(canvas, f2 + this.nameWidth + AndroidUtilities.dp(9.0f), row.y, -1, 1.0f);
         }
-        this.buttonRect.set(width - ((this.buttonText.getCurrentWidth() + AndroidUtilities.dp(30.0f)) / 2.0f), this.buttonY, width + ((this.buttonText.getCurrentWidth() + AndroidUtilities.dp(30.0f)) / 2.0f), this.buttonY + this.buttonHeight);
-        this.buttonPath.rewind();
-        Path path = this.buttonPath;
-        RectF rectF = this.buttonRect;
-        float f3 = this.buttonHeight / 2.0f;
-        path.addRoundRect(rectF, f3, f3, Path.Direction.CW);
-        this.buttonBackgroundPaint.setColor(Theme.multAlpha(-16777216, 0.13f));
-        float scale2 = this.buttonBounce.getScale(0.075f);
-        canvas.scale(scale2, scale2, this.buttonRect.centerX(), this.buttonRect.centerY());
-        canvas.drawPath(this.buttonPath, this.buttonBackgroundPaint);
-        canvas.restore();
-        this.ribbon.setBounds(((int) this.backgroundRect.right) - AndroidUtilities.dp(46.67f), ((int) this.backgroundRect.top) - AndroidUtilities.dp(1.33f), ((int) this.backgroundRect.right) + AndroidUtilities.dp(1.33f), ((int) this.backgroundRect.top) + AndroidUtilities.dp(46.67f));
-        this.ribbon.setTextColor(i);
-        this.ribbon.draw(canvas);
+        if (!this.repost) {
+            this.buttonRect.set(width - ((this.buttonText.getCurrentWidth() + AndroidUtilities.dp(30.0f)) / 2.0f), this.buttonY, width + ((this.buttonText.getCurrentWidth() + AndroidUtilities.dp(30.0f)) / 2.0f), this.buttonY + this.buttonHeight);
+            this.buttonPath.rewind();
+            Path path = this.buttonPath;
+            RectF rectF = this.buttonRect;
+            float f3 = this.buttonHeight / 2.0f;
+            path.addRoundRect(rectF, f3, f3, Path.Direction.CW);
+            this.buttonBackgroundPaint.setColor(Theme.multAlpha(-16777216, 0.13f));
+            float scale2 = this.buttonBounce.getScale(0.075f);
+            canvas.scale(scale2, scale2, this.buttonRect.centerX(), this.buttonRect.centerY());
+            canvas.drawPath(this.buttonPath, this.buttonBackgroundPaint);
+            canvas.restore();
+            this.ribbon.setBounds(((int) this.backgroundRect.right) - AndroidUtilities.dp(46.67f), ((int) this.backgroundRect.top) - AndroidUtilities.dp(1.33f), ((int) this.backgroundRect.right) + AndroidUtilities.dp(1.33f), ((int) this.backgroundRect.top) + AndroidUtilities.dp(46.67f));
+            this.ribbon.setTextColor(i);
+            this.ribbon.draw(canvas);
+        }
         canvas.restore();
     }
 
     public void drawOutbounds(Canvas canvas) {
+        if (this.repost) {
+            return;
+        }
         canvas.save();
         float scale = this.bounce.getScale(0.0125f);
         canvas.scale(scale, scale, this.backgroundRect.centerX(), this.backgroundRect.centerY());
@@ -204,7 +210,7 @@ public class StarGiftUniqueActionLayout {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftUniqueActionLayout.onTouchEvent(float, float, android.view.MotionEvent):boolean");
     }
 
-    public void set(org.telegram.messenger.MessageObject r10, boolean r11) {
+    public void set(org.telegram.messenger.MessageObject r11, boolean r12) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftUniqueActionLayout.set(org.telegram.messenger.MessageObject, boolean):void");
     }
 }

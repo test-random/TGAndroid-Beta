@@ -29,7 +29,7 @@ import org.telegram.tgnet.tl.TL_stats;
 import org.telegram.tgnet.tl.TL_stories;
 
 public class TLRPC {
-    public static final int LAYER = 196;
+    public static final int LAYER = 197;
     public static final int MESSAGE_FLAG_EDITED = 32768;
     public static final int MESSAGE_FLAG_FWD = 4;
     public static final int MESSAGE_FLAG_HAS_BOT_ID = 2048;
@@ -3496,8 +3496,8 @@ public class TLRPC {
                 if (this.params == null) {
                     this.params = new HashMap<>();
                 }
-                this.layer = 196;
-                this.params.put("legacy_layer", "196");
+                this.layer = 197;
+                this.params.put("legacy_layer", "197");
             }
             if ((this.id < 0 || this.send_state == 3 || this.legacy) && (hashMap2 = this.params) != null && hashMap2.size() > 0) {
                 for (Map.Entry<String, String> entry2 : this.params.entrySet()) {
@@ -59471,12 +59471,7 @@ public class TLRPC {
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.peer = Peer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             this.bot_id = inputSerializedData.readInt64(z);
-            this.commands = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
-                @Override
-                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
-                    return TLRPC.TL_botCommand.TLdeserialize(inputSerializedData2, i, z2);
-                }
-            }, z);
+            this.commands = Vector.deserialize(inputSerializedData, new TLRPC$TL_updateBotCommands$$ExternalSyntheticLambda0(), z);
         }
 
         @Override
@@ -68843,6 +68838,38 @@ public class TLRPC {
         }
     }
 
+    public static class TL_users extends Users {
+        public static final int constructor = 1658259128;
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1658259128);
+            Vector.serialize(outputSerializedData, this.users);
+        }
+    }
+
+    public static class TL_usersSlice extends Users {
+        public static final int constructor = 828000628;
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.count = inputSerializedData.readInt32(z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(828000628);
+            outputSerializedData.writeInt32(this.count);
+            Vector.serialize(outputSerializedData, this.users);
+        }
+    }
+
     public static class TL_users_getFullUser extends TLObject {
         public static final int constructor = -1240508136;
         public InputUser id;
@@ -69923,6 +69950,22 @@ public class TLRPC {
             if ((this.flags & 2) != 0) {
                 this.settings.serializeToStream(outputSerializedData);
             }
+        }
+    }
+
+    public static class TL_webPageAttributeUniqueStarGift extends WebPageAttribute {
+        public static final int constructor = -814781000;
+        public TL_stars.StarGift gift;
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.gift = TL_stars.StarGift.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-814781000);
+            this.gift.serializeToStream(outputSerializedData);
         }
     }
 
@@ -71488,6 +71531,27 @@ public class TLRPC {
         }
     }
 
+    public static class Users extends TLObject {
+        public int count;
+        public ArrayList<User> users = new ArrayList<>();
+
+        public static Users TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
+            TLObject tL_usersSlice;
+            if (i == 828000628) {
+                tL_usersSlice = new TL_usersSlice();
+            } else {
+                if (i != 1658259128) {
+                    if (z) {
+                        throw new RuntimeException(String.format("can't parse magic %x in Users", Integer.valueOf(i)));
+                    }
+                    return null;
+                }
+                tL_usersSlice = new TL_users();
+            }
+            return (Users) TLRPC.deserialize(tL_usersSlice, inputSerializedData, z);
+        }
+    }
+
     public static abstract class Video extends TLObject {
         public long access_hash;
         public String caption;
@@ -71750,14 +71814,34 @@ public class TLRPC {
         public int flags;
 
         public static WebPageAttribute TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
-            WebPageAttribute tL_webPageAttributeTheme = i != -1818605967 ? i != 781501415 ? i != 1355547603 ? i != 1421174295 ? null : new TL_webPageAttributeTheme() : new TL_webPageAttributeStickerSet() : new TL_webPageAttributeStory() : new TL_webPageAttributeStory_layer162();
-            if (tL_webPageAttributeTheme == null && z) {
+            WebPageAttribute tL_webPageAttributeStory_layer162;
+            switch (i) {
+                case -1818605967:
+                    tL_webPageAttributeStory_layer162 = new TL_webPageAttributeStory_layer162();
+                    break;
+                case -814781000:
+                    tL_webPageAttributeStory_layer162 = new TL_webPageAttributeUniqueStarGift();
+                    break;
+                case 781501415:
+                    tL_webPageAttributeStory_layer162 = new TL_webPageAttributeStory();
+                    break;
+                case 1355547603:
+                    tL_webPageAttributeStory_layer162 = new TL_webPageAttributeStickerSet();
+                    break;
+                case 1421174295:
+                    tL_webPageAttributeStory_layer162 = new TL_webPageAttributeTheme();
+                    break;
+                default:
+                    tL_webPageAttributeStory_layer162 = null;
+                    break;
+            }
+            if (tL_webPageAttributeStory_layer162 == null && z) {
                 throw new RuntimeException(String.format("can't parse magic %x in contacts_Contacts", Integer.valueOf(i)));
             }
-            if (tL_webPageAttributeTheme != null) {
-                tL_webPageAttributeTheme.readParams(inputSerializedData, z);
+            if (tL_webPageAttributeStory_layer162 != null) {
+                tL_webPageAttributeStory_layer162.readParams(inputSerializedData, z);
             }
-            return tL_webPageAttributeTheme;
+            return tL_webPageAttributeStory_layer162;
         }
     }
 

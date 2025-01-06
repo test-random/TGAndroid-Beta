@@ -900,7 +900,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                 profileSearchCell = null;
             }
             if (profileSearchCell != null) {
-                profileSearchCell.setData((TLRPC.Chat) this.chats.get(i), null, null, null, false, false);
+                profileSearchCell.setData(this.chats.get(i), null, null, null, false, false);
                 profileSearchCell.useSeparator = i != this.chats.size() - 1;
             }
         }
@@ -909,7 +909,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             View profileSearchCell;
             if (i == 18) {
-                profileSearchCell = new MoreRecommendationsCell(SharedMediaLayout.this.profileActivity == null ? UserConfig.selectedAccount : SharedMediaLayout.this.profileActivity.getCurrentAccount(), this.mContext, SharedMediaLayout.this.resourcesProvider, new Runnable() {
+                profileSearchCell = new MoreRecommendationsCell(SharedMediaLayout.this.profileActivity == null ? UserConfig.selectedAccount : SharedMediaLayout.this.profileActivity.getCurrentAccount(), this.mContext, SharedMediaLayout.this.dialog_id > 0, SharedMediaLayout.this.resourcesProvider, new Runnable() {
                     @Override
                     public final void run() {
                         SharedMediaLayout.ChannelRecommendationsAdapter.this.lambda$onCreateViewHolder$0();
@@ -923,18 +923,39 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         }
 
         public void openPreview(final int i) {
+            long j;
+            String str;
             if (i < 0 || i >= this.chats.size()) {
                 return;
             }
-            final TLRPC.Chat chat = (TLRPC.Chat) this.chats.get(i);
+            TLObject tLObject = (TLObject) this.chats.get(i);
             Bundle bundle = new Bundle();
-            bundle.putLong("chat_id", chat.id);
+            boolean z = tLObject instanceof TLRPC.Chat;
+            if (z) {
+                j = ((TLRPC.Chat) tLObject).id;
+                str = "chat_id";
+            } else {
+                if (!(tLObject instanceof TLRPC.User)) {
+                    return;
+                }
+                j = ((TLRPC.User) tLObject).id;
+                str = "user_id";
+            }
+            bundle.putLong(str, j);
             ChatActivity chatActivity = new ChatActivity(bundle);
             if (SharedMediaLayout.this.profileActivity instanceof ProfileActivity) {
                 ((ProfileActivity) SharedMediaLayout.this.profileActivity).prepareBlurBitmap();
             }
             ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(SharedMediaLayout.this.getContext(), R.drawable.popup_fixed_alert, SharedMediaLayout.this.resourcesProvider, 2);
             actionBarPopupWindowLayout.setBackgroundColor(SharedMediaLayout.this.getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));
+            if (!z) {
+                if (tLObject instanceof TLRPC.User) {
+                    SharedMediaLayout.this.profileActivity.presentFragmentAsPreview(chatActivity);
+                    return;
+                }
+                return;
+            }
+            final TLRPC.Chat chat = (TLRPC.Chat) tLObject;
             ActionBarMenuSubItem actionBarMenuSubItem = new ActionBarMenuSubItem(SharedMediaLayout.this.getContext(), false, false);
             actionBarMenuSubItem.setTextAndIcon(LocaleController.getString(R.string.OpenChannel2), R.drawable.msg_channel);
             actionBarMenuSubItem.setMinimumWidth(160);
@@ -959,19 +980,27 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         }
 
         public void update(boolean z) {
-            TLRPC.Chat chat;
-            if (SharedMediaLayout.this.profileActivity == null || !DialogObject.isChatDialog(SharedMediaLayout.this.dialog_id) || (chat = MessagesController.getInstance(SharedMediaLayout.this.profileActivity.getCurrentAccount()).getChat(Long.valueOf(-SharedMediaLayout.this.dialog_id))) == null || !ChatObject.isChannelAndNotMegaGroup(chat)) {
+            if (SharedMediaLayout.this.profileActivity == null) {
                 return;
             }
-            MessagesController.ChannelRecommendations channelRecommendations = MessagesController.getInstance(SharedMediaLayout.this.profileActivity.getCurrentAccount()).getChannelRecommendations(chat.id);
+            if (DialogObject.isChatDialog(SharedMediaLayout.this.dialog_id)) {
+                TLRPC.Chat chat = MessagesController.getInstance(SharedMediaLayout.this.profileActivity.getCurrentAccount()).getChat(Long.valueOf(-SharedMediaLayout.this.dialog_id));
+                if (chat == null || !ChatObject.isChannelAndNotMegaGroup(chat)) {
+                    return;
+                }
+            } else if (MessagesController.getInstance(SharedMediaLayout.this.profileActivity.getCurrentAccount()).getUser(Long.valueOf(SharedMediaLayout.this.dialog_id)) == null) {
+                return;
+            }
+            MessagesController.ChannelRecommendations channelRecommendations = MessagesController.getInstance(SharedMediaLayout.this.profileActivity.getCurrentAccount()).getChannelRecommendations(SharedMediaLayout.this.dialog_id);
             this.chats.clear();
             int i = 0;
             if (channelRecommendations != null) {
                 for (int i2 = 0; i2 < channelRecommendations.chats.size(); i2++) {
-                    TLRPC.Chat chat2 = channelRecommendations.chats.get(i2);
-                    if (chat2 != null && ChatObject.isNotInChat(chat2)) {
-                        this.chats.add(chat2);
+                    TLObject tLObject = channelRecommendations.chats.get(i2);
+                    if (tLObject instanceof TLRPC.Chat) {
+                        ChatObject.isNotInChat((TLRPC.Chat) tLObject);
                     }
+                    this.chats.add(tLObject);
                 }
             }
             if (!this.chats.isEmpty() && !UserConfig.getInstance(SharedMediaLayout.this.profileActivity.getCurrentAccount()).isPremium()) {
@@ -2012,7 +2041,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
         private final Theme.ResourcesProvider resourcesProvider;
         private final LinkSpanDrawable.LinksTextView textView;
 
-        public MoreRecommendationsCell(int i, Context context, Theme.ResourcesProvider resourcesProvider, final Runnable runnable) {
+        public MoreRecommendationsCell(int i, Context context, boolean z, Theme.ResourcesProvider resourcesProvider, final Runnable runnable) {
             super(context);
             this.currentAccount = i;
             this.resourcesProvider = resourcesProvider;
@@ -2029,7 +2058,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             ButtonWithCounterView buttonWithCounterView = new ButtonWithCounterView(context, resourcesProvider);
             this.button = buttonWithCounterView;
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-            spannableStringBuilder.append((CharSequence) LocaleController.getString(R.string.MoreSimilarButton));
+            spannableStringBuilder.append((CharSequence) LocaleController.getString(z ? R.string.MoreSimilarBotsButton : R.string.MoreSimilarButton));
             spannableStringBuilder.append((CharSequence) " ");
             SpannableString spannableString = new SpannableString("l");
             spannableString.setSpan(new ColoredImageSpan(R.drawable.msg_mini_lock2), 0, 1, 33);
@@ -2050,7 +2079,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             linksTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));
             linksTextView.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, resourcesProvider));
             linksTextView.setLineSpacing(AndroidUtilities.dp(3.0f), 1.0f);
-            SpannableStringBuilder premiumText = AndroidUtilities.premiumText(LocaleController.getString(R.string.MoreSimilarText), new Runnable() {
+            SpannableStringBuilder premiumText = AndroidUtilities.premiumText(LocaleController.getString(z ? R.string.MoreSimilarBotsText : R.string.MoreSimilarText), new Runnable() {
                 @Override
                 public final void run() {
                     SharedMediaLayout.MoreRecommendationsCell.lambda$new$1(runnable);
@@ -4983,7 +5012,14 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                         if (mediaPage.selectedType == 10) {
                             if (((view instanceof ProfileSearchCell) || f2 < AndroidUtilities.dp(60.0f)) && i >= 0 && i < this.channelRecommendationsAdapter.chats.size()) {
                                 Bundle bundle = new Bundle();
-                                bundle.putLong("chat_id", ((TLRPC.Chat) this.channelRecommendationsAdapter.chats.get(i)).id);
+                                TLObject tLObject = (TLObject) this.channelRecommendationsAdapter.chats.get(i);
+                                if (tLObject instanceof TLRPC.Chat) {
+                                    bundle.putLong("chat_id", ((TLRPC.Chat) tLObject).id);
+                                } else if (!(tLObject instanceof TLRPC.User)) {
+                                    return;
+                                } else {
+                                    bundle.putLong("user_id", ((TLRPC.User) tLObject).id);
+                                }
                                 this.profileActivity.presentFragment(new ChatActivity(bundle));
                                 return;
                             }

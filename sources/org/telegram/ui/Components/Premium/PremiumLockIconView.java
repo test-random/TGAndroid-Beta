@@ -24,6 +24,7 @@ public class PremiumLockIconView extends ImageView {
     public static int TYPE_REACTIONS_LOCK = 2;
     public static int TYPE_STICKERS_PREMIUM_LOCKED = 1;
     boolean attachedToWindow;
+    private Integer blendColor;
     CellFlickerDrawable cellFlickerDrawable;
     int color1;
     int color2;
@@ -291,8 +292,16 @@ public class PremiumLockIconView extends ImageView {
         }
     }
 
+    public void setBlendWithColor(Integer num) {
+        this.blendColor = num;
+    }
+
     public void setColor(int i) {
         this.colorRetrieved = true;
+        Integer num = this.blendColor;
+        if (num != null) {
+            i = Theme.blendOver(i, num.intValue());
+        }
         if (this.currentColor != i) {
             this.currentColor = i;
             int i2 = this.type;

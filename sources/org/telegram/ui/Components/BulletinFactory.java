@@ -653,7 +653,7 @@ public final class BulletinFactory {
     }
 
     public Bulletin createCopyLinkBulletin() {
-        return createCopyLinkBulletin(false, this.resourcesProvider);
+        return createCopyLinkBulletin(false);
     }
 
     public Bulletin createCopyLinkBulletin(String str, Theme.ResourcesProvider resourcesProvider) {
@@ -666,17 +666,17 @@ public final class BulletinFactory {
         return create(lottieLayout, 1500);
     }
 
-    public Bulletin createCopyLinkBulletin(boolean z, Theme.ResourcesProvider resourcesProvider) {
+    public Bulletin createCopyLinkBulletin(boolean z) {
         if (!AndroidUtilities.shouldShowClipboardToast()) {
             return new Bulletin.EmptyBulletin();
         }
         if (!z) {
-            Bulletin.LottieLayout lottieLayout = new Bulletin.LottieLayout(getContext(), resourcesProvider);
+            Bulletin.LottieLayout lottieLayout = new Bulletin.LottieLayout(getContext(), this.resourcesProvider);
             lottieLayout.setAnimation(R.raw.voip_invite, 36, 36, "Wibe", "Circle");
             lottieLayout.textView.setText(LocaleController.getString(R.string.LinkCopied));
             return create(lottieLayout, 1500);
         }
-        Bulletin.TwoLineLottieLayout twoLineLottieLayout = new Bulletin.TwoLineLottieLayout(getContext(), resourcesProvider);
+        Bulletin.TwoLineLottieLayout twoLineLottieLayout = new Bulletin.TwoLineLottieLayout(getContext(), this.resourcesProvider);
         twoLineLottieLayout.setAnimation(R.raw.voip_invite, 36, 36, "Wibe", "Circle");
         twoLineLottieLayout.titleTextView.setText(LocaleController.getString(R.string.LinkCopied));
         twoLineLottieLayout.subtitleTextView.setText(LocaleController.getString(R.string.LinkCopiedPrivateInfo));

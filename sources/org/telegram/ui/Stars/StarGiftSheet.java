@@ -28,6 +28,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.collection.LongSparseArray;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.json.JSONObject;
@@ -51,10 +52,12 @@ import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Cells.ShareDialogCell;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
+import org.telegram.ui.Components.Bulletin;
 import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.ButtonSpan;
 import org.telegram.ui.Components.CheckBox2;
@@ -62,12 +65,14 @@ import org.telegram.ui.Components.ColoredImageSpan;
 import org.telegram.ui.Components.CompatDrawable;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.FireworksOverlay;
+import org.telegram.ui.Components.ItemOptions;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.LinkSpanDrawable;
 import org.telegram.ui.Components.LoadingSpan;
 import org.telegram.ui.Components.Premium.boosts.UserSelectorBottomSheet;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.ScaleStateListAnimator;
+import org.telegram.ui.Components.ShareAlert;
 import org.telegram.ui.Components.TableView;
 import org.telegram.ui.Components.spoilers.SpoilersTextView;
 import org.telegram.ui.FilterCreateActivity;
@@ -78,6 +83,8 @@ import org.telegram.ui.Stars.StarGiftSheet;
 import org.telegram.ui.Stars.StarsIntroActivity;
 import org.telegram.ui.Stories.recorder.ButtonWithCounterView;
 import org.telegram.ui.Stories.recorder.HintView2;
+import org.telegram.ui.Stories.recorder.StoryEntry;
+import org.telegram.ui.Stories.recorder.StoryRecorder;
 import org.telegram.ui.bots.AffiliateProgramFragment;
 import org.telegram.ui.bots.BotWebViewSheet;
 
@@ -104,6 +111,9 @@ public class StarGiftSheet extends BottomSheet {
     private boolean messageObjectRepolling;
     private boolean myProfile;
     private ArrayList sample_attributes;
+    private ShareAlert shareAlert;
+    private String slug;
+    private TL_stars.TL_starGiftUnique slugStarGift;
     private ValueAnimator switchingPagesAnimator;
     private final TableView tableView;
     private final TopView topView;
@@ -112,10 +122,64 @@ public class StarGiftSheet extends BottomSheet {
     private TLRPC.PaymentForm upgrade_form;
     private TL_stars.UserStarGift userStarGift;
 
-    public class AnonymousClass1 extends AnimatorListenerAdapter {
+    public class AnonymousClass1 extends ShareAlert {
+        AnonymousClass1(Context context, ChatActivity chatActivity, ArrayList arrayList, String str, String str2, boolean z, String str3, String str4, boolean z2, boolean z3, boolean z4, Theme.ResourcesProvider resourcesProvider) {
+            super(context, chatActivity, arrayList, str, str2, z, str3, str4, z2, z3, z4, resourcesProvider);
+            this.includeStoryFromMessage = true;
+        }
+
+        @Override
+        public void onSend(LongSparseArray longSparseArray, int i, TLRPC.TL_forumTopic tL_forumTopic) {
+            Bulletin createSimpleBulletin;
+            super.onSend(longSparseArray, i, tL_forumTopic);
+            BulletinFactory bulletinFactory = StarGiftSheet.this.getBulletinFactory();
+            if (bulletinFactory != null) {
+                if (longSparseArray.size() == 1) {
+                    long keyAt = longSparseArray.keyAt(0);
+                    if (keyAt == UserConfig.getInstance(this.currentAccount).clientUserId) {
+                        createSimpleBulletin = bulletinFactory.createSimpleBulletin(R.raw.saved_messages, AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LinkSharedToSavedMessages, new Object[0])), 5000);
+                    } else if (keyAt < 0) {
+                        createSimpleBulletin = bulletinFactory.createSimpleBulletin(R.raw.forward, AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LinkSharedTo, tL_forumTopic != null ? tL_forumTopic.title : MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(-keyAt)).title)), 5000);
+                    } else {
+                        createSimpleBulletin = bulletinFactory.createSimpleBulletin(R.raw.forward, AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LinkSharedTo, MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(keyAt)).first_name)), 5000);
+                    }
+                } else {
+                    createSimpleBulletin = bulletinFactory.createSimpleBulletin(R.raw.forward, AndroidUtilities.replaceTags(LocaleController.formatPluralString("LinkSharedToManyChats", longSparseArray.size(), Integer.valueOf(longSparseArray.size()))));
+                }
+                createSimpleBulletin.hideAfterBottomSheet(false).show();
+                try {
+                    this.container.performHapticFeedback(3);
+                } catch (Exception unused) {
+                }
+            }
+        }
+
+        @Override
+        protected void onShareStory(View view) {
+            StarGiftSheet.this.repostStory(view);
+        }
+    }
+
+    public class AnonymousClass2 implements ShareAlert.ShareAlertDelegate {
+        AnonymousClass2() {
+        }
+
+        @Override
+        public boolean didCopy() {
+            StarGiftSheet.this.getBulletinFactory().createCopyLinkBulletin(false).show();
+            return true;
+        }
+
+        @Override
+        public void didShare() {
+            ShareAlert.ShareAlertDelegate.CC.$default$didShare(this);
+        }
+    }
+
+    public class AnonymousClass3 extends AnimatorListenerAdapter {
         final boolean val$toUpgrade;
 
-        AnonymousClass1(boolean z) {
+        AnonymousClass3(boolean z) {
             r2 = z;
         }
 
@@ -128,16 +192,16 @@ public class StarGiftSheet extends BottomSheet {
         }
     }
 
-    public class AnonymousClass2 extends ClickableSpan {
+    public class AnonymousClass4 extends ClickableSpan {
         final TL_stars.starGiftAttributeOriginalDetails val$details;
 
-        AnonymousClass2(TL_stars.starGiftAttributeOriginalDetails stargiftattributeoriginaldetails) {
+        AnonymousClass4(TL_stars.starGiftAttributeOriginalDetails stargiftattributeoriginaldetails) {
             r2 = stargiftattributeoriginaldetails;
         }
 
         @Override
         public void onClick(View view) {
-            StarGiftSheet.this.lambda$set$17(r2.sender_id);
+            StarGiftSheet.this.lambda$set$23(r2.sender_id);
         }
 
         @Override
@@ -146,16 +210,16 @@ public class StarGiftSheet extends BottomSheet {
         }
     }
 
-    public class AnonymousClass3 extends ClickableSpan {
+    public class AnonymousClass5 extends ClickableSpan {
         final TL_stars.starGiftAttributeOriginalDetails val$details;
 
-        AnonymousClass3(TL_stars.starGiftAttributeOriginalDetails stargiftattributeoriginaldetails) {
+        AnonymousClass5(TL_stars.starGiftAttributeOriginalDetails stargiftattributeoriginaldetails) {
             r2 = stargiftattributeoriginaldetails;
         }
 
         @Override
         public void onClick(View view) {
-            StarGiftSheet.this.lambda$set$17(r2.recipient_id);
+            StarGiftSheet.this.lambda$set$23(r2.recipient_id);
         }
 
         @Override
@@ -164,10 +228,10 @@ public class StarGiftSheet extends BottomSheet {
         }
     }
 
-    public class AnonymousClass4 extends BaseFragment {
+    public class AnonymousClass6 extends BaseFragment {
         final UserSelectorBottomSheet[] val$sheet;
 
-        AnonymousClass4(UserSelectorBottomSheet[] userSelectorBottomSheetArr) {
+        AnonymousClass6(UserSelectorBottomSheet[] userSelectorBottomSheetArr) {
             r2 = userSelectorBottomSheetArr;
         }
 
@@ -350,7 +414,9 @@ public class StarGiftSheet extends BottomSheet {
         private final Path path;
         private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable pattern;
         private float patternsScale;
+        private int patternsType;
         private final RectF rect;
+        private int rounding;
         private final int sizeDp;
 
         public StarGiftDrawableIcon(View view, TL_stars.StarGift starGift, int i, float f) {
@@ -358,10 +424,12 @@ public class StarGiftSheet extends BottomSheet {
             this.path = new Path();
             this.rect = new RectF();
             this.matrix = new Matrix();
+            this.rounding = AndroidUtilities.dp(16.0f);
+            this.patternsType = 0;
             this.patternsScale = f;
             ImageReceiver imageReceiver = new ImageReceiver(view);
             this.imageReceiver = imageReceiver;
-            AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(view, AndroidUtilities.dp(18.0f));
+            AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(view, false, AndroidUtilities.dp(i > 180 ? 24.0f : 18.0f));
             this.pattern = swapAnimatedEmojiDrawable;
             this.sizeDp = i;
             if (starGift != null) {
@@ -370,12 +438,13 @@ public class StarGiftSheet extends BottomSheet {
                 TL_stars.starGiftAttributeModel stargiftattributemodel = (TL_stars.starGiftAttributeModel) StarsController.findAttribute(starGift.attributes, TL_stars.starGiftAttributeModel.class);
                 if (stargiftattributebackdrop != null) {
                     this.gradient = new RadialGradient(0.0f, 0.0f, AndroidUtilities.dpf2(i) / 2.0f, new int[]{stargiftattributebackdrop.center_color | (-16777216), stargiftattributebackdrop.edge_color | (-16777216)}, new float[]{0.0f, 1.0f}, Shader.TileMode.CLAMP);
+                    swapAnimatedEmojiDrawable.setColor(Integer.valueOf(stargiftattributebackdrop.pattern_color | (-16777216)));
                 }
                 if (stargiftattributepattern != null) {
                     swapAnimatedEmojiDrawable.set(stargiftattributepattern.document, false);
                 }
                 if (stargiftattributemodel != null) {
-                    StarsIntroActivity.setGiftImage(imageReceiver, stargiftattributemodel.document, 45);
+                    StarsIntroActivity.setGiftImage(imageReceiver, stargiftattributemodel.document, (int) (i * 0.75f));
                 }
             }
             this.paint.setShader(this.gradient);
@@ -389,7 +458,10 @@ public class StarGiftSheet extends BottomSheet {
             this.rect.set(getBounds());
             canvas.save();
             this.path.rewind();
-            this.path.addRoundRect(this.rect, AndroidUtilities.dp(16.0f), AndroidUtilities.dp(16.0f), Path.Direction.CW);
+            Path path = this.path;
+            RectF rectF = this.rect;
+            float f = this.rounding;
+            path.addRoundRect(rectF, f, f, Path.Direction.CW);
             canvas.clipPath(this.path);
             if (this.gradient != null) {
                 this.matrix.reset();
@@ -400,11 +472,11 @@ public class StarGiftSheet extends BottomSheet {
             canvas.drawPaint(this.paint);
             canvas.save();
             canvas.translate(this.rect.centerX(), this.rect.centerY());
-            StarGiftPatterns.drawPatterns(canvas, this.pattern, this.rect.width(), this.rect.height(), 1.0f, this.patternsScale);
+            StarGiftPatterns.drawPatterns(canvas, this.patternsType, this.pattern, this.rect.width(), this.rect.height(), 1.0f, this.patternsScale);
             canvas.restore();
             float min = Math.min(this.rect.width(), this.rect.height()) * 0.75f;
-            float f = min / 2.0f;
-            this.imageReceiver.setImageCoords(this.rect.centerX() - f, this.rect.centerY() - f, min, min);
+            float f2 = min / 2.0f;
+            this.imageReceiver.setImageCoords(this.rect.centerX() - f2, this.rect.centerY() - f2, min, min);
             this.imageReceiver.draw(canvas);
             canvas.restore();
         }
@@ -430,6 +502,16 @@ public class StarGiftSheet extends BottomSheet {
             this.pattern.detach();
             this.imageReceiver.onDetachedFromWindow();
         }
+
+        public StarGiftDrawableIcon setPatternsType(int i) {
+            this.patternsType = i;
+            return this;
+        }
+
+        public StarGiftDrawableIcon setRounding(int i) {
+            this.rounding = i;
+            return this;
+        }
     }
 
     public static class TopView extends FrameLayout {
@@ -443,17 +525,20 @@ public class StarGiftSheet extends BottomSheet {
         private final ImageView closeView;
         private int currentImageIndex;
         private float currentPage;
+        private boolean hasLink;
         private final FrameLayout imageLayout;
         private final BackupImageView[] imageView;
         private final LinearLayout[] layout;
         private final FrameLayout.LayoutParams[] layoutLayoutParams;
         private BagRandomizer models;
+        private final ImageView optionsView;
         private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable[] pattern;
         private BagRandomizer patterns;
         private LinkSpanDrawable.LinksTextView priceView;
         private final Theme.ResourcesProvider resourcesProvider;
         private ValueAnimator rotationAnimator;
         private ArrayList sampleAttributes;
+        private final ImageView shareView;
         private final LinkSpanDrawable.LinksTextView[] subtitleView;
         private final LinearLayout.LayoutParams[] subtitleViewLayoutParams;
         private ValueAnimator switchAnimator;
@@ -490,7 +575,7 @@ public class StarGiftSheet extends BottomSheet {
             }
         }
 
-        public TopView(Context context, Theme.ResourcesProvider resourcesProvider, final Runnable runnable) {
+        public TopView(Context context, Theme.ResourcesProvider resourcesProvider, final Runnable runnable, View.OnClickListener onClickListener, View.OnClickListener onClickListener2) {
             super(context);
             this.imageView = new BackupImageView[3];
             this.currentImageIndex = 0;
@@ -599,6 +684,26 @@ public class StarGiftSheet extends BottomSheet {
                     runnable.run();
                 }
             });
+            imageView.setVisibility(8);
+            ImageView imageView2 = new ImageView(context);
+            this.optionsView = imageView2;
+            imageView2.setImageResource(R.drawable.media_more);
+            ImageView.ScaleType scaleType = ImageView.ScaleType.CENTER;
+            imageView2.setScaleType(scaleType);
+            imageView2.setBackground(Theme.createSelectorDrawable(553648127, 1));
+            ScaleStateListAnimator.apply(imageView2);
+            addView(imageView2, LayoutHelper.createFrame(42, 42.0f, 53, 0.0f, 5.0f, 5.0f, 0.0f));
+            imageView2.setOnClickListener(onClickListener);
+            imageView2.setVisibility(8);
+            ImageView imageView3 = new ImageView(context);
+            this.shareView = imageView3;
+            imageView3.setImageResource(R.drawable.msg_header_share);
+            imageView3.setScaleType(scaleType);
+            imageView3.setBackground(Theme.createSelectorDrawable(553648127, 1));
+            ScaleStateListAnimator.apply(imageView3);
+            addView(imageView3, LayoutHelper.createFrame(42, 42.0f, 53, 0.0f, 5.0f, 47.0f, 0.0f));
+            imageView3.setOnClickListener(onClickListener2);
+            imageView3.setVisibility(8);
         }
 
         private void animateSwitch() {
@@ -764,7 +869,7 @@ public class StarGiftSheet extends BottomSheet {
             }
         }
 
-        public void setGift(TL_stars.StarGift starGift) {
+        public void setGift(TL_stars.StarGift starGift, boolean z) {
             LinkSpanDrawable.LinksTextView linksTextView;
             float f;
             if (starGift instanceof TL_stars.TL_starGiftUnique) {
@@ -779,8 +884,10 @@ public class StarGiftSheet extends BottomSheet {
                 f = 14.0f;
             }
             linksTextView.setTextSize(1, f);
+            this.hasLink = z;
             setBackdropPaint(0, this.backdrop[0]);
             StarsIntroActivity.setGiftImage(this.imageView[0].getImageReceiver(), starGift, 160);
+            onSwitchPage(this.currentPage);
         }
 
         public void setPreviewingAttributes(ArrayList<TL_stars.StarGiftAttribute> arrayList) {
@@ -931,13 +1038,13 @@ public class StarGiftSheet extends BottomSheet {
         linearLayout2.setOrientation(1);
         linearLayout2.setPadding(AndroidUtilities.dp(4.0f) + this.backgroundPaddingLeft, AndroidUtilities.dp(24.0f), AndroidUtilities.dp(4.0f) + this.backgroundPaddingLeft, AndroidUtilities.dp(56.0f));
         this.containerView.addView(linearLayout2, LayoutHelper.createFrame(-1, -1, 87));
-        this.featureCells = r8;
+        this.featureCells = r6;
         AffiliateProgramFragment.FeatureCell featureCell = new AffiliateProgramFragment.FeatureCell(context, resourcesProvider);
         featureCell.set(R.drawable.menu_feature_unique, LocaleController.getString(R.string.Gift2UpgradeFeature1Title), LocaleController.getString(R.string.Gift2UpgradeFeature1Text));
-        linearLayout2.addView(r8[0], LayoutHelper.createLinear(-1, -2));
+        linearLayout2.addView(r6[0], LayoutHelper.createLinear(-1, -2));
         AffiliateProgramFragment.FeatureCell featureCell2 = new AffiliateProgramFragment.FeatureCell(context, resourcesProvider);
         featureCell2.set(R.drawable.menu_feature_transfer, LocaleController.getString(R.string.Gift2UpgradeFeature2Title), LocaleController.getString(R.string.Gift2UpgradeFeature2Text));
-        linearLayout2.addView(r8[1], LayoutHelper.createLinear(-1, -2));
+        linearLayout2.addView(r6[1], LayoutHelper.createLinear(-1, -2));
         AffiliateProgramFragment.FeatureCell[] featureCellArr = {featureCell, featureCell2, new AffiliateProgramFragment.FeatureCell(context, resourcesProvider)};
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Gift2UpgradeFeature3Title));
         spannableStringBuilder.append((CharSequence) "  d");
@@ -984,6 +1091,16 @@ public class StarGiftSheet extends BottomSheet {
             public final void run() {
                 StarGiftSheet.this.onBackPressed();
             }
+        }, new View.OnClickListener() {
+            @Override
+            public final void onClick(View view2) {
+                StarGiftSheet.this.onMenuPressed(view2);
+            }
+        }, new View.OnClickListener() {
+            @Override
+            public final void onClick(View view2) {
+                StarGiftSheet.this.onSharePressed(view2);
+            }
         });
         this.topView = topView;
         int i4 = this.backgroundPaddingLeft;
@@ -992,6 +1109,25 @@ public class StarGiftSheet extends BottomSheet {
         FireworksOverlay fireworksOverlay = new FireworksOverlay(context);
         this.fireworksOverlay = fireworksOverlay;
         this.container.addView(fireworksOverlay, LayoutHelper.createFrame(-1, -1.0f));
+    }
+
+    private void addAttributeRow(final TL_stars.StarGiftAttribute starGiftAttribute) {
+        int i;
+        if (starGiftAttribute instanceof TL_stars.starGiftAttributeModel) {
+            i = R.string.Gift2AttributeModel;
+        } else if (starGiftAttribute instanceof TL_stars.starGiftAttributeBackdrop) {
+            i = R.string.Gift2AttributeBackdrop;
+        } else if (!(starGiftAttribute instanceof TL_stars.starGiftAttributePattern)) {
+            return;
+        } else {
+            i = R.string.Gift2AttributeSymbol;
+        }
+        final ButtonSpan.TextViewButtons[] textViewButtonsArr = {(ButtonSpan.TextViewButtons) ((TableView.TableRowContent) this.tableView.addRow(LocaleController.getString(i), starGiftAttribute.name, AffiliateProgramFragment.percents(starGiftAttribute.rarity_permille), new Runnable() {
+            @Override
+            public final void run() {
+                StarGiftSheet.this.lambda$addAttributeRow$8(starGiftAttribute, textViewButtonsArr);
+            }
+        }).getChildAt(1)).getChildAt(0)};
     }
 
     private boolean applyNewGiftFromUpdates(TLRPC.Updates updates) {
@@ -1019,7 +1155,9 @@ public class StarGiftSheet extends BottomSheet {
         }
         this.userStarGift = null;
         this.myProfile = false;
-        set(new MessageObject(this.currentAccount, tL_updateNewMessage.message, false, false));
+        MessageObject messageObject = new MessageObject(this.currentAccount, tL_updateNewMessage.message, false, false);
+        messageObject.setType();
+        set(messageObject);
         return true;
     }
 
@@ -1086,7 +1224,7 @@ public class StarGiftSheet extends BottomSheet {
         new AlertDialog.Builder(getContext(), this.resourcesProvider).setTitle(LocaleController.getString(R.string.Gift2ConvertTitle)).setMessage(AndroidUtilities.replaceTags(LocaleController.formatPluralString("Gift2ConvertText2", max, (user == null || UserObject.isService(j)) ? LocaleController.getString(R.string.StarsTransactionHidden) : UserObject.getForcedFirstName(user), LocaleController.formatPluralStringComma("Gift2ConvertStars", (int) j3)))).setPositiveButton(LocaleController.getString(R.string.Gift2ConvertButton), new DialogInterface.OnClickListener() {
             @Override
             public final void onClick(DialogInterface dialogInterface, int i6) {
-                StarGiftSheet.this.lambda$convert$29(i, j2, clientUserId, j7, dialogInterface, i6);
+                StarGiftSheet.this.lambda$convert$35(i, j2, clientUserId, j7, dialogInterface, i6);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
     }
@@ -1128,12 +1266,22 @@ public class StarGiftSheet extends BottomSheet {
             requestDelegate = new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    StarGiftSheet.this.lambda$doTransfer$53(runnable, j, str2, tLObject, tL_error);
+                    StarGiftSheet.this.lambda$doTransfer$64(runnable, j, str2, tLObject, tL_error);
                 }
             };
             tL_payments_getPaymentForm = transferstargift;
             connectionsManager = connectionsManager2;
         } else {
+            final StarsController starsController = StarsController.getInstance(this.currentAccount);
+            if (!starsController.balanceAvailable()) {
+                starsController.getBalance(new Runnable() {
+                    @Override
+                    public final void run() {
+                        StarGiftSheet.this.lambda$doTransfer$65(starsController, j, runnable);
+                    }
+                });
+                return;
+            }
             final TLRPC.TL_inputInvoiceStarGiftTransfer tL_inputInvoiceStarGiftTransfer = new TLRPC.TL_inputInvoiceStarGiftTransfer();
             tL_inputInvoiceStarGiftTransfer.msg_id = i;
             tL_inputInvoiceStarGiftTransfer.to_id = MessagesController.getInstance(this.currentAccount).getInputUser(j);
@@ -1150,7 +1298,7 @@ public class StarGiftSheet extends BottomSheet {
             requestDelegate = new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    StarGiftSheet.this.lambda$doTransfer$61(tL_inputInvoiceStarGiftTransfer, runnable, j, str, tLObject, tL_error);
+                    StarGiftSheet.this.lambda$doTransfer$74(tL_inputInvoiceStarGiftTransfer, runnable, j, str, tLObject, tL_error);
                 }
             };
             tL_payments_getPaymentForm = tL_payments_getPaymentForm2;
@@ -1193,7 +1341,17 @@ public class StarGiftSheet extends BottomSheet {
                 ConnectionsManager.getInstance(this.currentAccount).sendRequest(upgradestargift, new RequestDelegate() {
                     @Override
                     public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                        StarGiftSheet.this.lambda$doUpgrade$42(tLObject, tL_error);
+                        StarGiftSheet.this.lambda$doUpgrade$51(tLObject, tL_error);
+                    }
+                });
+                return;
+            }
+            final StarsController starsController = StarsController.getInstance(this.currentAccount);
+            if (!starsController.balanceAvailable()) {
+                starsController.getBalance(new Runnable() {
+                    @Override
+                    public final void run() {
+                        StarGiftSheet.this.lambda$doUpgrade$52(starsController);
                     }
                 });
                 return;
@@ -1207,24 +1365,67 @@ public class StarGiftSheet extends BottomSheet {
             ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_payments_sendStarsForm, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    StarGiftSheet.this.lambda$doUpgrade$47(j, tLObject, tL_error);
+                    StarGiftSheet.this.lambda$doUpgrade$58(j, tLObject, tL_error);
                 }
             });
         }
     }
 
-    public static void lambda$convert$26(StarsIntroActivity starsIntroActivity, long j) {
+    private long getDialogId() {
+        MessageObject messageObject = this.messageObject;
+        if (messageObject != null) {
+            TLRPC.Message message = messageObject.messageOwner;
+            if (message == null) {
+                return 0L;
+            }
+            TLRPC.MessageAction messageAction = message.action;
+            if (messageAction instanceof TLRPC.TL_messageActionStarGift) {
+                return messageObject.isOutOwner() ? this.messageObject.getDialogId() : UserConfig.getInstance(this.currentAccount).getClientUserId();
+            }
+            if (messageAction instanceof TLRPC.TL_messageActionStarGiftUnique) {
+                TL_stars.StarGift starGift = ((TLRPC.TL_messageActionStarGiftUnique) messageAction).gift;
+                if (starGift instanceof TL_stars.TL_starGiftUnique) {
+                    return starGift.owner_id;
+                }
+            }
+        } else {
+            TL_stars.UserStarGift userStarGift = this.userStarGift;
+            if (userStarGift != null) {
+                TL_stars.StarGift starGift2 = userStarGift.gift;
+                return starGift2 instanceof TL_stars.TL_starGiftUnique ? ((TL_stars.TL_starGiftUnique) starGift2).owner_id : this.dialogId;
+            }
+            TL_stars.TL_starGiftUnique tL_starGiftUnique = this.slugStarGift;
+            if (tL_starGiftUnique != null) {
+                return tL_starGiftUnique.owner_id;
+            }
+        }
+        return 0L;
+    }
+
+    private String getLink() {
+        TL_stars.StarGift gift = getGift();
+        if (!(gift instanceof TL_stars.TL_starGiftUnique) || gift.slug == null) {
+            return null;
+        }
+        return MessagesController.getInstance(this.currentAccount).linkPrefix + "/nft/" + gift.slug;
+    }
+
+    public void lambda$addAttributeRow$8(TL_stars.StarGiftAttribute starGiftAttribute, ButtonSpan.TextViewButtons[] textViewButtonsArr) {
+        showHint(starGiftAttribute.rarity_permille, textViewButtonsArr[0]);
+    }
+
+    public static void lambda$convert$32(StarsIntroActivity starsIntroActivity, long j) {
         BulletinFactory.of(starsIntroActivity).createSimpleBulletin(R.raw.stars_topup, LocaleController.getString(R.string.Gift2ConvertedTitle), LocaleController.formatPluralStringComma("Gift2Converted", (int) j)).show(true);
     }
 
-    public void lambda$convert$27(AlertDialog alertDialog, TLObject tLObject, long j, long j2, final long j3, TLRPC.TL_error tL_error) {
+    public void lambda$convert$33(AlertDialog alertDialog, TLObject tLObject, long j, long j2, final long j3, TLRPC.TL_error tL_error) {
         alertDialog.dismissUnless(400L);
         BaseFragment safeLastFragment = LaunchActivity.getSafeLastFragment();
         if (safeLastFragment == null) {
             return;
         }
         if (!(tLObject instanceof TLRPC.TL_boolTrue)) {
-            BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).createErrorBulletin(tL_error != null ? LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text) : LocaleController.getString(R.string.UnknownError)).show(false);
+            getBulletinFactory().createErrorBulletin(tL_error != null ? LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text) : LocaleController.getString(R.string.UnknownError)).show(false);
             return;
         }
         dismiss();
@@ -1247,22 +1448,22 @@ public class StarGiftSheet extends BottomSheet {
         starsIntroActivity.whenFullyVisible(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.lambda$convert$26(StarsIntroActivity.this, j3);
+                StarGiftSheet.lambda$convert$32(StarsIntroActivity.this, j3);
             }
         });
         safeLastFragment.presentFragment(starsIntroActivity);
     }
 
-    public void lambda$convert$28(final AlertDialog alertDialog, final long j, final long j2, final long j3, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$convert$34(final AlertDialog alertDialog, final long j, final long j2, final long j3, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$convert$27(alertDialog, tLObject, j, j2, j3, tL_error);
+                StarGiftSheet.this.lambda$convert$33(alertDialog, tLObject, j, j2, j3, tL_error);
             }
         });
     }
 
-    public void lambda$convert$29(int i, final long j, final long j2, final long j3, DialogInterface dialogInterface, int i2) {
+    public void lambda$convert$35(int i, final long j, final long j2, final long j3, DialogInterface dialogInterface, int i2) {
         final AlertDialog alertDialog = new AlertDialog(ApplicationLoader.applicationContext, 3);
         alertDialog.showDelayed(500L);
         TL_stars.convertStarGift convertstargift = new TL_stars.convertStarGift();
@@ -1270,16 +1471,16 @@ public class StarGiftSheet extends BottomSheet {
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(convertstargift, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                StarGiftSheet.this.lambda$convert$28(alertDialog, j, j2, j3, tLObject, tL_error);
+                StarGiftSheet.this.lambda$convert$34(alertDialog, j, j2, j3, tLObject, tL_error);
             }
         });
     }
 
-    public static void lambda$doTransfer$51(ChatActivity chatActivity, String str, TLRPC.User user) {
+    public static void lambda$doTransfer$62(ChatActivity chatActivity, String str, TLRPC.User user) {
         BulletinFactory.of(chatActivity).createSimpleBulletin(R.raw.forward, LocaleController.getString(R.string.Gift2TransferredTitle), AndroidUtilities.replaceTags(LocaleController.formatString(R.string.Gift2TransferredText, str, UserObject.getForcedFirstName(user)))).show(true);
     }
 
-    public void lambda$doTransfer$52(Runnable runnable, TLObject tLObject, long j, final String str, TLRPC.TL_error tL_error) {
+    public void lambda$doTransfer$63(Runnable runnable, TLObject tLObject, long j, final String str, TLRPC.TL_error tL_error) {
         if (runnable != null) {
             runnable.run();
         }
@@ -1291,7 +1492,7 @@ public class StarGiftSheet extends BottomSheet {
                 of.whenFullyVisible(new Runnable() {
                     @Override
                     public final void run() {
-                        StarGiftSheet.lambda$doTransfer$51(ChatActivity.this, str, user);
+                        StarGiftSheet.lambda$doTransfer$62(ChatActivity.this, str, user);
                     }
                 });
                 safeLastFragment.presentFragment(of);
@@ -1302,61 +1503,77 @@ public class StarGiftSheet extends BottomSheet {
         StarsController.getInstance(this.currentAccount).invalidateProfileGifts(UserConfig.getInstance(this.currentAccount).getClientUserId());
     }
 
-    public void lambda$doTransfer$53(final Runnable runnable, final long j, final String str, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$doTransfer$64(final Runnable runnable, final long j, final String str, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         if (tLObject instanceof TLRPC.Updates) {
             MessagesController.getInstance(this.currentAccount).processUpdates((TLRPC.Updates) tLObject, false);
         }
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$doTransfer$52(runnable, tLObject, j, str, tL_error);
+                StarGiftSheet.this.lambda$doTransfer$63(runnable, tLObject, j, str, tL_error);
             }
         });
     }
 
-    public static void lambda$doTransfer$54(ChatActivity chatActivity, String str, TLRPC.User user) {
+    public void lambda$doTransfer$65(StarsController starsController, long j, Runnable runnable) {
+        if (starsController.balanceAvailable()) {
+            doTransfer(j, runnable);
+        } else {
+            getBulletinFactory().createSimpleBulletin(R.raw.error, LocaleController.formatString(R.string.UnknownErrorCode, "NO_BALANCE")).show();
+        }
+    }
+
+    public static void lambda$doTransfer$66(ChatActivity chatActivity, String str, TLRPC.User user) {
         BulletinFactory.of(chatActivity).createSimpleBulletin(R.raw.forward, LocaleController.getString(R.string.Gift2TransferredTitle), AndroidUtilities.replaceTags(LocaleController.formatString(R.string.Gift2TransferredText, str, UserObject.getForcedFirstName(user)))).show(true);
     }
 
-    public void lambda$doTransfer$55(TLRPC.TL_payments_paymentResult tL_payments_paymentResult) {
+    public void lambda$doTransfer$67(TLRPC.TL_payments_paymentResult tL_payments_paymentResult) {
         MessagesController.getInstance(this.currentAccount).processUpdates(tL_payments_paymentResult.updates, false);
     }
 
-    public void lambda$doTransfer$56(boolean[] zArr, long j, Runnable runnable) {
+    public void lambda$doTransfer$68(boolean[] zArr, long j, Runnable runnable) {
         zArr[0] = true;
         this.button.setLoading(false);
         doTransfer(j, runnable);
     }
 
-    public void lambda$doTransfer$57(DialogInterface dialogInterface) {
+    public void lambda$doTransfer$69(DialogInterface dialogInterface) {
         this.button.setLoading(false);
     }
 
-    public void lambda$doTransfer$58(TLObject tLObject, final Runnable runnable, final long j, final String str, TLRPC.TL_error tL_error, long j2) {
+    public void lambda$doTransfer$70(long j, final long j2, final Runnable runnable) {
+        final boolean[] zArr = {false};
+        StarsIntroActivity.StarsNeededSheet starsNeededSheet = new StarsIntroActivity.StarsNeededSheet(getContext(), this.resourcesProvider, j, 11, null, new Runnable() {
+            @Override
+            public final void run() {
+                StarGiftSheet.this.lambda$doTransfer$68(zArr, j2, runnable);
+            }
+        });
+        starsNeededSheet.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public final void onDismiss(DialogInterface dialogInterface) {
+                StarGiftSheet.this.lambda$doTransfer$69(dialogInterface);
+            }
+        });
+        starsNeededSheet.show();
+    }
+
+    public void lambda$doTransfer$71(TLObject tLObject, final Runnable runnable, final long j, final String str, TLRPC.TL_error tL_error, final long j2) {
         if (!(tLObject instanceof TLRPC.TL_payments_paymentResult)) {
             if (tL_error == null || !"BALANCE_TOO_LOW".equals(tL_error.text)) {
-                BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).showForError(tL_error);
+                getBulletinFactory().showForError(tL_error);
                 return;
-            }
-            if (!MessagesController.getInstance(this.currentAccount).starsPurchaseAvailable()) {
-                this.button.setLoading(false);
-                StarsController.showNoSupportDialog(getContext(), this.resourcesProvider);
-                return;
-            } else {
-                final boolean[] zArr = {false};
-                StarsIntroActivity.StarsNeededSheet starsNeededSheet = new StarsIntroActivity.StarsNeededSheet(getContext(), this.resourcesProvider, j2, 11, null, new Runnable() {
+            } else if (MessagesController.getInstance(this.currentAccount).starsPurchaseAvailable()) {
+                StarsController.getInstance(this.currentAccount).invalidateBalance(new Runnable() {
                     @Override
                     public final void run() {
-                        StarGiftSheet.this.lambda$doTransfer$56(zArr, j, runnable);
+                        StarGiftSheet.this.lambda$doTransfer$70(j2, j, runnable);
                     }
                 });
-                starsNeededSheet.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public final void onDismiss(DialogInterface dialogInterface) {
-                        StarGiftSheet.this.lambda$doTransfer$57(dialogInterface);
-                    }
-                });
-                starsNeededSheet.show();
+                return;
+            } else {
+                this.button.setLoading(false);
+                StarsController.showNoSupportDialog(getContext(), this.resourcesProvider);
                 return;
             }
         }
@@ -1376,7 +1593,7 @@ public class StarGiftSheet extends BottomSheet {
             of.whenFullyVisible(new Runnable() {
                 @Override
                 public final void run() {
-                    StarGiftSheet.lambda$doTransfer$54(ChatActivity.this, str, user);
+                    StarGiftSheet.lambda$doTransfer$66(ChatActivity.this, str, user);
                 }
             });
             safeLastFragment.presentFragment(of);
@@ -1384,23 +1601,23 @@ public class StarGiftSheet extends BottomSheet {
         Utilities.stageQueue.postRunnable(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$doTransfer$55(tL_payments_paymentResult);
+                StarGiftSheet.this.lambda$doTransfer$67(tL_payments_paymentResult);
             }
         });
     }
 
-    public void lambda$doTransfer$59(final Runnable runnable, final long j, final String str, final long j2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$doTransfer$72(final Runnable runnable, final long j, final String str, final long j2, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$doTransfer$58(tLObject, runnable, j, str, tL_error, j2);
+                StarGiftSheet.this.lambda$doTransfer$71(tLObject, runnable, j, str, tL_error, j2);
             }
         });
     }
 
-    public void lambda$doTransfer$60(TLObject tLObject, TLRPC.TL_inputInvoiceStarGiftTransfer tL_inputInvoiceStarGiftTransfer, final Runnable runnable, final long j, final String str, TLRPC.TL_error tL_error) {
+    public void lambda$doTransfer$73(TLObject tLObject, TLRPC.TL_inputInvoiceStarGiftTransfer tL_inputInvoiceStarGiftTransfer, final Runnable runnable, final long j, final String str, TLRPC.TL_error tL_error) {
         if (!(tLObject instanceof TLRPC.PaymentForm)) {
-            BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).makeForError(tL_error).show();
+            getBulletinFactory().makeForError(tL_error).show();
             return;
         }
         TLRPC.PaymentForm paymentForm = (TLRPC.PaymentForm) tLObject;
@@ -1416,28 +1633,28 @@ public class StarGiftSheet extends BottomSheet {
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_payments_sendStarsForm, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject2, TLRPC.TL_error tL_error2) {
-                StarGiftSheet.this.lambda$doTransfer$59(runnable, j, str, j2, tLObject2, tL_error2);
+                StarGiftSheet.this.lambda$doTransfer$72(runnable, j, str, j2, tLObject2, tL_error2);
             }
         });
     }
 
-    public void lambda$doTransfer$61(final TLRPC.TL_inputInvoiceStarGiftTransfer tL_inputInvoiceStarGiftTransfer, final Runnable runnable, final long j, final String str, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$doTransfer$74(final TLRPC.TL_inputInvoiceStarGiftTransfer tL_inputInvoiceStarGiftTransfer, final Runnable runnable, final long j, final String str, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$doTransfer$60(tLObject, tL_inputInvoiceStarGiftTransfer, runnable, j, str, tL_error);
+                StarGiftSheet.this.lambda$doTransfer$73(tLObject, tL_inputInvoiceStarGiftTransfer, runnable, j, str, tL_error);
             }
         });
     }
 
-    public void lambda$doUpgrade$40(TLObject tLObject) {
+    public void lambda$doUpgrade$49(TLObject tLObject) {
         MessagesController.getInstance(this.currentAccount).processUpdates((TLRPC.Updates) tLObject, false);
     }
 
-    public void lambda$doUpgrade$41(TLRPC.TL_error tL_error, final TLObject tLObject) {
+    public void lambda$doUpgrade$50(TLRPC.TL_error tL_error, final TLObject tLObject) {
         String str;
         if (tL_error != null || !(tLObject instanceof TLRPC.Updates)) {
-            BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).showForError(tL_error);
+            getBulletinFactory().showForError(tL_error);
             return;
         }
         StarsController.getInstance(this.currentAccount).invalidateProfileGifts(UserConfig.getInstance(this.currentAccount).getClientUserId());
@@ -1453,16 +1670,16 @@ public class StarGiftSheet extends BottomSheet {
         } else {
             str = "";
         }
-        BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).createSimpleBulletin(R.raw.gift_upgrade, LocaleController.getString(R.string.Gift2UpgradedTitle), AndroidUtilities.replaceTags(LocaleController.formatString(R.string.Gift2UpgradedText, str))).setDuration(5000).show();
+        getBulletinFactory().createSimpleBulletin(R.raw.gift_upgrade, LocaleController.getString(R.string.Gift2UpgradedTitle), AndroidUtilities.replaceTags(LocaleController.formatString(R.string.Gift2UpgradedText, str))).setDuration(5000).show();
         Utilities.stageQueue.postRunnable(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$doUpgrade$40(tLObject);
+                StarGiftSheet.this.lambda$doUpgrade$49(tLObject);
             }
         });
     }
 
-    public void lambda$doUpgrade$42(final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$doUpgrade$51(final TLObject tLObject, final TLRPC.TL_error tL_error) {
         if (tLObject instanceof TLRPC.Updates) {
             TLRPC.Updates updates = (TLRPC.Updates) tLObject;
             MessagesController.getInstance(this.currentAccount).putUsers(updates.users, false);
@@ -1471,51 +1688,68 @@ public class StarGiftSheet extends BottomSheet {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$doUpgrade$41(tL_error, tLObject);
+                StarGiftSheet.this.lambda$doUpgrade$50(tL_error, tLObject);
             }
         });
     }
 
-    public void lambda$doUpgrade$43(TLRPC.TL_payments_paymentResult tL_payments_paymentResult) {
+    public void lambda$doUpgrade$52(StarsController starsController) {
+        if (!starsController.balanceAvailable()) {
+            getBulletinFactory().createSimpleBulletin(R.raw.error, LocaleController.formatString(R.string.UnknownErrorCode, "NO_BALANCE")).show();
+        } else {
+            this.button.setLoading(false);
+            doUpgrade();
+        }
+    }
+
+    public void lambda$doUpgrade$53(TLRPC.TL_payments_paymentResult tL_payments_paymentResult) {
         MessagesController.getInstance(this.currentAccount).processUpdates(tL_payments_paymentResult.updates, false);
     }
 
-    public void lambda$doUpgrade$44(boolean[] zArr) {
+    public void lambda$doUpgrade$54(boolean[] zArr) {
         zArr[0] = true;
         this.button.setLoading(false);
         doUpgrade();
     }
 
-    public void lambda$doUpgrade$45(DialogInterface dialogInterface) {
+    public void lambda$doUpgrade$55(DialogInterface dialogInterface) {
         this.button.setLoading(false);
     }
 
-    public void lambda$doUpgrade$46(TLObject tLObject, TLRPC.TL_error tL_error, long j) {
+    public void lambda$doUpgrade$56(long j) {
+        final boolean[] zArr = {false};
+        StarsIntroActivity.StarsNeededSheet starsNeededSheet = new StarsIntroActivity.StarsNeededSheet(getContext(), this.resourcesProvider, j, 10, null, new Runnable() {
+            @Override
+            public final void run() {
+                StarGiftSheet.this.lambda$doUpgrade$54(zArr);
+            }
+        });
+        starsNeededSheet.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public final void onDismiss(DialogInterface dialogInterface) {
+                StarGiftSheet.this.lambda$doUpgrade$55(dialogInterface);
+            }
+        });
+        starsNeededSheet.show();
+    }
+
+    public void lambda$doUpgrade$57(TLObject tLObject, TLRPC.TL_error tL_error, final long j) {
         String str;
         if (!(tLObject instanceof TLRPC.TL_payments_paymentResult)) {
             if (tL_error == null || !"BALANCE_TOO_LOW".equals(tL_error.text)) {
-                BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).showForError(tL_error);
+                getBulletinFactory().showForError(tL_error);
                 return;
-            }
-            if (!MessagesController.getInstance(this.currentAccount).starsPurchaseAvailable()) {
-                this.button.setLoading(false);
-                StarsController.showNoSupportDialog(getContext(), this.resourcesProvider);
-                return;
-            } else {
-                final boolean[] zArr = {false};
-                StarsIntroActivity.StarsNeededSheet starsNeededSheet = new StarsIntroActivity.StarsNeededSheet(getContext(), this.resourcesProvider, j, 10, null, new Runnable() {
+            } else if (MessagesController.getInstance(this.currentAccount).starsPurchaseAvailable()) {
+                StarsController.getInstance(this.currentAccount).invalidateBalance(new Runnable() {
                     @Override
                     public final void run() {
-                        StarGiftSheet.this.lambda$doUpgrade$44(zArr);
+                        StarGiftSheet.this.lambda$doUpgrade$56(j);
                     }
                 });
-                starsNeededSheet.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public final void onDismiss(DialogInterface dialogInterface) {
-                        StarGiftSheet.this.lambda$doUpgrade$45(dialogInterface);
-                    }
-                });
-                starsNeededSheet.show();
+                return;
+            } else {
+                this.button.setLoading(false);
+                StarsController.showNoSupportDialog(getContext(), this.resourcesProvider);
                 return;
             }
         }
@@ -1537,20 +1771,20 @@ public class StarGiftSheet extends BottomSheet {
         } else {
             str = "";
         }
-        BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).createSimpleBulletin(R.raw.gift_upgrade, LocaleController.getString(R.string.Gift2UpgradedTitle), AndroidUtilities.replaceTags(LocaleController.formatString(R.string.Gift2UpgradedText, str))).setDuration(5000).show();
+        getBulletinFactory().createSimpleBulletin(R.raw.gift_upgrade, LocaleController.getString(R.string.Gift2UpgradedTitle), AndroidUtilities.replaceTags(LocaleController.formatString(R.string.Gift2UpgradedText, str))).setDuration(5000).show();
         Utilities.stageQueue.postRunnable(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$doUpgrade$43(tL_payments_paymentResult);
+                StarGiftSheet.this.lambda$doUpgrade$53(tL_payments_paymentResult);
             }
         });
     }
 
-    public void lambda$doUpgrade$47(final long j, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$doUpgrade$58(final long j, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$doUpgrade$46(tLObject, tL_error, j);
+                StarGiftSheet.this.lambda$doUpgrade$57(tLObject, tL_error, j);
             }
         });
     }
@@ -1562,11 +1796,20 @@ public class StarGiftSheet extends BottomSheet {
         this.checkbox.setChecked(!r3.isChecked(), true);
     }
 
-    public void lambda$openAsLearnMore$24(View view) {
+    public void lambda$onMenuPressed$1(String str) {
+        AndroidUtilities.addToClipboard(str);
+        getBulletinFactory().createCopyLinkBulletin(false).show();
+    }
+
+    public void lambda$onMenuPressed$2() {
+        onSharePressed(null);
+    }
+
+    public void lambda$openAsLearnMore$30(View view) {
         dismiss();
     }
 
-    public void lambda$openAsLearnMore$25(String str, TL_stars.starGiftUpgradePreview stargiftupgradepreview) {
+    public void lambda$openAsLearnMore$31(String str, TL_stars.starGiftUpgradePreview stargiftupgradepreview) {
         if (stargiftupgradepreview == null) {
             return;
         }
@@ -1582,27 +1825,27 @@ public class StarGiftSheet extends BottomSheet {
         this.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                StarGiftSheet.this.lambda$openAsLearnMore$24(view);
+                StarGiftSheet.this.lambda$openAsLearnMore$30(view);
             }
         });
         show();
     }
 
-    public void lambda$openTransfer$48(UserSelectorBottomSheet[] userSelectorBottomSheetArr) {
+    public void lambda$openTransfer$59(UserSelectorBottomSheet[] userSelectorBottomSheetArr) {
         userSelectorBottomSheetArr[0].dismiss();
         dismiss();
     }
 
-    public void lambda$openTransfer$49(Long l, final UserSelectorBottomSheet[] userSelectorBottomSheetArr, DialogInterface dialogInterface, int i) {
+    public void lambda$openTransfer$60(Long l, final UserSelectorBottomSheet[] userSelectorBottomSheetArr, DialogInterface dialogInterface, int i) {
         doTransfer(l.longValue(), new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$openTransfer$48(userSelectorBottomSheetArr);
+                StarGiftSheet.this.lambda$openTransfer$59(userSelectorBottomSheetArr);
             }
         });
     }
 
-    public void lambda$openTransfer$50(int i, int i2, int i3, TL_stars.TL_starGiftUnique tL_starGiftUnique, long j, String str, final UserSelectorBottomSheet[] userSelectorBottomSheetArr, final Long l) {
+    public void lambda$openTransfer$61(int i, int i2, int i3, TL_stars.TL_starGiftUnique tL_starGiftUnique, long j, String str, final UserSelectorBottomSheet[] userSelectorBottomSheetArr, final Long l) {
         AlertDialog.Builder title;
         String string;
         if (l.longValue() == -99) {
@@ -1626,16 +1869,16 @@ public class StarGiftSheet extends BottomSheet {
         textView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, this.resourcesProvider));
         textView.setTextSize(1, 16.0f);
         textView.setText(AndroidUtilities.replaceTags(j > 0 ? LocaleController.formatPluralString("Gift2TransferPriceText", (int) j, str, UserObject.getForcedFirstName(MessagesController.getInstance(this.currentAccount).getUser(l))) : LocaleController.formatString(R.string.Gift2TransferText, str, UserObject.getForcedFirstName(user))));
-        linearLayout.addView(textView, LayoutHelper.createLinear(-1, -2, 48, 24, 4, 24, 0));
+        linearLayout.addView(textView, LayoutHelper.createLinear(-1, -2, 48, 24, 4, 24, 4));
         new AlertDialog.Builder(getContext(), this.resourcesProvider).setView(linearLayout).setPositiveButton(j > 0 ? StarsIntroActivity.replaceStars(LocaleController.formatString(R.string.Gift2TransferDoPrice, Integer.valueOf((int) j))) : LocaleController.getString(R.string.Gift2TransferDo), new DialogInterface.OnClickListener() {
             @Override
             public final void onClick(DialogInterface dialogInterface, int i4) {
-                StarGiftSheet.this.lambda$openTransfer$49(l, userSelectorBottomSheetArr, dialogInterface, i4);
+                StarGiftSheet.this.lambda$openTransfer$60(l, userSelectorBottomSheetArr, dialogInterface, i4);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
     }
 
-    public void lambda$openUpgrade$36(TL_stars.starGiftUpgradePreview stargiftupgradepreview) {
+    public void lambda$openUpgrade$45(TL_stars.starGiftUpgradePreview stargiftupgradepreview) {
         if (stargiftupgradepreview == null) {
             return;
         }
@@ -1643,9 +1886,9 @@ public class StarGiftSheet extends BottomSheet {
         openUpgradeAfter();
     }
 
-    public void lambda$openUpgrade$37(TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$openUpgrade$46(TLObject tLObject, TLRPC.TL_error tL_error) {
         if (!(tLObject instanceof TLRPC.PaymentForm)) {
-            BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).makeForError(tL_error).show();
+            getBulletinFactory().makeForError(tL_error).show();
             return;
         }
         TLRPC.PaymentForm paymentForm = (TLRPC.PaymentForm) tLObject;
@@ -1654,60 +1897,69 @@ public class StarGiftSheet extends BottomSheet {
         openUpgradeAfter();
     }
 
-    public void lambda$openUpgrade$38(final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$openUpgrade$47(final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$openUpgrade$37(tLObject, tL_error);
+                StarGiftSheet.this.lambda$openUpgrade$46(tLObject, tL_error);
             }
         });
     }
 
-    public void lambda$openUpgradeAfter$39(View view) {
+    public void lambda$openUpgradeAfter$48(View view) {
         doUpgrade();
     }
 
-    public void lambda$set$11(long j) {
-        new GiftSheet(getContext(), this.currentAccount, j, new StarGiftSheet$$ExternalSyntheticLambda30(this)).show();
+    public void lambda$repostStory$5(Long l) {
+        TLRPC.Chat chat;
+        String str = (l.longValue() >= 0 || (chat = MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(-l.longValue()))) == null) ? "" : chat.title;
+        getBulletinFactory().createSimpleBulletin(R.raw.contact_check, AndroidUtilities.replaceTags(TextUtils.isEmpty(str) ? LocaleController.getString(R.string.GiftRepostedToProfile) : LocaleController.formatString(R.string.GiftRepostedToChannelProfile, str))).show();
     }
 
-    public void lambda$set$12(View view) {
-        openUpgrade();
+    public void lambda$repostStory$6(StoryRecorder storyRecorder, View view, Long l, Runnable runnable, Boolean bool, final Long l2) {
+        boolean booleanValue = bool.booleanValue();
+        StoryRecorder.SourceView sourceView = null;
+        if (booleanValue) {
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    StarGiftSheet.this.lambda$repostStory$5(l2);
+                }
+            });
+            storyRecorder.replaceSourceView(null);
+            ShareAlert shareAlert = this.shareAlert;
+            if (shareAlert != null) {
+                shareAlert.dismiss();
+                this.shareAlert = null;
+            }
+        } else {
+            if ((view instanceof ShareDialogCell) && view.isAttachedToWindow()) {
+                sourceView = StoryRecorder.SourceView.fromShareCell((ShareDialogCell) view);
+            }
+            storyRecorder.replaceSourceView(sourceView);
+        }
+        AndroidUtilities.runOnUIThread(runnable);
     }
 
-    public void lambda$set$13(View view) {
-        onBackPressed();
+    public void lambda$set$10(TL_stars.TL_starGiftUnique tL_starGiftUnique) {
+        lambda$set$23(tL_starGiftUnique.owner_id);
     }
 
-    public void lambda$set$14() {
-        new ExplainStarsSheet(getContext()).show();
-    }
-
-    public void lambda$set$16(long j) {
-        new GiftSheet(getContext(), this.currentAccount, j, new StarGiftSheet$$ExternalSyntheticLambda30(this)).show();
-    }
-
-    public void lambda$set$18(long j) {
-        new GiftSheet(getContext(), this.currentAccount, j, new StarGiftSheet$$ExternalSyntheticLambda30(this)).show();
-    }
-
-    public void lambda$set$19(MessageObject messageObject) {
+    public void lambda$set$11(MessageObject messageObject) {
         this.messageObjectRepolled = true;
         set(messageObject);
     }
 
-    public void lambda$set$2(TL_stars.TL_starGiftUnique tL_starGiftUnique) {
-        lambda$set$17(tL_starGiftUnique.owner_id);
-    }
-
-    public void lambda$set$20(TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$set$12(int i, TLObject tLObject, TLRPC.TL_error tL_error) {
         final MessageObject messageObject;
         if (tLObject instanceof TLRPC.messages_Messages) {
             TLRPC.messages_Messages messages_messages = (TLRPC.messages_Messages) tLObject;
-            for (int i = 0; i < messages_messages.messages.size(); i++) {
-                TLRPC.Message message = messages_messages.messages.get(i);
-                if (message != null && (message.action instanceof TLRPC.TL_messageActionStarGift)) {
+            MessagesController.getInstance(this.currentAccount).putUsers(messages_messages.users, false);
+            for (int i2 = 0; i2 < messages_messages.messages.size(); i2++) {
+                TLRPC.Message message = messages_messages.messages.get(i2);
+                if (message != null && message.id == i && (message.action instanceof TLRPC.TL_messageActionStarGiftUnique)) {
                     messageObject = new MessageObject(this.currentAccount, message, false, false);
+                    messageObject.setType();
                     break;
                 }
             }
@@ -1717,21 +1969,86 @@ public class StarGiftSheet extends BottomSheet {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    StarGiftSheet.this.lambda$set$19(messageObject);
+                    StarGiftSheet.this.lambda$set$11(messageObject);
                 }
             });
         }
     }
 
-    public void lambda$set$21(View view) {
-        openUpgrade();
+    public void lambda$set$13(View view) {
+        toggleShow();
     }
 
-    public void lambda$set$22(View view) {
+    public void lambda$set$14(View view) {
         onBackPressed();
     }
 
-    public void lambda$set$23(long j) {
+    public void lambda$set$15() {
+        new ExplainStarsSheet(getContext()).show();
+    }
+
+    public void lambda$set$17(long j) {
+        new GiftSheet(getContext(), this.currentAccount, j, new StarGiftSheet$$ExternalSyntheticLambda48(this)).show();
+    }
+
+    public void lambda$set$18(View view) {
+        openUpgrade();
+    }
+
+    public void lambda$set$19(View view) {
+        onBackPressed();
+    }
+
+    public void lambda$set$20() {
+        new ExplainStarsSheet(getContext()).show();
+    }
+
+    public void lambda$set$22(long j) {
+        new GiftSheet(getContext(), this.currentAccount, j, new StarGiftSheet$$ExternalSyntheticLambda48(this)).show();
+    }
+
+    public void lambda$set$24(long j) {
+        new GiftSheet(getContext(), this.currentAccount, j, new StarGiftSheet$$ExternalSyntheticLambda48(this)).show();
+    }
+
+    public void lambda$set$25(MessageObject messageObject) {
+        this.messageObjectRepolled = true;
+        set(messageObject);
+    }
+
+    public void lambda$set$26(TLObject tLObject, TLRPC.TL_error tL_error) {
+        final MessageObject messageObject;
+        if (tLObject instanceof TLRPC.messages_Messages) {
+            TLRPC.messages_Messages messages_messages = (TLRPC.messages_Messages) tLObject;
+            for (int i = 0; i < messages_messages.messages.size(); i++) {
+                TLRPC.Message message = messages_messages.messages.get(i);
+                if (message != null && (message.action instanceof TLRPC.TL_messageActionStarGift)) {
+                    messageObject = new MessageObject(this.currentAccount, message, false, false);
+                    messageObject.setType();
+                    break;
+                }
+            }
+        }
+        messageObject = null;
+        if (messageObject != null) {
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public final void run() {
+                    StarGiftSheet.this.lambda$set$25(messageObject);
+                }
+            });
+        }
+    }
+
+    public void lambda$set$27(View view) {
+        openUpgrade();
+    }
+
+    public void lambda$set$28(View view) {
+        onBackPressed();
+    }
+
+    public void lambda$set$29(long j) {
         BaseFragment safeLastFragment = LaunchActivity.getSafeLastFragment();
         if (safeLastFragment == null) {
             return;
@@ -1747,63 +2064,55 @@ public class StarGiftSheet extends BottomSheet {
         safeLastFragment.presentFragment(new ProfileActivity(bundle));
     }
 
-    public void lambda$set$3(TL_stars.TL_starGiftUnique tL_starGiftUnique) {
-        lambda$set$17(tL_starGiftUnique.owner_id);
+    public void lambda$set$9(TL_stars.TL_starGiftUnique tL_starGiftUnique) {
+        lambda$set$23(tL_starGiftUnique.owner_id);
     }
 
-    public void lambda$set$4(TL_stars.StarGiftAttribute starGiftAttribute, ButtonSpan.TextViewButtons[] textViewButtonsArr) {
-        showHint(starGiftAttribute.rarity_permille, textViewButtonsArr[0]);
+    public void lambda$show$39(TL_stars.TL_payments_uniqueStarGift tL_payments_uniqueStarGift) {
+        TL_stars.TL_starGiftUnique tL_starGiftUnique = (TL_stars.TL_starGiftUnique) tL_payments_uniqueStarGift.gift;
+        this.slugStarGift = tL_starGiftUnique;
+        set(tL_starGiftUnique, true, false);
+        super.show();
     }
 
-    public void lambda$set$5(MessageObject messageObject) {
-        this.messageObjectRepolled = true;
-        set(messageObject);
+    public static void lambda$show$40(AlertDialog alertDialog) {
+        alertDialog.dismiss();
+        BaseFragment safeLastFragment = LaunchActivity.getSafeLastFragment();
+        if (safeLastFragment != null) {
+            BulletinFactory.of(safeLastFragment).createSimpleBulletin(R.raw.error, LocaleController.getString(R.string.UniqueGiftNotFound)).show();
+        }
     }
 
-    public void lambda$set$6(int i, TLObject tLObject, TLRPC.TL_error tL_error) {
-        final MessageObject messageObject;
-        if (tLObject instanceof TLRPC.messages_Messages) {
-            TLRPC.messages_Messages messages_messages = (TLRPC.messages_Messages) tLObject;
-            MessagesController.getInstance(this.currentAccount).putUsers(messages_messages.users, false);
-            for (int i2 = 0; i2 < messages_messages.messages.size(); i2++) {
-                TLRPC.Message message = messages_messages.messages.get(i2);
-                if (message != null && message.id == i && (message.action instanceof TLRPC.TL_messageActionStarGiftUnique)) {
-                    messageObject = new MessageObject(this.currentAccount, message, false, false);
-                    break;
-                }
+    public void lambda$show$41(final AlertDialog alertDialog, TLObject tLObject, TLRPC.TL_error tL_error) {
+        if (tLObject instanceof TL_stars.TL_payments_uniqueStarGift) {
+            final TL_stars.TL_payments_uniqueStarGift tL_payments_uniqueStarGift = (TL_stars.TL_payments_uniqueStarGift) tLObject;
+            MessagesController.getInstance(this.currentAccount).putUsers(tL_payments_uniqueStarGift.users, false);
+            if (tL_payments_uniqueStarGift.gift instanceof TL_stars.TL_starGiftUnique) {
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public final void run() {
+                        StarGiftSheet.this.lambda$show$39(tL_payments_uniqueStarGift);
+                    }
+                });
+                return;
             }
         }
-        messageObject = null;
-        if (messageObject != null) {
-            AndroidUtilities.runOnUIThread(new Runnable() {
-                @Override
-                public final void run() {
-                    StarGiftSheet.this.lambda$set$5(messageObject);
-                }
-            });
-        }
+        AndroidUtilities.runOnUIThread(new Runnable() {
+            @Override
+            public final void run() {
+                StarGiftSheet.lambda$show$40(AlertDialog.this);
+            }
+        });
     }
 
-    public void lambda$set$7(View view) {
-        toggleShow();
-    }
-
-    public void lambda$set$8(View view) {
-        onBackPressed();
-    }
-
-    public void lambda$set$9() {
-        new ExplainStarsSheet(getContext()).show();
-    }
-
-    public void lambda$show$33(AlertDialog alertDialog, MessageObject messageObject) {
+    public void lambda$show$42(AlertDialog alertDialog, MessageObject messageObject) {
         alertDialog.dismiss();
         this.messageObjectRepolled = true;
         set(messageObject);
         super.show();
     }
 
-    public static void lambda$show$34(AlertDialog alertDialog) {
+    public static void lambda$show$43(AlertDialog alertDialog) {
         alertDialog.dismiss();
         BaseFragment safeLastFragment = LaunchActivity.getSafeLastFragment();
         if (safeLastFragment != null) {
@@ -1811,7 +2120,7 @@ public class StarGiftSheet extends BottomSheet {
         }
     }
 
-    public void lambda$show$35(TLRPC.TL_messageActionStarGift tL_messageActionStarGift, final AlertDialog alertDialog, TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$show$44(TLRPC.TL_messageActionStarGift tL_messageActionStarGift, final AlertDialog alertDialog, TLObject tLObject, TLRPC.TL_error tL_error) {
         final MessageObject messageObject;
         if (tLObject instanceof TLRPC.messages_Messages) {
             TLRPC.messages_Messages messages_messages = (TLRPC.messages_Messages) tLObject;
@@ -1820,6 +2129,7 @@ public class StarGiftSheet extends BottomSheet {
                 TLRPC.Message message = messages_messages.messages.get(i);
                 if (message != null && !(message instanceof TLRPC.TL_messageEmpty) && message.id == tL_messageActionStarGift.upgrade_msg_id) {
                     messageObject = new MessageObject(this.currentAccount, message, false, false);
+                    messageObject.setType();
                     break;
                 }
             }
@@ -1829,24 +2139,24 @@ public class StarGiftSheet extends BottomSheet {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    StarGiftSheet.this.lambda$show$33(alertDialog, messageObject);
+                    StarGiftSheet.this.lambda$show$42(alertDialog, messageObject);
                 }
             });
         } else {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    StarGiftSheet.lambda$show$34(AlertDialog.this);
+                    StarGiftSheet.lambda$show$43(AlertDialog.this);
                 }
             });
         }
     }
 
-    public void lambda$switchPage$1(ValueAnimator valueAnimator) {
+    public void lambda$switchPage$7(ValueAnimator valueAnimator) {
         onSwitchedPage(((Float) valueAnimator.getAnimatedValue()).floatValue());
     }
 
-    public void lambda$toggleShow$30(BaseFragment baseFragment) {
+    public void lambda$toggleShow$36(BaseFragment baseFragment) {
         Bundle bundle = new Bundle();
         bundle.putLong("user_id", UserConfig.getInstance(this.currentAccount).getClientUserId());
         bundle.putBoolean("my_profile", true);
@@ -1854,7 +2164,7 @@ public class StarGiftSheet extends BottomSheet {
         baseFragment.presentFragment(new ProfileActivity(bundle));
     }
 
-    public void lambda$toggleShow$31(TLObject tLObject, long j, TLRPC.Document document, boolean z, TLRPC.TL_error tL_error) {
+    public void lambda$toggleShow$37(TLObject tLObject, long j, TLRPC.Document document, boolean z, TLRPC.TL_error tL_error) {
         final BaseFragment safeLastFragment = LaunchActivity.getSafeLastFragment();
         if (safeLastFragment == null) {
             return;
@@ -1865,21 +2175,46 @@ public class StarGiftSheet extends BottomSheet {
             BulletinFactory.of(safeLastFragment).createEmojiBulletin(document, LocaleController.getString(z ? R.string.Gift2MadePrivateTitle : R.string.Gift2MadePublicTitle), AndroidUtilities.replaceSingleTag(LocaleController.getString(z ? R.string.Gift2MadePrivate : R.string.Gift2MadePublic), safeLastFragment instanceof ProfileActivity ? null : new Runnable() {
                 @Override
                 public final void run() {
-                    StarGiftSheet.this.lambda$toggleShow$30(safeLastFragment);
+                    StarGiftSheet.this.lambda$toggleShow$36(safeLastFragment);
                 }
             })).show(true);
         } else if (tL_error != null) {
-            BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider).createErrorBulletin(LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text)).show(false);
+            getBulletinFactory().createErrorBulletin(LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text)).show(false);
         }
     }
 
-    public void lambda$toggleShow$32(final long j, final TLRPC.Document document, final boolean z, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$toggleShow$38(final long j, final TLRPC.Document document, final boolean z, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarGiftSheet.this.lambda$toggleShow$31(tLObject, j, document, z, tL_error);
+                StarGiftSheet.this.lambda$toggleShow$37(tLObject, j, document, z, tL_error);
             }
         });
+    }
+
+    public void onMenuPressed(View view) {
+        final String link = getLink();
+        ItemOptions.makeOptions(this.container, this.resourcesProvider, view).addIf(link != null, R.drawable.msg_link, LocaleController.getString(R.string.CopyLink), new Runnable() {
+            @Override
+            public final void run() {
+                StarGiftSheet.this.lambda$onMenuPressed$1(link);
+            }
+        }).addIf(link != null, R.drawable.msg_share, LocaleController.getString(R.string.ShareFile), new Runnable() {
+            @Override
+            public final void run() {
+                StarGiftSheet.this.lambda$onMenuPressed$2();
+            }
+        }).addIf(canTransfer(), R.drawable.menu_feature_transfer, LocaleController.getString(R.string.Gift2TransferOption), new Runnable() {
+            @Override
+            public final void run() {
+                StarGiftSheet.this.lambda$onMenuPressed$3();
+            }
+        }).addIf(this.userStarGift == null && getDialogId() != 0, R.drawable.msg_view_file, LocaleController.getString(R.string.Gift2ViewInProfile), new Runnable() {
+            @Override
+            public final void run() {
+                StarGiftSheet.this.lambda$onMenuPressed$4();
+            }
+        }).setDrawScrim(false).setOnTopOfScrim().setDimAlpha(0).show();
     }
 
     public void onSwitchedPage(float f) {
@@ -1891,7 +2226,15 @@ public class StarGiftSheet extends BottomSheet {
         this.container.invalidate();
     }
 
-    public void lambda$set$17(long j) {
+    public void lambda$onMenuPressed$4() {
+        long dialogId = getDialogId();
+        if (dialogId == 0) {
+            return;
+        }
+        lambda$set$23(dialogId);
+    }
+
+    public void lambda$set$23(long j) {
         HintView2 hintView2 = this.currentHintView;
         if (hintView2 != null) {
             hintView2.hide();
@@ -1907,8 +2250,8 @@ public class StarGiftSheet extends BottomSheet {
             bundle.putLong("user_id", j);
             if (j == UserConfig.getInstance(this.currentAccount).getClientUserId()) {
                 bundle.putBoolean("my_profile", true);
-                bundle.putBoolean("open_gifts", true);
             }
+            bundle.putBoolean("open_gifts", true);
         } else {
             bundle.putLong("chat_id", -j);
         }
@@ -1955,12 +2298,48 @@ public class StarGiftSheet extends BottomSheet {
                 this.button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public final void onClick(View view) {
-                        StarGiftSheet.this.lambda$openUpgradeAfter$39(view);
+                        StarGiftSheet.this.lambda$openUpgradeAfter$48(view);
                     }
                 });
                 switchPage(true, true);
             }
         }
+    }
+
+    public void repostStory(final View view) {
+        LaunchActivity launchActivity = LaunchActivity.instance;
+        if (launchActivity == null) {
+            return;
+        }
+        StoryRecorder.SourceView fromShareCell = view instanceof ShareDialogCell ? StoryRecorder.SourceView.fromShareCell((ShareDialogCell) view) : null;
+        ArrayList arrayList = new ArrayList();
+        MessageObject messageObject = this.messageObject;
+        if (messageObject == null) {
+            if (!(getGift() instanceof TL_stars.TL_starGiftUnique)) {
+                return;
+            }
+            long clientUserId = UserConfig.getInstance(this.currentAccount).getClientUserId();
+            TL_stars.TL_starGiftUnique tL_starGiftUnique = (TL_stars.TL_starGiftUnique) getGift();
+            TLRPC.TL_messageService tL_messageService = new TLRPC.TL_messageService();
+            tL_messageService.peer_id = MessagesController.getInstance(this.currentAccount).getPeer(clientUserId);
+            tL_messageService.from_id = MessagesController.getInstance(this.currentAccount).getPeer(clientUserId);
+            tL_messageService.date = ConnectionsManager.getInstance(this.currentAccount).getCurrentTime();
+            TLRPC.TL_messageActionStarGiftUnique tL_messageActionStarGiftUnique = new TLRPC.TL_messageActionStarGiftUnique();
+            tL_messageActionStarGiftUnique.gift = tL_starGiftUnique;
+            tL_messageActionStarGiftUnique.upgrade = true;
+            tL_messageService.action = tL_messageActionStarGiftUnique;
+            messageObject = new MessageObject(this.currentAccount, tL_messageService, false, false);
+            messageObject.setType();
+        }
+        arrayList.add(messageObject);
+        final StoryRecorder storyRecorder = StoryRecorder.getInstance(launchActivity, this.currentAccount);
+        storyRecorder.setOnPrepareCloseListener(new Utilities.Callback4() {
+            @Override
+            public final void run(Object obj, Object obj2, Object obj3, Object obj4) {
+                StarGiftSheet.this.lambda$repostStory$6(storyRecorder, view, (Long) obj, (Runnable) obj2, (Boolean) obj3, (Long) obj4);
+            }
+        });
+        storyRecorder.openRepost(fromShareCell, StoryEntry.repostMessage(arrayList));
     }
 
     public void toggleShow() {
@@ -2008,9 +2387,17 @@ public class StarGiftSheet extends BottomSheet {
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(savestargift, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                StarGiftSheet.this.lambda$toggleShow$32(clientUserId, document, z, tLObject, tL_error);
+                StarGiftSheet.this.lambda$toggleShow$38(clientUserId, document, z, tLObject, tL_error);
             }
         });
+    }
+
+    public boolean canTransfer() {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftSheet.canTransfer():boolean");
+    }
+
+    protected BulletinFactory getBulletinFactory() {
+        return BulletinFactory.of(this.topBulletinContainer, this.resourcesProvider);
     }
 
     public TL_stars.StarGift getGift() {
@@ -2031,6 +2418,10 @@ public class StarGiftSheet extends BottomSheet {
             TL_stars.UserStarGift userStarGift = this.userStarGift;
             if (userStarGift != null) {
                 return userStarGift.gift;
+            }
+            TL_stars.TL_starGiftUnique tL_starGiftUnique = this.slugStarGift;
+            if (tL_starGiftUnique != null) {
+                return tL_starGiftUnique;
             }
         }
         return null;
@@ -2073,6 +2464,68 @@ public class StarGiftSheet extends BottomSheet {
         switchPage(false, true);
     }
 
+    public void onSharePressed(View view) {
+        ShareAlert shareAlert = this.shareAlert;
+        if (shareAlert != null && shareAlert.isShown()) {
+            this.shareAlert.dismiss();
+        }
+        String link = getLink();
+        AnonymousClass1 anonymousClass1 = new ShareAlert(getContext(), null, null, link, null, false, link, null, false, false, true, this.resourcesProvider) {
+            AnonymousClass1(Context context, ChatActivity chatActivity, ArrayList arrayList, String link2, String str2, boolean z, String link22, String str4, boolean z2, boolean z3, boolean z4, Theme.ResourcesProvider resourcesProvider) {
+                super(context, chatActivity, arrayList, link22, str2, z, link22, str4, z2, z3, z4, resourcesProvider);
+                this.includeStoryFromMessage = true;
+            }
+
+            @Override
+            public void onSend(LongSparseArray longSparseArray, int i, TLRPC.TL_forumTopic tL_forumTopic) {
+                Bulletin createSimpleBulletin;
+                super.onSend(longSparseArray, i, tL_forumTopic);
+                BulletinFactory bulletinFactory = StarGiftSheet.this.getBulletinFactory();
+                if (bulletinFactory != null) {
+                    if (longSparseArray.size() == 1) {
+                        long keyAt = longSparseArray.keyAt(0);
+                        if (keyAt == UserConfig.getInstance(this.currentAccount).clientUserId) {
+                            createSimpleBulletin = bulletinFactory.createSimpleBulletin(R.raw.saved_messages, AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LinkSharedToSavedMessages, new Object[0])), 5000);
+                        } else if (keyAt < 0) {
+                            createSimpleBulletin = bulletinFactory.createSimpleBulletin(R.raw.forward, AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LinkSharedTo, tL_forumTopic != null ? tL_forumTopic.title : MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(-keyAt)).title)), 5000);
+                        } else {
+                            createSimpleBulletin = bulletinFactory.createSimpleBulletin(R.raw.forward, AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LinkSharedTo, MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(keyAt)).first_name)), 5000);
+                        }
+                    } else {
+                        createSimpleBulletin = bulletinFactory.createSimpleBulletin(R.raw.forward, AndroidUtilities.replaceTags(LocaleController.formatPluralString("LinkSharedToManyChats", longSparseArray.size(), Integer.valueOf(longSparseArray.size()))));
+                    }
+                    createSimpleBulletin.hideAfterBottomSheet(false).show();
+                    try {
+                        this.container.performHapticFeedback(3);
+                    } catch (Exception unused) {
+                    }
+                }
+            }
+
+            @Override
+            protected void onShareStory(View view2) {
+                StarGiftSheet.this.repostStory(view2);
+            }
+        };
+        this.shareAlert = anonymousClass1;
+        anonymousClass1.setDelegate(new ShareAlert.ShareAlertDelegate() {
+            AnonymousClass2() {
+            }
+
+            @Override
+            public boolean didCopy() {
+                StarGiftSheet.this.getBulletinFactory().createCopyLinkBulletin(false).show();
+                return true;
+            }
+
+            @Override
+            public void didShare() {
+                ShareAlert.ShareAlertDelegate.CC.$default$didShare(this);
+            }
+        });
+        this.shareAlert.show();
+    }
+
     @Override
     protected void onSwipeStarts() {
         HintView2 hintView2 = this.currentHintView;
@@ -2087,13 +2540,26 @@ public class StarGiftSheet extends BottomSheet {
         StarsController.getInstance(this.currentAccount).getStarGiftPreview(j, new Utilities.Callback() {
             @Override
             public final void run(Object obj) {
-                StarGiftSheet.this.lambda$openAsLearnMore$25(str, (TL_stars.starGiftUpgradePreview) obj);
+                StarGiftSheet.this.lambda$openAsLearnMore$31(str, (TL_stars.starGiftUpgradePreview) obj);
             }
         });
     }
 
-    public void openTransfer() {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftSheet.openTransfer():void");
+    public void lambda$onMenuPressed$3() {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftSheet.lambda$onMenuPressed$3():void");
+    }
+
+    public StarGiftSheet set(String str, TL_stars.TL_starGiftUnique tL_starGiftUnique) {
+        this.slug = str;
+        this.slugStarGift = tL_starGiftUnique;
+        set(tL_starGiftUnique, true, false);
+        this.beforeTableTextView.setVisibility(8);
+        this.afterTableTextView.setVisibility(8);
+        if (this.firstSet) {
+            switchPage(false, false);
+            this.firstSet = false;
+        }
+        return this;
     }
 
     public org.telegram.ui.Stars.StarGiftSheet set(org.telegram.messenger.MessageObject r45) {
@@ -2108,7 +2574,6 @@ public class StarGiftSheet extends BottomSheet {
         ButtonWithCounterView buttonWithCounterView;
         View.OnClickListener onClickListener;
         SpannableString spannableString;
-        int i;
         boolean z3;
         TableView tableView;
         CharSequence formatSpannable;
@@ -2118,50 +2583,38 @@ public class StarGiftSheet extends BottomSheet {
         TableView tableView3;
         String string;
         StringBuilder sb;
-        int i2;
-        this.topView.setGift(tL_starGiftUnique);
+        this.topView.setGift(tL_starGiftUnique, getLink() != null);
         this.topView.setText(0, tL_starGiftUnique.title, 0L, LocaleController.formatPluralStringComma("Gift2CollectionNumber", tL_starGiftUnique.num));
         this.tableView.clear();
         long clientUserId = UserConfig.getInstance(this.currentAccount).getClientUserId();
         if (!z2) {
-            if (tL_starGiftUnique.owner_id == clientUserId && z) {
+            long j = tL_starGiftUnique.owner_id;
+            if (j == 0 && tL_starGiftUnique.owner_name != null) {
+                this.tableView.addRow(LocaleController.getString(R.string.Gift2Owner), tL_starGiftUnique.owner_name);
+            } else if (j != 0 && j == clientUserId && z) {
                 this.tableView.addRowUser(LocaleController.getString(R.string.Gift2Owner), this.currentAccount, tL_starGiftUnique.owner_id, new Runnable() {
                     @Override
                     public final void run() {
-                        StarGiftSheet.this.lambda$set$2(tL_starGiftUnique);
+                        StarGiftSheet.this.lambda$set$9(tL_starGiftUnique);
                     }
                 }, LocaleController.getString(R.string.Gift2OwnerChange), new Runnable() {
                     @Override
                     public final void run() {
-                        StarGiftSheet.this.openTransfer();
+                        StarGiftSheet.this.lambda$onMenuPressed$3();
                     }
                 });
-            } else {
+            } else if (j != 0) {
                 this.tableView.addRowUser(LocaleController.getString(R.string.Gift2Owner), this.currentAccount, tL_starGiftUnique.owner_id, new Runnable() {
                     @Override
                     public final void run() {
-                        StarGiftSheet.this.lambda$set$3(tL_starGiftUnique);
+                        StarGiftSheet.this.lambda$set$10(tL_starGiftUnique);
                     }
                 });
             }
         }
-        Iterator<TL_stars.StarGiftAttribute> it = tL_starGiftUnique.attributes.iterator();
-        while (it.hasNext()) {
-            final TL_stars.StarGiftAttribute next = it.next();
-            if (next instanceof TL_stars.starGiftAttributeModel) {
-                i2 = R.string.Gift2AttributeModel;
-            } else if (next instanceof TL_stars.starGiftAttributeBackdrop) {
-                i2 = R.string.Gift2AttributeBackdrop;
-            } else if (next instanceof TL_stars.starGiftAttributePattern) {
-                i2 = R.string.Gift2AttributeSymbol;
-            }
-            final ButtonSpan.TextViewButtons[] textViewButtonsArr = {(ButtonSpan.TextViewButtons) ((TableView.TableRowContent) this.tableView.addRow(LocaleController.getString(i2), next.name, AffiliateProgramFragment.percents(next.rarity_permille), new Runnable() {
-                @Override
-                public final void run() {
-                    StarGiftSheet.this.lambda$set$4(next, textViewButtonsArr);
-                }
-            }).getChildAt(1)).getChildAt(0)};
-        }
+        addAttributeRow(StarsController.findAttribute(tL_starGiftUnique.attributes, TL_stars.starGiftAttributeModel.class));
+        addAttributeRow(StarsController.findAttribute(tL_starGiftUnique.attributes, TL_stars.starGiftAttributeBackdrop.class));
+        addAttributeRow(StarsController.findAttribute(tL_starGiftUnique.attributes, TL_stars.starGiftAttributePattern.class));
         if (!z2) {
             if (this.messageObject == null) {
                 tableView3 = this.tableView;
@@ -2175,8 +2628,8 @@ public class StarGiftSheet extends BottomSheet {
                 TextView textView = (TextView) ((TableView.TableRowContent) this.tableView.addRow(LocaleController.getString(R.string.Gift2Quantity), "").getChildAt(1)).getChildAt(0);
                 SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder("x ");
                 LoadingSpan loadingSpan = new LoadingSpan(textView, AndroidUtilities.dp(90.0f), 0, this.resourcesProvider);
-                int i3 = Theme.key_windowBackgroundWhiteBlackText;
-                loadingSpan.setColors(Theme.multAlpha(Theme.getColor(i3, this.resourcesProvider), 0.21f), Theme.multAlpha(Theme.getColor(i3, this.resourcesProvider), 0.08f));
+                int i = Theme.key_windowBackgroundWhiteBlackText;
+                loadingSpan.setColors(Theme.multAlpha(Theme.getColor(i, this.resourcesProvider), 0.21f), Theme.multAlpha(Theme.getColor(i, this.resourcesProvider), 0.08f));
                 spannableStringBuilder.setSpan(loadingSpan, 0, 1, 33);
                 textView.setText(spannableStringBuilder, TextView.BufferType.SPANNABLE);
                 if (!this.messageObjectRepolling) {
@@ -2187,7 +2640,7 @@ public class StarGiftSheet extends BottomSheet {
                     ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_getMessages, new RequestDelegate() {
                         @Override
                         public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                            StarGiftSheet.this.lambda$set$6(id, tLObject, tL_error);
+                            StarGiftSheet.this.lambda$set$12(id, tLObject, tL_error);
                         }
                     });
                 }
@@ -2204,13 +2657,13 @@ public class StarGiftSheet extends BottomSheet {
                 spannableString.setSpan(new ClickableSpan() {
                     final TL_stars.starGiftAttributeOriginalDetails val$details;
 
-                    AnonymousClass2(TL_stars.starGiftAttributeOriginalDetails stargiftattributeoriginaldetails2) {
+                    AnonymousClass4(TL_stars.starGiftAttributeOriginalDetails stargiftattributeoriginaldetails2) {
                         r2 = stargiftattributeoriginaldetails2;
                     }
 
                     @Override
                     public void onClick(View view) {
-                        StarGiftSheet.this.lambda$set$17(r2.sender_id);
+                        StarGiftSheet.this.lambda$set$23(r2.sender_id);
                     }
 
                     @Override
@@ -2225,13 +2678,13 @@ public class StarGiftSheet extends BottomSheet {
             spannableString2.setSpan(new ClickableSpan() {
                 final TL_stars.starGiftAttributeOriginalDetails val$details;
 
-                AnonymousClass3(TL_stars.starGiftAttributeOriginalDetails stargiftattributeoriginaldetails2) {
+                AnonymousClass5(TL_stars.starGiftAttributeOriginalDetails stargiftattributeoriginaldetails2) {
                     r2 = stargiftattributeoriginaldetails2;
                 }
 
                 @Override
                 public void onClick(View view) {
-                    StarGiftSheet.this.lambda$set$17(r2.recipient_id);
+                    StarGiftSheet.this.lambda$set$23(r2.recipient_id);
                 }
 
                 @Override
@@ -2248,7 +2701,6 @@ public class StarGiftSheet extends BottomSheet {
             }
             String replaceAll = LocaleController.getInstance().getFormatterYear().format(stargiftattributeoriginaldetails2.date * 1000).replaceAll("\\.", "/");
             if (stargiftattributeoriginaldetails2.sender_id != stargiftattributeoriginaldetails2.recipient_id) {
-                i = 0;
                 z3 = true;
                 if (spannableString != null) {
                     tableView = this.tableView;
@@ -2264,19 +2716,17 @@ public class StarGiftSheet extends BottomSheet {
                 addFullRow = tableView.addFullRow(formatSpannable);
             } else if (spannable == null) {
                 tableView2 = this.tableView;
-                i = 0;
                 z3 = true;
                 formatSpannable2 = LocaleController.formatSpannable(R.string.Gift2AttributeOriginalDetailsSelf, spannableString, replaceAll);
                 addFullRow = tableView2.addFullRow(formatSpannable2);
             } else {
-                i = 0;
                 z3 = true;
                 tableView = this.tableView;
                 formatSpannable = LocaleController.formatSpannable(R.string.Gift2AttributeOriginalDetailsSelfComment, spannableString, replaceAll, spannable);
                 addFullRow = tableView.addFullRow(formatSpannable);
             }
             addFullRow.setFilled(z3);
-            ((SpoilersTextView) addFullRow.getChildAt(i)).setGravity(17);
+            ((SpoilersTextView) addFullRow.getChildAt(0)).setGravity(17);
         }
         if (z2 || tL_starGiftUnique.owner_id != clientUserId) {
             this.button.setText(LocaleController.getString(R.string.OK), true);
@@ -2284,7 +2734,7 @@ public class StarGiftSheet extends BottomSheet {
             onClickListener = new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    StarGiftSheet.this.lambda$set$8(view);
+                    StarGiftSheet.this.lambda$set$14(view);
                 }
             };
         } else {
@@ -2293,7 +2743,7 @@ public class StarGiftSheet extends BottomSheet {
             onClickListener = new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    StarGiftSheet.this.lambda$set$7(view);
+                    StarGiftSheet.this.lambda$set$13(view);
                 }
             };
         }
@@ -2304,19 +2754,30 @@ public class StarGiftSheet extends BottomSheet {
     public void show() {
         MessageObject messageObject;
         TLRPC.Message message;
-        if (this.userStarGift == null && (messageObject = this.messageObject) != null && (message = messageObject.messageOwner) != null) {
+        if (this.slug != null && this.slugStarGift == null) {
+            final AlertDialog alertDialog = new AlertDialog(getContext(), 3);
+            alertDialog.showDelayed(500L);
+            TL_stars.getUniqueStarGift getuniquestargift = new TL_stars.getUniqueStarGift();
+            getuniquestargift.slug = this.slug;
+            ConnectionsManager.getInstance(this.currentAccount).sendRequest(getuniquestargift, new RequestDelegate() {
+                @Override
+                public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
+                    StarGiftSheet.this.lambda$show$41(alertDialog, tLObject, tL_error);
+                }
+            });
+        } else if (this.userStarGift == null && (messageObject = this.messageObject) != null && (message = messageObject.messageOwner) != null) {
             TLRPC.MessageAction messageAction = message.action;
             if (messageAction instanceof TLRPC.TL_messageActionStarGift) {
                 final TLRPC.TL_messageActionStarGift tL_messageActionStarGift = (TLRPC.TL_messageActionStarGift) messageAction;
                 if (tL_messageActionStarGift.upgraded) {
-                    final AlertDialog alertDialog = new AlertDialog(getContext(), 3);
-                    alertDialog.showDelayed(500L);
+                    final AlertDialog alertDialog2 = new AlertDialog(getContext(), 3);
+                    alertDialog2.showDelayed(500L);
                     TLRPC.TL_messages_getMessages tL_messages_getMessages = new TLRPC.TL_messages_getMessages();
                     tL_messages_getMessages.id.add(Integer.valueOf(tL_messageActionStarGift.upgrade_msg_id));
                     ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_getMessages, new RequestDelegate() {
                         @Override
                         public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                            StarGiftSheet.this.lambda$show$35(tL_messageActionStarGift, alertDialog, tLObject, tL_error);
+                            StarGiftSheet.this.lambda$show$44(tL_messageActionStarGift, alertDialog2, tLObject, tL_error);
                         }
                     });
                     return;
@@ -2350,6 +2811,7 @@ public class StarGiftSheet extends BottomSheet {
                 this.currentHintView = null;
             }
             final HintView2 hintView23 = new HintView2(getContext(), 3);
+            hintView23.setMultilineText(true);
             hintView23.setText(LocaleController.formatString(R.string.Gift2RarityHint, AffiliateProgramFragment.percents(i)));
             hintView23.setJointPx(0.0f, (iArr2[0] + paddingLeft) - (AndroidUtilities.dp(16.0f) + this.backgroundPaddingLeft));
             hintView23.setTranslationY(((iArr2[1] - AndroidUtilities.dp(100.0f)) - (textView.getHeight() / 2.0f)) + AndroidUtilities.dp(4.33f));
@@ -2385,13 +2847,13 @@ public class StarGiftSheet extends BottomSheet {
             ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
-                    StarGiftSheet.this.lambda$switchPage$1(valueAnimator2);
+                    StarGiftSheet.this.lambda$switchPage$7(valueAnimator2);
                 }
             });
             this.switchingPagesAnimator.addListener(new AnimatorListenerAdapter() {
                 final boolean val$toUpgrade;
 
-                AnonymousClass1(boolean z3) {
+                AnonymousClass3(boolean z3) {
                     r2 = z3;
                 }
 

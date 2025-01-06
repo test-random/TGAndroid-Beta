@@ -67,6 +67,7 @@ public abstract class PreviewView extends FrameLayout {
     private final Paint bitmapPaint;
     private final BlurringShader.BlurManager blurManager;
     private CollageLayoutView2 collage;
+    private CropEditor cropEditorDrawing;
     private float cx;
     private float cy;
     private boolean doNotSpanRotation;
@@ -1195,7 +1196,7 @@ public abstract class PreviewView extends FrameLayout {
         }
         VideoEditTextureView videoEditTextureView = this.textureView;
         if (videoEditTextureView != null) {
-            setTextureViewTransform(videoEditTextureView);
+            setTextureViewTransform(false, videoEditTextureView);
             this.textureView.invalidate();
         }
         invalidate();
@@ -1245,14 +1246,17 @@ public abstract class PreviewView extends FrameLayout {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         drawBackground(canvas);
-        if (this.draw && this.entry != null && !isCollage()) {
+        CropEditor cropEditor = this.cropEditorDrawing;
+        if (cropEditor != null) {
+            cropEditor.contentView.drawImage(canvas, true);
+        } else if (this.draw && this.entry != null && !isCollage()) {
             float f = this.thumbAlpha.set(this.bitmap == null);
             if (this.thumbBitmap != null && f > 0.0f) {
                 canvas.save();
                 canvas.scale(getWidth() / this.entry.resultWidth, getHeight() / this.entry.resultHeight);
                 canvas.concat(this.entry.matrix);
                 if (this.entry.crop != null) {
-                    canvas.translate(r1.width / 2.0f, r1.height / 2.0f);
+                    canvas.translate(r2.width / 2.0f, r2.height / 2.0f);
                     canvas.rotate(-this.entry.orientation);
                     StoryEntry storyEntry = this.entry;
                     int i = storyEntry.width;
@@ -1272,7 +1276,7 @@ public abstract class PreviewView extends FrameLayout {
                     canvas.scale(f6, f6);
                     MediaController.CropState cropState2 = this.entry.crop;
                     canvas.translate(cropState2.cropPx * f4, cropState2.cropPy * f5);
-                    canvas.rotate(this.entry.crop.cropRotate + r1.transformRotation);
+                    canvas.rotate(this.entry.crop.cropRotate + r2.transformRotation);
                     if (this.entry.crop.mirrored) {
                         canvas.scale(-1.0f, 1.0f);
                     }
@@ -1290,7 +1294,7 @@ public abstract class PreviewView extends FrameLayout {
                 canvas.scale(getWidth() / this.entry.resultWidth, getHeight() / this.entry.resultHeight);
                 canvas.concat(this.entry.matrix);
                 if (this.entry.crop != null) {
-                    canvas.translate(r1.width / 2.0f, r1.height / 2.0f);
+                    canvas.translate(r2.width / 2.0f, r2.height / 2.0f);
                     canvas.rotate(-this.entry.orientation);
                     StoryEntry storyEntry3 = this.entry;
                     int i4 = storyEntry3.width;
@@ -1676,6 +1680,13 @@ public abstract class PreviewView extends FrameLayout {
         this.collage = collageLayoutView2;
     }
 
+    public void setCropEditorDrawing(CropEditor cropEditor) {
+        if (this.cropEditorDrawing != cropEditor) {
+            this.cropEditorDrawing = cropEditor;
+            invalidate();
+        }
+    }
+
     public void setDraw(boolean z) {
         this.draw = z;
         invalidate();
@@ -1702,29 +1713,57 @@ public abstract class PreviewView extends FrameLayout {
         this.onTap = runnable;
     }
 
-    public void setTextureViewTransform(TextureView textureView) {
-        if (textureView != null) {
-            this.matrix.set(this.entry.matrix);
-            Matrix matrix = this.matrix;
-            float width = 1.0f / getWidth();
-            int i = this.entry.width;
-            if (i < 0) {
-                i = this.videoWidth;
-            }
-            float f = width * i;
-            float height = 1.0f / getHeight();
-            int i2 = this.entry.height;
-            if (i2 < 0) {
-                i2 = this.videoHeight;
-            }
-            matrix.preScale(f, height * i2);
-            this.matrix.postScale(getWidth() / this.entry.resultWidth, getHeight() / this.entry.resultHeight);
-            this.transformBackMatrix.reset();
-            this.matrix.invert(this.transformBackMatrix);
-            this.transformBackMatrix.postScale(this.entry.width / getWidth(), this.entry.height / getHeight());
-            textureView.setTransform(this.matrix);
-            textureView.invalidate();
+    public void setTextureViewTransform(boolean z, TextureView textureView) {
+        if (this.entry == null || textureView == null) {
+            return;
         }
+        invalidate();
+        this.transformMatrix.reset();
+        Matrix matrix = this.transformMatrix;
+        float width = 1.0f / getWidth();
+        int i = this.entry.width;
+        if (i < 0) {
+            i = this.videoWidth;
+        }
+        float f = width * i;
+        float height = 1.0f / getHeight();
+        int i2 = this.entry.height;
+        if (i2 < 0) {
+            i2 = this.videoHeight;
+        }
+        matrix.postScale(f, height * i2);
+        if (this.entry.crop != null) {
+            this.transformMatrix.preTranslate(r8.width / 2.0f, r8.height / 2.0f);
+            this.transformMatrix.preRotate(-this.entry.orientation);
+            StoryEntry storyEntry = this.entry;
+            int i3 = storyEntry.width;
+            int i4 = storyEntry.height;
+            int i5 = storyEntry.orientation;
+            MediaController.CropState cropState = storyEntry.crop;
+            if (((i5 + cropState.transformRotation) / 90) % 2 == 1) {
+                i4 = i3;
+                i3 = i4;
+            }
+            Matrix matrix2 = this.transformMatrix;
+            float f2 = cropState.cropScale;
+            matrix2.preScale(f2, f2);
+            Matrix matrix3 = this.transformMatrix;
+            MediaController.CropState cropState2 = this.entry.crop;
+            matrix3.preTranslate(cropState2.cropPx * i3, cropState2.cropPy * i4);
+            this.transformMatrix.preRotate(this.entry.crop.cropRotate + r0.transformRotation);
+            if (this.entry.crop.mirrored) {
+                this.transformMatrix.preScale(-1.0f, 1.0f);
+            }
+            this.transformMatrix.preRotate(this.entry.orientation);
+            Matrix matrix4 = this.transformMatrix;
+            StoryEntry storyEntry2 = this.entry;
+            matrix4.preTranslate((-storyEntry2.width) / 2.0f, (-storyEntry2.height) / 2.0f);
+        }
+        this.transformMatrix.preConcat(this.entry.matrix);
+        this.transformMatrix.preScale(getWidth() / this.entry.resultWidth, getHeight() / this.entry.resultHeight);
+        this.transformBackMatrix.reset();
+        this.transformMatrix.invert(this.transformBackMatrix);
+        textureView.setTransform(this.transformMatrix);
     }
 
     public void setVideoTimelineView(TimelineView timelineView) {

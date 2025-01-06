@@ -676,13 +676,13 @@ public class ProfileSearchCell extends BaseCell implements NotificationCenter.No
         if (this.openButtonText == null) {
             this.openButtonText = new Text(LocaleController.getString(R.string.BotOpen), 14.0f, AndroidUtilities.bold());
         }
-        int dp = z ? AndroidUtilities.dp(28.0f) + ((int) this.openButtonText.getCurrentWidth()) + AndroidUtilities.dp(30.0f) : 0;
+        int currentWidth = z ? ((int) this.openButtonText.getCurrentWidth()) + AndroidUtilities.dp(30.0f) : 0;
         boolean z2 = LocaleController.isRTL;
-        int i = z2 ? dp : 0;
+        int i = z2 ? currentWidth : 0;
         if (z2) {
-            dp = 0;
+            currentWidth = 0;
         }
-        setPadding(i, 0, dp, 0);
+        setPadding(i, 0, currentWidth, 0);
         this.openBot = z;
         this.openButtonBounce.setPressed(false);
     }

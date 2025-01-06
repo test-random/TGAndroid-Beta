@@ -6,11 +6,9 @@ import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.widget.FrameLayout;
 import androidx.recyclerview.widget.RecyclerView;
-import j$.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BirthdayController;
@@ -22,10 +20,13 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.tl.TL_stars;
+import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.ColoredImageSpan;
 import org.telegram.ui.Components.FlickerLoadingView;
+import org.telegram.ui.Components.ItemOptions;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.LinkSpanDrawable;
 import org.telegram.ui.Components.Premium.boosts.UserSelectorBottomSheet;
@@ -42,6 +43,7 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
     private final ButtonWithCounterView button;
     private final FrameLayout buttonContainer;
     private final int currentAccount;
+    private final BaseFragment fragment;
     private final StarsController.GiftsList list;
     private final UniversalRecyclerView listView;
     private final Theme.ResourcesProvider resourcesProvider;
@@ -87,9 +89,10 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
         }
     }
 
-    public ProfileGiftsContainer(Context context, final int i, long j, Theme.ResourcesProvider resourcesProvider) {
+    public ProfileGiftsContainer(BaseFragment baseFragment, Context context, final int i, long j, Theme.ResourcesProvider resourcesProvider) {
         super(context);
         this.visibleHeight = AndroidUtilities.displaySize.y;
+        this.fragment = baseFragment;
         this.currentAccount = i;
         this.userId = j;
         StarsController.GiftsList profileGiftsList = StarsController.getInstance(i).getProfileGiftsList(j);
@@ -150,23 +153,6 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
         });
     }
 
-    private long getRandomUserId() {
-        ConcurrentHashMap<Long, TLRPC.User> users = MessagesController.getInstance(this.currentAccount).getUsers();
-        int size = users.size();
-        if (size == 0) {
-            return 0L;
-        }
-        int nextInt = Utilities.fastRandom.nextInt(size);
-        int i = 0;
-        for (Map.Entry<Long, TLRPC.User> entry : users.entrySet()) {
-            if (i == nextInt) {
-                return entry.getValue().id;
-            }
-            i++;
-        }
-        return 0L;
-    }
-
     public boolean isLoadingVisible() {
         for (int i = 0; i < this.listView.getChildCount(); i++) {
             if (this.listView.getChildAt(i) instanceof FlickerLoadingView) {
@@ -178,6 +164,29 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
 
     public static void lambda$new$0(int i, View view) {
         UserSelectorBottomSheet.open(2, 0L, BirthdayController.getInstance(i).getState());
+    }
+
+    public void lambda$onItemLongPress$1(String str) {
+        AndroidUtilities.addToClipboard(str);
+        BulletinFactory.of(this.fragment).createCopyLinkBulletin(false).show();
+    }
+
+    public void lambda$onItemLongPress$2(TL_stars.UserStarGift userStarGift) {
+        new StarGiftSheet(getContext(), this.currentAccount, this.userId, this.resourcesProvider) {
+            @Override
+            protected BulletinFactory getBulletinFactory() {
+                return BulletinFactory.of(ProfileGiftsContainer.this.fragment);
+            }
+        }.set(this.userId == UserConfig.getInstance(this.currentAccount).getClientUserId(), userStarGift).onSharePressed(null);
+    }
+
+    public void lambda$onItemLongPress$3(TL_stars.UserStarGift userStarGift) {
+        new StarGiftSheet(getContext(), this.currentAccount, this.userId, this.resourcesProvider) {
+            @Override
+            protected BulletinFactory getBulletinFactory() {
+                return BulletinFactory.of(ProfileGiftsContainer.this.fragment);
+            }
+        }.set(this.userId == UserConfig.getInstance(this.currentAccount).getClientUserId(), userStarGift).lambda$onMenuPressed$3();
     }
 
     @Override
@@ -332,6 +341,36 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
     }
 
     public boolean onItemLongPress(UItem uItem, View view, int i, float f, float f2) {
+        final String str;
+        Object obj = uItem.object;
+        if (obj instanceof TL_stars.UserStarGift) {
+            final TL_stars.UserStarGift userStarGift = (TL_stars.UserStarGift) obj;
+            TL_stars.StarGift starGift = userStarGift.gift;
+            if (starGift instanceof TL_stars.TL_starGiftUnique) {
+                if (starGift.slug != null) {
+                    str = MessagesController.getInstance(this.currentAccount).linkPrefix + "/nft/" + userStarGift.gift.slug;
+                } else {
+                    str = null;
+                }
+                ItemOptions.makeOptions(this.fragment, view).addIf(str != null, R.drawable.msg_link, LocaleController.getString(R.string.CopyLink), new Runnable() {
+                    @Override
+                    public final void run() {
+                        ProfileGiftsContainer.this.lambda$onItemLongPress$1(str);
+                    }
+                }).addIf(str != null, R.drawable.msg_share, LocaleController.getString(R.string.ShareFile), new Runnable() {
+                    @Override
+                    public final void run() {
+                        ProfileGiftsContainer.this.lambda$onItemLongPress$2(userStarGift);
+                    }
+                }).addIf(((TL_stars.TL_starGiftUnique) userStarGift.gift).owner_id == UserConfig.getInstance(this.currentAccount).getClientUserId(), R.drawable.menu_feature_transfer, LocaleController.getString(R.string.Gift2TransferOption), new Runnable() {
+                    @Override
+                    public final void run() {
+                        ProfileGiftsContainer.this.lambda$onItemLongPress$3(userStarGift);
+                    }
+                }).setGravity(3).setBlur(true).show();
+                return true;
+            }
+        }
         return false;
     }
 

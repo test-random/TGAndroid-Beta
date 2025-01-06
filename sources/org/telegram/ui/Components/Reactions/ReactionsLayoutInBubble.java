@@ -115,6 +115,7 @@ public class ReactionsLayoutInBubble {
     HashMap lastDrawingReactionButtons = new HashMap();
     HashMap lastDrawingReactionButtonsTmp = new HashMap();
     HashMap animatedReactions = new HashMap();
+    private final ArrayList reactionLineWidths = new ArrayList();
     private final RectF scrimRect = new RectF();
     private final Rect scrimRect2 = new Rect();
     int currentAccount = UserConfig.selectedAccount;
@@ -207,6 +208,7 @@ public class ReactionsLayoutInBubble {
         private final Drawable.Callback supercallback;
         int textColor;
         public AnimatedTextView.AnimatedTextDrawable textDrawable;
+        public int top;
         ArrayList users;
         VisibleReaction visibleReaction;
         public boolean wasDrawn;
@@ -1330,11 +1332,13 @@ public class ReactionsLayoutInBubble {
             return;
         }
         this.availableWidth = i;
+        this.reactionLineWidths.clear();
         int i3 = 0;
         int i4 = 0;
         int i5 = 0;
-        for (int i6 = 0; i6 < this.reactionButtons.size(); i6++) {
-            ReactionButton reactionButton = (ReactionButton) this.reactionButtons.get(i6);
+        int i6 = 0;
+        for (int i7 = 0; i7 < this.reactionButtons.size(); i7++) {
+            ReactionButton reactionButton = (ReactionButton) this.reactionButtons.get(i7);
             if (reactionButton.isSmall) {
                 reactionButton.width = AndroidUtilities.dp(14.0f);
                 reactionButton.height = AndroidUtilities.dp(14.0f);
@@ -1360,63 +1364,53 @@ public class ReactionsLayoutInBubble {
                 }
                 reactionButton.height = AndroidUtilities.dp(26.0f);
             }
-            if (reactionButton.width + i4 > i) {
+            if (reactionButton.width + i3 > i) {
+                this.reactionLineWidths.add(Integer.valueOf(i3));
                 i5 += reactionButton.height + AndroidUtilities.dp(4.0f);
-                i4 = 0;
+                i6++;
+                i3 = 0;
             }
-            reactionButton.x = i4;
+            reactionButton.x = i3;
             reactionButton.y = i5;
-            i4 += reactionButton.width + AndroidUtilities.dp(4.0f);
-            if (i4 > i3) {
-                i3 = i4;
+            reactionButton.top = i6;
+            i3 += reactionButton.width + AndroidUtilities.dp(4.0f);
+            if (i3 > i4) {
+                i4 = i3;
             }
         }
+        this.reactionLineWidths.add(Integer.valueOf(i3));
         if (i2 == 5 && !this.reactionButtons.isEmpty()) {
-            int i7 = ((ReactionButton) this.reactionButtons.get(0)).y;
-            int i8 = 0;
-            for (int i9 = 0; i9 < this.reactionButtons.size(); i9++) {
-                if (((ReactionButton) this.reactionButtons.get(i9)).y != i7) {
-                    int i10 = i9 - 1;
-                    int i11 = i - (((ReactionButton) this.reactionButtons.get(i10)).x + ((ReactionButton) this.reactionButtons.get(i10)).width);
-                    while (i8 < i9) {
-                        ((ReactionButton) this.reactionButtons.get(i8)).x += i11;
-                        i8++;
+            int i8 = ((ReactionButton) this.reactionButtons.get(0)).y;
+            int i9 = 0;
+            for (int i10 = 0; i10 < this.reactionButtons.size(); i10++) {
+                if (((ReactionButton) this.reactionButtons.get(i10)).y != i8) {
+                    int i11 = i10 - 1;
+                    int i12 = i - (((ReactionButton) this.reactionButtons.get(i11)).x + ((ReactionButton) this.reactionButtons.get(i11)).width);
+                    while (i9 < i10) {
+                        ((ReactionButton) this.reactionButtons.get(i9)).x += i12;
+                        i9++;
                     }
-                    i8 = i9;
+                    i9 = i10;
                 }
             }
             int size = this.reactionButtons.size() - 1;
-            int i12 = i - (((ReactionButton) this.reactionButtons.get(size)).x + ((ReactionButton) this.reactionButtons.get(size)).width);
-            while (i8 <= size) {
-                ((ReactionButton) this.reactionButtons.get(i8)).x += i12;
-                i8++;
+            int i13 = i - (((ReactionButton) this.reactionButtons.get(size)).x + ((ReactionButton) this.reactionButtons.get(size)).width);
+            while (i9 <= size) {
+                ((ReactionButton) this.reactionButtons.get(i9)).x += i13;
+                i9++;
             }
         } else if (i2 == 1 && !this.reactionButtons.isEmpty()) {
-            int i13 = ((ReactionButton) this.reactionButtons.get(0)).y;
-            int i14 = 0;
-            for (int i15 = 0; i15 < this.reactionButtons.size(); i15++) {
-                if (((ReactionButton) this.reactionButtons.get(i15)).y != i13) {
-                    int i16 = i15 - 1;
-                    int i17 = i - (((ReactionButton) this.reactionButtons.get(i16)).x + ((ReactionButton) this.reactionButtons.get(i16)).width);
-                    while (i14 < i15) {
-                        ((ReactionButton) this.reactionButtons.get(i14)).x += i17;
-                        i14++;
-                    }
-                    i14 = i15;
-                }
-            }
-            int size2 = this.reactionButtons.size() - 1;
-            int i18 = i - (((ReactionButton) this.reactionButtons.get(size2)).x + ((ReactionButton) this.reactionButtons.get(size2)).width);
-            while (i14 <= size2) {
-                ((ReactionButton) this.reactionButtons.get(i14)).x = (int) (r12.x + (i18 / 2.0f));
-                i14++;
+            for (int i14 = 0; i14 < this.reactionButtons.size(); i14++) {
+                ReactionButton reactionButton2 = (ReactionButton) this.reactionButtons.get(i14);
+                int i15 = reactionButton2.top;
+                reactionButton2.x = (int) (reactionButton2.x + ((i - ((i15 < 0 || i15 >= this.reactionLineWidths.size()) ? 0.0f : ((Integer) this.reactionLineWidths.get(reactionButton2.top)).intValue())) / 2.0f));
             }
         }
-        this.lastLineX = i4;
+        this.lastLineX = i3;
         if (i2 == 5 || i2 == 1) {
             this.width = i;
         } else {
-            this.width = i3;
+            this.width = i4;
         }
         this.height = i5 + (this.reactionButtons.size() == 0 ? 0 : AndroidUtilities.dp(26.0f));
         this.drawServiceShaderBackground = 0.0f;

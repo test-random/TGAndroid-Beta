@@ -971,14 +971,14 @@ public class FilterCreateActivity extends BaseFragment {
         }
 
         protected CharSequence getTitle(TextView textView) {
-            CharSequence charSequence;
+            Object obj;
             if (this.filter != null) {
                 Paint.FontMetricsInt fontMetricsInt = textView == null ? null : textView.getPaint().getFontMetricsInt();
-                charSequence = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(new SpannableStringBuilder(this.filter.name), fontMetricsInt, false), this.filter.entities, fontMetricsInt);
+                obj = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji(new SpannableStringBuilder(this.filter.name), fontMetricsInt, false), this.filter.entities, fontMetricsInt);
             } else {
-                charSequence = "";
+                obj = "";
             }
-            return LocaleController.formatSpannable(R.string.FolderLinkShareTitle2, charSequence);
+            return LocaleController.formatSpannable(R.string.FolderLinkShareTitle2, obj);
         }
 
         @Override

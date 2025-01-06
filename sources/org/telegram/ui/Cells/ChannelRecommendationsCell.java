@@ -25,7 +25,9 @@ import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
+import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedFloat;
@@ -79,7 +81,7 @@ public class ChannelRecommendationsCell {
         public final ImageReceiver[] avatarImageReceiver;
         public final ButtonBounce bounce;
         private final ChatMessageCell cell;
-        public final TLRPC.Chat chat;
+        public final TLObject chat;
         public final boolean isLock;
         private final CharSequence name;
         private StaticLayout nameText;
@@ -96,15 +98,14 @@ public class ChannelRecommendationsCell {
         private final Paint subscribersStrokePaint;
         private final Text subscribersText;
 
-        public ChannelBlock(int i, final ChatMessageCell chatMessageCell, TLRPC.Chat chat) {
-            int i2;
+        public ChannelBlock(int i, final ChatMessageCell chatMessageCell, TLObject tLObject) {
             TextPaint textPaint = new TextPaint(1);
             this.nameTextPaint = textPaint;
             this.subscribersStrokePaint = new Paint(1);
             this.subscribersBackgroundPaint = new Paint(1);
             this.subscribersBackgroundDimPaint = new Paint(1);
             this.cell = chatMessageCell;
-            this.chat = chat;
+            this.chat = tLObject;
             this.bounce = new ButtonBounce(chatMessageCell) {
                 @Override
                 public void invalidate() {
@@ -119,36 +120,32 @@ public class ChannelRecommendationsCell {
             if (chatMessageCell.isCellAttachedToWindow()) {
                 attach();
             }
-            this.avatarDrawable = r3;
+            this.avatarDrawable = r1;
             AvatarDrawable avatarDrawable = new AvatarDrawable();
             AvatarDrawable[] avatarDrawableArr = {avatarDrawable};
-            avatarDrawable.setInfo(i, chat);
-            imageReceiverArr[0].setForUserOrChat(chat, avatarDrawableArr[0]);
+            avatarDrawable.setInfo(i, tLObject);
+            imageReceiverArr[0].setForUserOrChat(tLObject, avatarDrawableArr[0]);
             textPaint.setTextSize(AndroidUtilities.dp(11.0f));
-            String str = chat != null ? chat.title : "";
+            String userName = tLObject instanceof TLRPC.Chat ? ((TLRPC.Chat) tLObject).title : tLObject instanceof TLRPC.User ? UserObject.getUserName((TLRPC.User) tLObject) : "";
             try {
-                str = Emoji.replaceEmoji(str, textPaint.getFontMetricsInt(), false);
+                userName = Emoji.replaceEmoji(userName, textPaint.getFontMetricsInt(), false);
             } catch (Exception unused) {
             }
-            this.name = str;
+            this.name = userName;
             this.subscribersStrokePaint.setStyle(Paint.Style.STROKE);
             this.isLock = false;
             this.subscribersDrawable = chatMessageCell.getContext().getResources().getDrawable(R.drawable.mini_reply_user).mutate();
-            if (chat == null || (i2 = chat.participants_count) <= 1) {
-                this.subscribersText = null;
-            } else {
-                this.subscribersText = new Text(LocaleController.formatShortNumber(i2, null), 9.33f, AndroidUtilities.bold());
-            }
+            this.subscribersText = getSubscribersCount(tLObject) == null ? null : new Text(getSubscribersCount(tLObject), 9.33f, AndroidUtilities.bold());
         }
 
-        public ChannelBlock(int i, final ChatMessageCell chatMessageCell, TLRPC.Chat[] chatArr, int i2) {
-            TLRPC.Chat chat;
+        public ChannelBlock(int i, final ChatMessageCell chatMessageCell, TLObject[] tLObjectArr, int i2) {
+            TLObject tLObject;
             this.nameTextPaint = new TextPaint(1);
             this.subscribersStrokePaint = new Paint(1);
             this.subscribersBackgroundPaint = new Paint(1);
             this.subscribersBackgroundDimPaint = new Paint(1);
             this.cell = chatMessageCell;
-            this.chat = chatArr[0];
+            this.chat = tLObjectArr[0];
             this.bounce = new ButtonBounce(chatMessageCell) {
                 @Override
                 public void invalidate() {
@@ -162,7 +159,7 @@ public class ChannelRecommendationsCell {
                 this.avatarImageReceiver[i3].setParentView(chatMessageCell);
                 this.avatarImageReceiver[i3].setRoundRadius(avatarSize());
                 this.avatarDrawable[i3] = new AvatarDrawable();
-                if (i3 >= chatArr.length || (chat = chatArr[i3]) == null) {
+                if (i3 >= tLObjectArr.length || (tLObject = tLObjectArr[i3]) == null) {
                     final Paint paint = new Paint(1);
                     final int blendOver = Theme.blendOver(chatMessageCell.getThemedColor(Theme.key_chat_inBubble), Theme.multAlpha(chatMessageCell.getThemedColor(Theme.key_windowBackgroundWhiteGrayText), 0.5f));
                     paint.setColor(blendOver);
@@ -188,8 +185,8 @@ public class ChannelRecommendationsCell {
                         }
                     });
                 } else {
-                    this.avatarDrawable[i3].setInfo(i, chat);
-                    this.avatarImageReceiver[i3].setForUserOrChat(chatArr[i3], this.avatarDrawable[i3]);
+                    this.avatarDrawable[i3].setInfo(i, tLObject);
+                    this.avatarImageReceiver[i3].setForUserOrChat(tLObjectArr[i3], this.avatarDrawable[i3]);
                 }
             }
             if (chatMessageCell.isCellAttachedToWindow()) {
@@ -201,8 +198,7 @@ public class ChannelRecommendationsCell {
             this.subscribersStrokePaint.setStyle(Paint.Style.STROKE);
             this.isLock = true;
             this.subscribersDrawable = isPremium ? null : chatMessageCell.getContext().getResources().getDrawable(R.drawable.mini_switch_lock).mutate();
-            TLRPC.Chat chat2 = this.chat;
-            if (chat2 == null || chat2.participants_count <= 1) {
+            if (getSubscribersCount(this.chat) == null) {
                 this.subscribersText = null;
                 return;
             }
@@ -248,6 +244,21 @@ public class ChannelRecommendationsCell {
             float f4 = 0.35f * f2;
             rectF.set(((f2 - f4) / 2.0f) + f, AndroidUtilities.dp(83.0f), f + ((f2 + f4) / 2.0f), AndroidUtilities.dp(91.0f));
             path.addRoundRect(rectF, AndroidUtilities.dp(2.5f), AndroidUtilities.dp(2.5f), direction);
+        }
+
+        private String getSubscribersCount(TLObject tLObject) {
+            int i;
+            if (tLObject instanceof TLRPC.Chat) {
+                int i2 = ((TLRPC.Chat) tLObject).participants_count;
+                if (i2 <= 1) {
+                    return null;
+                }
+                return LocaleController.formatShortNumber(i2, null);
+            }
+            if (!(tLObject instanceof TLRPC.User) || (i = ((TLRPC.User) tLObject).bot_active_users) <= 1) {
+                return null;
+            }
+            return LocaleController.formatShortNumber(i, null);
         }
 
         public static int height() {
@@ -409,9 +420,9 @@ public class ChannelRecommendationsCell {
         }
     }
 
-    public void didClickChannel(TLRPC.Chat chat, boolean z) {
+    public void didClickChannel(TLObject tLObject, boolean z) {
         if (this.cell.getDelegate() != null) {
-            this.cell.getDelegate().didPressChannelRecommendation(this.cell, chat, z);
+            this.cell.getDelegate().didPressChannelRecommendation(this.cell, tLObject, z);
         }
     }
 
@@ -538,7 +549,7 @@ public class ChannelRecommendationsCell {
         this.serviceTextPaint.setTextSize(AndroidUtilities.dp(14.0f));
         this.serviceTextPaint.setColor(this.cell.getThemedColor(Theme.key_chat_serviceText));
         this.serviceText = new StaticLayout(LocaleController.getString(R.string.ChannelJoined), this.serviceTextPaint, this.msg.getMaxMessageTextWidth(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
-        this.serviceTextLeft = r13.getWidth();
+        this.serviceTextLeft = r14.getWidth();
         this.serviceTextRight = 0.0f;
         for (int i3 = 0; i3 < this.serviceText.getLineCount(); i3++) {
             this.serviceTextLeft = Math.min(this.serviceTextLeft, this.serviceText.getLineLeft(i3));
@@ -550,9 +561,6 @@ public class ChannelRecommendationsCell {
         this.closePaint.setStrokeJoin(Paint.Join.ROUND);
         this.closePaint.setColor(this.cell.getThemedColor(Theme.key_dialogEmptyImage));
         this.cell.totalHeight = AndroidUtilities.dp(14.66f) + this.serviceTextHeight;
-        if (this.headerText == null) {
-            this.headerText = new Text(LocaleController.getString(R.string.SimilarChannels), 14.0f, AndroidUtilities.bold()).hackClipBounds();
-        }
         for (int i4 = 0; i4 < this.channels.size(); i4++) {
             ((ChannelBlock) this.channels.get(i4)).detach();
         }
@@ -561,7 +569,8 @@ public class ChannelRecommendationsCell {
         ArrayList arrayList = (channelRecommendations == null || channelRecommendations.chats == null) ? new ArrayList() : new ArrayList(channelRecommendations.chats);
         int i5 = 0;
         while (i5 < arrayList.size()) {
-            if (!ChatObject.isNotInChat((TLRPC.Chat) arrayList.get(i5))) {
+            TLObject tLObject = (TLObject) arrayList.get(i5);
+            if ((tLObject instanceof TLRPC.Chat) && !ChatObject.isNotInChat((TLRPC.Chat) tLObject)) {
                 arrayList.remove(i5);
                 i5--;
             }
@@ -576,17 +585,20 @@ public class ChannelRecommendationsCell {
             }
             int min = Math.min(size, 10);
             for (int i6 = 0; i6 < min; i6++) {
-                this.channels.add(new ChannelBlock(this.currentAccount, this.cell, (TLRPC.Chat) arrayList.get(i6)));
+                this.channels.add(new ChannelBlock(this.currentAccount, this.cell, (TLObject) arrayList.get(i6)));
             }
             if (min < arrayList.size()) {
-                TLRPC.Chat chat = null;
-                TLRPC.Chat chat2 = (min < 0 || min >= arrayList.size()) ? null : (TLRPC.Chat) arrayList.get(min);
-                TLRPC.Chat chat3 = (min < 0 || (i2 = min + 1) >= arrayList.size()) ? null : (TLRPC.Chat) arrayList.get(i2);
+                TLObject tLObject2 = null;
+                TLObject tLObject3 = (min < 0 || min >= arrayList.size()) ? null : (TLObject) arrayList.get(min);
+                TLObject tLObject4 = (min < 0 || (i2 = min + 1) >= arrayList.size()) ? null : (TLObject) arrayList.get(i2);
                 if (min >= 0 && (i = min + 2) < arrayList.size()) {
-                    chat = (TLRPC.Chat) arrayList.get(i);
+                    tLObject2 = (TLObject) arrayList.get(i);
                 }
-                this.channels.add(new ChannelBlock(this.currentAccount, this.cell, new TLRPC.Chat[]{chat2, chat3, chat}, (arrayList.size() + channelRecommendations.more) - min));
+                this.channels.add(new ChannelBlock(this.currentAccount, this.cell, new TLObject[]{tLObject3, tLObject4, tLObject2}, (arrayList.size() + channelRecommendations.more) - min));
             }
+        }
+        if (this.headerText == null) {
+            this.headerText = new Text(LocaleController.getString(this.dialogId > 0 ? R.string.SimilarBots : R.string.SimilarChannels), 14.0f, AndroidUtilities.bold()).hackClipBounds();
         }
         if (isExpanded()) {
             this.cell.totalHeight += AndroidUtilities.dp(144.0f);

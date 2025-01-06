@@ -4304,7 +4304,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
 
         @Override
-        public void onBindViewHolder(final androidx.recyclerview.widget.RecyclerView.ViewHolder r31, final int r32) {
+        public void onBindViewHolder(final androidx.recyclerview.widget.RecyclerView.ViewHolder r28, final int r29) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ProfileActivity.ListAdapter.onBindViewHolder(androidx.recyclerview.widget.RecyclerView$ViewHolder, int):void");
         }
 
@@ -13077,6 +13077,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     public void didReceivedNotification(int i, int i2, final Object... objArr) {
         TL_stories.PeerStories peerStories;
         ListAdapter listAdapter;
+        ListAdapter listAdapter2;
         TLRPC.ChatFull chatFull;
         TLRPC.ChatFull chatFull2;
         TLRPC.TL_inputGroupCall tL_inputGroupCall;
@@ -13363,8 +13364,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 MessageObject messageObject = (MessageObject) arrayList.get(i4);
                                 if (this.currentEncryptedChat != null) {
                                     TLRPC.MessageAction messageAction = messageObject.messageOwner.action;
-                                    if ((messageAction instanceof TLRPC.TL_messageEncryptedAction) && (messageAction.encryptedAction instanceof TLRPC.TL_decryptedMessageActionSetMessageTTL) && (listAdapter = this.listAdapter) != null) {
-                                        listAdapter.notifyDataSetChanged();
+                                    if ((messageAction instanceof TLRPC.TL_messageEncryptedAction) && (messageAction.encryptedAction instanceof TLRPC.TL_decryptedMessageActionSetMessageTTL) && (listAdapter2 = this.listAdapter) != null) {
+                                        listAdapter2.notifyDataSetChanged();
                                     }
                                 }
                             }
@@ -13388,11 +13389,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             updateRowsIds();
                             if (i5 == this.passwordSuggestionRow && i6 == this.phoneSuggestionRow && i7 == this.graceSuggestionRow) {
                                 return;
+                            } else {
+                                listAdapter = this.listAdapter;
                             }
-                            this.listAdapter.notifyDataSetChanged();
-                            return;
-                        }
-                        if (i != NotificationCenter.topicsDidLoaded) {
+                        } else if (i != NotificationCenter.topicsDidLoaded) {
                             if (i == NotificationCenter.updateSearchSettings) {
                                 SearchAdapter searchAdapter = this.searchAdapter;
                                 if (searchAdapter != null) {
@@ -13450,7 +13450,18 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                             }
                                             return;
                                         }
-                                        return;
+                                        if (i != NotificationCenter.channelRecommendationsLoaded) {
+                                            return;
+                                        }
+                                        long longValue2 = ((Long) objArr[0]).longValue();
+                                        if (this.sharedMediaRow >= 0 || longValue2 != getDialogId()) {
+                                            return;
+                                        }
+                                        updateRowsIds();
+                                        listAdapter = this.listAdapter;
+                                        if (listAdapter == null) {
+                                            return;
+                                        }
                                     }
                                 }
                                 updateEditColorIcon();
@@ -13459,6 +13470,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         } else if (!this.isTopic) {
                             return;
                         }
+                        listAdapter.notifyDataSetChanged();
+                        return;
                     }
                 }
             }
@@ -14073,6 +14086,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().addObserver(this, NotificationCenter.botStarsUpdated);
         getNotificationCenter().addObserver(this, NotificationCenter.botStarsTransactionsLoaded);
         getNotificationCenter().addObserver(this, NotificationCenter.dialogDeleted);
+        getNotificationCenter().addObserver(this, NotificationCenter.channelRecommendationsLoaded);
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
         updateRowsIds();
         ListAdapter listAdapter = this.listAdapter;
@@ -14172,6 +14186,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().removeObserver(this, NotificationCenter.botStarsUpdated);
         getNotificationCenter().removeObserver(this, NotificationCenter.botStarsTransactionsLoaded);
         getNotificationCenter().removeObserver(this, NotificationCenter.dialogDeleted);
+        getNotificationCenter().removeObserver(this, NotificationCenter.channelRecommendationsLoaded);
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
         ProfileGalleryView profileGalleryView = this.avatarsViewPager;
         if (profileGalleryView != null) {
@@ -15063,9 +15078,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     clippingTextViewSwitcher3 = this.mediaCounterTextView;
                     formatPluralString = LocaleController.formatPluralString("ProfileStoriesArchiveCount", this.sharedMediaLayout.getStoriesCount(closestTab), new Object[0]);
                 } else if (closestTab == 10) {
-                    MessagesController.ChannelRecommendations channelRecommendations = MessagesController.getInstance(this.currentAccount).getChannelRecommendations(this.chatId);
+                    MessagesController.ChannelRecommendations channelRecommendations = MessagesController.getInstance(this.currentAccount).getChannelRecommendations(getDialogId());
                     clippingTextViewSwitcher2 = this.mediaCounterTextView;
-                    formatPluralStringComma = LocaleController.formatPluralString("Channels", channelRecommendations == null ? 0 : channelRecommendations.chats.size() + channelRecommendations.more, new Object[0]);
+                    formatPluralStringComma = LocaleController.formatPluralString(this.isBot ? "Bots" : "Channels", channelRecommendations == null ? 0 : channelRecommendations.chats.size() + channelRecommendations.more, new Object[0]);
                 } else if (closestTab == 12) {
                     int messagesCount = getMessagesController().getSavedMessagesController().getMessagesCount(getDialogId());
                     AudioPlayerAlert.ClippingTextViewSwitcher clippingTextViewSwitcher5 = this.mediaCounterTextView;

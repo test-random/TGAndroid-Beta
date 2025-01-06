@@ -2,13 +2,17 @@ package org.telegram.tgnet.tl;
 
 import java.util.ArrayList;
 import org.telegram.messenger.DialogObject;
+import org.telegram.messenger.MessagesStorage$$ExternalSyntheticLambda42;
 import org.telegram.tgnet.InputSerializedData;
 import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1;
 import org.telegram.tgnet.TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1;
+import org.telegram.tgnet.TLRPC$TL_messageReactions$$ExternalSyntheticLambda0;
+import org.telegram.tgnet.TLRPC$TL_updatePrivacy$$ExternalSyntheticLambda0;
 import org.telegram.tgnet.Vector;
+import org.telegram.tgnet.Vector$$ExternalSyntheticLambda3;
 import org.telegram.tgnet.tl.TL_stats;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.Stories.recorder.StoryPrivacyBottomSheet;
@@ -82,6 +86,9 @@ public class TL_stories {
                     break;
                 case 1235637404:
                     tL_mediaAreaWeather2 = new TL_mediaAreaWeather();
+                    break;
+                case 1468491885:
+                    tL_mediaAreaWeather2 = new TL_mediaAreaStarGift();
                     break;
                 case 1996756655:
                     tL_mediaAreaWeather2 = new TL_mediaAreaChannelPost();
@@ -502,54 +509,17 @@ public class TL_stories {
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.flags = inputSerializedData.readInt32(z);
             this.count = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
+            this.stories = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_stories.TL_foundStory.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                TL_foundStory TLdeserialize = TL_foundStory.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.stories.add(TLdeserialize);
-            }
+            }, z);
             if ((this.flags & 1) != 0) {
                 this.next_offset = inputSerializedData.readString(z);
             }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.chats.add(TLdeserialize2);
-            }
-            int readInt325 = inputSerializedData.readInt32(z);
-            if (readInt325 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
-                }
-                return;
-            }
-            int readInt326 = inputSerializedData.readInt32(z);
-            for (int i3 = 0; i3 < readInt326; i3++) {
-                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize3 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize3);
-            }
+            this.chats = Vector.deserialize(inputSerializedData, new TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1(), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
         }
 
         @Override
@@ -557,27 +527,12 @@ public class TL_stories {
             outputSerializedData.writeInt32(-488736969);
             outputSerializedData.writeInt32(this.flags);
             outputSerializedData.writeInt32(this.count);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.stories.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.stories.get(i).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.stories);
             if ((this.flags & 1) != 0) {
                 outputSerializedData.writeString(this.next_offset);
             }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.chats.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.chats.get(i2).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size3 = this.users.size();
-            outputSerializedData.writeInt32(size3);
-            for (int i3 = 0; i3 < size3; i3++) {
-                this.users.get(i3).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.chats);
+            Vector.serialize(outputSerializedData, this.users);
         }
     }
 
@@ -886,6 +841,24 @@ public class TL_stories {
         }
     }
 
+    public static class TL_mediaAreaStarGift extends MediaArea {
+        public static final int constructor = 1468491885;
+        public String slug;
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.coordinates = MediaAreaCoordinates.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+            this.slug = inputSerializedData.readString(z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(1468491885);
+            this.coordinates.serializeToStream(outputSerializedData);
+            outputSerializedData.writeString(this.slug);
+        }
+    }
+
     public static class TL_mediaAreaSuggestedReaction extends MediaArea {
         public static final int constructor = 340088945;
 
@@ -1102,21 +1075,7 @@ public class TL_stories {
             if ((this.flags & 1) != 0) {
                 this.max_read_id = inputSerializedData.readInt32(z);
             }
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                StoryItem TLdeserialize = StoryItem.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.stories.add(TLdeserialize);
-            }
+            this.stories = Vector.deserialize(inputSerializedData, new TL_stories$TL_peerStories$$ExternalSyntheticLambda0(), z);
         }
 
         @Override
@@ -1127,12 +1086,7 @@ public class TL_stories {
             if ((this.flags & 1) != 0) {
                 outputSerializedData.writeInt32(this.max_read_id);
             }
-            outputSerializedData.writeInt32(481674261);
-            int size = this.stories.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.stories.get(i).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.stories);
         }
     }
 
@@ -1149,21 +1103,7 @@ public class TL_stories {
             if ((this.flags & 1) != 0) {
                 this.max_read_id = inputSerializedData.readInt32(z);
             }
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                StoryItem TLdeserialize = StoryItem.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.stories.add(TLdeserialize);
-            }
+            this.stories = Vector.deserialize(inputSerializedData, new TL_stories$TL_peerStories$$ExternalSyntheticLambda0(), z);
         }
 
         @Override
@@ -1174,12 +1114,7 @@ public class TL_stories {
             if ((this.flags & 1) != 0) {
                 outputSerializedData.writeInt32(this.max_read_id);
             }
-            outputSerializedData.writeInt32(481674261);
-            int size = this.stories.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.stories.get(i).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.stories);
         }
     }
 
@@ -1199,12 +1134,7 @@ public class TL_stories {
             outputSerializedData.writeInt32(constructor);
             outputSerializedData.writeInt32(this.flags);
             if ((this.flags & 1) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.slots.size();
-                outputSerializedData.writeInt32(size);
-                for (int i = 0; i < size; i++) {
-                    outputSerializedData.writeInt32(this.slots.get(i).intValue());
-                }
+                Vector.serializeInt(outputSerializedData, this.slots);
             }
             this.peer.serializeToStream(outputSerializedData);
         }
@@ -1234,39 +1164,16 @@ public class TL_stories {
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.flags = inputSerializedData.readInt32(z);
             this.count = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
+            this.boosts = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_stories.Boost.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                Boost TLdeserialize = Boost.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.boosts.add(TLdeserialize);
-            }
+            }, z);
             if ((this.flags & 1) != 0) {
                 this.next_offset = inputSerializedData.readString(z);
             }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.User TLdeserialize2 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize2);
-            }
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
         }
 
         @Override
@@ -1274,21 +1181,11 @@ public class TL_stories {
             outputSerializedData.writeInt32(constructor);
             outputSerializedData.writeInt32(this.flags);
             outputSerializedData.writeInt32(this.count);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.boosts.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.boosts.get(i).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.boosts);
             if ((this.flags & 1) != 0) {
                 outputSerializedData.writeString(this.next_offset);
             }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.users.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.users.get(i2).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.users);
         }
     }
 
@@ -1337,34 +1234,15 @@ public class TL_stories {
             }
             this.boost_url = inputSerializedData.readString(z);
             if ((this.flags & 8) != 0) {
-                int readInt322 = inputSerializedData.readInt32(z);
-                if (readInt322 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
+                this.prepaid_giveaways = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                    @Override
+                    public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                        return TL_stories.PrepaidGiveaway.TLdeserialize(inputSerializedData2, i, z2);
                     }
-                    return;
-                }
-                int readInt323 = inputSerializedData.readInt32(z);
-                for (int i = 0; i < readInt323; i++) {
-                    PrepaidGiveaway TLdeserialize = PrepaidGiveaway.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize == null) {
-                        return;
-                    }
-                    this.prepaid_giveaways.add(TLdeserialize);
-                }
+                }, z);
             }
             if ((this.flags & 4) != 0) {
-                int readInt324 = inputSerializedData.readInt32(z);
-                if (readInt324 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt324)));
-                    }
-                } else {
-                    int readInt325 = inputSerializedData.readInt32(z);
-                    for (int i2 = 0; i2 < readInt325; i2++) {
-                        this.my_boost_slots.add(Integer.valueOf(inputSerializedData.readInt32(z)));
-                    }
-                }
+                this.my_boost_slots = Vector.deserializeInt(inputSerializedData, z);
             }
         }
 
@@ -1388,20 +1266,10 @@ public class TL_stories {
             }
             outputSerializedData.writeString(this.boost_url);
             if ((this.flags & 8) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.prepaid_giveaways.size();
-                outputSerializedData.writeInt32(size);
-                for (int i2 = 0; i2 < size; i2++) {
-                    this.prepaid_giveaways.get(i2).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.prepaid_giveaways);
             }
             if ((this.flags & 4) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size2 = this.my_boost_slots.size();
-                outputSerializedData.writeInt32(size2);
-                for (int i3 = 0; i3 < size2; i3++) {
-                    outputSerializedData.writeInt32(this.my_boost_slots.get(i3).intValue());
-                }
+                Vector.serializeInt(outputSerializedData, this.my_boost_slots);
             }
         }
     }
@@ -1481,74 +1349,22 @@ public class TL_stories {
 
         @Override
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
+            this.my_boosts = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_stories.TL_myBoost.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                TL_myBoost TLdeserialize = TL_myBoost.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.my_boosts.add(TLdeserialize);
-            }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.chats.add(TLdeserialize2);
-            }
-            int readInt325 = inputSerializedData.readInt32(z);
-            if (readInt325 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
-                }
-                return;
-            }
-            int readInt326 = inputSerializedData.readInt32(z);
-            for (int i3 = 0; i3 < readInt326; i3++) {
-                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize3 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize3);
-            }
+            }, z);
+            this.chats = Vector.deserialize(inputSerializedData, new TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1(), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
         }
 
         @Override
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(constructor);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.my_boosts.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.my_boosts.get(i).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.chats.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.chats.get(i2).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size3 = this.users.size();
-            outputSerializedData.writeInt32(size3);
-            for (int i3 = 0; i3 < size3; i3++) {
-                this.users.get(i3).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.my_boosts);
+            Vector.serialize(outputSerializedData, this.chats);
+            Vector.serialize(outputSerializedData, this.users);
         }
     }
 
@@ -1754,51 +1570,14 @@ public class TL_stories {
             this.has_more = (readInt32 & 1) != 0;
             this.count = inputSerializedData.readInt32(z);
             this.state = inputSerializedData.readString(z);
-            int readInt322 = inputSerializedData.readInt32(z);
-            if (readInt322 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
+            this.peer_stories = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_stories.PeerStories.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt323 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt323; i++) {
-                PeerStories TLdeserialize = PeerStories.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.peer_stories.add(TLdeserialize);
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            if (readInt324 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt324)));
-                }
-                return;
-            }
-            int readInt325 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt325; i2++) {
-                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.chats.add(TLdeserialize2);
-            }
-            int readInt326 = inputSerializedData.readInt32(z);
-            if (readInt326 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt326)));
-                }
-                return;
-            }
-            int readInt327 = inputSerializedData.readInt32(z);
-            for (int i3 = 0; i3 < readInt327; i3++) {
-                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize3 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize3);
-            }
+            }, z);
+            this.chats = Vector.deserialize(inputSerializedData, new TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1(), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
             this.stealth_mode = TL_storiesStealthMode.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
         }
 
@@ -1810,24 +1589,9 @@ public class TL_stories {
             outputSerializedData.writeInt32(i);
             outputSerializedData.writeInt32(this.count);
             outputSerializedData.writeString(this.state);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.peer_stories.size();
-            outputSerializedData.writeInt32(size);
-            for (int i2 = 0; i2 < size; i2++) {
-                this.peer_stories.get(i2).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.chats.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i3 = 0; i3 < size2; i3++) {
-                this.chats.get(i3).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size3 = this.users.size();
-            outputSerializedData.writeInt32(size3);
-            for (int i4 = 0; i4 < size3; i4++) {
-                this.users.get(i4).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.peer_stories);
+            Vector.serialize(outputSerializedData, this.chats);
+            Vector.serialize(outputSerializedData, this.users);
             this.stealth_mode.serializeToStream(outputSerializedData);
         }
     }
@@ -1884,12 +1648,7 @@ public class TL_stories {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-1369842849);
             this.peer.serializeToStream(outputSerializedData);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.id.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                outputSerializedData.writeInt32(this.id.get(i).intValue());
-            }
+            Vector.serializeInt(outputSerializedData, this.id);
         }
     }
 
@@ -1919,31 +1678,16 @@ public class TL_stories {
                 this.media.serializeToStream(outputSerializedData);
             }
             if ((this.flags & 8) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.media_areas.size();
-                outputSerializedData.writeInt32(size);
-                for (int i = 0; i < size; i++) {
-                    this.media_areas.get(i).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.media_areas);
             }
             if ((this.flags & 2) != 0) {
                 outputSerializedData.writeString(this.caption);
             }
             if ((this.flags & 2) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size2 = this.entities.size();
-                outputSerializedData.writeInt32(size2);
-                for (int i2 = 0; i2 < size2; i2++) {
-                    this.entities.get(i2).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.entities);
             }
             if ((this.flags & 4) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size3 = this.privacy_rules.size();
-                outputSerializedData.writeInt32(size3);
-                for (int i3 = 0; i3 < size3; i3++) {
-                    this.privacy_rules.get(i3).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.privacy_rules);
             }
         }
     }
@@ -2032,12 +1776,7 @@ public class TL_stories {
         @Override
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(1398375363);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.id.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.id.get(i).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.id);
         }
     }
 
@@ -2111,12 +1850,7 @@ public class TL_stories {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(1467271796);
             this.peer.serializeToStream(outputSerializedData);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.id.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                outputSerializedData.writeInt32(this.id.get(i).intValue());
-            }
+            Vector.serializeInt(outputSerializedData, this.id);
         }
     }
 
@@ -2134,12 +1868,7 @@ public class TL_stories {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(685862088);
             this.peer.serializeToStream(outputSerializedData);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.id.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                outputSerializedData.writeInt32(this.id.get(i).intValue());
-            }
+            Vector.serializeInt(outputSerializedData, this.id);
         }
     }
 
@@ -2194,12 +1923,7 @@ public class TL_stories {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-1308456197);
             this.peer.serializeToStream(outputSerializedData);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.id.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                outputSerializedData.writeInt32(this.id.get(i).intValue());
-            }
+            Vector.serializeInt(outputSerializedData, this.id);
         }
     }
 
@@ -2224,54 +1948,16 @@ public class TL_stories {
         @Override
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.stories = PeerStories.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                TLRPC.Chat TLdeserialize = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.chats.add(TLdeserialize);
-            }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.User TLdeserialize2 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize2);
-            }
+            this.chats = Vector.deserialize(inputSerializedData, new TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1(), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
         }
 
         @Override
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-890861720);
             this.stories.serializeToStream(outputSerializedData);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.chats.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.chats.get(i).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.users.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.users.get(i2).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.chats);
+            Vector.serialize(outputSerializedData, this.users);
         }
     }
 
@@ -2309,12 +1995,7 @@ public class TL_stories {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(433646405);
             this.peer.serializeToStream(outputSerializedData);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.id.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                outputSerializedData.writeInt32(this.id.get(i).intValue());
-            }
+            Vector.serialize(outputSerializedData, new Vector$$ExternalSyntheticLambda3(outputSerializedData), this.id);
             outputSerializedData.writeByteArray(this.option);
             outputSerializedData.writeString(this.message);
         }
@@ -2459,65 +2140,12 @@ public class TL_stories {
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.flags = inputSerializedData.readInt32(z);
             this.count = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                StoryItem TLdeserialize = StoryItem.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.stories.add(TLdeserialize);
-            }
+            this.stories = Vector.deserialize(inputSerializedData, new TL_stories$TL_peerStories$$ExternalSyntheticLambda0(), z);
             if ((this.flags & 1) != 0) {
-                int readInt323 = inputSerializedData.readInt32(z);
-                if (readInt323 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                    }
-                    return;
-                } else {
-                    int readInt324 = inputSerializedData.readInt32(z);
-                    for (int i2 = 0; i2 < readInt324; i2++) {
-                        this.pinned_to_top.add(Integer.valueOf(inputSerializedData.readInt32(z)));
-                    }
-                }
+                this.pinned_to_top = Vector.deserializeInt(inputSerializedData, z);
             }
-            int readInt325 = inputSerializedData.readInt32(z);
-            if (readInt325 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
-                }
-                return;
-            }
-            int readInt326 = inputSerializedData.readInt32(z);
-            for (int i3 = 0; i3 < readInt326; i3++) {
-                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.chats.add(TLdeserialize2);
-            }
-            int readInt327 = inputSerializedData.readInt32(z);
-            if (readInt327 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt327)));
-                }
-                return;
-            }
-            int readInt328 = inputSerializedData.readInt32(z);
-            for (int i4 = 0; i4 < readInt328; i4++) {
-                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize3 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize3);
-            }
+            this.chats = Vector.deserialize(inputSerializedData, new TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1(), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
         }
 
         @Override
@@ -2525,32 +2153,12 @@ public class TL_stories {
             outputSerializedData.writeInt32(1673780490);
             outputSerializedData.writeInt32(this.flags);
             outputSerializedData.writeInt32(this.count);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.stories.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.stories.get(i).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.stories);
             if ((this.flags & 1) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size2 = this.pinned_to_top.size();
-                outputSerializedData.writeInt32(size2);
-                for (int i2 = 0; i2 < size2; i2++) {
-                    outputSerializedData.writeInt32(this.pinned_to_top.get(i2).intValue());
-                }
+                Vector.serializeInt(outputSerializedData, this.pinned_to_top);
             }
-            outputSerializedData.writeInt32(481674261);
-            int size3 = this.chats.size();
-            outputSerializedData.writeInt32(size3);
-            for (int i3 = 0; i3 < size3; i3++) {
-                this.chats.get(i3).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size4 = this.users.size();
-            outputSerializedData.writeInt32(size4);
-            for (int i4 = 0; i4 < size4; i4++) {
-                this.users.get(i4).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.chats);
+            Vector.serialize(outputSerializedData, this.users);
         }
     }
 
@@ -2674,56 +2282,14 @@ public class TL_stories {
                 this.caption = inputSerializedData.readString(z);
             }
             if ((this.flags & 2) != 0) {
-                int readInt322 = inputSerializedData.readInt32(z);
-                if (readInt322 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
-                    }
-                    return;
-                }
-                int readInt323 = inputSerializedData.readInt32(z);
-                for (int i = 0; i < readInt323; i++) {
-                    TLRPC.MessageEntity TLdeserialize = TLRPC.MessageEntity.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize == null) {
-                        return;
-                    }
-                    this.entities.add(TLdeserialize);
-                }
+                this.entities = Vector.deserialize(inputSerializedData, new MessagesStorage$$ExternalSyntheticLambda42(), z);
             }
             this.media = TLRPC.MessageMedia.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             if ((this.flags & 16384) != 0) {
-                int readInt324 = inputSerializedData.readInt32(z);
-                if (readInt324 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt324)));
-                    }
-                    return;
-                }
-                int readInt325 = inputSerializedData.readInt32(z);
-                for (int i2 = 0; i2 < readInt325; i2++) {
-                    MediaArea TLdeserialize2 = MediaArea.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize2 == null) {
-                        return;
-                    }
-                    this.media_areas.add(TLdeserialize2);
-                }
+                this.media_areas = Vector.deserialize(inputSerializedData, new TL_stories$TL_storyItem$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 4) != 0) {
-                int readInt326 = inputSerializedData.readInt32(z);
-                if (readInt326 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt326)));
-                    }
-                    return;
-                }
-                int readInt327 = inputSerializedData.readInt32(z);
-                for (int i3 = 0; i3 < readInt327; i3++) {
-                    TLRPC.PrivacyRule TLdeserialize3 = TLRPC.PrivacyRule.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize3 == null) {
-                        return;
-                    }
-                    this.privacy.add(TLdeserialize3);
-                }
+                this.privacy = Vector.deserialize(inputSerializedData, new TLRPC$TL_updatePrivacy$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 8) != 0) {
                 this.views = StoryViews.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
@@ -2768,29 +2334,14 @@ public class TL_stories {
                 outputSerializedData.writeString(this.caption);
             }
             if ((this.flags & 2) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.entities.size();
-                outputSerializedData.writeInt32(size);
-                for (int i10 = 0; i10 < size; i10++) {
-                    this.entities.get(i10).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.entities);
             }
             this.media.serializeToStream(outputSerializedData);
             if ((this.flags & 16384) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size2 = this.media_areas.size();
-                outputSerializedData.writeInt32(size2);
-                for (int i11 = 0; i11 < size2; i11++) {
-                    this.media_areas.get(i11).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.media_areas);
             }
             if ((this.flags & 4) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size3 = this.privacy.size();
-                outputSerializedData.writeInt32(size3);
-                for (int i12 = 0; i12 < size3; i12++) {
-                    this.privacy.get(i12).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.privacy);
             }
             if ((this.flags & 8) != 0) {
                 this.views.serializeToStream(outputSerializedData);
@@ -2863,39 +2414,11 @@ public class TL_stories {
                 this.caption = inputSerializedData.readString(z);
             }
             if ((this.flags & 2) != 0) {
-                int readInt322 = inputSerializedData.readInt32(z);
-                if (readInt322 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
-                    }
-                    return;
-                }
-                int readInt323 = inputSerializedData.readInt32(z);
-                for (int i = 0; i < readInt323; i++) {
-                    TLRPC.MessageEntity TLdeserialize = TLRPC.MessageEntity.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize == null) {
-                        return;
-                    }
-                    this.entities.add(TLdeserialize);
-                }
+                this.entities = Vector.deserialize(inputSerializedData, new MessagesStorage$$ExternalSyntheticLambda42(), z);
             }
             this.media = TLRPC.MessageMedia.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             if ((this.flags & 4) != 0) {
-                int readInt324 = inputSerializedData.readInt32(z);
-                if (readInt324 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt324)));
-                    }
-                    return;
-                }
-                int readInt325 = inputSerializedData.readInt32(z);
-                for (int i2 = 0; i2 < readInt325; i2++) {
-                    TLRPC.PrivacyRule TLdeserialize2 = TLRPC.PrivacyRule.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize2 == null) {
-                        return;
-                    }
-                    this.privacy.add(TLdeserialize2);
-                }
+                this.privacy = Vector.deserialize(inputSerializedData, new TLRPC$TL_updatePrivacy$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 8) != 0) {
                 this.views = StoryViews.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
@@ -2929,21 +2452,11 @@ public class TL_stories {
                 outputSerializedData.writeString(this.caption);
             }
             if ((this.flags & 2) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.entities.size();
-                outputSerializedData.writeInt32(size);
-                for (int i9 = 0; i9 < size; i9++) {
-                    this.entities.get(i9).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.entities);
             }
             this.media.serializeToStream(outputSerializedData);
             if ((this.flags & 4) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size2 = this.privacy.size();
-                outputSerializedData.writeInt32(size2);
-                for (int i10 = 0; i10 < size2; i10++) {
-                    this.privacy.get(i10).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.privacy);
             }
             if ((this.flags & 8) != 0) {
                 this.views.serializeToStream(outputSerializedData);
@@ -2974,56 +2487,14 @@ public class TL_stories {
                 this.caption = inputSerializedData.readString(z);
             }
             if ((this.flags & 2) != 0) {
-                int readInt322 = inputSerializedData.readInt32(z);
-                if (readInt322 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
-                    }
-                    return;
-                }
-                int readInt323 = inputSerializedData.readInt32(z);
-                for (int i = 0; i < readInt323; i++) {
-                    TLRPC.MessageEntity TLdeserialize = TLRPC.MessageEntity.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize == null) {
-                        return;
-                    }
-                    this.entities.add(TLdeserialize);
-                }
+                this.entities = Vector.deserialize(inputSerializedData, new MessagesStorage$$ExternalSyntheticLambda42(), z);
             }
             this.media = TLRPC.MessageMedia.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             if ((this.flags & 16384) != 0) {
-                int readInt324 = inputSerializedData.readInt32(z);
-                if (readInt324 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt324)));
-                    }
-                    return;
-                }
-                int readInt325 = inputSerializedData.readInt32(z);
-                for (int i2 = 0; i2 < readInt325; i2++) {
-                    MediaArea TLdeserialize2 = MediaArea.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize2 == null) {
-                        return;
-                    }
-                    this.media_areas.add(TLdeserialize2);
-                }
+                this.media_areas = Vector.deserialize(inputSerializedData, new TL_stories$TL_storyItem$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 4) != 0) {
-                int readInt326 = inputSerializedData.readInt32(z);
-                if (readInt326 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt326)));
-                    }
-                    return;
-                }
-                int readInt327 = inputSerializedData.readInt32(z);
-                for (int i3 = 0; i3 < readInt327; i3++) {
-                    TLRPC.PrivacyRule TLdeserialize3 = TLRPC.PrivacyRule.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize3 == null) {
-                        return;
-                    }
-                    this.privacy.add(TLdeserialize3);
-                }
+                this.privacy = Vector.deserialize(inputSerializedData, new TLRPC$TL_updatePrivacy$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 8) != 0) {
                 this.views = StoryViews.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
@@ -3062,29 +2533,14 @@ public class TL_stories {
                 outputSerializedData.writeString(this.caption);
             }
             if ((this.flags & 2) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.entities.size();
-                outputSerializedData.writeInt32(size);
-                for (int i10 = 0; i10 < size; i10++) {
-                    this.entities.get(i10).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.entities);
             }
             this.media.serializeToStream(outputSerializedData);
             if ((this.flags & 16384) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size2 = this.media_areas.size();
-                outputSerializedData.writeInt32(size2);
-                for (int i11 = 0; i11 < size2; i11++) {
-                    this.media_areas.get(i11).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.media_areas);
             }
             if ((this.flags & 4) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size3 = this.privacy.size();
-                outputSerializedData.writeInt32(size3);
-                for (int i12 = 0; i12 < size3; i12++) {
-                    this.privacy.get(i12).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.privacy);
             }
             if ((this.flags & 8) != 0) {
                 this.views.serializeToStream(outputSerializedData);
@@ -3121,56 +2577,14 @@ public class TL_stories {
                 this.caption = inputSerializedData.readString(z);
             }
             if ((this.flags & 2) != 0) {
-                int readInt322 = inputSerializedData.readInt32(z);
-                if (readInt322 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
-                    }
-                    return;
-                }
-                int readInt323 = inputSerializedData.readInt32(z);
-                for (int i = 0; i < readInt323; i++) {
-                    TLRPC.MessageEntity TLdeserialize = TLRPC.MessageEntity.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize == null) {
-                        return;
-                    }
-                    this.entities.add(TLdeserialize);
-                }
+                this.entities = Vector.deserialize(inputSerializedData, new MessagesStorage$$ExternalSyntheticLambda42(), z);
             }
             this.media = TLRPC.MessageMedia.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
             if ((this.flags & 16384) != 0) {
-                int readInt324 = inputSerializedData.readInt32(z);
-                if (readInt324 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt324)));
-                    }
-                    return;
-                }
-                int readInt325 = inputSerializedData.readInt32(z);
-                for (int i2 = 0; i2 < readInt325; i2++) {
-                    MediaArea TLdeserialize2 = MediaArea.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize2 == null) {
-                        return;
-                    }
-                    this.media_areas.add(TLdeserialize2);
-                }
+                this.media_areas = Vector.deserialize(inputSerializedData, new TL_stories$TL_storyItem$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 4) != 0) {
-                int readInt326 = inputSerializedData.readInt32(z);
-                if (readInt326 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt326)));
-                    }
-                    return;
-                }
-                int readInt327 = inputSerializedData.readInt32(z);
-                for (int i3 = 0; i3 < readInt327; i3++) {
-                    TLRPC.PrivacyRule TLdeserialize3 = TLRPC.PrivacyRule.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize3 == null) {
-                        return;
-                    }
-                    this.privacy.add(TLdeserialize3);
-                }
+                this.privacy = Vector.deserialize(inputSerializedData, new TLRPC$TL_updatePrivacy$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 8) != 0) {
                 this.views = StoryViews.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
@@ -3212,29 +2626,14 @@ public class TL_stories {
                 outputSerializedData.writeString(this.caption);
             }
             if ((this.flags & 2) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.entities.size();
-                outputSerializedData.writeInt32(size);
-                for (int i10 = 0; i10 < size; i10++) {
-                    this.entities.get(i10).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.entities);
             }
             this.media.serializeToStream(outputSerializedData);
             if ((this.flags & 16384) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size2 = this.media_areas.size();
-                outputSerializedData.writeInt32(size2);
-                for (int i11 = 0; i11 < size2; i11++) {
-                    this.media_areas.get(i11).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.media_areas);
             }
             if ((this.flags & 4) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size3 = this.privacy.size();
-                outputSerializedData.writeInt32(size3);
-                for (int i12 = 0; i12 < size3; i12++) {
-                    this.privacy.get(i12).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.privacy);
             }
             if ((this.flags & 8) != 0) {
                 this.views.serializeToStream(outputSerializedData);
@@ -3449,37 +2848,13 @@ public class TL_stories {
                 this.forwards_count = inputSerializedData.readInt32(z);
             }
             if ((this.flags & 8) != 0) {
-                int readInt322 = inputSerializedData.readInt32(z);
-                if (readInt322 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
-                    }
-                    return;
-                }
-                int readInt323 = inputSerializedData.readInt32(z);
-                for (int i = 0; i < readInt323; i++) {
-                    TLRPC.ReactionCount TLdeserialize = TLRPC.ReactionCount.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize == null) {
-                        return;
-                    }
-                    this.reactions.add(TLdeserialize);
-                }
+                this.reactions = Vector.deserialize(inputSerializedData, new TLRPC$TL_messageReactions$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 16) != 0) {
                 this.reactions_count = inputSerializedData.readInt32(z);
             }
             if ((this.flags & 1) != 0) {
-                int readInt324 = inputSerializedData.readInt32(z);
-                if (readInt324 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt324)));
-                    }
-                } else {
-                    int readInt325 = inputSerializedData.readInt32(z);
-                    for (int i2 = 0; i2 < readInt325; i2++) {
-                        this.recent_viewers.add(Long.valueOf(inputSerializedData.readInt64(z)));
-                    }
-                }
+                this.recent_viewers = Vector.deserializeLong(inputSerializedData, z);
             }
         }
 
@@ -3494,23 +2869,13 @@ public class TL_stories {
                 outputSerializedData.writeInt32(this.forwards_count);
             }
             if ((this.flags & 8) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.reactions.size();
-                outputSerializedData.writeInt32(size);
-                for (int i2 = 0; i2 < size; i2++) {
-                    this.reactions.get(i2).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.reactions);
             }
             if ((this.flags & 16) != 0) {
                 outputSerializedData.writeInt32(this.reactions_count);
             }
             if ((this.flags & 1) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size2 = this.recent_viewers.size();
-                outputSerializedData.writeInt32(size2);
-                for (int i3 = 0; i3 < size2; i3++) {
-                    outputSerializedData.writeInt64(this.recent_viewers.get(i3).longValue());
-                }
+                Vector.serializeLong(outputSerializedData, this.recent_viewers);
             }
         }
     }
@@ -3525,51 +2890,9 @@ public class TL_stories {
             this.views_count = inputSerializedData.readInt32(z);
             this.forwards_count = inputSerializedData.readInt32(z);
             this.reactions_count = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                StoryView TLdeserialize = StoryView.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.views.add(TLdeserialize);
-            }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.Chat TLdeserialize2 = TLRPC.Chat.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.chats.add(TLdeserialize2);
-            }
-            int readInt325 = inputSerializedData.readInt32(z);
-            if (readInt325 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt325)));
-                }
-                return;
-            }
-            int readInt326 = inputSerializedData.readInt32(z);
-            for (int i3 = 0; i3 < readInt326; i3++) {
-                TLRPC.User TLdeserialize3 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize3 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize3);
-            }
+            this.views = Vector.deserialize(inputSerializedData, new TL_stories$TL_storyViewsList$$ExternalSyntheticLambda0(), z);
+            this.chats = Vector.deserialize(inputSerializedData, new TLRPC$TL_channels_adminLogResults$$ExternalSyntheticLambda1(), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
             if ((this.flags & 1) != 0) {
                 this.next_offset = inputSerializedData.readString(z);
             }
@@ -3583,24 +2906,9 @@ public class TL_stories {
             outputSerializedData.writeInt32(this.views_count);
             outputSerializedData.writeInt32(this.forwards_count);
             outputSerializedData.writeInt32(this.reactions_count);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.views.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.views.get(i).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.chats.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.chats.get(i2).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size3 = this.users.size();
-            outputSerializedData.writeInt32(size3);
-            for (int i3 = 0; i3 < size3; i3++) {
-                this.users.get(i3).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.views);
+            Vector.serialize(outputSerializedData, this.chats);
+            Vector.serialize(outputSerializedData, this.users);
             if ((this.flags & 1) != 0) {
                 outputSerializedData.writeString(this.next_offset);
             }
@@ -3615,36 +2923,8 @@ public class TL_stories {
             this.flags = inputSerializedData.readInt32(z);
             this.count = inputSerializedData.readInt32(z);
             this.reactions_count = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                StoryView TLdeserialize = StoryView.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.views.add(TLdeserialize);
-            }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.User TLdeserialize2 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize2);
-            }
+            this.views = Vector.deserialize(inputSerializedData, new TL_stories$TL_storyViewsList$$ExternalSyntheticLambda0(), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
             if ((this.flags & 1) != 0) {
                 this.next_offset = inputSerializedData.readString(z);
             }
@@ -3656,18 +2936,8 @@ public class TL_stories {
             outputSerializedData.writeInt32(this.flags);
             outputSerializedData.writeInt32(this.count);
             outputSerializedData.writeInt32(this.reactions_count);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.views.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.views.get(i).serializeToStream(outputSerializedData);
-            }
-            outputSerializedData.writeInt32(481674261);
-            int size2 = this.users.size();
-            outputSerializedData.writeInt32(size2);
-            for (int i2 = 0; i2 < size2; i2++) {
-                this.users.get(i2).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.views);
+            Vector.serialize(outputSerializedData, this.users);
             if ((this.flags & 1) != 0) {
                 outputSerializedData.writeString(this.next_offset);
             }
@@ -3682,17 +2952,7 @@ public class TL_stories {
             this.flags = inputSerializedData.readInt32(z);
             this.views_count = inputSerializedData.readInt32(z);
             if ((this.flags & 1) != 0) {
-                int readInt32 = inputSerializedData.readInt32(z);
-                if (readInt32 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                    }
-                } else {
-                    int readInt322 = inputSerializedData.readInt32(z);
-                    for (int i = 0; i < readInt322; i++) {
-                        this.recent_viewers.add(Long.valueOf(inputSerializedData.readInt64(z)));
-                    }
-                }
+                this.recent_viewers = Vector.deserializeLong(inputSerializedData, z);
             }
         }
 
@@ -3702,12 +2962,7 @@ public class TL_stories {
             outputSerializedData.writeInt32(this.flags);
             outputSerializedData.writeInt32(this.views_count);
             if ((this.flags & 1) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.recent_viewers.size();
-                outputSerializedData.writeInt32(size);
-                for (int i = 0; i < size; i++) {
-                    outputSerializedData.writeInt64(this.recent_viewers.get(i).longValue());
-                }
+                Vector.serializeLong(outputSerializedData, this.recent_viewers);
             }
         }
     }
@@ -3721,17 +2976,7 @@ public class TL_stories {
             this.views_count = inputSerializedData.readInt32(z);
             this.reactions_count = inputSerializedData.readInt32(z);
             if ((this.flags & 1) != 0) {
-                int readInt32 = inputSerializedData.readInt32(z);
-                if (readInt32 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
-                    }
-                } else {
-                    int readInt322 = inputSerializedData.readInt32(z);
-                    for (int i = 0; i < readInt322; i++) {
-                        this.recent_viewers.add(Long.valueOf(inputSerializedData.readInt64(z)));
-                    }
-                }
+                this.recent_viewers = Vector.deserializeLong(inputSerializedData, z);
             }
         }
 
@@ -3742,12 +2987,7 @@ public class TL_stories {
             outputSerializedData.writeInt32(this.views_count);
             outputSerializedData.writeInt32(this.reactions_count);
             if ((this.flags & 1) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.recent_viewers.size();
-                outputSerializedData.writeInt32(size);
-                for (int i = 0; i < size; i++) {
-                    outputSerializedData.writeInt64(this.recent_viewers.get(i).longValue());
-                }
+                Vector.serializeLong(outputSerializedData, this.recent_viewers);
             }
         }
     }
@@ -3852,12 +3092,7 @@ public class TL_stories {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-1703566865);
             this.peer.serializeToStream(outputSerializedData);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.id.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                outputSerializedData.writeInt32(this.id.get(i).intValue());
-            }
+            Vector.serializeInt(outputSerializedData, this.id);
             outputSerializedData.writeBool(this.pinned);
         }
     }

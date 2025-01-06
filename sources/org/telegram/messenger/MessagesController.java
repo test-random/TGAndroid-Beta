@@ -843,7 +843,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public static class ChannelRecommendations {
-        public final ArrayList<TLRPC.Chat> chats = new ArrayList<>();
+        public final ArrayList<TLObject> chats = new ArrayList<>();
         public int more;
         public boolean wasPremium;
 
@@ -5776,23 +5776,33 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void lambda$getChannelRecommendations$433(TLObject tLObject, boolean z, long j) {
-        int i;
         if (tLObject instanceof TLRPC.messages_Chats) {
             ArrayList<TLRPC.Chat> arrayList = ((TLRPC.messages_Chats) tLObject).chats;
             putChats(arrayList, false);
             ChannelRecommendations channelRecommendations = new ChannelRecommendations();
             channelRecommendations.wasPremium = z;
             channelRecommendations.chats.addAll(arrayList);
-            if (!(tLObject instanceof TLRPC.TL_messages_chatsSlice)) {
-                if (!getUserConfig().isPremium() && BuildVars.DEBUG_PRIVATE_VERSION) {
-                    i = 90;
-                }
-                this.cachedChannelRecommendations.put(Long.valueOf(j), channelRecommendations);
-                getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.channelRecommendationsLoaded, Long.valueOf(j));
+            if (tLObject instanceof TLRPC.TL_messages_chatsSlice) {
+                channelRecommendations.more = Math.max(0, ((TLRPC.TL_messages_chatsSlice) tLObject).count - arrayList.size());
+            } else if (!getUserConfig().isPremium() && BuildVars.DEBUG_PRIVATE_VERSION) {
+                channelRecommendations.more = 90;
             }
-            i = Math.max(0, ((TLRPC.TL_messages_chatsSlice) tLObject).count - arrayList.size());
-            channelRecommendations.more = i;
             this.cachedChannelRecommendations.put(Long.valueOf(j), channelRecommendations);
+            getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.channelRecommendationsLoaded, Long.valueOf(j));
+            return;
+        }
+        if (tLObject instanceof TLRPC.Users) {
+            ArrayList<TLRPC.User> arrayList2 = ((TLRPC.Users) tLObject).users;
+            putUsers(arrayList2, false);
+            ChannelRecommendations channelRecommendations2 = new ChannelRecommendations();
+            channelRecommendations2.wasPremium = z;
+            channelRecommendations2.chats.addAll(arrayList2);
+            if (tLObject instanceof TLRPC.TL_usersSlice) {
+                channelRecommendations2.more = Math.max(0, ((TLRPC.TL_usersSlice) tLObject).count - this.chats.size());
+            } else if (!getUserConfig().isPremium() && BuildVars.DEBUG_PRIVATE_VERSION) {
+                channelRecommendations2.more = 90;
+            }
+            this.cachedChannelRecommendations.put(Long.valueOf(j), channelRecommendations2);
             getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.channelRecommendationsLoaded, Long.valueOf(j));
         }
     }
@@ -8890,37 +8900,8 @@ public class MessagesController extends BaseController implements NotificationCe
         }
     }
 
-    public void lambda$reloadWebPages$175(HashMap hashMap, String str, TLObject tLObject, LongSparseArray longSparseArray, long j, int i) {
-        ArrayList arrayList = (ArrayList) hashMap.remove(str);
-        if (arrayList == null) {
-            return;
-        }
-        TLRPC.TL_messages_messages tL_messages_messages = new TLRPC.TL_messages_messages();
-        if (tLObject instanceof TLRPC.TL_messageMediaWebPage) {
-            TLRPC.TL_messageMediaWebPage tL_messageMediaWebPage = (TLRPC.TL_messageMediaWebPage) tLObject;
-            TLRPC.WebPage webPage = tL_messageMediaWebPage.webpage;
-            if ((webPage instanceof TLRPC.TL_webPage) || (webPage instanceof TLRPC.TL_webPageEmpty)) {
-                for (int i2 = 0; i2 < arrayList.size(); i2++) {
-                    ((MessageObject) arrayList.get(i2)).messageOwner.media.webpage = tL_messageMediaWebPage.webpage;
-                    if (i2 == 0) {
-                        ImageLoader.saveMessageThumbs(((MessageObject) arrayList.get(i2)).messageOwner);
-                    }
-                    tL_messages_messages.messages.add(((MessageObject) arrayList.get(i2)).messageOwner);
-                }
-            } else {
-                longSparseArray.put(webPage.id, arrayList);
-            }
-        } else {
-            for (int i3 = 0; i3 < arrayList.size(); i3++) {
-                ((MessageObject) arrayList.get(i3)).messageOwner.media.webpage = new TLRPC.TL_webPageEmpty();
-                tL_messages_messages.messages.add(((MessageObject) arrayList.get(i3)).messageOwner);
-            }
-        }
-        if (tL_messages_messages.messages.isEmpty()) {
-            return;
-        }
-        getMessagesStorage().putMessages((TLRPC.messages_Messages) tL_messages_messages, j, -2, 0, false, i, 0L);
-        getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.replaceMessagesObjects, Long.valueOf(j), arrayList);
+    public void lambda$reloadWebPages$175(java.util.HashMap r16, java.lang.String r17, org.telegram.tgnet.TLObject r18, androidx.collection.LongSparseArray r19, long r20, int r22) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessagesController.lambda$reloadWebPages$175(java.util.HashMap, java.lang.String, org.telegram.tgnet.TLObject, androidx.collection.LongSparseArray, long, int):void");
     }
 
     public void lambda$reloadWebPages$176(final HashMap hashMap, final String str, final LongSparseArray longSparseArray, final long j, final int i, final TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -13001,28 +12982,40 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public ChannelRecommendations getChannelRecommendations(final long j) {
         ChannelRecommendations channelRecommendations;
-        TLRPC.InputChannel inputChannel = getInputChannel(j);
-        if (inputChannel == null && j != 0) {
-            return null;
-        }
+        TLRPC.TL_channels_getChannelRecommendations tL_channels_getChannelRecommendations;
         if (this.cachedChannelRecommendations == null) {
             this.cachedChannelRecommendations = new HashMap<>();
         }
         final boolean isPremium = getUserConfig().isPremium();
         if (this.cachedChannelRecommendations.containsKey(Long.valueOf(j))) {
             channelRecommendations = this.cachedChannelRecommendations.get(Long.valueOf(j));
-            if (channelRecommendations != null && channelRecommendations.wasPremium == isPremium) {
+            if (channelRecommendations == null || channelRecommendations.wasPremium == isPremium) {
                 return channelRecommendations;
             }
         } else {
             channelRecommendations = null;
         }
-        this.cachedChannelRecommendations.put(Long.valueOf(j), null);
-        TLRPC.TL_channels_getChannelRecommendations tL_channels_getChannelRecommendations = new TLRPC.TL_channels_getChannelRecommendations();
-        if (j != 0) {
-            tL_channels_getChannelRecommendations.flags |= 1;
-            tL_channels_getChannelRecommendations.channel = inputChannel;
+        if (j > 0) {
+            TL_bots.getBotRecommendations getbotrecommendations = new TL_bots.getBotRecommendations();
+            TLRPC.InputUser inputUser = getInputUser(j);
+            getbotrecommendations.bot = inputUser;
+            tL_channels_getChannelRecommendations = getbotrecommendations;
+            if (inputUser == null) {
+                return null;
+            }
+        } else {
+            TLRPC.TL_channels_getChannelRecommendations tL_channels_getChannelRecommendations2 = new TLRPC.TL_channels_getChannelRecommendations();
+            if (j != 0) {
+                tL_channels_getChannelRecommendations2.flags |= 1;
+                TLRPC.InputChannel inputChannel = getInputChannel(-j);
+                tL_channels_getChannelRecommendations2.channel = inputChannel;
+                if (inputChannel == null) {
+                    return null;
+                }
+            }
+            tL_channels_getChannelRecommendations = tL_channels_getChannelRecommendations2;
         }
+        this.cachedChannelRecommendations.put(Long.valueOf(j), null);
         getConnectionsManager().sendRequest(tL_channels_getChannelRecommendations, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {

@@ -530,6 +530,21 @@ public class BlurringShader {
             this.bitmapShader.setLocalMatrix(this.matrix);
         }
 
+        public StoryBlurDrawer adapt(boolean z) {
+            if (this.wasDark != z) {
+                this.wasDark = z;
+                if (this.type == 10) {
+                    ColorMatrix colorMatrix = new ColorMatrix();
+                    colorMatrix.setSaturation(1.6f);
+                    AndroidUtilities.multiplyBrightnessColorMatrix(colorMatrix, this.wasDark ? 0.97f : 0.92f);
+                    AndroidUtilities.adjustBrightnessColorMatrix(colorMatrix, this.wasDark ? 0.12f : -0.06f);
+                    this.paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+                    this.oldPaint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+                }
+            }
+            return this;
+        }
+
         public void drawRect(Canvas canvas) {
             drawRect(canvas, 0.0f, 0.0f, 1.0f);
         }

@@ -28,6 +28,8 @@ public class TL_stars {
         public boolean limited;
         public int num;
         public long owner_id;
+        public String owner_name;
+        public String slug;
         public boolean sold_out;
         public long stars;
         public TLRPC.Document sticker;
@@ -35,14 +37,34 @@ public class TL_stars {
         public long upgrade_stars;
 
         public static StarGift TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
-            StarGift tL_starGiftUnique = i != -1365150482 ? i != 46953416 ? i != 1237678029 ? i != 1779697613 ? null : new TL_starGiftUnique() : new TL_starGift_layer195() : new TL_starGift() : new TL_starGift_layer190();
-            if (tL_starGiftUnique == null && z) {
+            StarGift tL_starGift_layer190;
+            switch (i) {
+                case -1365150482:
+                    tL_starGift_layer190 = new TL_starGift_layer190();
+                    break;
+                case 46953416:
+                    tL_starGift_layer190 = new TL_starGift();
+                    break;
+                case 880997154:
+                    tL_starGift_layer190 = new TL_starGiftUnique();
+                    break;
+                case 1237678029:
+                    tL_starGift_layer190 = new TL_starGift_layer195();
+                    break;
+                case 1779697613:
+                    tL_starGift_layer190 = new TL_starGiftUnique_layer196();
+                    break;
+                default:
+                    tL_starGift_layer190 = null;
+                    break;
+            }
+            if (tL_starGift_layer190 == null && z) {
                 throw new RuntimeException(String.format("can't parse magic %x in StarGift", Integer.valueOf(i)));
             }
-            if (tL_starGiftUnique != null) {
-                tL_starGiftUnique.readParams(inputSerializedData, z);
+            if (tL_starGift_layer190 != null) {
+                tL_starGift_layer190.readParams(inputSerializedData, z);
             }
-            return tL_starGiftUnique;
+            return tL_starGift_layer190;
         }
 
         public TLRPC.Document getDocument() {
@@ -592,6 +614,37 @@ public class TL_stars {
         }
     }
 
+    public static final class TL_payments_uniqueStarGift extends TLObject {
+        public static final int constructor = -895289845;
+        public StarGift gift;
+        public ArrayList<TLRPC.User> users = new ArrayList<>();
+
+        public static TL_payments_uniqueStarGift TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
+            if (-895289845 != i) {
+                if (z) {
+                    throw new RuntimeException(String.format("can't parse magic %x in TL_payments_uniqueStarGift", Integer.valueOf(i)));
+                }
+                return null;
+            }
+            TL_payments_uniqueStarGift tL_payments_uniqueStarGift = new TL_payments_uniqueStarGift();
+            tL_payments_uniqueStarGift.readParams(inputSerializedData, z);
+            return tL_payments_uniqueStarGift;
+        }
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.gift = StarGift.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-895289845);
+            this.gift.serializeToStream(outputSerializedData);
+            Vector.serialize(outputSerializedData, this.users);
+        }
+    }
+
     public static class TL_starGift extends StarGift {
         public static final int constructor = 46953416;
 
@@ -651,6 +704,47 @@ public class TL_stars {
     }
 
     public static class TL_starGiftUnique extends StarGift {
+        public static final int constructor = 880997154;
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.flags = inputSerializedData.readInt32(z);
+            this.id = inputSerializedData.readInt64(z);
+            this.title = inputSerializedData.readString(z);
+            this.slug = inputSerializedData.readString(z);
+            this.num = inputSerializedData.readInt32(z);
+            if ((this.flags & 1) != 0) {
+                this.owner_id = inputSerializedData.readInt64(z);
+            }
+            if ((this.flags & 2) != 0) {
+                this.owner_name = inputSerializedData.readString(z);
+            }
+            this.attributes = Vector.deserialize(inputSerializedData, new TL_stars$TL_starGiftUnique$$ExternalSyntheticLambda0(), z);
+            this.availability_issued = inputSerializedData.readInt32(z);
+            this.availability_total = inputSerializedData.readInt32(z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(880997154);
+            outputSerializedData.writeInt32(this.flags);
+            outputSerializedData.writeInt64(this.id);
+            outputSerializedData.writeString(this.title);
+            outputSerializedData.writeString(this.slug);
+            outputSerializedData.writeInt32(this.num);
+            if ((this.flags & 1) != 0) {
+                outputSerializedData.writeInt64(this.owner_id);
+            }
+            if ((this.flags & 2) != 0) {
+                outputSerializedData.writeString(this.owner_name);
+            }
+            Vector.serialize(outputSerializedData, this.attributes);
+            outputSerializedData.writeInt32(this.availability_issued);
+            outputSerializedData.writeInt32(this.availability_total);
+        }
+    }
+
+    public static class TL_starGiftUnique_layer196 extends TL_starGiftUnique {
         public static final int constructor = 1779697613;
 
         @Override
@@ -770,33 +864,19 @@ public class TL_stars {
         @Override
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.hash = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
+            this.gifts = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_stars.StarGift.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                StarGift TLdeserialize = StarGift.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.gifts.add(TLdeserialize);
-            }
+            }, z);
         }
 
         @Override
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-1877571094);
             outputSerializedData.writeInt32(this.hash);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.gifts.size();
-            outputSerializedData.writeInt32(size);
-            for (int i = 0; i < size; i++) {
-                this.gifts.get(i).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.gifts);
         }
     }
 
@@ -903,21 +983,12 @@ public class TL_stars {
             }
             this.currency = inputSerializedData.readString(z);
             this.amount = inputSerializedData.readInt64(z);
-            int readInt322 = inputSerializedData.readInt32(z);
-            if (readInt322 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
+            this.winners = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_stars.TL_starsGiveawayWinnersOption.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt323 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt323; i++) {
-                TL_starsGiveawayWinnersOption TLdeserialize = TL_starsGiveawayWinnersOption.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.winners.add(TLdeserialize);
-            }
+            }, z);
         }
 
         @Override
@@ -935,12 +1006,7 @@ public class TL_stars {
             }
             outputSerializedData.writeString(this.currency);
             outputSerializedData.writeInt64(this.amount);
-            outputSerializedData.writeInt32(481674261);
-            int size = this.winners.size();
-            outputSerializedData.writeInt32(size);
-            for (int i3 = 0; i3 < size; i3++) {
-                this.winners.get(i3).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.winners);
         }
     }
 
@@ -1236,21 +1302,7 @@ public class TL_stars {
                 this.msg_id = inputSerializedData.readInt32(z);
             }
             if ((this.flags & 512) != 0) {
-                int readInt322 = inputSerializedData.readInt32(z);
-                if (readInt322 != 481674261) {
-                    if (z) {
-                        throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt322)));
-                    }
-                    return;
-                }
-                int readInt323 = inputSerializedData.readInt32(z);
-                for (int i = 0; i < readInt323; i++) {
-                    TLRPC.MessageMedia TLdeserialize = TLRPC.MessageMedia.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                    if (TLdeserialize == null) {
-                        return;
-                    }
-                    this.extended_media.add(TLdeserialize);
-                }
+                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 4096) != 0) {
                 this.subscription_period = inputSerializedData.readInt32(z);
@@ -1316,12 +1368,7 @@ public class TL_stars {
                 outputSerializedData.writeInt32(this.msg_id);
             }
             if ((this.flags & 512) != 0) {
-                outputSerializedData.writeInt32(481674261);
-                int size = this.extended_media.size();
-                outputSerializedData.writeInt32(size);
-                for (int i9 = 0; i9 < size; i9++) {
-                    this.extended_media.get(i9).serializeToStream(outputSerializedData);
-                }
+                Vector.serialize(outputSerializedData, this.extended_media);
             }
             if ((this.flags & 4096) != 0) {
                 outputSerializedData.writeInt32(this.subscription_period);
@@ -1588,7 +1635,7 @@ public class TL_stars {
                 this.msg_id = inputSerializedData.readInt32(z);
             }
             if ((this.flags & 512) != 0) {
-                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction_layer185$$ExternalSyntheticLambda0(), z);
+                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction$$ExternalSyntheticLambda0(), z);
             }
         }
 
@@ -1669,7 +1716,7 @@ public class TL_stars {
                 this.msg_id = inputSerializedData.readInt32(z);
             }
             if ((this.flags & 512) != 0) {
-                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction_layer185$$ExternalSyntheticLambda0(), z);
+                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 4096) != 0) {
                 this.subscription_period = inputSerializedData.readInt32(z);
@@ -1760,7 +1807,7 @@ public class TL_stars {
                 this.msg_id = inputSerializedData.readInt32(z);
             }
             if ((this.flags & 512) != 0) {
-                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction_layer185$$ExternalSyntheticLambda0(), z);
+                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 4096) != 0) {
                 this.subscription_period = inputSerializedData.readInt32(z);
@@ -1857,7 +1904,7 @@ public class TL_stars {
                 this.msg_id = inputSerializedData.readInt32(z);
             }
             if ((this.flags & 512) != 0) {
-                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction_layer185$$ExternalSyntheticLambda0(), z);
+                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 4096) != 0) {
                 this.subscription_period = inputSerializedData.readInt32(z);
@@ -1961,7 +2008,7 @@ public class TL_stars {
                 this.msg_id = inputSerializedData.readInt32(z);
             }
             if ((this.flags & 512) != 0) {
-                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction_layer185$$ExternalSyntheticLambda0(), z);
+                this.extended_media = Vector.deserialize(inputSerializedData, new TL_stars$TL_starsTransaction$$ExternalSyntheticLambda0(), z);
             }
             if ((this.flags & 4096) != 0) {
                 this.subscription_period = inputSerializedData.readInt32(z);
@@ -2182,39 +2229,16 @@ public class TL_stars {
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
             this.flags = inputSerializedData.readInt32(z);
             this.count = inputSerializedData.readInt32(z);
-            int readInt32 = inputSerializedData.readInt32(z);
-            if (readInt32 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt32)));
+            this.gifts = Vector.deserialize(inputSerializedData, new Vector.TLDeserializer() {
+                @Override
+                public final TLObject deserialize(InputSerializedData inputSerializedData2, int i, boolean z2) {
+                    return TL_stars.UserStarGift.TLdeserialize(inputSerializedData2, i, z2);
                 }
-                return;
-            }
-            int readInt322 = inputSerializedData.readInt32(z);
-            for (int i = 0; i < readInt322; i++) {
-                UserStarGift TLdeserialize = UserStarGift.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize == null) {
-                    return;
-                }
-                this.gifts.add(TLdeserialize);
-            }
+            }, z);
             if ((this.flags & 1) != 0) {
                 this.next_offset = inputSerializedData.readString(z);
             }
-            int readInt323 = inputSerializedData.readInt32(z);
-            if (readInt323 != 481674261) {
-                if (z) {
-                    throw new RuntimeException(String.format("wrong Vector magic, got %x", Integer.valueOf(readInt323)));
-                }
-                return;
-            }
-            int readInt324 = inputSerializedData.readInt32(z);
-            for (int i2 = 0; i2 < readInt324; i2++) {
-                TLRPC.User TLdeserialize2 = TLRPC.User.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
-                if (TLdeserialize2 == null) {
-                    return;
-                }
-                this.users.add(TLdeserialize2);
-            }
+            this.users = Vector.deserialize(inputSerializedData, new TLRPC$TL_attachMenuBots$$ExternalSyntheticLambda1(), z);
         }
 
         @Override
@@ -2222,19 +2246,11 @@ public class TL_stars {
             outputSerializedData.writeInt32(1801827607);
             outputSerializedData.writeInt32(this.flags);
             outputSerializedData.writeInt32(this.count);
-            outputSerializedData.writeInt32(481674261);
-            outputSerializedData.writeInt32(this.gifts.size());
-            for (int i = 0; i < this.gifts.size(); i++) {
-                this.gifts.get(i).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.gifts);
             if ((this.flags & 1) != 0) {
                 outputSerializedData.writeString(this.next_offset);
             }
-            outputSerializedData.writeInt32(481674261);
-            outputSerializedData.writeInt32(this.users.size());
-            for (int i2 = 0; i2 < this.users.size(); i2++) {
-                this.users.get(i2).serializeToStream(outputSerializedData);
-            }
+            Vector.serialize(outputSerializedData, this.users);
         }
     }
 
@@ -2311,6 +2327,22 @@ public class TL_stars {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-1000983152);
             outputSerializedData.writeInt32(this.hash);
+        }
+    }
+
+    public static final class getUniqueStarGift extends TLObject {
+        public static final int constructor = -1583919758;
+        public String slug;
+
+        @Override
+        public TLObject deserializeResponse(InputSerializedData inputSerializedData, int i, boolean z) {
+            return TL_payments_uniqueStarGift.TLdeserialize(inputSerializedData, i, z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-1583919758);
+            outputSerializedData.writeString(this.slug);
         }
     }
 

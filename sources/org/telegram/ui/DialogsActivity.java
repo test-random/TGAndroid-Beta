@@ -218,7 +218,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public final Property SCROLL_Y;
     public final Property SEARCH_TRANSLATION_Y;
     private ValueAnimator actionBarColorAnimator;
-    private Paint actionBarDefaultPaint;
+    private final Paint actionBarDefaultPaint;
     private int actionModeAdditionalHeight;
     private boolean actionModeFullyShowed;
     private final ArrayList actionModeViews;
@@ -3160,36 +3160,31 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private boolean checkCanWrite(long j) {
         AlertDialog.Builder builder;
         int i;
-        if (this.addToGroupAlertString != null || this.initialDialogsType == 15 || !this.checkCanWrite) {
-            return true;
+        int i2 = this.initialDialogsType;
+        if (i2 != 15 && i2 != 16 && this.addToGroupAlertString == null && this.checkCanWrite) {
+            if (DialogObject.isChatDialog(j)) {
+                long j2 = -j;
+                TLRPC.Chat chat = getMessagesController().getChat(Long.valueOf(j2));
+                if (ChatObject.isChannel(chat) && !chat.megagroup && (this.cantSendToChannels || !ChatObject.isCanWriteToChannel(j2, this.currentAccount) || this.hasPoll == 2)) {
+                    builder = new AlertDialog.Builder(getParentActivity());
+                    builder.setTitle(LocaleController.getString(R.string.SendMessageTitle));
+                    i = this.hasPoll == 2 ? R.string.PublicPollCantForward : R.string.ChannelCantSendMessage;
+                    builder.setMessage(LocaleController.getString(i));
+                    builder.setNegativeButton(LocaleController.getString(R.string.OK), null);
+                    showDialog(builder.create());
+                    return false;
+                }
+            } else if (DialogObject.isEncryptedDialog(j) && (this.hasPoll != 0 || this.hasInvoice)) {
+                builder = new AlertDialog.Builder(getParentActivity());
+                builder.setTitle(LocaleController.getString(R.string.SendMessageTitle));
+                i = this.hasPoll != 0 ? R.string.PollCantForwardSecretChat : R.string.InvoiceCantForwardSecretChat;
+                builder.setMessage(LocaleController.getString(i));
+                builder.setNegativeButton(LocaleController.getString(R.string.OK), null);
+                showDialog(builder.create());
+                return false;
+            }
         }
-        if (DialogObject.isChatDialog(j)) {
-            long j2 = -j;
-            TLRPC.Chat chat = getMessagesController().getChat(Long.valueOf(j2));
-            if (!ChatObject.isChannel(chat) || chat.megagroup) {
-                return true;
-            }
-            if (!this.cantSendToChannels && ChatObject.isCanWriteToChannel(j2, this.currentAccount) && this.hasPoll != 2) {
-                return true;
-            }
-            builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle(LocaleController.getString(R.string.SendMessageTitle));
-            i = this.hasPoll == 2 ? R.string.PublicPollCantForward : R.string.ChannelCantSendMessage;
-        } else {
-            if (!DialogObject.isEncryptedDialog(j)) {
-                return true;
-            }
-            if (this.hasPoll == 0 && !this.hasInvoice) {
-                return true;
-            }
-            builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle(LocaleController.getString(R.string.SendMessageTitle));
-            i = this.hasPoll != 0 ? R.string.PollCantForwardSecretChat : R.string.InvoiceCantForwardSecretChat;
-        }
-        builder.setMessage(LocaleController.getString(i));
-        builder.setNegativeButton(LocaleController.getString(R.string.OK), null);
-        showDialog(builder.create());
-        return false;
+        return true;
     }
 
     public void checkListLoad(ViewPage viewPage) {
@@ -3882,11 +3877,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public void lambda$createSearchViewPager$137(View view, int i, float f, float f2) {
         String str;
         BaseFragment highlightFoundQuote;
-        Object topPeerObject = this.searchViewPager.botsSearchAdapter.getTopPeerObject(i);
-        if (topPeerObject instanceof TLRPC.User) {
-            getMessagesController().openApp((TLRPC.User) topPeerObject, getClassGuid());
-            return;
-        }
         Object object = this.searchViewPager.botsSearchAdapter.getObject(i);
         if (object instanceof TLRPC.User) {
             highlightFoundQuote = ProfileActivity.of(((TLRPC.User) object).id);

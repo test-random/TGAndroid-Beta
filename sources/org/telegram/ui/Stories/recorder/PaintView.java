@@ -4161,7 +4161,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         return AndroidUtilities.dp(48.0f);
     }
 
-    public android.graphics.Bitmap getBitmap(java.util.ArrayList r24, int r25, int r26, boolean r27, boolean r28, boolean r29, boolean r30, org.telegram.ui.Stories.recorder.StoryEntry r31) {
+    public android.graphics.Bitmap getBitmap(java.util.ArrayList r33, int r34, int r35, boolean r36, boolean r37, boolean r38, boolean r39, org.telegram.ui.Stories.recorder.StoryEntry r40) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.recorder.PaintView.getBitmap(java.util.ArrayList, int, int, boolean, boolean, boolean, boolean, org.telegram.ui.Stories.recorder.StoryEntry):android.graphics.Bitmap");
     }
 

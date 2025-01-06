@@ -355,7 +355,7 @@ public abstract class MessageEntityView extends EntityView {
             MessageObject messageObject = (MessageObject) arrayList.get(i);
             TLRPC.Message message = messageObject.messageOwner;
             int i2 = message.date;
-            TLRPC.TL_message copyMessage = copyMessage(message);
+            TLRPC.Message copyMessage = copyMessage(message);
             Boolean useForwardForRepost = StoryEntry.useForwardForRepost(messageObject);
             if (useForwardForRepost != null && useForwardForRepost.booleanValue() && (messageFwdHeader = copyMessage.fwd_from) != null && (peer = messageFwdHeader.from_id) != null) {
                 copyMessage.from_id = peer;
@@ -365,7 +365,9 @@ public abstract class MessageEntityView extends EntityView {
             }
             copyMessage.voiceTranscriptionOpen = false;
             int i3 = messageObject.currentAccount;
-            this.messageObjects.add(new MessageObject(i3, copyMessage, messageObject.replyMessageObject, MessagesController.getInstance(i3).getUsers(), MessagesController.getInstance(messageObject.currentAccount).getChats(), null, null, true, true, 0L, true, z, false));
+            MessageObject messageObject2 = new MessageObject(i3, copyMessage, messageObject.replyMessageObject, MessagesController.getInstance(i3).getUsers(), MessagesController.getInstance(messageObject.currentAccount).getChats(), null, null, true, true, 0L, true, z, false);
+            messageObject2.setType();
+            this.messageObjects.add(messageObject2);
         }
         this.groupedMessages = null;
         if (this.messageObjects.size() > 1) {
@@ -412,18 +414,30 @@ public abstract class MessageEntityView extends EntityView {
 
             @Override
             protected void onLayout(boolean z2, int i4, int i5, int i6, int i7) {
+                int left;
+                int boundsRight;
                 int measuredWidth = MessageEntityView.this.listView.getMeasuredWidth();
                 int i8 = 0;
                 for (int i9 = 0; i9 < MessageEntityView.this.listView.getChildCount(); i9++) {
                     View childAt = MessageEntityView.this.listView.getChildAt(i9);
-                    int left = childAt.getLeft();
+                    int left2 = childAt.getLeft();
                     int right = childAt.getRight();
                     if (childAt instanceof ChatMessageCell) {
                         ChatMessageCell chatMessageCell = (ChatMessageCell) childAt;
-                        left = childAt.getLeft() + chatMessageCell.getBoundsLeft();
-                        right = chatMessageCell.getBoundsRight() + childAt.getLeft();
+                        left2 = childAt.getLeft() + chatMessageCell.getBoundsLeft();
+                        left = childAt.getLeft();
+                        boundsRight = chatMessageCell.getBoundsRight();
+                    } else if (childAt instanceof ChatActionCell) {
+                        ChatActionCell chatActionCell = (ChatActionCell) childAt;
+                        left2 = childAt.getLeft() + chatActionCell.getBoundsLeft();
+                        left = childAt.getLeft();
+                        boundsRight = chatActionCell.getBoundsRight();
+                    } else {
+                        measuredWidth = Math.min(left2, measuredWidth);
+                        i8 = Math.max(right, i8);
                     }
-                    measuredWidth = Math.min(left, measuredWidth);
+                    right = boundsRight + left;
+                    measuredWidth = Math.min(left2, measuredWidth);
                     i8 = Math.max(right, i8);
                 }
                 RecyclerListView recyclerListView = MessageEntityView.this.listView;
@@ -435,6 +449,8 @@ public abstract class MessageEntityView extends EntityView {
 
             @Override
             protected void onMeasure(int i4, int i5) {
+                int left;
+                int boundsRight;
                 MessageEntityView.this.listView.measure(i4, View.MeasureSpec.makeMeasureSpec(0, 0));
                 if (MessageEntityView.this.textureView != null) {
                     MessageEntityView.this.textureView.measure(View.MeasureSpec.makeMeasureSpec(MessageEntityView.this.listView.getMeasuredWidth(), 1073741824), View.MeasureSpec.makeMeasureSpec(MessageEntityView.this.listView.getMeasuredHeight(), 1073741824));
@@ -443,14 +459,24 @@ public abstract class MessageEntityView extends EntityView {
                 int i6 = 0;
                 for (int i7 = 0; i7 < MessageEntityView.this.listView.getChildCount(); i7++) {
                     View childAt = MessageEntityView.this.listView.getChildAt(i7);
-                    int left = childAt.getLeft();
+                    int left2 = childAt.getLeft();
                     int right = childAt.getRight();
                     if (childAt instanceof ChatMessageCell) {
                         ChatMessageCell chatMessageCell = (ChatMessageCell) childAt;
-                        left = childAt.getLeft() + chatMessageCell.getBoundsLeft();
-                        right = chatMessageCell.getBoundsRight() + childAt.getLeft();
+                        left2 = childAt.getLeft() + chatMessageCell.getBoundsLeft();
+                        left = childAt.getLeft();
+                        boundsRight = chatMessageCell.getBoundsRight();
+                    } else if (childAt instanceof ChatActionCell) {
+                        ChatActionCell chatActionCell = (ChatActionCell) childAt;
+                        left2 = childAt.getLeft() + chatActionCell.getBoundsLeft();
+                        left = childAt.getLeft();
+                        boundsRight = chatActionCell.getBoundsRight();
+                    } else {
+                        measuredWidth = Math.min(left2, measuredWidth);
+                        i6 = Math.max(right, i6);
                     }
-                    measuredWidth = Math.min(left, measuredWidth);
+                    right = boundsRight + left;
+                    measuredWidth = Math.min(left2, measuredWidth);
                     i6 = Math.max(right, i6);
                 }
                 setMeasuredDimension(i6 - measuredWidth, MessageEntityView.this.listView.getMeasuredHeight());
@@ -537,7 +563,7 @@ public abstract class MessageEntityView extends EntityView {
                                 canvas.translate(chatActionCell.getX(), chatActionCell.getY());
                                 canvas.scale(chatActionCell.getScaleX(), chatActionCell.getScaleY(), chatActionCell.getMeasuredWidth() / 2.0f, chatActionCell.getMeasuredHeight() / 2.0f);
                                 chatActionCell.drawBackground(canvas, true);
-                                chatActionCell.drawReactions(canvas, true);
+                                chatActionCell.drawReactions(canvas, true, null);
                                 canvas.restore();
                             }
                         }
@@ -785,6 +811,11 @@ public abstract class MessageEntityView extends EntityView {
             }
 
             @Override
+            public int getItemViewType(int i4) {
+                return ((MessageObject) MessageEntityView.this.messageObjects.get((MessageEntityView.this.messageObjects.size() - 1) - i4)).contentType;
+            }
+
+            @Override
             public boolean isEnabled(RecyclerView.ViewHolder viewHolder) {
                 return true;
             }
@@ -792,12 +823,47 @@ public abstract class MessageEntityView extends EntityView {
             @Override
             public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i4) {
                 MessageObject.GroupedMessagePosition position;
-                MessageObject messageObject2 = (MessageObject) MessageEntityView.this.messageObjects.get((MessageEntityView.this.messageObjects.size() - 1) - i4);
-                ((ChatMessageCell) viewHolder.itemView).setMessageObject(messageObject2, MessageEntityView.this.groupedMessages, MessageEntityView.this.groupedMessages != null, (MessageEntityView.this.groupedMessages == null || (position = MessageEntityView.this.groupedMessages.getPosition(messageObject2)) == null || position.minY == 0) ? false : true);
+                MessageObject messageObject3 = (MessageObject) MessageEntityView.this.messageObjects.get((MessageEntityView.this.messageObjects.size() - 1) - i4);
+                View view = viewHolder.itemView;
+                if (view instanceof ChatMessageCell) {
+                    ((ChatMessageCell) view).setMessageObject(messageObject3, MessageEntityView.this.groupedMessages, MessageEntityView.this.groupedMessages != null, (MessageEntityView.this.groupedMessages == null || (position = MessageEntityView.this.groupedMessages.getPosition(messageObject3)) == null || position.minY == 0) ? false : true);
+                } else if (view instanceof ChatActionCell) {
+                    ((ChatActionCell) view).setMessageObject(messageObject3);
+                }
             }
 
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i4) {
+                if (i4 == 1) {
+                    return new RecyclerListView.Holder(new ChatActionCell(context, false, MessageEntityView.this.resourcesProvider) {
+                        public final BlurringShader.StoryBlurDrawer blurDrawer;
+                        private final TextPaint textPaint;
+
+                        {
+                            this.blurDrawer = new BlurringShader.StoryBlurDrawer(blurManager, this, 10);
+                            TextPaint textPaint = new TextPaint(1);
+                            this.textPaint = textPaint;
+                            textPaint.setTypeface(AndroidUtilities.bold());
+                            textPaint.setTextSize(AndroidUtilities.dp(Math.max(16, SharedConfig.fontSize) - 2));
+                            textPaint.setColor(-1);
+                        }
+
+                        @Override
+                        public Paint getThemedPaint(String str) {
+                            if ("paintChatActionText".equals(str) || "paintChatActionText2".equals(str)) {
+                                return this.textPaint;
+                            }
+                            if ("paintChatActionBackground".equals(str)) {
+                                MessageEntityView.this.usesBackgroundPaint = true;
+                                Paint paint = this.blurDrawer.adapt(MessageEntityView.this.isDark).getPaint(1.0f);
+                                if (paint != null) {
+                                    return paint;
+                                }
+                            }
+                            return super.getThemedPaint(str);
+                        }
+                    });
+                }
                 ChatMessageCell chatMessageCell = new ChatMessageCell(context, UserConfig.selectedAccount, false, null, MessageEntityView.this.resourcesProvider) {
                     public BlurringShader.StoryBlurDrawer blurDrawer;
                     private final Paint clearPaint;
@@ -1032,75 +1098,83 @@ public abstract class MessageEntityView extends EntityView {
         }, 60L);
     }
 
-    public TLRPC.TL_message copyMessage(TLRPC.Message message) {
-        TLRPC.TL_message tL_message = new TLRPC.TL_message();
-        tL_message.id = message.id;
-        tL_message.from_id = message.from_id;
-        tL_message.peer_id = message.peer_id;
-        tL_message.date = message.date;
-        tL_message.expire_date = message.expire_date;
-        tL_message.action = message.action;
-        tL_message.message = message.message;
-        tL_message.media = message.media;
-        tL_message.flags = message.flags;
-        tL_message.mentioned = message.mentioned;
-        tL_message.media_unread = message.media_unread;
-        tL_message.out = message.out;
-        tL_message.unread = message.unread;
-        tL_message.entities = message.entities;
-        tL_message.via_bot_name = message.via_bot_name;
-        tL_message.reply_markup = message.reply_markup;
-        tL_message.views = message.views;
-        tL_message.forwards = message.forwards;
-        tL_message.replies = message.replies;
-        tL_message.edit_date = message.edit_date;
-        tL_message.silent = message.silent;
-        tL_message.post = message.post;
-        tL_message.from_scheduled = message.from_scheduled;
-        tL_message.legacy = message.legacy;
-        tL_message.edit_hide = message.edit_hide;
-        tL_message.pinned = message.pinned;
-        tL_message.fwd_from = message.fwd_from;
-        tL_message.via_bot_id = message.via_bot_id;
-        tL_message.reply_to = message.reply_to;
-        tL_message.post_author = message.post_author;
-        tL_message.grouped_id = message.grouped_id;
-        tL_message.reactions = message.reactions;
-        tL_message.restriction_reason = message.restriction_reason;
-        tL_message.ttl_period = message.ttl_period;
-        tL_message.noforwards = message.noforwards;
-        tL_message.invert_media = message.invert_media;
-        tL_message.send_state = message.send_state;
-        tL_message.fwd_msg_id = message.fwd_msg_id;
-        tL_message.attachPath = message.attachPath;
-        tL_message.params = message.params;
-        tL_message.random_id = message.random_id;
-        tL_message.local_id = message.local_id;
-        tL_message.dialog_id = message.dialog_id;
-        tL_message.ttl = message.ttl;
-        tL_message.destroyTime = message.destroyTime;
-        tL_message.destroyTimeMillis = message.destroyTimeMillis;
-        tL_message.layer = message.layer;
-        tL_message.seq_in = message.seq_in;
-        tL_message.seq_out = message.seq_out;
-        tL_message.with_my_score = message.with_my_score;
-        tL_message.replyMessage = message.replyMessage;
-        tL_message.reqId = message.reqId;
-        tL_message.realId = message.realId;
-        tL_message.stickerVerified = message.stickerVerified;
-        tL_message.isThreadMessage = message.isThreadMessage;
-        tL_message.voiceTranscription = message.voiceTranscription;
-        tL_message.voiceTranscriptionOpen = message.voiceTranscriptionOpen;
-        tL_message.voiceTranscriptionRated = message.voiceTranscriptionRated;
-        tL_message.voiceTranscriptionFinal = message.voiceTranscriptionFinal;
-        tL_message.voiceTranscriptionForce = message.voiceTranscriptionForce;
-        tL_message.voiceTranscriptionId = message.voiceTranscriptionId;
-        tL_message.premiumEffectWasPlayed = message.premiumEffectWasPlayed;
-        tL_message.originalLanguage = message.originalLanguage;
-        tL_message.translatedToLanguage = message.translatedToLanguage;
-        tL_message.translatedText = message.translatedText;
-        tL_message.replyStory = message.replyStory;
-        return tL_message;
+    public TLRPC.Message copyMessage(TLRPC.Message message) {
+        TLRPC.Message tL_messageService;
+        if (message instanceof TLRPC.TL_message) {
+            tL_messageService = new TLRPC.TL_message();
+        } else {
+            if (!(message instanceof TLRPC.TL_messageService)) {
+                return message;
+            }
+            tL_messageService = new TLRPC.TL_messageService();
+        }
+        tL_messageService.id = message.id;
+        tL_messageService.from_id = message.from_id;
+        tL_messageService.peer_id = message.peer_id;
+        tL_messageService.date = message.date;
+        tL_messageService.expire_date = message.expire_date;
+        tL_messageService.action = message.action;
+        tL_messageService.message = message.message;
+        tL_messageService.media = message.media;
+        tL_messageService.flags = message.flags;
+        tL_messageService.mentioned = message.mentioned;
+        tL_messageService.media_unread = message.media_unread;
+        tL_messageService.out = message.out;
+        tL_messageService.unread = message.unread;
+        tL_messageService.entities = message.entities;
+        tL_messageService.via_bot_name = message.via_bot_name;
+        tL_messageService.reply_markup = message.reply_markup;
+        tL_messageService.views = message.views;
+        tL_messageService.forwards = message.forwards;
+        tL_messageService.replies = message.replies;
+        tL_messageService.edit_date = message.edit_date;
+        tL_messageService.silent = message.silent;
+        tL_messageService.post = message.post;
+        tL_messageService.from_scheduled = message.from_scheduled;
+        tL_messageService.legacy = message.legacy;
+        tL_messageService.edit_hide = message.edit_hide;
+        tL_messageService.pinned = message.pinned;
+        tL_messageService.fwd_from = message.fwd_from;
+        tL_messageService.via_bot_id = message.via_bot_id;
+        tL_messageService.reply_to = message.reply_to;
+        tL_messageService.post_author = message.post_author;
+        tL_messageService.grouped_id = message.grouped_id;
+        tL_messageService.reactions = message.reactions;
+        tL_messageService.restriction_reason = message.restriction_reason;
+        tL_messageService.ttl_period = message.ttl_period;
+        tL_messageService.noforwards = message.noforwards;
+        tL_messageService.invert_media = message.invert_media;
+        tL_messageService.send_state = message.send_state;
+        tL_messageService.fwd_msg_id = message.fwd_msg_id;
+        tL_messageService.attachPath = message.attachPath;
+        tL_messageService.params = message.params;
+        tL_messageService.random_id = message.random_id;
+        tL_messageService.local_id = message.local_id;
+        tL_messageService.dialog_id = message.dialog_id;
+        tL_messageService.ttl = message.ttl;
+        tL_messageService.destroyTime = message.destroyTime;
+        tL_messageService.destroyTimeMillis = message.destroyTimeMillis;
+        tL_messageService.layer = message.layer;
+        tL_messageService.seq_in = message.seq_in;
+        tL_messageService.seq_out = message.seq_out;
+        tL_messageService.with_my_score = message.with_my_score;
+        tL_messageService.replyMessage = message.replyMessage;
+        tL_messageService.reqId = message.reqId;
+        tL_messageService.realId = message.realId;
+        tL_messageService.stickerVerified = message.stickerVerified;
+        tL_messageService.isThreadMessage = message.isThreadMessage;
+        tL_messageService.voiceTranscription = message.voiceTranscription;
+        tL_messageService.voiceTranscriptionOpen = message.voiceTranscriptionOpen;
+        tL_messageService.voiceTranscriptionRated = message.voiceTranscriptionRated;
+        tL_messageService.voiceTranscriptionFinal = message.voiceTranscriptionFinal;
+        tL_messageService.voiceTranscriptionForce = message.voiceTranscriptionForce;
+        tL_messageService.voiceTranscriptionId = message.voiceTranscriptionId;
+        tL_messageService.premiumEffectWasPlayed = message.premiumEffectWasPlayed;
+        tL_messageService.originalLanguage = message.originalLanguage;
+        tL_messageService.translatedToLanguage = message.translatedToLanguage;
+        tL_messageService.translatedText = message.translatedText;
+        tL_messageService.replyStory = message.replyStory;
+        return tL_messageService;
     }
 
     @Override
@@ -1116,41 +1190,55 @@ public abstract class MessageEntityView extends EntityView {
     }
 
     public float getBubbleBounds(RectF rectF) {
+        float x;
         float y;
         float y2;
+        float max;
         float f;
-        float f2;
+        float f2 = 2.1474836E9f;
         float f3 = 2.1474836E9f;
-        float f4 = 2.1474836E9f;
+        float f4 = -2.1474836E9f;
         float f5 = -2.1474836E9f;
-        float f6 = -2.1474836E9f;
         for (int i = 0; i < this.listView.getChildCount(); i++) {
             View childAt = this.listView.getChildAt(i);
             if (childAt instanceof ChatMessageCell) {
                 ChatMessageCell chatMessageCell = (ChatMessageCell) childAt;
                 if (chatMessageCell.getMessageObject() == null || !chatMessageCell.getMessageObject().isRoundVideo() || chatMessageCell.getPhotoImage() == null) {
-                    float x = this.container.getX() + childAt.getX() + chatMessageCell.getBackgroundDrawableLeft() + AndroidUtilities.dp(1.0f);
+                    float x2 = this.container.getX() + childAt.getX() + chatMessageCell.getBackgroundDrawableLeft() + AndroidUtilities.dp(1.0f);
                     if (this.groupedMessages == null) {
-                        x += AndroidUtilities.dp(8.0f);
+                        x2 += AndroidUtilities.dp(8.0f);
                     }
-                    float x2 = ((this.container.getX() + childAt.getX()) + chatMessageCell.getBackgroundDrawableRight()) - AndroidUtilities.dp(1.66f);
+                    float x3 = ((this.container.getX() + childAt.getX()) + chatMessageCell.getBackgroundDrawableRight()) - AndroidUtilities.dp(1.66f);
                     y = this.container.getY() + childAt.getY() + chatMessageCell.getBackgroundDrawableTop() + AndroidUtilities.dp(2.0f);
                     y2 = ((this.container.getY() + childAt.getY()) + chatMessageCell.getBackgroundDrawableBottom()) - AndroidUtilities.dp(1.0f);
-                    f = x;
-                    f2 = x2;
+                    f = x2;
+                    x = x3;
                 } else {
                     f = this.container.getX() + chatMessageCell.getX() + chatMessageCell.getPhotoImage().getImageX();
-                    f2 = this.container.getX() + chatMessageCell.getX() + chatMessageCell.getPhotoImage().getImageX2();
+                    x = this.container.getX() + chatMessageCell.getX() + chatMessageCell.getPhotoImage().getImageX2();
                     y = this.container.getY() + chatMessageCell.getY() + chatMessageCell.getPhotoImage().getImageY();
                     y2 = this.container.getY() + chatMessageCell.getY() + chatMessageCell.getPhotoImage().getImageY2();
                 }
-                f3 = Math.min(Math.min(f3, f), f2);
-                f5 = Math.max(Math.max(f5, f), f2);
-                f4 = Math.min(Math.min(f4, y), y2);
-                f6 = Math.max(Math.max(f6, y), y2);
+                f2 = Math.min(Math.min(f2, f), x);
+                max = Math.max(f4, f);
+            } else {
+                if (childAt instanceof ChatActionCell) {
+                    ChatActionCell chatActionCell = (ChatActionCell) childAt;
+                    if (chatActionCell.starGiftLayout.has()) {
+                        float x4 = this.container.getX() + chatActionCell.getX() + chatActionCell.getBoundsLeft();
+                        x = this.container.getX() + chatActionCell.getX() + chatActionCell.getBoundsRight();
+                        y = this.container.getY() + chatActionCell.getY();
+                        y2 = this.container.getY() + chatActionCell.getY() + chatActionCell.getMeasuredHeight();
+                        f2 = Math.min(Math.min(f2, x4), x);
+                        max = Math.max(f4, x4);
+                    }
+                }
             }
+            f4 = Math.max(max, x);
+            f3 = Math.min(Math.min(f3, y), y2);
+            f5 = Math.max(Math.max(f5, y), y2);
         }
-        rectF.set(f3, f4, f5, f6);
+        rectF.set(f2, f3, f4, f5);
         return AndroidUtilities.dp(SharedConfig.bubbleRadius);
     }
 
@@ -1172,20 +1260,8 @@ public abstract class MessageEntityView extends EntityView {
     }
 
     @Override
-    protected void onMeasure(int i, int i2) {
-        this.container.measure(i, i2);
-        setMeasuredDimension(this.container.getMeasuredWidth(), this.container.getMeasuredHeight());
-        updatePosition();
-        if (this.firstMeasure) {
-            float min = Math.min((View.MeasureSpec.getSize(i) - AndroidUtilities.dp(44.0f)) / getMeasuredWidth(), (View.MeasureSpec.getSize(i2) - AndroidUtilities.dp(192.0f)) / getMeasuredHeight());
-            if (min < 1.0f) {
-                setScale(min);
-            }
-            Point position = getPosition();
-            position.x -= AndroidUtilities.dp(19.0f) * Math.min(1.0f, min);
-            setPosition(position);
-            this.firstMeasure = false;
-        }
+    protected void onMeasure(int r5, int r6) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.Paint.Views.MessageEntityView.onMeasure(int, int):void");
     }
 
     public void prepareToDraw(boolean z) {

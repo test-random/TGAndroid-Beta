@@ -1349,7 +1349,7 @@ public class LocaleController {
         }
     }
 
-    public static CharSequence formatSpannable(int i, CharSequence... charSequenceArr) {
+    public static CharSequence formatSpannable(int i, Object... objArr) {
         String str = resourcesCacheMap.get(Integer.valueOf(i));
         if (str == null) {
             HashMap<Integer, String> hashMap = resourcesCacheMap;
@@ -1358,11 +1358,11 @@ public class LocaleController {
             hashMap.put(valueOf, resourceEntryName);
             str = resourceEntryName;
         }
-        return formatSpannable(str, i, charSequenceArr);
+        return formatSpannable(str, i, objArr);
     }
 
-    public static CharSequence formatSpannable(String str, int i, CharSequence... charSequenceArr) {
-        return formatSpannable(str, null, i, 0, charSequenceArr);
+    public static CharSequence formatSpannable(String str, int i, Object... objArr) {
+        return formatSpannable(str, null, i, 0, objArr);
     }
 
     public static CharSequence formatSpannable(String str, String str2, int i, int i2, Object... objArr) {

@@ -3514,6 +3514,13 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         if (myWebView != null) {
             AndroidUtilities.removeFromParent(myWebView);
         }
+        try {
+            if (SharedConfig.debugWebView) {
+                WebView.setWebContentsDebuggingEnabled(true);
+            }
+        } catch (Exception e) {
+            FileLog.e(e);
+        }
         MyWebView myWebView3 = myWebView == null ? new MyWebView(getContext(), this.bot) : myWebView;
         this.webView = myWebView3;
         if (this.bot) {
@@ -3573,8 +3580,8 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                 replaceAll = replaceAll + " Telegram-Android/" + packageInfo.versionName + " (" + capitalizeFirst(Build.MANUFACTURER) + " " + Build.MODEL + "; Android " + str + "; SDK " + Build.VERSION.SDK_INT + "; " + (devicePerformanceClass == 0 ? "LOW" : devicePerformanceClass == 1 ? "AVERAGE" : "HIGH") + ")";
             }
             settings.setUserAgentString(replaceAll);
-        } catch (Exception e) {
-            FileLog.e(e);
+        } catch (Exception e2) {
+            FileLog.e(e2);
         }
         settings.setTextSize(WebSettings.TextSize.NORMAL);
         File file = new File(ApplicationLoader.getFilesDirFixed(), "webview_database");

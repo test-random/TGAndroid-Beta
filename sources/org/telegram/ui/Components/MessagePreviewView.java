@@ -42,6 +42,8 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
+import org.telegram.messenger.browser.Browser;
+import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
@@ -403,7 +405,9 @@ public abstract class MessagePreviewView extends FrameLayout {
 
                         @Override
                         public boolean canPerformReply() {
-                            return canPerformActions();
+                            boolean canPerformActions;
+                            canPerformActions = canPerformActions();
+                            return canPerformActions;
                         }
 
                         @Override
@@ -457,8 +461,8 @@ public abstract class MessagePreviewView extends FrameLayout {
                         }
 
                         @Override
-                        public void didPressChannelRecommendation(ChatMessageCell chatMessageCell2, TLRPC.Chat chat, boolean z) {
-                            ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressChannelRecommendation(this, chatMessageCell2, chat, z);
+                        public void didPressChannelRecommendation(ChatMessageCell chatMessageCell2, TLObject tLObject, boolean z) {
+                            ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressChannelRecommendation(this, chatMessageCell2, tLObject, z);
                         }
 
                         @Override
@@ -613,7 +617,7 @@ public abstract class MessagePreviewView extends FrameLayout {
 
                         @Override
                         public void didPressWebPage(ChatMessageCell chatMessageCell2, TLRPC.WebPage webPage, String str, boolean z) {
-                            ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressWebPage(this, chatMessageCell2, webPage, str, z);
+                            Browser.openUrl(chatMessageCell2.getContext(), str);
                         }
 
                         @Override
@@ -808,7 +812,9 @@ public abstract class MessagePreviewView extends FrameLayout {
 
                     @Override
                     public boolean canPerformReply() {
-                        return canPerformActions();
+                        boolean canPerformActions;
+                        canPerformActions = canPerformActions();
+                        return canPerformActions;
                     }
 
                     @Override
@@ -862,8 +868,8 @@ public abstract class MessagePreviewView extends FrameLayout {
                     }
 
                     @Override
-                    public void didPressChannelRecommendation(ChatMessageCell chatMessageCell2, TLRPC.Chat chat, boolean z) {
-                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressChannelRecommendation(this, chatMessageCell2, chat, z);
+                    public void didPressChannelRecommendation(ChatMessageCell chatMessageCell2, TLObject tLObject, boolean z) {
+                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressChannelRecommendation(this, chatMessageCell2, tLObject, z);
                     }
 
                     @Override
@@ -1031,7 +1037,7 @@ public abstract class MessagePreviewView extends FrameLayout {
 
                     @Override
                     public void didPressWebPage(ChatMessageCell chatMessageCell2, TLRPC.WebPage webPage, String str, boolean z) {
-                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressWebPage(this, chatMessageCell2, webPage, str, z);
+                        Browser.openUrl(chatMessageCell2.getContext(), str);
                     }
 
                     @Override

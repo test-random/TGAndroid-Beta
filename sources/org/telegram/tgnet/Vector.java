@@ -2,6 +2,8 @@ package org.telegram.tgnet;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLObject;
 
 public class Vector<T extends TLObject> extends TLObject {
@@ -81,7 +83,7 @@ public class Vector<T extends TLObject> extends TLObject {
             }
             return null;
         }
-        Vector<Int> vector = new Vector<>(new Vector$$ExternalSyntheticLambda0());
+        Vector<Int> vector = new Vector<>(new Vector$$ExternalSyntheticLambda5());
         vector.readParams(inputSerializedData, z);
         return vector;
     }
@@ -93,9 +95,25 @@ public class Vector<T extends TLObject> extends TLObject {
             }
             return null;
         }
-        Vector<Int> vector = new Vector<>(new Vector$$ExternalSyntheticLambda0());
+        Vector<Int> vector = new Vector<>(new Vector$$ExternalSyntheticLambda5());
         vector.readParams(inputSerializedData, z);
         return vector;
+    }
+
+    public static <T> ArrayList<T> deserialize(InputSerializedData inputSerializedData, Utilities.CallbackReturn<Boolean, T> callbackReturn, boolean z) {
+        int readInt32 = inputSerializedData.readInt32(z);
+        if (readInt32 != 481674261) {
+            if (z) {
+                throw new RuntimeException(String.format("can't parse magic %x in Vector", Integer.valueOf(readInt32)));
+            }
+            return new ArrayList<>();
+        }
+        int readInt322 = inputSerializedData.readInt32(z);
+        ArrayList<T> arrayList = new ArrayList<>(readInt322);
+        for (int i = 0; i < readInt322; i++) {
+            arrayList.add(callbackReturn.run(Boolean.valueOf(z)));
+        }
+        return arrayList;
     }
 
     public static <T extends TLObject> ArrayList<T> deserialize(InputSerializedData inputSerializedData, TLDeserializer<T> tLDeserializer, boolean z) {
@@ -117,52 +135,34 @@ public class Vector<T extends TLObject> extends TLObject {
         return arrayList;
     }
 
-    public static ArrayList<Integer> deserializeInt(InputSerializedData inputSerializedData, boolean z) {
-        int readInt32 = inputSerializedData.readInt32(z);
-        if (readInt32 != 481674261) {
-            if (z) {
-                throw new RuntimeException(String.format("can't parse magic %x in Vector", Integer.valueOf(readInt32)));
+    public static ArrayList<Integer> deserializeInt(final InputSerializedData inputSerializedData, boolean z) {
+        Objects.requireNonNull(inputSerializedData);
+        return deserialize(inputSerializedData, new Utilities.CallbackReturn() {
+            @Override
+            public final Object run(Object obj) {
+                return Integer.valueOf(InputSerializedData.this.readInt32(((Boolean) obj).booleanValue()));
             }
-            return new ArrayList<>();
-        }
-        int readInt322 = inputSerializedData.readInt32(z);
-        ArrayList<Integer> arrayList = new ArrayList<>(readInt322);
-        for (int i = 0; i < readInt322; i++) {
-            arrayList.add(Integer.valueOf(inputSerializedData.readInt32(z)));
-        }
-        return arrayList;
+        }, z);
     }
 
-    public static ArrayList<java.lang.Long> deserializeLong(InputSerializedData inputSerializedData, boolean z) {
-        int readInt32 = inputSerializedData.readInt32(z);
-        if (readInt32 != 481674261) {
-            if (z) {
-                throw new RuntimeException(String.format("can't parse magic %x in Vector", Integer.valueOf(readInt32)));
+    public static ArrayList<java.lang.Long> deserializeLong(final InputSerializedData inputSerializedData, boolean z) {
+        Objects.requireNonNull(inputSerializedData);
+        return deserialize(inputSerializedData, new Utilities.CallbackReturn() {
+            @Override
+            public final Object run(Object obj) {
+                return Long.valueOf(InputSerializedData.this.readInt64(((Boolean) obj).booleanValue()));
             }
-            return new ArrayList<>();
-        }
-        int readInt322 = inputSerializedData.readInt32(z);
-        ArrayList<java.lang.Long> arrayList = new ArrayList<>(readInt322);
-        for (int i = 0; i < readInt322; i++) {
-            arrayList.add(java.lang.Long.valueOf(inputSerializedData.readInt64(z)));
-        }
-        return arrayList;
+        }, z);
     }
 
-    public static ArrayList<String> deserializeString(InputSerializedData inputSerializedData, boolean z) {
-        int readInt32 = inputSerializedData.readInt32(z);
-        if (readInt32 != 481674261) {
-            if (z) {
-                throw new RuntimeException(String.format("can't parse magic %x in Vector", Integer.valueOf(readInt32)));
+    public static ArrayList<String> deserializeString(final InputSerializedData inputSerializedData, boolean z) {
+        Objects.requireNonNull(inputSerializedData);
+        return deserialize(inputSerializedData, new Utilities.CallbackReturn() {
+            @Override
+            public final Object run(Object obj) {
+                return InputSerializedData.this.readString(((Boolean) obj).booleanValue());
             }
-            return new ArrayList<>();
-        }
-        int readInt322 = inputSerializedData.readInt32(z);
-        ArrayList<String> arrayList = new ArrayList<>(readInt322);
-        for (int i = 0; i < readInt322; i++) {
-            arrayList.add(inputSerializedData.readString(z));
-        }
-        return arrayList;
+        }, z);
     }
 
     public static <T extends TLObject> void serialize(OutputSerializedData outputSerializedData, ArrayList<T> arrayList) {
@@ -173,28 +173,37 @@ public class Vector<T extends TLObject> extends TLObject {
         }
     }
 
+    public static <T> void serialize(OutputSerializedData outputSerializedData, Utilities.Callback<T> callback, ArrayList<T> arrayList) {
+        outputSerializedData.writeInt32(481674261);
+        outputSerializedData.writeInt32(arrayList.size());
+        for (int i = 0; i < arrayList.size(); i++) {
+            callback.run(arrayList.get(i));
+        }
+    }
+
     public static void serializeInt(OutputSerializedData outputSerializedData, ArrayList<Integer> arrayList) {
-        outputSerializedData.writeInt32(481674261);
-        outputSerializedData.writeInt32(arrayList.size());
-        for (int i = 0; i < arrayList.size(); i++) {
-            outputSerializedData.writeInt32(arrayList.get(i).intValue());
-        }
+        Objects.requireNonNull(outputSerializedData);
+        serialize(outputSerializedData, new Vector$$ExternalSyntheticLambda3(outputSerializedData), arrayList);
     }
 
-    public static void serializeLong(OutputSerializedData outputSerializedData, ArrayList<java.lang.Long> arrayList) {
-        outputSerializedData.writeInt32(481674261);
-        outputSerializedData.writeInt32(arrayList.size());
-        for (int i = 0; i < arrayList.size(); i++) {
-            outputSerializedData.writeInt64(arrayList.get(i).longValue());
-        }
+    public static void serializeLong(final OutputSerializedData outputSerializedData, ArrayList<java.lang.Long> arrayList) {
+        Objects.requireNonNull(outputSerializedData);
+        serialize(outputSerializedData, new Utilities.Callback() {
+            @Override
+            public final void run(Object obj) {
+                OutputSerializedData.this.writeInt64(((Long) obj).longValue());
+            }
+        }, arrayList);
     }
 
-    public static void serializeString(OutputSerializedData outputSerializedData, ArrayList<String> arrayList) {
-        outputSerializedData.writeInt32(481674261);
-        outputSerializedData.writeInt32(arrayList.size());
-        for (int i = 0; i < arrayList.size(); i++) {
-            outputSerializedData.writeString(arrayList.get(i));
-        }
+    public static void serializeString(final OutputSerializedData outputSerializedData, ArrayList<String> arrayList) {
+        Objects.requireNonNull(outputSerializedData);
+        serialize(outputSerializedData, new Utilities.Callback() {
+            @Override
+            public final void run(Object obj) {
+                OutputSerializedData.this.writeString((String) obj);
+            }
+        }, arrayList);
     }
 
     @Override

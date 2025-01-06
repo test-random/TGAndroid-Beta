@@ -14,7 +14,7 @@ public class MenuDrawable extends Drawable {
     private int alpha;
     private float animatedDownloadProgress;
     private int backColor;
-    private Paint backPaint;
+    private final Paint backPaint;
     private int currentAnimationTime;
     private float currentRotation;
     private float downloadProgress;
@@ -26,7 +26,7 @@ public class MenuDrawable extends Drawable {
     private DecelerateInterpolator interpolator;
     private long lastFrameTime;
     private boolean miniIcon;
-    private Paint paint;
+    private final Paint paint;
     private int previousType;
     private RectF rect;
     private boolean reverseAngle;
@@ -40,16 +40,18 @@ public class MenuDrawable extends Drawable {
     }
 
     public MenuDrawable(int i) {
-        this.paint = new Paint(1);
-        this.backPaint = new Paint(1);
+        Paint paint = new Paint(1);
+        this.paint = paint;
+        Paint paint2 = new Paint(1);
+        this.backPaint = paint2;
         this.rotateToBack = true;
         this.interpolator = new DecelerateInterpolator();
         this.rect = new RectF();
         this.alpha = 255;
-        this.paint.setStrokeWidth(AndroidUtilities.dp(2.0f));
-        this.backPaint.setStrokeWidth(AndroidUtilities.density * 1.66f);
-        this.backPaint.setStrokeCap(Paint.Cap.ROUND);
-        this.backPaint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(AndroidUtilities.dp(2.0f));
+        paint2.setStrokeWidth(AndroidUtilities.density * 1.66f);
+        paint2.setStrokeCap(Paint.Cap.ROUND);
+        paint2.setStyle(Paint.Style.STROKE);
         this.previousType = TYPE_DEFAULT;
         this.type = i;
         this.typeAnimationProgress = 1.0f;

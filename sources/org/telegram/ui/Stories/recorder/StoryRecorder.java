@@ -80,6 +80,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BotWebViewVibrationEffect;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageReceiver;
@@ -6113,6 +6114,7 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         SimpleTextView simpleTextView2;
         int i3;
         StoryEntry storyEntry3;
+        StoryEntry storyEntry4;
         VideoEditTextureView textureView;
         if (i2 == 0) {
             requestCameraPermission(false);
@@ -6125,9 +6127,9 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             this.zoomControlView.setVisibility(0);
             this.zoomControlView.setAlpha(0.0f);
             this.videoTimerView.setDuration(0L, true);
-            StoryEntry storyEntry4 = this.outputEntry;
-            if (storyEntry4 != null) {
-                storyEntry4.destroy(false);
+            StoryEntry storyEntry5 = this.outputEntry;
+            if (storyEntry5 != null) {
+                storyEntry5.destroy(false);
                 this.outputEntry = null;
             }
             CollageLayoutView2 collageLayoutView2 = this.collageLayoutView;
@@ -6158,17 +6160,17 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             this.downloadButton.setEntry(i2 == 1 ? this.outputEntry : null);
             if (this.isVideo) {
                 this.muteButton.setVisibility(0);
-                StoryEntry storyEntry5 = this.outputEntry;
-                setIconMuted(storyEntry5 != null && storyEntry5.muted, false);
+                StoryEntry storyEntry6 = this.outputEntry;
+                setIconMuted(storyEntry6 != null && storyEntry6.muted, false);
                 this.playButton.setVisibility(0);
                 this.previewView.play(true);
                 this.playButton.drawable.setPause(this.previewView.isPlaying(), false);
                 simpleTextView = this.titleTextView;
                 f = 144.0f;
             } else {
-                StoryEntry storyEntry6 = this.outputEntry;
+                StoryEntry storyEntry7 = this.outputEntry;
                 f = 48.0f;
-                if (storyEntry6 != null && !TextUtils.isEmpty(storyEntry6.audioPath)) {
+                if (storyEntry7 != null && !TextUtils.isEmpty(storyEntry7.audioPath)) {
                     this.muteButton.setVisibility(8);
                     this.playButton.setVisibility(0);
                     this.playButton.drawable.setPause(true, false);
@@ -6177,8 +6179,8 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             }
             simpleTextView.setRightPadding(AndroidUtilities.dp(f));
             this.downloadButton.setVisibility(0);
-            StoryEntry storyEntry7 = this.outputEntry;
-            if (storyEntry7 == null || !storyEntry7.isRepostMessage) {
+            StoryEntry storyEntry8 = this.outputEntry;
+            if (storyEntry8 == null || !storyEntry8.isRepostMessage) {
                 ImageView imageView = this.themeButton;
                 if (imageView != null) {
                     imageView.setVisibility(8);
@@ -6196,22 +6198,22 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             this.captionContainer.setVisibility(0);
             this.captionContainer.clearFocus();
             CaptionStory captionStory = this.captionEdit;
-            StoryEntry storyEntry8 = this.outputEntry;
-            captionStory.setPeriod(storyEntry8 == null ? 86400 : storyEntry8.period, false);
+            StoryEntry storyEntry9 = this.outputEntry;
+            captionStory.setPeriod(storyEntry9 == null ? 86400 : storyEntry9.period, false);
             this.captionEdit.setPeriodVisible(!MessagesController.getInstance(this.currentAccount).premiumFeaturesBlocked() && ((storyEntry = this.outputEntry) == null || !storyEntry.isEdit));
             CaptionStory captionStory2 = this.captionEdit;
-            StoryEntry storyEntry9 = this.outputEntry;
-            captionStory2.setHasRoundVideo((storyEntry9 == null || storyEntry9.round == null) ? false : true);
+            StoryEntry storyEntry10 = this.outputEntry;
+            captionStory2.setHasRoundVideo((storyEntry10 == null || storyEntry10.round == null) ? false : true);
             setReply();
             TimelineView timelineView = this.timelineView;
-            StoryEntry storyEntry10 = this.outputEntry;
-            timelineView.setOpen((storyEntry10 != null && storyEntry10.isCollage() && this.outputEntry.hasVideo()) ? false : true, false);
+            StoryEntry storyEntry11 = this.outputEntry;
+            timelineView.setOpen((storyEntry11 != null && storyEntry11.isCollage() && this.outputEntry.hasVideo()) ? false : true, false);
         }
         if (i2 == 2 || i == 2) {
             this.titleTextView.setVisibility(0);
             this.coverTimelineView.setVisibility(0);
-            StoryEntry storyEntry11 = this.outputEntry;
-            if (storyEntry11 != null && storyEntry11.isEditingCover) {
+            StoryEntry storyEntry12 = this.outputEntry;
+            if (storyEntry12 != null && storyEntry12.isEditingCover) {
                 this.titleTextView.setText(LocaleController.getString(R.string.RecorderEditCover));
             }
             this.captionContainer.setVisibility(0);
@@ -6222,17 +6224,17 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
         }
         if (i2 == 1) {
             this.videoError = false;
-            StoryEntry storyEntry12 = this.outputEntry;
-            boolean z = (storyEntry12 == null || storyEntry12.botId == 0) ? false : true;
-            this.previewButtons.setShareText(LocaleController.getString(storyEntry12 != null && storyEntry12.isEdit ? R.string.Done : z ? R.string.UploadBotPreview : R.string.Next), !z);
+            StoryEntry storyEntry13 = this.outputEntry;
+            boolean z = (storyEntry13 == null || storyEntry13.botId == 0) ? false : true;
+            this.previewButtons.setShareText(LocaleController.getString(storyEntry13 != null && storyEntry13.isEdit ? R.string.Done : z ? R.string.UploadBotPreview : R.string.Next), !z);
             this.coverTimelineView.setVisibility(8);
             this.coverButton.setVisibility(8);
             if (!this.previewAlreadySet) {
-                StoryEntry storyEntry13 = this.outputEntry;
-                if (storyEntry13 == null || !storyEntry13.isRepostMessage) {
-                    this.previewView.set(storyEntry13);
+                StoryEntry storyEntry14 = this.outputEntry;
+                if (storyEntry14 == null || !storyEntry14.isRepostMessage) {
+                    this.previewView.set(storyEntry14);
                 } else {
-                    this.previewView.preset(storyEntry13);
+                    this.previewView.preset(storyEntry14);
                 }
             }
             this.previewAlreadySet = false;
@@ -6242,17 +6244,17 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                     StoryRecorder.this.lambda$onNavigateStart$60();
                 }
             });
-            StoryEntry storyEntry14 = this.outputEntry;
-            if (storyEntry14 == null || !(storyEntry14.isDraft || storyEntry14.isEdit || this.isReposting)) {
+            StoryEntry storyEntry15 = this.outputEntry;
+            if (storyEntry15 == null || !(storyEntry15.isDraft || storyEntry15.isEdit || this.isReposting)) {
                 this.captionEdit.clear();
             } else {
-                if (storyEntry14.paintFile != null) {
+                if (storyEntry15.paintFile != null) {
                     destroyPhotoPaintView();
                     createPhotoPaintView();
                     hidePhotoPaintView();
                 }
-                StoryEntry storyEntry15 = this.outputEntry;
-                if (storyEntry15.isVideo && storyEntry15.filterState != null && (textureView = this.previewView.getTextureView()) != null) {
+                StoryEntry storyEntry16 = this.outputEntry;
+                if (storyEntry16.isVideo && storyEntry16.filterState != null && (textureView = this.previewView.getTextureView()) != null) {
                     textureView.setDelegate(new VideoEditTextureView.VideoEditTextureViewDelegate() {
                         @Override
                         public final void onEGLThreadAvailable(FilterGLThread filterGLThread) {
@@ -6263,27 +6265,27 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
                 this.captionEdit.setText(this.outputEntry.caption);
             }
             PreviewButtons previewButtons = this.previewButtons;
-            StoryEntry storyEntry16 = this.outputEntry;
-            previewButtons.setButtonVisible(4, storyEntry16 == null || ((!storyEntry16.isRepostMessage || storyEntry16.isVideo) && !storyEntry16.isCollage()));
-            this.previewButtons.setButtonVisible(3, false);
+            StoryEntry storyEntry17 = this.outputEntry;
+            previewButtons.setButtonVisible(4, storyEntry17 == null || ((!storyEntry17.isRepostMessage || storyEntry17.isVideo) && !storyEntry17.isCollage()));
+            this.previewButtons.setButtonVisible(3, (!BuildVars.DEBUG_PRIVATE_VERSION || (storyEntry4 = this.outputEntry) == null || storyEntry4.isRepostMessage || storyEntry4.isCollage()) ? false : true);
             this.previewButtons.setShareEnabled((this.videoError || this.captionEdit.isCaptionOverLimit() || (MessagesController.getInstance(this.currentAccount).getStoriesController().hasStoryLimit() && ((storyEntry3 = this.outputEntry) == null || (!storyEntry3.isEdit && storyEntry3.botId == 0)))) ? false : true);
             RLottieImageView rLottieImageView = this.muteButton;
-            StoryEntry storyEntry17 = this.outputEntry;
-            rLottieImageView.setImageResource((storyEntry17 == null || !storyEntry17.muted) ? R.drawable.media_mute : R.drawable.media_unmute);
+            StoryEntry storyEntry18 = this.outputEntry;
+            rLottieImageView.setImageResource((storyEntry18 == null || !storyEntry18.muted) ? R.drawable.media_mute : R.drawable.media_unmute);
             this.previewView.setVisibility(0);
             this.timelineView.setVisibility(0);
             this.titleTextView.setVisibility(0);
             this.titleTextView.setTranslationX(0.0f);
-            StoryEntry storyEntry18 = this.outputEntry;
+            StoryEntry storyEntry19 = this.outputEntry;
             String str = "";
-            if (storyEntry18 == null || storyEntry18.botId == 0) {
-                if (storyEntry18 != null && storyEntry18.isEdit) {
+            if (storyEntry19 == null || storyEntry19.botId == 0) {
+                if (storyEntry19 != null && storyEntry19.isEdit) {
                     simpleTextView2 = this.titleTextView;
                     i3 = R.string.RecorderEditStory;
-                } else if (storyEntry18 != null && storyEntry18.isRepostMessage) {
+                } else if (storyEntry19 != null && storyEntry19.isRepostMessage) {
                     simpleTextView2 = this.titleTextView;
                     i3 = R.string.RecorderRepost;
-                } else if (storyEntry18 == null || !storyEntry18.isRepost) {
+                } else if (storyEntry19 == null || !storyEntry19.isRepost) {
                     simpleTextView2 = this.titleTextView;
                     i3 = R.string.RecorderNewStory;
                 } else {
@@ -6324,18 +6326,18 @@ public class StoryRecorder implements NotificationCenter.NotificationCenterDeleg
             }
             this.coverValue = storyEntry2.cover;
             long duration = this.previewView.getDuration() < 100 ? this.outputEntry.duration : this.previewView.getDuration();
-            StoryEntry storyEntry19 = this.outputEntry;
-            if (storyEntry19.duration <= 0) {
-                storyEntry19.duration = duration;
+            StoryEntry storyEntry20 = this.outputEntry;
+            if (storyEntry20.duration <= 0) {
+                storyEntry20.duration = duration;
             }
             TimelineView timelineView2 = this.coverTimelineView;
-            String absolutePath = storyEntry19.getOriginalFile().getAbsolutePath();
-            StoryEntry storyEntry20 = this.outputEntry;
-            timelineView2.setVideo(false, absolutePath, storyEntry20.duration, storyEntry20.videoVolume);
-            TimelineView timelineView3 = this.coverTimelineView;
+            String absolutePath = storyEntry20.getOriginalFile().getAbsolutePath();
             StoryEntry storyEntry21 = this.outputEntry;
+            timelineView2.setVideo(false, absolutePath, storyEntry21.duration, storyEntry21.videoVolume);
+            TimelineView timelineView3 = this.coverTimelineView;
+            StoryEntry storyEntry22 = this.outputEntry;
             float f2 = (float) duration;
-            timelineView3.setCoverVideo(storyEntry21.left * f2, storyEntry21.right * f2);
+            timelineView3.setCoverVideo(storyEntry22.left * f2, storyEntry22.right * f2);
             Utilities.Callback2 callback2 = new Utilities.Callback2() {
                 @Override
                 public final void run(Object obj, Object obj2) {

@@ -52,6 +52,8 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
+import org.telegram.messenger.browser.Browser;
+import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.AdjustPanLayoutHelper;
@@ -1112,7 +1114,9 @@ public class MessageSendPreview extends Dialog implements NotificationCenter.Not
 
                     @Override
                     public boolean canPerformReply() {
-                        return canPerformActions();
+                        boolean canPerformActions;
+                        canPerformActions = canPerformActions();
+                        return canPerformActions;
                     }
 
                     @Override
@@ -1166,8 +1170,8 @@ public class MessageSendPreview extends Dialog implements NotificationCenter.Not
                     }
 
                     @Override
-                    public void didPressChannelRecommendation(ChatMessageCell chatMessageCell, TLRPC.Chat chat, boolean z) {
-                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressChannelRecommendation(this, chatMessageCell, chat, z);
+                    public void didPressChannelRecommendation(ChatMessageCell chatMessageCell, TLObject tLObject, boolean z) {
+                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressChannelRecommendation(this, chatMessageCell, tLObject, z);
                     }
 
                     @Override
@@ -1322,7 +1326,7 @@ public class MessageSendPreview extends Dialog implements NotificationCenter.Not
 
                     @Override
                     public void didPressWebPage(ChatMessageCell chatMessageCell, TLRPC.WebPage webPage, String str, boolean z) {
-                        ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressWebPage(this, chatMessageCell, webPage, str, z);
+                        Browser.openUrl(chatMessageCell.getContext(), str);
                     }
 
                     @Override

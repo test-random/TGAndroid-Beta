@@ -288,6 +288,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private int currentMapProvider;
     private MessageObject currentMessageObject;
     private MessageObject.GroupedMessages currentMessagesGroup;
+    private long currentNameBotVerificationId;
+    public AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable currentNameEmojiStatusDrawable;
     private Object currentNameStatus;
     public AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable currentNameStatusDrawable;
     private String currentNameString;
@@ -968,7 +970,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             public static void $default$didPressChannelAvatar(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.Chat chat, int i, float f, float f2, boolean z) {
             }
 
-            public static void $default$didPressChannelRecommendation(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.Chat chat, boolean z) {
+            public static void $default$didPressChannelRecommendation(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLObject tLObject, boolean z) {
             }
 
             public static void $default$didPressChannelRecommendationsClose(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell) {
@@ -1059,10 +1061,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
 
             public static void $default$didPressVoteButtons(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, ArrayList arrayList, int i, int i2, int i3) {
-            }
-
-            public static void $default$didPressWebPage(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.WebPage webPage, String str, boolean z) {
-                Browser.openUrl(chatMessageCell.getContext(), str);
             }
 
             public static void $default$didStartVideoStream(ChatMessageCellDelegate chatMessageCellDelegate, MessageObject messageObject) {
@@ -1187,7 +1185,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
         void didPressChannelAvatar(ChatMessageCell chatMessageCell, TLRPC.Chat chat, int i, float f, float f2, boolean z);
 
-        void didPressChannelRecommendation(ChatMessageCell chatMessageCell, TLRPC.Chat chat, boolean z);
+        void didPressChannelRecommendation(ChatMessageCell chatMessageCell, TLObject tLObject, boolean z);
 
         void didPressChannelRecommendationsClose(ChatMessageCell chatMessageCell);
 
@@ -3781,7 +3779,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                             } else if (i3 == 17) {
                                 i2 = R.string.ViewStory;
                             } else {
-                                i = (i3 == 18 || i3 == 22) ? R.string.BoostLinkButton : i3 == 19 ? R.string.BoostingHowItWork : i3 == 20 ? R.string.OpenGift : i3 == 21 ? R.string.AppUpdate : i3 == 23 ? R.string.OpenStickerSet : i3 == 24 ? R.string.OpenEmojiSet : R.string.InstantView;
+                                i = (i3 == 18 || i3 == 22) ? R.string.BoostLinkButton : i3 == 19 ? R.string.BoostingHowItWork : i3 == 20 ? R.string.OpenGift : i3 == 21 ? R.string.AppUpdate : i3 == 23 ? R.string.OpenStickerSet : i3 == 24 ? R.string.OpenEmojiSet : i3 == 26 ? R.string.OpenUniqueGift : R.string.InstantView;
                             }
                         }
                         i = R.string.VoipGroupJoinAsLinstener;
@@ -4536,6 +4534,18 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         return (groupedMessagePosition.flags & 1) == 0 ? dp + AndroidUtilities.dp(4.0f) : dp;
     }
 
+    private long getAuthorBotVerificationId() {
+        TLRPC.User user = this.currentUser;
+        if (user != null) {
+            return DialogObject.getBotVerificationIcon(user);
+        }
+        TLRPC.Chat chat = this.currentChat;
+        if (chat != null) {
+            return DialogObject.getBotVerificationIcon(chat);
+        }
+        return 0L;
+    }
+
     private String getAuthorName() {
         TLRPC.User user = this.currentUser;
         if (user != null) {
@@ -5093,11 +5103,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         buttonBounce.setPressed(z);
     }
 
-    private void setMessageContent(org.telegram.messenger.MessageObject r88, org.telegram.messenger.MessageObject.GroupedMessages r89, boolean r90, boolean r91) {
+    private void setMessageContent(org.telegram.messenger.MessageObject r86, org.telegram.messenger.MessageObject.GroupedMessages r87, boolean r88, boolean r89) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.setMessageContent(org.telegram.messenger.MessageObject, org.telegram.messenger.MessageObject$GroupedMessages, boolean, boolean):void");
     }
 
-    private void setMessageObjectInternal(org.telegram.messenger.MessageObject r57) {
+    private void setMessageObjectInternal(org.telegram.messenger.MessageObject r61) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.setMessageObjectInternal(org.telegram.messenger.MessageObject):void");
     }
 
@@ -6314,7 +6324,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.drawNamesLayout(android.graphics.Canvas, float):void");
     }
 
-    public void drawOutboundsContent(android.graphics.Canvas r13) {
+    public void drawOutboundsContent(android.graphics.Canvas r18) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.drawOutboundsContent(android.graphics.Canvas):void");
     }
 
@@ -7766,6 +7776,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (swapAnimatedEmojiDrawable != null) {
             swapAnimatedEmojiDrawable.attach();
         }
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.currentNameEmojiStatusDrawable;
+        if (swapAnimatedEmojiDrawable2 != null) {
+            swapAnimatedEmojiDrawable2.attach();
+        }
         SpoilerEffect2 spoilerEffect2 = this.mediaSpoilerEffect2;
         if (spoilerEffect2 != null) {
             if (spoilerEffect2.destroyed) {
@@ -7858,6 +7872,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = this.currentNameStatusDrawable;
         if (swapAnimatedEmojiDrawable != null) {
             swapAnimatedEmojiDrawable.detach();
+        }
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = this.currentNameEmojiStatusDrawable;
+        if (swapAnimatedEmojiDrawable2 != null) {
+            swapAnimatedEmojiDrawable2.detach();
         }
         SpoilerEffect2 spoilerEffect2 = this.mediaSpoilerEffect2;
         if (spoilerEffect2 != null) {
