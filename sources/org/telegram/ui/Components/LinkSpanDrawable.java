@@ -86,7 +86,7 @@ public class LinkSpanDrawable {
         }
 
         @Override
-        public void onDraw(Canvas canvas) {
+        protected void onDraw(Canvas canvas) {
             if (isClickable()) {
                 RectF rectF = AndroidUtilities.rectTmp;
                 rectF.set(0.0f, 0.0f, getPaddingLeft() + getTextWidth() + getPaddingRight(), getHeight());

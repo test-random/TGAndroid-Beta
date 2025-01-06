@@ -28,7 +28,6 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
-import android.text.style.URLSpan;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -1050,7 +1049,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         }, new Utilities.Callback3() {
             @Override
             public final void run(Object obj, Object obj2, Object obj3) {
-                SecretMediaViewer.this.onLinkLongPress((URLSpan) obj, (TextView) obj2, (Runnable) obj3);
+                SecretMediaViewer.this.onLinkLongPress((ClickableSpan) obj, (TextView) obj2, (Runnable) obj3);
             }
         });
     }
@@ -1062,7 +1061,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
     public void onLinkClick(ClickableSpan clickableSpan, TextView textView) {
     }
 
-    public void onLinkLongPress(URLSpan uRLSpan, TextView textView, Runnable runnable) {
+    public void onLinkLongPress(ClickableSpan clickableSpan, TextView textView, Runnable runnable) {
     }
 
     private void onPhotoClosed(PhotoViewer.PlaceProviderObject placeProviderObject) {

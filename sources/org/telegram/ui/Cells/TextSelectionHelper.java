@@ -1592,10 +1592,6 @@ public abstract class TextSelectionHelper {
         public void onTextSelected(SimpleSelectabeleView simpleSelectabeleView, SimpleSelectabeleView simpleSelectabeleView2) {
         }
 
-        public void setSelectabeleView(SimpleSelectabeleView simpleSelectabeleView) {
-            this.selectabeleView = simpleSelectabeleView;
-        }
-
         public void update(float f, float f2) {
             Layout staticTextLayout = this.selectabeleView.getStaticTextLayout();
             if (staticTextLayout == null) {
@@ -2490,12 +2486,6 @@ public abstract class TextSelectionHelper {
             this.parentRecyclerView = (RecyclerListView) viewGroup;
         }
         this.parentView = viewGroup;
-    }
-
-    public void setScrollingParent(View view) {
-        if (view instanceof NestedScrollView) {
-            this.parentNestedScrollView = (NestedScrollView) view;
-        }
     }
 
     public void setTopOffset(int i) {

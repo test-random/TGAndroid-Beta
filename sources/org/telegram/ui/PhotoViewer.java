@@ -5495,23 +5495,29 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         private boolean hasQuote;
         private Layout lastLayout;
         private Layout lastLoadingLayout;
-        private final LinkSpanDrawable.LinkCollector links;
         private boolean loading;
         private LoadingDrawable loadingDrawable;
         private Path loadingPath;
-        private final Utilities.Callback2 onLinkClick;
-        private final Utilities.Callback3 onLinkLongPress;
-        private LinkSpanDrawable pressedLink;
         private ArrayList quoteBlocks;
         private final CaptionScrollView scrollView;
         private final TextSelectionHelper.SimpleTextSelectionHelper textSelectionHelper;
 
-        public CaptionTextView(Context context, final CaptionScrollView captionScrollView, TextSelectionHelper.SimpleTextSelectionHelper simpleTextSelectionHelper, Utilities.Callback2 callback2, Utilities.Callback3 callback3) {
+        public CaptionTextView(Context context, final CaptionScrollView captionScrollView, TextSelectionHelper.SimpleTextSelectionHelper simpleTextSelectionHelper, final Utilities.Callback2 callback2, final Utilities.Callback3 callback3) {
             super(context);
-            this.links = new LinkSpanDrawable.LinkCollector(this);
             this.scrollView = captionScrollView;
-            this.onLinkClick = callback2;
-            this.onLinkLongPress = callback3;
+            setClearLinkOnLongPress(false);
+            this.onPressListener = new LinkSpanDrawable.LinksTextView.OnLinkPress() {
+                @Override
+                public final void run(ClickableSpan clickableSpan) {
+                    PhotoViewer.CaptionTextView.this.lambda$new$0(callback2, clickableSpan);
+                }
+            };
+            this.onLongPressListener = new LinkSpanDrawable.LinksTextView.OnLinkPress() {
+                @Override
+                public final void run(ClickableSpan clickableSpan) {
+                    PhotoViewer.CaptionTextView.this.lambda$new$1(callback3, clickableSpan);
+                }
+            };
             this.textSelectionHelper = simpleTextSelectionHelper;
             ViewHelper.setPadding(this, 16.0f, 8.0f, 16.0f, 8.0f);
             setLinkTextColor(-8796932);
@@ -5522,7 +5528,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    PhotoViewer.CaptionTextView.lambda$new$0(PhotoViewer.CaptionScrollView.this, view);
+                    PhotoViewer.CaptionTextView.lambda$new$2(PhotoViewer.CaptionScrollView.this, view);
                 }
             });
         }
@@ -5561,21 +5567,22 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
         }
 
-        public static void lambda$new$0(CaptionScrollView captionScrollView, View view) {
-            if (captionScrollView != null) {
-                captionScrollView.smoothScrollBy(0, AndroidUtilities.dp(64.0f));
-            }
+        public void lambda$new$0(Utilities.Callback2 callback2, ClickableSpan clickableSpan) {
+            callback2.run(clickableSpan, this);
         }
 
-        public void lambda$onTouchEvent$1(LinkSpanDrawable linkSpanDrawable) {
-            LinkSpanDrawable linkSpanDrawable2 = this.pressedLink;
-            if (linkSpanDrawable == linkSpanDrawable2 && linkSpanDrawable2 != null && (linkSpanDrawable2.getSpan() instanceof URLSpan)) {
-                Utilities.Callback3 callback3 = this.onLinkLongPress;
-                URLSpan uRLSpan = (URLSpan) this.pressedLink.getSpan();
-                LinkSpanDrawable.LinkCollector linkCollector = this.links;
-                Objects.requireNonNull(linkCollector);
-                callback3.run(uRLSpan, this, new PhotoViewer$CaptionTextView$$ExternalSyntheticLambda2(linkCollector));
-                this.pressedLink = null;
+        public void lambda$new$1(Utilities.Callback3 callback3, ClickableSpan clickableSpan) {
+            callback3.run(clickableSpan, this, new Runnable() {
+                @Override
+                public final void run() {
+                    PhotoViewer.CaptionTextView.this.clearLinks();
+                }
+            });
+        }
+
+        public static void lambda$new$2(CaptionScrollView captionScrollView, View view) {
+            if (captionScrollView != null) {
+                captionScrollView.smoothScrollBy(0, AndroidUtilities.dp(64.0f));
             }
         }
 
@@ -5634,12 +5641,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 }
                 canvas.restore();
             }
-            canvas.save();
-            canvas.translate(getPaddingLeft(), 0.0f);
-            if (this.links.draw(canvas)) {
-                invalidate();
-            }
-            canvas.restore();
             super.onDraw(canvas);
             if (this.lastLayout != getLayout()) {
                 this.animatedEmojiDrawables = AnimatedEmojiSpan.update(0, this, this.animatedEmojiDrawables, getLayout());
@@ -5656,11 +5657,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             super.onTextChanged(charSequence, i, i2, i3);
             this.animatedEmojiDrawables = AnimatedEmojiSpan.update(0, this, this.animatedEmojiDrawables, getLayout());
             this.quoteBlocks = QuoteSpan.updateQuoteBlocksSpanned(getLayout(), this.quoteBlocks);
-        }
-
-        @Override
-        public boolean onTouchEvent(android.view.MotionEvent r10) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.CaptionTextView.onTouchEvent(android.view.MotionEvent):boolean");
         }
 
         public void setLoading(boolean z) {
@@ -11134,8 +11130,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         PipVideoOverlay.dismiss(true, true);
     }
 
-    public void lambda$onLinkLongPress$1(android.text.style.URLSpan r6, android.widget.TextView r7, int r8, android.content.DialogInterface r9, int r10) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.lambda$onLinkLongPress$1(android.text.style.URLSpan, android.widget.TextView, int, android.content.DialogInterface, int):void");
+    public void lambda$onLinkLongPress$1(android.text.style.ClickableSpan r5, android.widget.TextView r6, java.lang.String r7, int r8, android.content.DialogInterface r9, int r10) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.lambda$onLinkLongPress$1(android.text.style.ClickableSpan, android.widget.TextView, java.lang.String, int, android.content.DialogInterface, int):void");
     }
 
     public void lambda$onPhotoClosed$122(PlaceProviderObject placeProviderObject) {
@@ -11510,7 +11506,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }, new Utilities.Callback3() {
             @Override
             public final void run(Object obj, Object obj2, Object obj3) {
-                PhotoViewer.this.onLinkLongPress((URLSpan) obj, (TextView) obj2, (Runnable) obj3);
+                PhotoViewer.this.onLinkLongPress((ClickableSpan) obj, (TextView) obj2, (Runnable) obj3);
             }
         });
     }
@@ -12630,8 +12626,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         clickableSpan.onClick(textView);
     }
 
-    public void onLinkLongPress(final android.text.style.URLSpan r11, final android.widget.TextView r12, final java.lang.Runnable r13) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.onLinkLongPress(android.text.style.URLSpan, android.widget.TextView, java.lang.Runnable):void");
+    public void onLinkLongPress(final android.text.style.ClickableSpan r17, final android.widget.TextView r18, final java.lang.Runnable r19) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PhotoViewer.onLinkLongPress(android.text.style.ClickableSpan, android.widget.TextView, java.lang.Runnable):void");
     }
 
     private void onPhotoClosed(final PlaceProviderObject placeProviderObject) {
