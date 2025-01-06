@@ -5798,7 +5798,7 @@ public class MessagesController extends BaseController implements NotificationCe
             channelRecommendations2.wasPremium = z;
             channelRecommendations2.chats.addAll(arrayList2);
             if (tLObject instanceof TLRPC.TL_usersSlice) {
-                channelRecommendations2.more = Math.max(0, ((TLRPC.TL_usersSlice) tLObject).count - this.chats.size());
+                channelRecommendations2.more = Math.max(0, ((TLRPC.TL_usersSlice) tLObject).count - arrayList2.size());
             } else if (!getUserConfig().isPremium() && BuildVars.DEBUG_PRIVATE_VERSION) {
                 channelRecommendations2.more = 90;
             }
