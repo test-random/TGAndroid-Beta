@@ -578,6 +578,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private boolean nameStatusPressed;
     private Drawable nameStatusSelector;
     private int nameStatusSelectorColor;
+    private String nameStatusSlug;
     private int nameWidth;
     private float nameX;
     private float nameY;
@@ -1053,7 +1054,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             public static void $default$didPressUserAvatar(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.User user, float f, float f2, boolean z) {
             }
 
-            public static void $default$didPressUserStatus(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.User user, TLRPC.Document document) {
+            public static void $default$didPressUserStatus(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.User user, TLRPC.Document document, String str) {
             }
 
             public static void $default$didPressViaBot(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, String str) {
@@ -1241,7 +1242,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
         void didPressUserAvatar(ChatMessageCell chatMessageCell, TLRPC.User user, float f, float f2, boolean z);
 
-        void didPressUserStatus(ChatMessageCell chatMessageCell, TLRPC.User user, TLRPC.Document document);
+        void didPressUserStatus(ChatMessageCell chatMessageCell, TLRPC.User user, TLRPC.Document document, String str);
 
         void didPressViaBot(ChatMessageCell chatMessageCell, String str);
 
@@ -3076,7 +3077,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
         } else if (motionEvent.getAction() == 1 || motionEvent.getAction() == 3) {
             if (motionEvent.getAction() == 1 && this.nameStatusPressed && this.delegate != null && this.currentUser != null) {
-                this.delegate.didPressUserStatus(this, this.currentUser, this.currentNameStatusDrawable.getDrawable() instanceof AnimatedEmojiDrawable ? ((AnimatedEmojiDrawable) this.currentNameStatusDrawable.getDrawable()).getDocument() : null);
+                this.delegate.didPressUserStatus(this, this.currentUser, this.currentNameStatusDrawable.getDrawable() instanceof AnimatedEmojiDrawable ? ((AnimatedEmojiDrawable) this.currentNameStatusDrawable.getDrawable()).getDocument() : null, this.nameStatusSlug);
                 invalidateOutbounds();
             }
             this.nameStatusSelector.setState(StateSet.NOTHING);
@@ -4591,18 +4592,46 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     private Object getAuthorStatus() {
+        MessageObject messageObject;
         TLRPC.User user = this.currentUser;
-        if (user == null) {
-            return null;
-        }
-        Long emojiStatusDocumentId = UserObject.getEmojiStatusDocumentId(user);
-        if (emojiStatusDocumentId != null) {
+        if (user != null) {
+            Long emojiStatusDocumentId = UserObject.getEmojiStatusDocumentId(user);
+            if (emojiStatusDocumentId == null) {
+                if (this.currentUser.premium) {
+                    return ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.msg_premium_liststar).mutate();
+                }
+                return null;
+            }
+            TLRPC.EmojiStatus emojiStatus = this.currentUser.emoji_status;
+            if (emojiStatus instanceof TLRPC.TL_emojiStatusCollectible) {
+                this.nameStatusSlug = ((TLRPC.TL_emojiStatusCollectible) emojiStatus).slug;
+            }
             return emojiStatusDocumentId;
         }
-        if (this.currentUser.premium) {
-            return ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.msg_premium_liststar).mutate();
+        if (this.currentChat == null || (messageObject = this.currentMessageObject) == null || messageObject.getDialogId() == 1271266957 || !this.currentChat.signature_profiles) {
+            return null;
         }
-        return null;
+        long peerDialogId = DialogObject.getPeerDialogId(this.currentMessageObject.messageOwner.from_id);
+        MessagesController messagesController = MessagesController.getInstance(this.currentAccount);
+        if (peerDialogId >= 0) {
+            TLRPC.User user2 = messagesController.getUser(Long.valueOf(peerDialogId));
+            if (user2 != null) {
+                TLRPC.EmojiStatus emojiStatus2 = user2.emoji_status;
+                if (emojiStatus2 instanceof TLRPC.TL_emojiStatusCollectible) {
+                    this.nameStatusSlug = ((TLRPC.TL_emojiStatusCollectible) emojiStatus2).slug;
+                }
+            }
+            return UserObject.getEmojiStatusDocumentId(user2);
+        }
+        TLRPC.Chat chat = messagesController.getChat(Long.valueOf(-peerDialogId));
+        if (chat == null) {
+            return null;
+        }
+        TLRPC.EmojiStatus emojiStatus3 = chat.emoji_status;
+        if (emojiStatus3 instanceof TLRPC.TL_emojiStatusCollectible) {
+            this.nameStatusSlug = ((TLRPC.TL_emojiStatusCollectible) emojiStatus3).slug;
+        }
+        return Long.valueOf(DialogObject.getEmojiStatusDocumentId(emojiStatus3));
     }
 
     private int getExtraTimeX() {

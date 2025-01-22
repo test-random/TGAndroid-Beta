@@ -1218,13 +1218,13 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
             int dp3 = (dp2 < paddingTop ? 0 : paddingTop - ((paddingTop / 5) * 3)) + AndroidUtilities.dp(8.0f);
             if (ShareAlert.this.gridView.getPaddingTop() != dp3) {
                 this.ignoreLayout = true;
-                ShareAlert.this.gridView.setPadding(0, dp3, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 48) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
-                ShareAlert.this.topicsGridView.setPadding(0, dp3, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 48) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
+                ShareAlert.this.gridView.setPadding(0, dp3, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 60) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
+                ShareAlert.this.topicsGridView.setPadding(0, dp3, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 60) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
                 this.ignoreLayout = false;
             }
             if (((BottomSheet) ShareAlert.this).keyboardVisible && getLayoutParams().height <= 0 && ShareAlert.this.searchGridView.getPaddingTop() != dp3) {
                 this.ignoreLayout = true;
-                ShareAlert.this.searchGridView.setPadding(0, 0, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 48) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
+                ShareAlert.this.searchGridView.setPadding(0, 0, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout == null ? 0 : 48) + 60) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
                 this.ignoreLayout = false;
             }
             boolean z = dp2 >= size;
@@ -3211,13 +3211,13 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 int dp3 = (dp2 < paddingTop ? 0 : paddingTop - ((paddingTop / 5) * 3)) + AndroidUtilities.dp(8.0f);
                 if (ShareAlert.this.gridView.getPaddingTop() != dp3) {
                     this.ignoreLayout = true;
-                    ShareAlert.this.gridView.setPadding(0, dp3, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 48) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
-                    ShareAlert.this.topicsGridView.setPadding(0, dp3, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 48) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
+                    ShareAlert.this.gridView.setPadding(0, dp3, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 60) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
+                    ShareAlert.this.topicsGridView.setPadding(0, dp3, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 60) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
                     this.ignoreLayout = false;
                 }
                 if (((BottomSheet) ShareAlert.this).keyboardVisible && getLayoutParams().height <= 0 && ShareAlert.this.searchGridView.getPaddingTop() != dp3) {
                     this.ignoreLayout = true;
-                    ShareAlert.this.searchGridView.setPadding(0, 0, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout != null ? 48 : 0) + 48) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
+                    ShareAlert.this.searchGridView.setPadding(0, 0, 0, AndroidUtilities.dp((ShareAlert.this.timestampFrameLayout == null ? 0 : 48) + 60) + ((BottomSheet) ShareAlert.this).navigationBarHeight);
                     this.ignoreLayout = false;
                 }
                 boolean z5 = dp2 >= size2;

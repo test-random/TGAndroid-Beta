@@ -13005,9 +13005,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
 
         @Override
-        public void didPressUserStatus(ChatMessageCell chatMessageCell, TLRPC.User user, TLRPC.Document document) {
+        public void didPressUserStatus(ChatMessageCell chatMessageCell, TLRPC.User user, TLRPC.Document document, String str) {
             ImageLocation forDocument;
             if (chatMessageCell == null) {
+                return;
+            }
+            if (!TextUtils.isEmpty(str)) {
+                Browser.openUrl(ChatActivity.this.getContext(), "https://" + ChatActivity.this.getMessagesController().linkPrefix + "/nft/" + str);
                 return;
             }
             ChatActivity chatActivity = ChatActivity.this;
@@ -13035,10 +13039,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     BackupImageView backupImageView = new BackupImageView(ChatActivity.this.getContext());
                     SvgHelper.SvgDrawable svgThumb = DocumentObject.getSvgThumb(document.thumbs, Theme.key_windowBackgroundWhiteGrayIcon, 0.2f);
                     TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(document.thumbs, 90);
-                    String str = "160_160";
+                    String str2 = "160_160";
                     if ("video/webm".equals(document.mime_type)) {
                         forDocument = ImageLocation.getForDocument(document);
-                        str = "160_160_g";
+                        str2 = "160_160_g";
                         if (svgThumb != null) {
                             svgThumb.overrideWidthAndHeight(512, 512);
                         }
@@ -13051,7 +13055,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     ImageLocation imageLocation = forDocument;
                     backupImageView.setLayerNum(7);
                     backupImageView.setRoundRadius(AndroidUtilities.dp(4.0f));
-                    backupImageView.setImage(imageLocation, str, ImageLocation.getForDocument(closestPhotoSizeWithSize, document), "140_140", svgThumb, document);
+                    backupImageView.setImage(imageLocation, str2, ImageLocation.getForDocument(closestPhotoSizeWithSize, document), "140_140", svgThumb, document);
                     if (MessageObject.isTextColorEmoji(document)) {
                         Integer num = premiumPreviewBottomSheet.accentColor;
                         backupImageView.setColorFilter(new PorterDuffColorFilter(num != null ? num.intValue() : ChatActivity.this.getThemedColor(Theme.key_windowBackgroundWhiteBlueIcon), PorterDuff.Mode.SRC_IN));
