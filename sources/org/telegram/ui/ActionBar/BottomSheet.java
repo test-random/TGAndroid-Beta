@@ -114,9 +114,11 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
     protected int navBarColorKey;
     protected float navigationBarAlpha;
     protected ValueAnimator navigationBarAnimation;
+    protected int navigationBarHeight;
     protected View nestedScrollChild;
     private AnimationNotificationsLocker notificationsLocker;
     public boolean occupyNavigationBar;
+    public boolean occupyNavigationBarWithoutKeyboard;
     private DialogInterface.OnClickListener onClickListener;
     private DialogInterface.OnDismissListener onHideListener;
     protected Interpolator openInterpolator;
@@ -1660,7 +1662,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
     }
 
     @Override
-    public View mo1009getWindowView() {
+    public View mo997getWindowView() {
         return this.container;
     }
 
@@ -1954,7 +1956,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
         }
         if (this.attachedFragment != null) {
             LaunchActivity.instance.checkSystemBarColors(true, true, true, false);
-            AndroidUtilities.setLightNavigationBar(mo1009getWindowView(), AndroidUtilities.computePerceivedBrightness(getNavigationBarColor(getThemedColor(Theme.key_windowBackgroundGray))) >= 0.721f);
+            AndroidUtilities.setLightNavigationBar(mo997getWindowView(), AndroidUtilities.computePerceivedBrightness(getNavigationBarColor(getThemedColor(Theme.key_windowBackgroundGray))) >= 0.721f);
         } else {
             AndroidUtilities.setNavigationBarColor(getWindow(), this.overlayDrawNavBarColor);
             AndroidUtilities.setLightNavigationBar(getWindow(), ((double) AndroidUtilities.computePerceivedBrightness(this.overlayDrawNavBarColor)) > 0.721d);

@@ -724,7 +724,7 @@ public class PollVotesAlert extends BottomSheet {
                 if (motionEvent.getAction() != 0 || PollVotesAlert.this.scrollOffsetY == 0 || motionEvent.getY() >= PollVotesAlert.this.scrollOffsetY + AndroidUtilities.dp(12.0f) || PollVotesAlert.this.actionBar.getAlpha() != 0.0f) {
                     return super.onInterceptTouchEvent(motionEvent);
                 }
-                PollVotesAlert.this.dismiss();
+                PollVotesAlert.this.lambda$new$0();
                 return true;
             }
 
@@ -922,7 +922,7 @@ public class PollVotesAlert extends BottomSheet {
             @Override
             public void onItemClick(int i12) {
                 if (i12 == -1) {
-                    PollVotesAlert.this.dismiss();
+                    PollVotesAlert.this.lambda$new$0();
                 }
             }
         });
@@ -949,7 +949,7 @@ public class PollVotesAlert extends BottomSheet {
         RecyclerView.ViewHolder findContainingViewHolder;
         this.queries.remove(numArr[i]);
         if (tLObject == null) {
-            dismiss();
+            lambda$new$0();
             return;
         }
         TLRPC.TL_messages_votesList tL_messages_votesList = (TLRPC.TL_messages_votesList) tLObject;
@@ -1072,7 +1072,7 @@ public class PollVotesAlert extends BottomSheet {
                         str = "chat_id";
                     }
                     bundle.putLong(str, j);
-                    dismiss();
+                    lambda$new$0();
                     ProfileActivity profileActivity = new ProfileActivity(bundle);
                     if (userCell.currentUser == null ? !((currentChat = chatActivity.getCurrentChat()) == null || currentChat.id != userCell.currentChat.id) : !((currentUser = chatActivity.getCurrentUser()) == null || currentUser.id != userCell.currentUser.id)) {
                         i2 = 1;

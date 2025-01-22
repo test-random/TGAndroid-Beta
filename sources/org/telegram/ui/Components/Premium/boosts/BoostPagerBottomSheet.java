@@ -164,7 +164,7 @@ public class BoostPagerBottomSheet extends BottomSheet {
         boostViaGiftsBottomSheet.setOnCloseClick(new Runnable() {
             @Override
             public final void run() {
-                BoostPagerBottomSheet.this.dismiss();
+                BoostPagerBottomSheet.this.lambda$new$0();
             }
         });
         boostViaGiftsBottomSheet.setActionListener(new BoostViaGiftsBottomSheet.ActionListener() {

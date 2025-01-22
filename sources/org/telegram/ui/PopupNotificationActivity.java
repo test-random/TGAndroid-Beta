@@ -3,7 +3,6 @@ package org.telegram.ui;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -613,7 +612,7 @@ public class PopupNotificationActivity extends Activity implements NotificationC
         openCurrentMessage();
     }
 
-    public void lambda$onRequestPermissionsResult$0(DialogInterface dialogInterface, int i) {
+    public void lambda$onRequestPermissionsResult$0(AlertDialog alertDialog, int i) {
         try {
             Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
             intent.setData(Uri.parse("package:" + ApplicationLoader.applicationContext.getPackageName()));
@@ -1423,10 +1422,10 @@ public class PopupNotificationActivity extends Activity implements NotificationC
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(LocaleController.getString(R.string.AppName));
         builder.setMessage(LocaleController.getString(R.string.PermissionNoAudioWithHint));
-        builder.setNegativeButton(LocaleController.getString(R.string.PermissionOpenSettings), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.PermissionOpenSettings), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                PopupNotificationActivity.this.lambda$onRequestPermissionsResult$0(dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                PopupNotificationActivity.this.lambda$onRequestPermissionsResult$0(alertDialog, i2);
             }
         });
         builder.setPositiveButton(LocaleController.getString(R.string.OK), null);

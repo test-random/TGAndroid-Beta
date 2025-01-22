@@ -78,6 +78,7 @@ import org.telegram.ui.Components.RLottieImageView;
 import org.telegram.ui.Components.RadialProgressView;
 import org.telegram.ui.Components.SizeNotifierFrameLayout;
 import org.telegram.ui.Components.TypefaceSpan;
+import org.telegram.ui.PhotoViewer;
 
 public class ChannelCreateActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, ImageUpdater.ImageUpdaterDelegate {
     private ArrayList adminedChannelCells;
@@ -169,7 +170,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
                     ChannelCreateActivity.this.showDoneCancelDialog();
                     return;
                 } else {
-                    ChannelCreateActivity.this.lambda$onBackPressed$321();
+                    ChannelCreateActivity.this.lambda$onBackPressed$323();
                     return;
                 }
             }
@@ -620,7 +621,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
         }
     }
 
-    public void lambda$loadAdminedChannels$18(TLRPC.Chat chat, DialogInterface dialogInterface, int i) {
+    public void lambda$loadAdminedChannels$18(TLRPC.Chat chat, AlertDialog alertDialog, int i) {
         TLRPC.TL_channels_updateUsername tL_channels_updateUsername = new TLRPC.TL_channels_updateUsername();
         tL_channels_updateUsername.channel = MessagesController.getInputChannel(chat);
         tL_channels_updateUsername.username = "";
@@ -644,10 +645,10 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
         }
         builder.setMessage(AndroidUtilities.replaceTags(formatString));
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        builder.setPositiveButton(LocaleController.getString(R.string.RevokeButton), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.RevokeButton), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChannelCreateActivity.this.lambda$loadAdminedChannels$18(currentChannel, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChannelCreateActivity.this.lambda$loadAdminedChannels$18(currentChannel, alertDialog, i);
             }
         });
         showDialog(builder.create());
@@ -708,7 +709,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
         updateDoneProgress(true);
     }
 
-    public void lambda$showDoneCancelDialog$2(DialogInterface dialogInterface, int i) {
+    public void lambda$showDoneCancelDialog$2(AlertDialog alertDialog, int i) {
         this.donePressed = false;
         this.createAfterUpload = false;
         if (this.doneRequestId != null) {
@@ -716,7 +717,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
             this.doneRequestId = null;
         }
         updateDoneProgress(false);
-        dialogInterface.dismiss();
+        alertDialog.dismiss();
     }
 
     public void lambda$showPremiumIncreaseLimitDialog$25() {
@@ -811,10 +812,10 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
         builder.setTitle(LocaleController.getString(R.string.StopLoadingTitle));
         builder.setMessage(LocaleController.getString(R.string.StopLoading));
         builder.setPositiveButton(LocaleController.getString(R.string.WaitMore), null);
-        builder.setNegativeButton(LocaleController.getString(R.string.Stop), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.Stop), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChannelCreateActivity.this.lambda$showDoneCancelDialog$2(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChannelCreateActivity.this.lambda$showDoneCancelDialog$2(alertDialog, i);
             }
         });
         this.cancelDialog = builder.show();
@@ -1383,7 +1384,7 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
     }
 
     @Override
-    public void didStartUpload(boolean z) {
+    public void didStartUpload(boolean z, boolean z2) {
         RadialProgressView radialProgressView = this.avatarProgressView;
         if (radialProgressView == null) {
             return;
@@ -1418,6 +1419,11 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
     public boolean dismissDialogOnPause(Dialog dialog) {
         ImageUpdater imageUpdater = this.imageUpdater;
         return (imageUpdater == null || imageUpdater.dismissDialogOnPause(dialog)) && super.dismissDialogOnPause(dialog);
+    }
+
+    @Override
+    public PhotoViewer.PlaceProviderObject getCloseIntoObject() {
+        return ImageUpdater.ImageUpdaterDelegate.CC.$default$getCloseIntoObject(this);
     }
 
     @Override
@@ -1673,5 +1679,10 @@ public class ChannelCreateActivity extends BaseFragment implements NotificationC
 
     public void setOnFinishListener(Utilities.Callback2 callback2) {
         this.onFinishListener = callback2;
+    }
+
+    @Override
+    public boolean supportsBulletin() {
+        return ImageUpdater.ImageUpdaterDelegate.CC.$default$supportsBulletin(this);
     }
 }

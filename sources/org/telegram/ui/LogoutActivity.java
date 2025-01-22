@@ -2,7 +2,6 @@ package org.telegram.ui;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.view.View;
@@ -216,7 +215,7 @@ public class LogoutActivity extends BaseFragment {
         }
     }
 
-    public static void lambda$makeLogOutDialog$1(int i, DialogInterface dialogInterface, int i2) {
+    public static void lambda$makeLogOutDialog$1(int i, AlertDialog alertDialog, int i2) {
         MessagesController.getInstance(i).performLogout(1);
     }
 
@@ -225,10 +224,10 @@ public class LogoutActivity extends BaseFragment {
         builder.setMessage(LocaleController.getString(R.string.AreYouSureLogout));
         int i2 = R.string.LogOut;
         builder.setTitle(LocaleController.getString(i2));
-        builder.setPositiveButton(LocaleController.getString(i2), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(i2), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                LogoutActivity.lambda$makeLogOutDialog$1(i, dialogInterface, i3);
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                LogoutActivity.lambda$makeLogOutDialog$1(i, alertDialog, i3);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -252,7 +251,7 @@ public class LogoutActivity extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    LogoutActivity.this.lambda$onBackPressed$321();
+                    LogoutActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

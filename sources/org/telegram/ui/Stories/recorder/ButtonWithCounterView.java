@@ -567,6 +567,11 @@ public class ButtonWithCounterView extends FrameLayout implements Loadable {
         this.countText.setTextColor(Theme.getColor(Theme.key_featuredStickers_addButton, this.resourcesProvider));
     }
 
+    public void updateColors(Theme.ResourcesProvider resourcesProvider) {
+        this.resourcesProvider = resourcesProvider;
+        updateColors();
+    }
+
     @Override
     protected boolean verifyDrawable(Drawable drawable) {
         return this.flickeringLoadingDrawable == drawable || this.text == drawable || this.subText == drawable || this.countText == drawable || super.verifyDrawable(drawable);

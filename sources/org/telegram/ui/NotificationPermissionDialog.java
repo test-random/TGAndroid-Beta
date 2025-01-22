@@ -270,7 +270,7 @@ public class NotificationPermissionDialog extends BottomSheet implements Notific
             callback.run(Boolean.TRUE);
             this.whenGranted = null;
         }
-        dismiss();
+        lambda$new$0();
     }
 
     public static boolean shouldAsk(Activity activity) {
@@ -298,8 +298,8 @@ public class NotificationPermissionDialog extends BottomSheet implements Notific
     }
 
     @Override
-    public void dismiss() {
-        super.dismiss();
+    public void lambda$new$0() {
+        super.lambda$new$0();
         Utilities.Callback callback = this.whenGranted;
         if (callback != null) {
             callback.run(Boolean.FALSE);

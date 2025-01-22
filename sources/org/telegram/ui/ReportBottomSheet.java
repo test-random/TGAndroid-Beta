@@ -233,7 +233,7 @@ public class ReportBottomSheet extends BottomSheet {
             if (motionEvent.getAction() != 0 || motionEvent.getY() >= this.top) {
                 return super.dispatchTouchEvent(motionEvent);
             }
-            ReportBottomSheet.this.dismiss();
+            ReportBottomSheet.this.lambda$new$0();
             return true;
         }
 
@@ -394,7 +394,7 @@ public class ReportBottomSheet extends BottomSheet {
 
         public void lambda$new$0() {
             if (this.pageType == 0) {
-                ReportBottomSheet.this.dismiss();
+                ReportBottomSheet.this.lambda$new$0();
             } else {
                 ReportBottomSheet.this.onBackPressed();
             }

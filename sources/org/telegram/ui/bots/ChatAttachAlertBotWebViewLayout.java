@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -733,7 +732,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
             return;
         }
         if (tL_error != null) {
-            this.parentAlert.dismiss();
+            this.parentAlert.lambda$new$0();
         } else {
             AndroidUtilities.runOnUIThread(this.pollRunnable, 60000L);
         }
@@ -822,8 +821,8 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
         }
     }
 
-    public void lambda$onCheckDismissByUser$9(DialogInterface dialogInterface, int i) {
-        this.parentAlert.dismiss();
+    public void lambda$onCheckDismissByUser$9(AlertDialog alertDialog, int i) {
+        this.parentAlert.lambda$new$0();
     }
 
     public void lambda$onPanTransitionStart$10(ValueAnimator valueAnimator) {
@@ -890,7 +889,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
             if (this.queryId == ((Long) objArr[0]).longValue()) {
                 this.webViewContainer.destroyWebView();
                 this.needReload = true;
-                this.parentAlert.dismiss();
+                this.parentAlert.lambda$new$0();
             }
         }
     }
@@ -975,14 +974,14 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
 
     public boolean onCheckDismissByUser() {
         if (!this.needCloseConfirmation) {
-            this.parentAlert.dismiss();
+            this.parentAlert.lambda$new$0();
             return true;
         }
         TLRPC.User user = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(this.botId));
-        AlertDialog create = new AlertDialog.Builder(getContext()).setTitle(user != null ? ContactsController.formatName(user.first_name, user.last_name) : null).setMessage(LocaleController.getString(R.string.BotWebViewChangesMayNotBeSaved)).setPositiveButton(LocaleController.getString(R.string.BotWebViewCloseAnyway), new DialogInterface.OnClickListener() {
+        AlertDialog create = new AlertDialog.Builder(getContext()).setTitle(user != null ? ContactsController.formatName(user.first_name, user.last_name) : null).setMessage(LocaleController.getString(R.string.BotWebViewChangesMayNotBeSaved)).setPositiveButton(LocaleController.getString(R.string.BotWebViewCloseAnyway), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChatAttachAlertBotWebViewLayout.this.lambda$onCheckDismissByUser$9(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChatAttachAlertBotWebViewLayout.this.lambda$onCheckDismissByUser$9(alertDialog, i);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).create();
         create.show();
@@ -1052,7 +1051,7 @@ public class ChatAttachAlertBotWebViewLayout extends ChatAttachAlert.AttachAlert
             Bundle bundle = new Bundle();
             bundle.putLong("user_id", this.botId);
             this.parentAlert.baseFragment.presentFragment(new ChatActivity(bundle));
-            this.parentAlert.dismiss();
+            this.parentAlert.lambda$new$0();
             return;
         }
         if (i == R.id.menu_reload_page) {

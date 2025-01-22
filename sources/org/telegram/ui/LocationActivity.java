@@ -207,7 +207,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
         public void lambda$addInfoView$0(VenueLocation venueLocation, boolean z, int i) {
             LocationActivity.this.delegate.didSelectLocation(venueLocation.venue, LocationActivity.this.locationType, z, i);
-            LocationActivity.this.lambda$onBackPressed$321();
+            LocationActivity.this.lambda$onBackPressed$323();
         }
 
         public void lambda$addInfoView$1(final VenueLocation venueLocation, View view) {
@@ -220,7 +220,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 });
             } else {
                 LocationActivity.this.delegate.didSelectLocation(venueLocation.venue, LocationActivity.this.locationType, true, 0);
-                LocationActivity.this.lambda$onBackPressed$321();
+                LocationActivity.this.lambda$onBackPressed$323();
             }
         }
 
@@ -632,10 +632,10 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                 builder.setTopAnimation(R.raw.permission_request_location, 72, false, getThemedColor(Theme.key_dialogTopBackground));
                 builder.setMessage(LocaleController.getString(R.string.GpsDisabledAlertText));
-                builder.setPositiveButton(LocaleController.getString(R.string.ConnectingToProxyEnable), new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(LocaleController.getString(R.string.ConnectingToProxyEnable), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i) {
-                        LocationActivity.this.lambda$checkGpsEnabled$38(dialogInterface, i);
+                    public final void onClick(AlertDialog alertDialog, int i) {
+                        LocationActivity.this.lambda$checkGpsEnabled$38(alertDialog, i);
                     }
                 });
                 builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -945,7 +945,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         return (getResourceProvider() == null && Theme.getActiveTheme().isDark()) || AndroidUtilities.computePerceivedBrightness(getThemedColor(Theme.key_windowBackgroundWhite)) < 0.721f;
     }
 
-    public void lambda$checkGpsEnabled$38(DialogInterface dialogInterface, int i) {
+    public void lambda$checkGpsEnabled$38(AlertDialog alertDialog, int i) {
         if (getParentActivity() == null) {
             return;
         }
@@ -1027,7 +1027,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         }
         alertDialogArr[0] = null;
         this.delegate.didSelectLocation(tL_messageMediaVenue, 4, true, 0);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$13(final AlertDialog[] alertDialogArr, final TLRPC.TL_messageMediaVenue tL_messageMediaVenue, TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -1045,12 +1045,12 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
     public void lambda$createView$15(TLRPC.TL_messageMediaGeo tL_messageMediaGeo, boolean z, int i) {
         this.delegate.didSelectLocation(tL_messageMediaGeo, this.locationType, z, i);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$16(Object obj, boolean z, int i) {
         this.delegate.didSelectLocation((TLRPC.TL_messageMediaVenue) obj, this.locationType, z, i);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$17(View view, int i) {
@@ -1186,7 +1186,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             return;
         }
         this.delegate.didSelectLocation(tL_messageMediaVenue2, 4, true, 0);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public boolean lambda$createView$18(MotionEvent motionEvent, IMapsProvider.ICallableMethod iCallableMethod) {
@@ -1326,7 +1326,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
     public void lambda$createView$26(TLRPC.TL_messageMediaVenue tL_messageMediaVenue, boolean z, int i) {
         this.delegate.didSelectLocation(tL_messageMediaVenue, this.locationType, z, i);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$27(ActionBarMenu actionBarMenu, View view, int i) {
@@ -1348,7 +1348,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 return;
             } else {
                 this.delegate.didSelectLocation(item, this.locationType, true, 0);
-                lambda$onBackPressed$321();
+                lambda$onBackPressed$323();
                 return;
             }
         }
@@ -1595,7 +1595,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             FileLog.e(e);
         }
         this.hasScreenshot = true;
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$onCheckGlScreenshot$45(Bitmap bitmap, final GLSurfaceView gLSurfaceView) {
@@ -1728,7 +1728,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         return false;
     }
 
-    public void lambda$openProximityAlert$29(TLRPC.User user, int i, DialogInterface dialogInterface, int i2) {
+    public void lambda$openProximityAlert$29(TLRPC.User user, int i, AlertDialog alertDialog, int i2) {
         shareLiveLocation(user, 900, i);
     }
 
@@ -1743,10 +1743,10 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.ShareLocationAlertTitle));
         builder.setMessage(LocaleController.getString(R.string.ShareLocationAlertText));
-        builder.setPositiveButton(LocaleController.getString(R.string.ShareLocationAlertButton), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.ShareLocationAlertButton), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                LocationActivity.this.lambda$openProximityAlert$29(user, i, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                LocationActivity.this.lambda$openProximityAlert$29(user, i, alertDialog, i2);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1829,7 +1829,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         }
     }
 
-    public void lambda$showPermissionAlert$39(DialogInterface dialogInterface, int i) {
+    public void lambda$showPermissionAlert$39(AlertDialog alertDialog, int i) {
         if (getParentActivity() == null) {
             return;
         }
@@ -2080,7 +2080,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         tL_messageMediaGeoLive.flags = i3 | 9;
         this.delegate.didSelectLocation(tL_messageMediaGeoLive, this.locationType, true, 0);
         if (i2 <= 0) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
             return;
         }
         this.proximitySheet.setRadiusSet();
@@ -2099,10 +2099,10 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTopAnimation(R.raw.permission_request_location, 72, false, getThemedColor(Theme.key_dialogTopBackground));
         builder.setMessage(AndroidUtilities.replaceTags(LocaleController.getString(z ? R.string.PermissionNoLocationNavigation : R.string.PermissionNoLocationFriends)));
-        builder.setNegativeButton(LocaleController.getString(R.string.PermissionOpenSettings), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.PermissionOpenSettings), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                LocationActivity.this.lambda$showPermissionAlert$39(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                LocationActivity.this.lambda$showPermissionAlert$39(alertDialog, i);
             }
         });
         builder.setPositiveButton(LocaleController.getString(R.string.OK), null);

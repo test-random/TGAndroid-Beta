@@ -22,6 +22,7 @@ import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.ImageUpdater;
+import org.telegram.ui.PhotoViewer;
 import org.telegram.ui.ProfileActivity;
 
 public abstract class PhotoUtilities {
@@ -256,8 +257,8 @@ public abstract class PhotoUtilities {
             }
 
             @Override
-            public void didStartUpload(boolean z) {
-                ImageUpdater.ImageUpdaterDelegate.CC.$default$didStartUpload(this, z);
+            public void didStartUpload(boolean z, boolean z2) {
+                ImageUpdater.ImageUpdaterDelegate.CC.$default$didStartUpload(this, z, z2);
             }
 
             @Override
@@ -271,6 +272,11 @@ public abstract class PhotoUtilities {
             }
 
             @Override
+            public PhotoViewer.PlaceProviderObject getCloseIntoObject() {
+                return ImageUpdater.ImageUpdaterDelegate.CC.$default$getCloseIntoObject(this);
+            }
+
+            @Override
             public String getInitialSearchString() {
                 return ImageUpdater.ImageUpdaterDelegate.CC.$default$getInitialSearchString(this);
             }
@@ -278,6 +284,11 @@ public abstract class PhotoUtilities {
             @Override
             public void onUploadProgressChanged(float f) {
                 ImageUpdater.ImageUpdaterDelegate.CC.$default$onUploadProgressChanged(this, f);
+            }
+
+            @Override
+            public boolean supportsBulletin() {
+                return ImageUpdater.ImageUpdaterDelegate.CC.$default$supportsBulletin(this);
             }
         });
     }
@@ -296,8 +307,8 @@ public abstract class PhotoUtilities {
             }
 
             @Override
-            public void didStartUpload(boolean z) {
-                ImageUpdater.ImageUpdaterDelegate.CC.$default$didStartUpload(this, z);
+            public void didStartUpload(boolean z, boolean z2) {
+                ImageUpdater.ImageUpdaterDelegate.CC.$default$didStartUpload(this, z, z2);
             }
 
             @Override
@@ -311,6 +322,11 @@ public abstract class PhotoUtilities {
             }
 
             @Override
+            public PhotoViewer.PlaceProviderObject getCloseIntoObject() {
+                return ImageUpdater.ImageUpdaterDelegate.CC.$default$getCloseIntoObject(this);
+            }
+
+            @Override
             public String getInitialSearchString() {
                 return ImageUpdater.ImageUpdaterDelegate.CC.$default$getInitialSearchString(this);
             }
@@ -318,6 +334,11 @@ public abstract class PhotoUtilities {
             @Override
             public void onUploadProgressChanged(float f) {
                 ImageUpdater.ImageUpdaterDelegate.CC.$default$onUploadProgressChanged(this, f);
+            }
+
+            @Override
+            public boolean supportsBulletin() {
+                return ImageUpdater.ImageUpdaterDelegate.CC.$default$supportsBulletin(this);
             }
         });
     }

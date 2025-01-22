@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -94,7 +93,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
             this.val$context = context;
         }
 
-        public void lambda$onItemClick$0(DialogInterface dialogInterface, int i) {
+        public void lambda$onItemClick$0(AlertDialog alertDialog, int i) {
             Iterator it = ProxyListActivity.this.selectedItems.iterator();
             while (it.hasNext()) {
                 SharedConfig.deleteProxy((SharedConfig.ProxyInfo) it.next());
@@ -127,10 +126,10 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                     builder.setMessage(LocaleController.getString(ProxyListActivity.this.selectedItems.size() > 1 ? R.string.DeleteProxyMultiConfirm : R.string.DeleteProxyConfirm));
                     builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
                     builder.setTitle(LocaleController.getString(R.string.DeleteProxyTitle));
-                    builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i2) {
-                            ProxyListActivity.AnonymousClass3.this.lambda$onItemClick$0(dialogInterface, i2);
+                        public final void onClick(AlertDialog alertDialog, int i2) {
+                            ProxyListActivity.AnonymousClass3.this.lambda$onItemClick$0(alertDialog, i2);
                         }
                     });
                     AlertDialog create = builder.create();
@@ -162,7 +161,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                     return;
                 }
             } else if (ProxyListActivity.this.selectedItems.isEmpty()) {
-                ProxyListActivity.this.lambda$onBackPressed$321();
+                ProxyListActivity.this.lambda$onBackPressed$323();
                 return;
             }
             ProxyListActivity.this.listAdapter.clearSelected();
@@ -755,7 +754,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
         });
     }
 
-    public void lambda$createView$0(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$0(AlertDialog alertDialog, int i) {
         Iterator it = this.proxyList.iterator();
         while (it.hasNext()) {
             SharedConfig.deleteProxy((SharedConfig.ProxyInfo) it.next());
@@ -852,10 +851,10 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                 builder.setMessage(LocaleController.getString(R.string.DeleteAllProxiesConfirm));
                 builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
                 builder.setTitle(LocaleController.getString(R.string.DeleteProxyTitle));
-                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i4) {
-                        ProxyListActivity.this.lambda$createView$0(dialogInterface, i4);
+                    public final void onClick(AlertDialog alertDialog, int i4) {
+                        ProxyListActivity.this.lambda$createView$0(alertDialog, i4);
                     }
                 });
                 AlertDialog create = builder.create();
@@ -957,7 +956,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    ProxyListActivity.this.lambda$onBackPressed$321();
+                    ProxyListActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

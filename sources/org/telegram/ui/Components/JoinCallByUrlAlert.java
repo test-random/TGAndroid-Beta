@@ -51,7 +51,7 @@ public abstract class JoinCallByUrlAlert extends BottomSheet {
 
     public void lambda$new$0(View view) {
         this.joinAfterDismiss = true;
-        dismiss();
+        lambda$new$0();
     }
 
     @Override

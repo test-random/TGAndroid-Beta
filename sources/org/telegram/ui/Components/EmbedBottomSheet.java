@@ -868,7 +868,7 @@ public class EmbedBottomSheet extends BottomSheet {
     }
 
     public void lambda$new$2(View view) {
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$3(View view) {
@@ -906,12 +906,12 @@ public class EmbedBottomSheet extends BottomSheet {
                 }
             });
         }
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$5(View view) {
         Browser.openUrl(this.parentActivity, this.openUrl);
-        dismiss();
+        lambda$new$0();
     }
 
     private void runJsCode(String str) {

@@ -3,7 +3,6 @@ package org.telegram.ui;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -471,16 +470,16 @@ public class ManageLinksActivity extends BaseFragment implements NotificationCen
             return i == 2 || i == 1;
         }
 
-        public void lambda$new$0(TLRPC.TL_chatInviteExported tL_chatInviteExported, DialogInterface dialogInterface, int i) {
+        public void lambda$new$0(TLRPC.TL_chatInviteExported tL_chatInviteExported, AlertDialog alertDialog, int i) {
             ManageLinksActivity.this.deleteLink(tL_chatInviteExported);
         }
 
         public void lambda$new$1() {
             final TLRPC.TL_chatInviteExported tL_chatInviteExported = this.invite;
-            new AlertDialog.Builder(ManageLinksActivity.this.getParentActivity()).setTitle(LocaleController.getString(R.string.DeleteLink)).setMessage(LocaleController.getString(R.string.DeleteLinkHelp)).setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(ManageLinksActivity.this.getParentActivity()).setTitle(LocaleController.getString(R.string.DeleteLink)).setMessage(LocaleController.getString(R.string.DeleteLinkHelp)).setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    ManageLinksActivity.LinkCell.this.lambda$new$0(tL_chatInviteExported, dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    ManageLinksActivity.LinkCell.this.lambda$new$0(tL_chatInviteExported, alertDialog, i);
                 }
             }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
         }
@@ -529,16 +528,16 @@ public class ManageLinksActivity extends BaseFragment implements NotificationCen
             ManageLinksActivity.this.editLink(this.invite);
         }
 
-        public void lambda$new$5(TLRPC.TL_chatInviteExported tL_chatInviteExported, DialogInterface dialogInterface, int i) {
+        public void lambda$new$5(TLRPC.TL_chatInviteExported tL_chatInviteExported, AlertDialog alertDialog, int i) {
             ManageLinksActivity.this.revokeLink(tL_chatInviteExported);
         }
 
         public void lambda$new$6() {
             final TLRPC.TL_chatInviteExported tL_chatInviteExported = this.invite;
-            new AlertDialog.Builder(ManageLinksActivity.this.getParentActivity()).setMessage(LocaleController.getString(R.string.RevokeAlert)).setTitle(LocaleController.getString(R.string.RevokeLink)).setPositiveButton(LocaleController.getString(R.string.RevokeButton), new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(ManageLinksActivity.this.getParentActivity()).setMessage(LocaleController.getString(R.string.RevokeAlert)).setTitle(LocaleController.getString(R.string.RevokeLink)).setPositiveButton(LocaleController.getString(R.string.RevokeButton), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    ManageLinksActivity.LinkCell.this.lambda$new$5(tL_chatInviteExported, dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    ManageLinksActivity.LinkCell.this.lambda$new$5(tL_chatInviteExported, alertDialog, i);
                 }
             }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
         }
@@ -974,7 +973,7 @@ public class ManageLinksActivity extends BaseFragment implements NotificationCen
         });
     }
 
-    public void lambda$createView$8(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$8(AlertDialog alertDialog, int i) {
         TLRPC.TL_messages_deleteRevokedExportedChatInvites tL_messages_deleteRevokedExportedChatInvites = new TLRPC.TL_messages_deleteRevokedExportedChatInvites();
         tL_messages_deleteRevokedExportedChatInvites.peer = getMessagesController().getInputPeer(-this.currentChatId);
         tL_messages_deleteRevokedExportedChatInvites.admin_id = this.adminId == getUserConfig().getClientUserId() ? getMessagesController().getInputUser(getUserConfig().getCurrentUser()) : getMessagesController().getInputUser(this.adminId);
@@ -1022,10 +1021,10 @@ public class ManageLinksActivity extends BaseFragment implements NotificationCen
                     AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                     builder.setTitle(LocaleController.getString(R.string.DeleteAllRevokedLinks));
                     builder.setMessage(LocaleController.getString(R.string.DeleteAllRevokedLinkHelp));
-                    builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i4) {
-                            ManageLinksActivity.this.lambda$createView$8(dialogInterface, i4);
+                        public final void onClick(AlertDialog alertDialog, int i4) {
+                            ManageLinksActivity.this.lambda$createView$8(alertDialog, i4);
                         }
                     });
                     builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1436,7 +1435,7 @@ public class ManageLinksActivity extends BaseFragment implements NotificationCen
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    ManageLinksActivity.this.lambda$onBackPressed$321();
+                    ManageLinksActivity.this.lambda$onBackPressed$323();
                 }
             }
         });
@@ -1534,7 +1533,7 @@ public class ManageLinksActivity extends BaseFragment implements NotificationCen
             if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
                 removeSelfFromStack();
             } else {
-                lambda$onBackPressed$321();
+                lambda$onBackPressed$323();
             }
         }
     }

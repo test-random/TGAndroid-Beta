@@ -15,11 +15,13 @@ public class DarkThemeResourceProvider implements Theme.ResourcesProvider {
     Paint actionPaint;
     ColorFilter animatedEmojiColorFilter;
     Drawable msgOutMedia;
-    HashSet debugUnknownKeys = new HashSet();
-    SparseIntArray sparseIntArray = new SparseIntArray();
+    protected HashSet debugUnknownKeys = new HashSet();
+    protected SparseIntArray sparseIntArray = new SparseIntArray();
     Paint dividerPaint = new Paint();
 
     public DarkThemeResourceProvider() {
+        this.sparseIntArray.put(Theme.key_chat_BlurAlpha, -1308622848);
+        this.sparseIntArray.put(Theme.key_chat_BlurAlphaSlow, -1056964608);
         this.sparseIntArray.put(Theme.key_statisticChartSignature, -1214008894);
         this.sparseIntArray.put(Theme.key_statisticChartSignatureAlpha, -1946157057);
         this.sparseIntArray.put(Theme.key_statisticChartHintLine, 452984831);
@@ -115,6 +117,7 @@ public class DarkThemeResourceProvider implements Theme.ResourcesProvider {
         this.sparseIntArray.put(Theme.key_windowBackgroundWhiteGrayText4, -8355712);
         this.sparseIntArray.put(Theme.key_voipgroup_nameText, -1);
         this.sparseIntArray.put(Theme.key_voipgroup_inviteMembersBackground, -14538189);
+        this.sparseIntArray.put(Theme.key_dialogScrollGlow, -14538189);
         this.sparseIntArray.put(Theme.key_chats_secretName, -9316522);
         this.sparseIntArray.put(Theme.key_chats_name, -1446156);
         this.sparseIntArray.put(Theme.key_chat_serviceBackground, -2110438831);
@@ -125,7 +128,9 @@ public class DarkThemeResourceProvider implements Theme.ResourcesProvider {
         this.sparseIntArray.put(Theme.key_dialogTextBlue2, -15033089);
         this.sparseIntArray.put(Theme.key_color_red, -832444);
         this.sparseIntArray.put(Theme.key_checkbox, -12692893);
-        this.sparseIntArray.put(Theme.key_checkboxDisabled, -10329502);
+        SparseIntArray sparseIntArray5 = this.sparseIntArray;
+        int i5 = Theme.key_checkboxDisabled;
+        sparseIntArray5.put(i5, -10329502);
         this.sparseIntArray.put(Theme.key_dialogRoundCheckBoxCheck, -1);
         this.sparseIntArray.put(i3, 436207615);
         this.sparseIntArray.put(Theme.key_groupcreate_spanBackground, -13816531);
@@ -154,6 +159,11 @@ public class DarkThemeResourceProvider implements Theme.ResourcesProvider {
         this.sparseIntArray.put(Theme.key_chat_outBubbleGradient2, 0);
         this.sparseIntArray.put(Theme.key_chat_outBubbleGradient3, 0);
         this.sparseIntArray.put(Theme.key_chat_textSelectBackground, ColorUtils.setAlphaComponent(-1, 75));
+        this.sparseIntArray.put(Theme.key_radioBackgroundChecked, -10177041);
+        this.sparseIntArray.put(i5, -12237499);
+        this.sparseIntArray.put(Theme.key_checkboxCheck, -1);
+        this.sparseIntArray.put(Theme.key_avatar_backgroundSaved, -10703370);
+        this.sparseIntArray.put(Theme.key_avatar_background2Saved, -12547121);
         appendColors();
         this.dividerPaint.setColor(getColor(i4));
     }

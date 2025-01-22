@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -38,6 +37,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_stars;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -120,7 +120,7 @@ public class ChatCustomReactionsEditActivity extends BaseFragment implements Not
         }
 
         @Override
-        protected void onEmojiSelected(View view, Long l, TLRPC.Document document, Integer num) {
+        protected void onEmojiSelected(View view, Long l, TLRPC.Document document, TL_stars.TL_starGiftUnique tL_starGiftUnique, Integer num) {
             if (ChatCustomReactionsEditActivity.this.selectedEmojisMap.containsKey(l)) {
                 ChatCustomReactionsEditActivity.this.selectedEmojisIds.remove(l);
                 final AnimatedEmojiSpan animatedEmojiSpan = (AnimatedEmojiSpan) ChatCustomReactionsEditActivity.this.selectedEmojisMap.remove(l);
@@ -196,16 +196,16 @@ public class ChatCustomReactionsEditActivity extends BaseFragment implements Not
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), getResourceProvider());
             builder.setTitle(LocaleController.getString("UnsavedChanges", R.string.UnsavedChanges));
             builder.setMessage(LocaleController.getString("ReactionApplyChangesDialog", R.string.ReactionApplyChangesDialog));
-            builder.setPositiveButton(LocaleController.getString("ApplyTheme", R.string.ApplyTheme), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString("ApplyTheme", R.string.ApplyTheme), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    ChatCustomReactionsEditActivity.this.lambda$checkChangesBeforeExit$14(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    ChatCustomReactionsEditActivity.this.lambda$checkChangesBeforeExit$14(alertDialog, i);
                 }
             });
-            builder.setNegativeButton(LocaleController.getString(R.string.Discard), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(LocaleController.getString(R.string.Discard), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    ChatCustomReactionsEditActivity.this.lambda$checkChangesBeforeExit$15(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    ChatCustomReactionsEditActivity.this.lambda$checkChangesBeforeExit$15(alertDialog, i);
                 }
             });
             builder.show();
@@ -338,12 +338,12 @@ public class ChatCustomReactionsEditActivity extends BaseFragment implements Not
         return Build.MODEL.toLowerCase().startsWith("zte") && Build.VERSION.SDK_INT <= 28;
     }
 
-    public void lambda$checkChangesBeforeExit$14(DialogInterface dialogInterface, int i) {
+    public void lambda$checkChangesBeforeExit$14(AlertDialog alertDialog, int i) {
         this.actionButton.performClick();
     }
 
-    public void lambda$checkChangesBeforeExit$15(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$checkChangesBeforeExit$15(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public void lambda$closeKeyboard$17(ValueAnimator valueAnimator) {
@@ -392,7 +392,7 @@ public class ChatCustomReactionsEditActivity extends BaseFragment implements Not
         }
         this.actionButton.setLoading(false);
         if (tL_error.text.equals("CHAT_NOT_MODIFIED")) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         } else {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
@@ -433,7 +433,7 @@ public class ChatCustomReactionsEditActivity extends BaseFragment implements Not
         }, new Runnable() {
             @Override
             public final void run() {
-                ChatCustomReactionsEditActivity.this.lambda$onBackPressed$321();
+                ChatCustomReactionsEditActivity.this.lambda$onBackPressed$323();
             }
         });
     }
@@ -655,7 +655,7 @@ public class ChatCustomReactionsEditActivity extends BaseFragment implements Not
             if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
                 removeSelfFromStack();
             } else {
-                lambda$onBackPressed$321();
+                lambda$onBackPressed$323();
             }
         }
     }

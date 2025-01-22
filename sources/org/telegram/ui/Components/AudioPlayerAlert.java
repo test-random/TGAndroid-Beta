@@ -322,14 +322,14 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                 DialogsActivity dialogsActivity = (DialogsActivity) AudioPlayerAlert.this.parentActivity.getActionBarLayout().getLastFragment();
                 if (!dialogsActivity.onlyDialogsAdapter()) {
                     dialogsActivity.setShowSearch(charSequence, 3);
-                    AudioPlayerAlert.this.dismiss();
+                    AudioPlayerAlert.this.lambda$new$0();
                 }
             }
             DialogsActivity dialogsActivity2 = new DialogsActivity(null);
             dialogsActivity2.setSearchString(charSequence);
             dialogsActivity2.setInitialSearchType(3);
             AudioPlayerAlert.this.parentActivity.presentFragment(dialogsActivity2, false, false);
-            AudioPlayerAlert.this.dismiss();
+            AudioPlayerAlert.this.lambda$new$0();
         }
 
         @Override
@@ -1092,7 +1092,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                 return true;
             }
         }
-        dialogsActivity.lambda$onBackPressed$321();
+        dialogsActivity.lambda$onBackPressed$323();
         return true;
     }
 
@@ -1455,7 +1455,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
         ActionBarMenuItem actionBarMenuItem2;
         MessageObject playingMessageObject = MediaController.getInstance().getPlayingMessageObject();
         if ((playingMessageObject == null && z) || (playingMessageObject != null && !playingMessageObject.isMusic())) {
-            dismiss();
+            lambda$new$0();
             return;
         }
         if (playingMessageObject == null) {
@@ -1633,8 +1633,8 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
     }
 
     @Override
-    public void dismiss() {
-        super.dismiss();
+    public void lambda$new$0() {
+        super.lambda$new$0();
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.messagePlayingDidReset);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.messagePlayingDidStart);

@@ -1,6 +1,5 @@
 package org.telegram.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import androidx.fragment.app.FragmentActivity;
@@ -15,7 +14,7 @@ import org.telegram.ui.ActionBar.Theme;
 public abstract class BasePermissionsActivity extends FragmentActivity {
     protected int currentAccount = -1;
 
-    public void lambda$createPermissionErrorAlert$0(DialogInterface dialogInterface, int i) {
+    public void lambda$createPermissionErrorAlert$0(AlertDialog alertDialog, int i) {
         try {
             Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
             intent.setData(Uri.parse("package:" + ApplicationLoader.applicationContext.getPackageName()));
@@ -34,10 +33,10 @@ public abstract class BasePermissionsActivity extends FragmentActivity {
     }
 
     public AlertDialog createPermissionErrorAlert(int i, String str) {
-        return new AlertDialog.Builder(this).setTopAnimation(i, 72, false, Theme.getColor(Theme.key_dialogTopBackground)).setMessage(AndroidUtilities.replaceTags(str)).setPositiveButton(LocaleController.getString(R.string.PermissionOpenSettings), new DialogInterface.OnClickListener() {
+        return new AlertDialog.Builder(this).setTopAnimation(i, 72, false, Theme.getColor(Theme.key_dialogTopBackground)).setMessage(AndroidUtilities.replaceTags(str)).setPositiveButton(LocaleController.getString(R.string.PermissionOpenSettings), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                BasePermissionsActivity.this.lambda$createPermissionErrorAlert$0(dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                BasePermissionsActivity.this.lambda$createPermissionErrorAlert$0(alertDialog, i2);
             }
         }).setNegativeButton(LocaleController.getString(R.string.ContactsPermissionAlertNotNow), null).create();
     }

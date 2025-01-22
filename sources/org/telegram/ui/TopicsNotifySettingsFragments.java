@@ -1,7 +1,6 @@
 package org.telegram.ui;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +104,7 @@ public class TopicsNotifySettingsFragments extends BaseFragment {
             TopicsNotifySettingsFragments.this.presentFragment(profileNotificationsActivity);
         }
 
-        public void lambda$onItemClick$2(DialogInterface dialogInterface, int i) {
+        public void lambda$onItemClick$2(AlertDialog alertDialog, int i) {
             Iterator it = TopicsNotifySettingsFragments.this.exceptionsTopics.iterator();
             while (it.hasNext()) {
                 TopicsNotifySettingsFragments.this.removeException(((Integer) it.next()).intValue());
@@ -144,10 +143,10 @@ public class TopicsNotifySettingsFragments extends BaseFragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TopicsNotifySettingsFragments.this.getParentActivity());
                 builder.setTitle(LocaleController.getString(R.string.NotificationsDeleteAllExceptionTitle));
                 builder.setMessage(LocaleController.getString(R.string.NotificationsDeleteAllExceptionAlert));
-                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        TopicsNotifySettingsFragments.AnonymousClass2.this.lambda$onItemClick$2(dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        TopicsNotifySettingsFragments.AnonymousClass2.this.lambda$onItemClick$2(alertDialog, i2);
                     }
                 });
                 builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -339,7 +338,7 @@ public class TopicsNotifySettingsFragments extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    TopicsNotifySettingsFragments.this.lambda$onBackPressed$321();
+                    TopicsNotifySettingsFragments.this.lambda$onBackPressed$323();
                 }
             }
         });

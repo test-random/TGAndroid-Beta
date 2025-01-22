@@ -5766,7 +5766,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         }
 
         @Override
-        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
+        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z, boolean z2) {
             ImageReceiver imageReceiverFromListView;
             if (i < 0 || i >= this.pageBlocks.size() || (imageReceiverFromListView = getImageReceiverFromListView(ArticleViewer.this.pages[0].listView, (TLRPC.PageBlock) this.pageBlocks.get(i), this.tempArr)) == null) {
                 return null;
@@ -7336,12 +7336,12 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                 bottomSheetTabDialog2.updateNavigationBarColor();
             } else {
                 LaunchActivity.instance.checkSystemBarColors(true, true, true, false);
-                AndroidUtilities.setLightNavigationBar(mo1009getWindowView(), AndroidUtilities.computePerceivedBrightness(getNavigationBarColor(ArticleViewer.this.getThemedColor(Theme.key_windowBackgroundGray))) >= 0.721f);
+                AndroidUtilities.setLightNavigationBar(mo997getWindowView(), AndroidUtilities.computePerceivedBrightness(getNavigationBarColor(ArticleViewer.this.getThemedColor(Theme.key_windowBackgroundGray))) >= 0.721f);
             }
         }
 
         @Override
-        public void dismiss() {
+        public void lambda$new$0() {
             dismiss(true);
         }
 
@@ -7414,7 +7414,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         }
 
         @Override
-        public WindowView mo1009getWindowView() {
+        public WindowView mo997getWindowView() {
             return this.windowView;
         }
 
@@ -11501,14 +11501,14 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         checkBoxCell.setChecked(!checkBoxCell.isChecked(), true);
     }
 
-    public static void lambda$setParentActivity$36(CheckBoxCell checkBoxCell, Utilities.Callback callback, Runnable runnable, DialogInterface dialogInterface, int i) {
+    public static void lambda$setParentActivity$36(CheckBoxCell checkBoxCell, Utilities.Callback callback, Runnable runnable, AlertDialog alertDialog, int i) {
         if (checkBoxCell.isChecked()) {
             callback.run(Boolean.TRUE);
         }
         runnable.run();
     }
 
-    public static void lambda$setParentActivity$37(CheckBoxCell checkBoxCell, Utilities.Callback callback, DialogInterface dialogInterface, int i) {
+    public static void lambda$setParentActivity$37(CheckBoxCell checkBoxCell, Utilities.Callback callback, AlertDialog alertDialog, int i) {
         if (checkBoxCell.isChecked()) {
             callback.run(Boolean.FALSE);
         }
@@ -11695,16 +11695,16 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                     textView.setText(AndroidUtilities.replaceTags(LocaleController.getString(R.string.BrowserExternalText)));
                     checkBoxCell.setText(AndroidUtilities.replaceTags(LocaleController.formatString(R.string.BrowserExternalCheck, hostAuthority2)), "", false, false);
                     builder.setView(linearLayout);
-                    builder.setPositiveButton(LocaleController.getString(R.string.Continue), new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(LocaleController.getString(R.string.Continue), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i) {
-                            ArticleViewer.lambda$setParentActivity$36(CheckBoxCell.this, callback, runnable, dialogInterface, i);
+                        public final void onClick(AlertDialog alertDialog, int i) {
+                            ArticleViewer.lambda$setParentActivity$36(CheckBoxCell.this, callback, runnable, alertDialog, i);
                         }
                     });
-                    builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i) {
-                            ArticleViewer.lambda$setParentActivity$37(CheckBoxCell.this, callback, dialogInterface, i);
+                        public final void onClick(AlertDialog alertDialog, int i) {
+                            ArticleViewer.lambda$setParentActivity$37(CheckBoxCell.this, callback, alertDialog, i);
                         }
                     });
                     builder.show();
@@ -12577,7 +12577,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         }
         BottomSheet bottomSheet = this.linkSheet;
         if (bottomSheet != null) {
-            bottomSheet.dismiss();
+            bottomSheet.lambda$new$0();
             this.linkSheet = null;
         }
         BottomSheet.Builder builder = new BottomSheet.Builder(this.parentActivity);

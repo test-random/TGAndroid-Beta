@@ -654,6 +654,10 @@ public class BotStarsController {
         return !getTransactionsState(j).transactions[i].isEmpty();
     }
 
+    public void invalidateStarsBalance(long j) {
+        getStarsRevenueStats(j, true);
+    }
+
     public void invalidateTransactions(long j, boolean z) {
         TransactionsState transactionsState = getTransactionsState(j);
         for (int i = 0; i < 3; i++) {

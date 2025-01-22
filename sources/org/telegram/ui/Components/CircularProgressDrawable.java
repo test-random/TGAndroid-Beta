@@ -84,6 +84,16 @@ public class CircularProgressDrawable extends Drawable {
     }
 
     @Override
+    public int getIntrinsicHeight() {
+        return (int) (this.size + this.thickness);
+    }
+
+    @Override
+    public int getIntrinsicWidth() {
+        return (int) (this.size + this.thickness);
+    }
+
+    @Override
     public int getOpacity() {
         return -2;
     }

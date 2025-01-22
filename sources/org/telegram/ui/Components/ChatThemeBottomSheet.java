@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -197,7 +196,7 @@ public class ChatThemeBottomSheet extends BottomSheet implements NotificationCen
                     bottomSheetParams.allowNestedScroll = false;
                     bottomSheetParams.occupyNavigationBar = true;
                     this.val$fragment.showAsSheet(themePreviewActivity, bottomSheetParams);
-                    this.val$chatAttachAlert.dismiss();
+                    this.val$chatAttachAlert.lambda$new$0();
                 }
             } catch (Throwable th) {
                 FileLog.e(th);
@@ -276,12 +275,12 @@ public class ChatThemeBottomSheet extends BottomSheet implements NotificationCen
 
         public void lambda$didPressedButton$0(TLRPC.WallPaper wallPaper) {
             ChatThemeBottomSheet.this.chatAttachAlert.dismissInternal();
-            ChatThemeBottomSheet.this.dismiss();
+            ChatThemeBottomSheet.this.lambda$new$0();
         }
 
         public void lambda$onWallpaperSelected$1(TLRPC.WallPaper wallPaper) {
             ChatThemeBottomSheet.this.chatAttachAlert.dismissInternal();
-            ChatThemeBottomSheet.this.dismiss();
+            ChatThemeBottomSheet.this.lambda$new$0();
         }
 
         @Override
@@ -789,7 +788,7 @@ public class ChatThemeBottomSheet extends BottomSheet implements NotificationCen
                 bulletin = Bulletin.make(this.chatActivity, stickerSetBulletinLayout, 2750);
             }
         }
-        dismiss();
+        lambda$new$0();
         if (bulletin != null) {
             bulletin.show();
         }
@@ -891,12 +890,12 @@ public class ChatThemeBottomSheet extends BottomSheet implements NotificationCen
         this.checkingBoostsLevel = false;
     }
 
-    public void lambda$close$8(DialogInterface dialogInterface, int i) {
+    public void lambda$close$8(AlertDialog alertDialog, int i) {
         applySelectedTheme();
     }
 
-    public void lambda$close$9(DialogInterface dialogInterface, int i) {
-        dismiss();
+    public void lambda$close$9(AlertDialog alertDialog, int i) {
+        lambda$new$0();
     }
 
     public void lambda$didReceivedNotification$10() {
@@ -905,7 +904,7 @@ public class ChatThemeBottomSheet extends BottomSheet implements NotificationCen
 
     public void lambda$new$0(View view) {
         if (!hasChanges()) {
-            dismiss();
+            lambda$new$0();
         } else {
             resetToPrimaryState(true);
             updateState(true);
@@ -955,11 +954,11 @@ public class ChatThemeBottomSheet extends BottomSheet implements NotificationCen
 
     public void lambda$new$4(ChatActivity chatActivity, View view) {
         if (this.currentWallpaper == null) {
-            dismiss();
+            lambda$new$0();
             return;
         }
         this.currentWallpaper = null;
-        dismiss();
+        lambda$new$0();
         ChatThemeController.getInstance(this.currentAccount).clearWallpaper(chatActivity.getDialogId(), true);
     }
 
@@ -1428,22 +1427,22 @@ public class ChatThemeBottomSheet extends BottomSheet implements NotificationCen
 
     public void close() {
         if (!hasChanges()) {
-            dismiss();
+            lambda$new$0();
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), this.resourcesProvider);
         builder.setTitle(LocaleController.getString(R.string.ChatThemeSaveDialogTitle));
         builder.setSubtitle(LocaleController.getString(R.string.ChatThemeSaveDialogText));
-        builder.setPositiveButton(LocaleController.getString(R.string.ChatThemeSaveDialogApply), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.ChatThemeSaveDialogApply), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChatThemeBottomSheet.this.lambda$close$8(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChatThemeBottomSheet.this.lambda$close$8(alertDialog, i);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.ChatThemeSaveDialogDiscard), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.ChatThemeSaveDialogDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChatThemeBottomSheet.this.lambda$close$9(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChatThemeBottomSheet.this.lambda$close$9(alertDialog, i);
             }
         });
         builder.show();
@@ -1462,10 +1461,10 @@ public class ChatThemeBottomSheet extends BottomSheet implements NotificationCen
     }
 
     @Override
-    public void dismiss() {
+    public void lambda$new$0() {
         Theme.ThemeInfo theme;
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
-        super.dismiss();
+        super.lambda$new$0();
         this.chatActivity.forceDisallowApplyWallpeper = false;
         if (!this.isApplyClicked) {
             TLRPC.WallPaper currentWallpaper = this.themeDelegate.getCurrentWallpaper();

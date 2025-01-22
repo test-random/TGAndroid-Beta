@@ -744,7 +744,7 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
         }
     }
 
-    public void lambda$requestInlinePermissions$42(DialogInterface dialogInterface, int i) {
+    public void lambda$requestInlinePermissions$42(AlertDialog alertDialog, int i) {
         VoIPWindowView voIPWindowView = this.windowView;
         if (voIPWindowView != null) {
             voIPWindowView.finish();
@@ -825,7 +825,7 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
         }
     }
 
-    public void lambda$setVideoAction$35(VoIPService voIPService, DialogInterface dialogInterface, int i) {
+    public void lambda$setVideoAction$35(VoIPService voIPService, AlertDialog alertDialog, int i) {
         voIPService.sharedUIParams.cameraAlertWasShowed = true;
         toggleCameraInput();
     }
@@ -849,10 +849,10 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
         builder.setMessage(LocaleController.getString(R.string.VoipSwitchToVideoCall));
-        builder.setPositiveButton(LocaleController.getString(R.string.VoipSwitch), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.VoipSwitch), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                VoIPFragment.this.lambda$setVideoAction$35(voIPService, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                VoIPFragment.this.lambda$setVideoAction$35(voIPService, alertDialog, i2);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -988,11 +988,11 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
         this.windowView.finish();
     }
 
-    public void lambda$updateViewState$26(DialogInterface dialogInterface, int i) {
+    public void lambda$updateViewState$26(AlertDialog alertDialog, int i) {
         this.windowView.finish();
     }
 
-    public void lambda$updateViewState$27(boolean[] zArr, DialogInterface dialogInterface, int i) {
+    public void lambda$updateViewState$27(boolean[] zArr, AlertDialog alertDialog, int i) {
         zArr[0] = true;
         this.currentState = 17;
         Intent intent = new Intent(this.activity, (Class<?>) VoIPService.class);
@@ -1134,10 +1134,10 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
 
     private void requestInlinePermissions() {
         if (Build.VERSION.SDK_INT >= 21) {
-            AlertsCreator.createDrawOverlayPermissionDialog(this.activity, new DialogInterface.OnClickListener() {
+            AlertsCreator.createDrawOverlayPermissionDialog(this.activity, new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    VoIPFragment.this.lambda$requestInlinePermissions$42(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    VoIPFragment.this.lambda$requestInlinePermissions$42(alertDialog, i);
                 }
             }).show();
         }
@@ -2340,11 +2340,11 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
             public final void run() {
                 VoIPFragment.this.startWaitingFoHideUi();
             }
-        }).setHideByTouch(true).setMaxWidth(320.0f).useScale(true).setInnerPadding(10, 6, 10, 6).setRounding(8.0f);
+        }).setHideByTouch(true).setMaxWidth(320.0f).useScale(true).setInnerPadding(10.0f, 6.0f, 10.0f, 6.0f).setRounding(8.0f);
         this.tapToVideoTooltip = rounding;
         rounding.setText(LocaleController.getString(R.string.TapToTurnCamera));
         frameLayout.addView(this.tapToVideoTooltip, LayoutHelper.createFrame(-2, -2.0f, 80, 19.0f, 0.0f, 19.0f, 0.0f));
-        HintView2 rounding2 = new VoIpHintView(context, 1, this.backgroundProvider, false).setMultilineText(true).setTextAlign(alignment).setDuration(4000L).setHideByTouch(true).setMaxWidth(320.0f).useScale(true).setInnerPadding(10, 6, 10, 6).setRounding(8.0f);
+        HintView2 rounding2 = new VoIpHintView(context, 1, this.backgroundProvider, false).setMultilineText(true).setTextAlign(alignment).setDuration(4000L).setHideByTouch(true).setMaxWidth(320.0f).useScale(true).setInnerPadding(10.0f, 6.0f, 10.0f, 6.0f).setRounding(8.0f);
         this.encryptionTooltip = rounding2;
         rounding2.setText(LocaleController.getString(R.string.VoipHintEncryptionKey));
         frameLayout.addView(this.encryptionTooltip, LayoutHelper.createFrame(-2, -2.0f, 1, 0.0f, 0.0f, 0.0f, 0.0f));

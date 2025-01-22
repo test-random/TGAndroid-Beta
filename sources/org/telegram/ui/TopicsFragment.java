@@ -7,7 +7,6 @@ import android.animation.ObjectAnimator;
 import android.animation.StateListAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -324,7 +323,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             if (i == 0) {
                 TopicsFragment.this.updateChatInfo();
             } else {
-                TopicsFragment.this.lambda$onBackPressed$321();
+                TopicsFragment.this.lambda$onBackPressed$323();
             }
         }
 
@@ -395,7 +394,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             int i = NotificationCenter.closeChats;
             notificationCenter.removeObserver(topicsFragment, i);
             TopicsFragment.this.getNotificationCenter().lambda$postNotificationNameOnUIThread$1(i, new Object[0]);
-            TopicsFragment.this.lambda$onBackPressed$321();
+            TopicsFragment.this.lambda$onBackPressed$323();
             TopicsFragment.this.getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.needDeleteDialog, Long.valueOf(-chat.id), null, chat, Boolean.valueOf(z));
         }
 
@@ -414,7 +413,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
                     TopicsFragment.this.clearSelectedTopics();
                     return;
                 } else {
-                    TopicsFragment.this.lambda$onBackPressed$321();
+                    TopicsFragment.this.lambda$onBackPressed$323();
                     return;
                 }
             }
@@ -606,58 +605,10 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         }
     }
 
-    public class AnonymousClass20 implements DialogInterface.OnClickListener {
-        final Runnable val$runnable;
-        final HashSet val$selectedTopics;
-        final ArrayList val$topicsToRemove;
-
-        AnonymousClass20(HashSet hashSet, ArrayList arrayList, Runnable runnable) {
-            this.val$selectedTopics = hashSet;
-            this.val$topicsToRemove = arrayList;
-            this.val$runnable = runnable;
-        }
-
-        public void lambda$onClick$0() {
-            TopicsFragment topicsFragment = TopicsFragment.this;
-            topicsFragment.excludeTopics = null;
-            topicsFragment.updateTopicsList(true, false);
-        }
-
-        public void lambda$onClick$1(ArrayList arrayList, Runnable runnable) {
-            TopicsFragment.this.topicsController.deleteTopics(TopicsFragment.this.chatId, arrayList);
-            runnable.run();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            TopicsFragment.this.excludeTopics = new HashSet();
-            TopicsFragment.this.excludeTopics.addAll(this.val$selectedTopics);
-            TopicsFragment.this.updateTopicsList(true, false);
-            BulletinFactory of = BulletinFactory.of(TopicsFragment.this);
-            String pluralString = LocaleController.getPluralString("TopicsDeleted", this.val$selectedTopics.size());
-            Runnable runnable = new Runnable() {
-                @Override
-                public final void run() {
-                    TopicsFragment.AnonymousClass20.this.lambda$onClick$0();
-                }
-            };
-            final ArrayList arrayList = this.val$topicsToRemove;
-            final Runnable runnable2 = this.val$runnable;
-            of.createUndoBulletin(pluralString, runnable, new Runnable() {
-                @Override
-                public final void run() {
-                    TopicsFragment.AnonymousClass20.this.lambda$onClick$1(arrayList, runnable2);
-                }
-            }).show();
-            TopicsFragment.this.clearSelectedTopics();
-            dialogInterface.dismiss();
-        }
-    }
-
-    public class AnonymousClass22 implements ChatNotificationsPopupWrapper.Callback {
+    public class AnonymousClass20 implements ChatNotificationsPopupWrapper.Callback {
         final TLRPC.TL_forumTopic val$topic;
 
-        AnonymousClass22(TLRPC.TL_forumTopic tL_forumTopic) {
+        AnonymousClass20(TLRPC.TL_forumTopic tL_forumTopic) {
             this.val$topic = tL_forumTopic;
         }
 
@@ -715,7 +666,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    TopicsFragment.AnonymousClass22.this.lambda$showCustomize$0(tL_forumTopic);
+                    TopicsFragment.AnonymousClass20.this.lambda$showCustomize$0(tL_forumTopic);
                 }
             }, 500L);
         }
@@ -2229,7 +2180,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         this.searchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public final void onAnimationUpdate(ValueAnimator valueAnimator2) {
-                TopicsFragment.this.lambda$animateToSearchView$14(valueAnimator2);
+                TopicsFragment.this.lambda$animateToSearchView$18(valueAnimator2);
             }
         });
         this.searchContainer.setVisibility(0);
@@ -2318,9 +2269,9 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         this.selectedDialogsCountTextView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public final boolean onTouch(View view, MotionEvent motionEvent) {
-                boolean lambda$chekActionMode$17;
-                lambda$chekActionMode$17 = TopicsFragment.lambda$chekActionMode$17(view, motionEvent);
-                return lambda$chekActionMode$17;
+                boolean lambda$chekActionMode$21;
+                lambda$chekActionMode$21 = TopicsFragment.lambda$chekActionMode$21(view, motionEvent);
+                return lambda$chekActionMode$21;
             }
         });
         this.pinItem = createActionMode.addItemWithWidth(4, R.drawable.msg_pin, AndroidUtilities.dp(54.0f));
@@ -2347,22 +2298,27 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         updateReordering();
     }
 
-    public void deleteTopics(HashSet hashSet, Runnable runnable) {
+    public void deleteTopics(final HashSet hashSet, final Runnable runnable) {
         String string;
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(LocaleController.getPluralString("DeleteTopics", hashSet.size()));
-        ArrayList arrayList = new ArrayList(hashSet);
+        final ArrayList arrayList = new ArrayList(hashSet);
         if (hashSet.size() == 1) {
             string = LocaleController.formatString("DeleteSelectedTopic", R.string.DeleteSelectedTopic, this.topicsController.findTopic(this.chatId, ((Integer) arrayList.get(0)).intValue()).title);
         } else {
             string = LocaleController.getString(R.string.DeleteSelectedTopics);
         }
         builder.setMessage(string);
-        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AnonymousClass20(hashSet, arrayList, runnable));
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
+            public final void onClick(AlertDialog alertDialog, int i) {
+                TopicsFragment.this.lambda$deleteTopics$11(hashSet, arrayList, runnable, alertDialog, i);
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
+            @Override
+            public final void onClick(AlertDialog alertDialog, int i) {
+                alertDialog.dismiss();
             }
         });
         AlertDialog create = builder.create();
@@ -2410,7 +2366,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             ofFloat.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    TopicsFragment.this.lambda$hideFloatingButton$18(valueAnimator);
+                    TopicsFragment.this.lambda$hideFloatingButton$22(valueAnimator);
                 }
             });
             animatorSet.playTogether(ofFloat);
@@ -2428,25 +2384,25 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         getMessagesController().addUserToChat(this.chatId, getUserConfig().getCurrentUser(), 0, null, this, false, new Runnable() {
             @Override
             public final void run() {
-                TopicsFragment.this.lambda$joinToGroup$15();
+                TopicsFragment.this.lambda$joinToGroup$19();
             }
         }, new MessagesController.ErrorDelegate() {
             @Override
             public final boolean run(TLRPC.TL_error tL_error) {
-                boolean lambda$joinToGroup$16;
-                lambda$joinToGroup$16 = TopicsFragment.this.lambda$joinToGroup$16(tL_error);
-                return lambda$joinToGroup$16;
+                boolean lambda$joinToGroup$20;
+                lambda$joinToGroup$20 = TopicsFragment.this.lambda$joinToGroup$20(tL_error);
+                return lambda$joinToGroup$20;
             }
         });
         NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.closeSearchByActiveAction, new Object[0]);
         updateChatInfo();
     }
 
-    public void lambda$animateToSearchView$14(ValueAnimator valueAnimator) {
+    public void lambda$animateToSearchView$18(ValueAnimator valueAnimator) {
         updateSearchProgress(((Float) valueAnimator.getAnimatedValue()).floatValue());
     }
 
-    public static boolean lambda$chekActionMode$17(View view, MotionEvent motionEvent) {
+    public static boolean lambda$chekActionMode$21(View view, MotionEvent motionEvent) {
         return true;
     }
 
@@ -2543,7 +2499,37 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         this.boostsStatus = tL_premium_boostsStatus;
     }
 
-    public void lambda$getThemeDescriptions$19() {
+    public void lambda$deleteTopics$10(ArrayList arrayList, Runnable runnable) {
+        this.topicsController.deleteTopics(this.chatId, arrayList);
+        runnable.run();
+    }
+
+    public void lambda$deleteTopics$11(HashSet hashSet, final ArrayList arrayList, final Runnable runnable, AlertDialog alertDialog, int i) {
+        HashSet hashSet2 = new HashSet();
+        this.excludeTopics = hashSet2;
+        hashSet2.addAll(hashSet);
+        updateTopicsList(true, false);
+        BulletinFactory.of(this).createUndoBulletin(LocaleController.getPluralString("TopicsDeleted", hashSet.size()), new Runnable() {
+            @Override
+            public final void run() {
+                TopicsFragment.this.lambda$deleteTopics$9();
+            }
+        }, new Runnable() {
+            @Override
+            public final void run() {
+                TopicsFragment.this.lambda$deleteTopics$10(arrayList, runnable);
+            }
+        }).show();
+        clearSelectedTopics();
+        alertDialog.dismiss();
+    }
+
+    public void lambda$deleteTopics$9() {
+        this.excludeTopics = null;
+        updateTopicsList(true, false);
+    }
+
+    public void lambda$getThemeDescriptions$23() {
         ViewGroup viewGroup;
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
@@ -2580,17 +2566,17 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         updateColors();
     }
 
-    public void lambda$hideFloatingButton$18(ValueAnimator valueAnimator) {
+    public void lambda$hideFloatingButton$22(ValueAnimator valueAnimator) {
         this.floatingButtonHideProgress = ((Float) valueAnimator.getAnimatedValue()).floatValue();
         updateFloatingButtonOffset();
     }
 
-    public void lambda$joinToGroup$15() {
+    public void lambda$joinToGroup$19() {
         this.joinRequested = false;
         updateChatInfo(true);
     }
 
-    public boolean lambda$joinToGroup$16(TLRPC.TL_error tL_error) {
+    public boolean lambda$joinToGroup$20(TLRPC.TL_error tL_error) {
         if (tL_error == null || !"INVITE_REQUEST_SENT".equals(tL_error.text)) {
             return true;
         }
@@ -2603,7 +2589,14 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
     public static void lambda$onDialogAnimationFinished$8() {
     }
 
-    public void lambda$showChatPreview$10(TLRPC.TL_forumTopic tL_forumTopic, ActionBarPopupWindow.ActionBarPopupWindowLayout[] actionBarPopupWindowLayoutArr, int i, View view) {
+    public void lambda$showChatPreview$13(TLRPC.TL_forumTopic tL_forumTopic, View view) {
+        this.scrollToTop = true;
+        this.updateAnimated = true;
+        this.topicsController.pinTopic(this.chatId, tL_forumTopic.id, !tL_forumTopic.pinned, this);
+        finishPreviewFragment();
+    }
+
+    public void lambda$showChatPreview$14(TLRPC.TL_forumTopic tL_forumTopic, ActionBarPopupWindow.ActionBarPopupWindowLayout[] actionBarPopupWindowLayoutArr, int i, View view) {
         if (!getMessagesController().isDialogMuted(-this.chatId, tL_forumTopic.id)) {
             actionBarPopupWindowLayoutArr[0].getSwipeBack().openForeground(i);
             return;
@@ -2615,32 +2608,25 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         }
     }
 
-    public void lambda$showChatPreview$11(TLRPC.TL_forumTopic tL_forumTopic, View view) {
+    public void lambda$showChatPreview$15(TLRPC.TL_forumTopic tL_forumTopic, View view) {
         this.updateAnimated = true;
         this.topicsController.toggleCloseTopic(this.chatId, tL_forumTopic.id, !tL_forumTopic.closed);
         finishPreviewFragment();
     }
 
-    public void lambda$showChatPreview$12() {
+    public void lambda$showChatPreview$16() {
         finishPreviewFragment();
     }
 
-    public void lambda$showChatPreview$13(TLRPC.TL_forumTopic tL_forumTopic, View view) {
+    public void lambda$showChatPreview$17(TLRPC.TL_forumTopic tL_forumTopic, View view) {
         HashSet hashSet = new HashSet();
         hashSet.add(Integer.valueOf(tL_forumTopic.id));
         deleteTopics(hashSet, new Runnable() {
             @Override
             public final void run() {
-                TopicsFragment.this.lambda$showChatPreview$12();
+                TopicsFragment.this.lambda$showChatPreview$16();
             }
         });
-    }
-
-    public void lambda$showChatPreview$9(TLRPC.TL_forumTopic tL_forumTopic, View view) {
-        this.scrollToTop = true;
-        this.updateAnimated = true;
-        this.topicsController.pinTopic(this.chatId, tL_forumTopic.id, !tL_forumTopic.pinned, this);
-        finishPreviewFragment();
     }
 
     public void onDialogAnimationFinished() {
@@ -2778,7 +2764,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         }
         final ActionBarPopupWindow.ActionBarPopupWindowLayout[] actionBarPopupWindowLayoutArr = {new ActionBarPopupWindow.ActionBarPopupWindowLayout(getParentActivity(), R.drawable.popup_fixed_alert, getResourceProvider(), 1)};
         final TLRPC.TL_forumTopic tL_forumTopic = dialogCell.forumTopic;
-        ChatNotificationsPopupWrapper chatNotificationsPopupWrapper = new ChatNotificationsPopupWrapper(getContext(), this.currentAccount, actionBarPopupWindowLayoutArr[0].getSwipeBack(), false, false, new AnonymousClass22(tL_forumTopic), getResourceProvider());
+        ChatNotificationsPopupWrapper chatNotificationsPopupWrapper = new ChatNotificationsPopupWrapper(getContext(), this.currentAccount, actionBarPopupWindowLayoutArr[0].getSwipeBack(), false, false, new AnonymousClass20(tL_forumTopic), getResourceProvider());
         final int addViewToSwipeBack = actionBarPopupWindowLayoutArr[0].addViewToSwipeBack(chatNotificationsPopupWrapper.windowLayout);
         chatNotificationsPopupWrapper.type = 1;
         chatNotificationsPopupWrapper.lambda$update$11(-this.chatId, tL_forumTopic.id, null);
@@ -2796,7 +2782,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    TopicsFragment.this.lambda$showChatPreview$9(tL_forumTopic, view);
+                    TopicsFragment.this.lambda$showChatPreview$13(tL_forumTopic, view);
                 }
             });
             actionBarPopupWindowLayoutArr[0].addView(actionBarMenuSubItem);
@@ -2814,7 +2800,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         actionBarMenuSubItem2.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                TopicsFragment.this.lambda$showChatPreview$10(tL_forumTopic, actionBarPopupWindowLayoutArr, addViewToSwipeBack, view);
+                TopicsFragment.this.lambda$showChatPreview$14(tL_forumTopic, actionBarPopupWindowLayoutArr, addViewToSwipeBack, view);
             }
         });
         actionBarPopupWindowLayoutArr[0].addView(actionBarMenuSubItem2);
@@ -2832,7 +2818,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             actionBarMenuSubItem3.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    TopicsFragment.this.lambda$showChatPreview$11(tL_forumTopic, view);
+                    TopicsFragment.this.lambda$showChatPreview$15(tL_forumTopic, view);
                 }
             });
             actionBarPopupWindowLayoutArr[0].addView(actionBarMenuSubItem3);
@@ -2846,7 +2832,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             actionBarMenuSubItem4.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    TopicsFragment.this.lambda$showChatPreview$13(tL_forumTopic, view);
+                    TopicsFragment.this.lambda$showChatPreview$17(tL_forumTopic, view);
                 }
             });
             actionBarPopupWindowLayoutArr[0].addView(actionBarMenuSubItem4);
@@ -3855,7 +3841,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         ThemeDescription.ThemeDescriptionDelegate themeDescriptionDelegate = new ThemeDescription.ThemeDescriptionDelegate() {
             @Override
             public final void didSetColor() {
-                TopicsFragment.this.lambda$getThemeDescriptions$19();
+                TopicsFragment.this.lambda$getThemeDescriptions$23();
             }
 
             @Override
@@ -4036,7 +4022,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
         if (!this.inPreviewMode || getMessagesController().isForum(-this.chatId)) {
             return;
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     @Override

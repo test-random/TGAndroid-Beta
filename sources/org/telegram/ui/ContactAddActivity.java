@@ -54,6 +54,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RadialProgressView;
 import org.telegram.ui.LNavigation.NavigationExt;
+import org.telegram.ui.PhotoViewer;
 
 public class ContactAddActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, ImageUpdater.ImageUpdaterDelegate {
     private boolean addContact;
@@ -556,7 +557,7 @@ public class ContactAddActivity extends BaseFragment implements NotificationCent
             @Override
             public void onItemClick(int i2) {
                 if (i2 == -1) {
-                    ContactAddActivity.this.lambda$onBackPressed$321();
+                    ContactAddActivity.this.lambda$onBackPressed$323();
                     return;
                 }
                 if (i2 != 1 || ContactAddActivity.this.firstNameField.getText().length() == 0) {
@@ -571,7 +572,7 @@ public class ContactAddActivity extends BaseFragment implements NotificationCent
                 MessagesController.getNotificationsSettings(((BaseFragment) ContactAddActivity.this).currentAccount).edit().putInt("dialog_bar_vis3" + ContactAddActivity.this.user_id, 3).commit();
                 ContactAddActivity.this.getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.updateInterfaces, Integer.valueOf(MessagesController.UPDATE_MASK_NAME));
                 ContactAddActivity.this.getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.peerSettingsDidLoad, Long.valueOf(ContactAddActivity.this.user_id));
-                ContactAddActivity.this.lambda$onBackPressed$321();
+                ContactAddActivity.this.lambda$onBackPressed$323();
                 if (ContactAddActivity.this.delegate != null) {
                     ContactAddActivity.this.delegate.didAddToContacts();
                 }
@@ -874,7 +875,7 @@ public class ContactAddActivity extends BaseFragment implements NotificationCent
     }
 
     @Override
-    public void didStartUpload(boolean z) {
+    public void didStartUpload(boolean z, boolean z2) {
         RadialProgressView radialProgressView = this.avatarProgressView;
         if (radialProgressView == null) {
             return;
@@ -901,6 +902,11 @@ public class ContactAddActivity extends BaseFragment implements NotificationCent
                 ContactAddActivity.this.lambda$didUploadPhoto$13(photoSize2, inputFile, inputFile2, photoSize, videoSize, d, z);
             }
         });
+    }
+
+    @Override
+    public PhotoViewer.PlaceProviderObject getCloseIntoObject() {
+        return ImageUpdater.ImageUpdaterDelegate.CC.$default$getCloseIntoObject(this);
     }
 
     @Override
@@ -1022,5 +1028,10 @@ public class ContactAddActivity extends BaseFragment implements NotificationCent
 
     public void setDelegate(ContactAddActivityDelegate contactAddActivityDelegate) {
         this.delegate = contactAddActivityDelegate;
+    }
+
+    @Override
+    public boolean supportsBulletin() {
+        return ImageUpdater.ImageUpdaterDelegate.CC.$default$supportsBulletin(this);
     }
 }

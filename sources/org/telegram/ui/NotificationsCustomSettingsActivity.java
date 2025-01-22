@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -45,6 +44,7 @@ import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
@@ -880,7 +880,7 @@ public class NotificationsCustomSettingsActivity extends BaseFragment implements
         }
     }
 
-    public void lambda$createView$16(SharedPreferences sharedPreferences, String str, boolean[] zArr, DialogInterface dialogInterface, int i) {
+    public void lambda$createView$16(SharedPreferences sharedPreferences, String str, boolean[] zArr, AlertDialog alertDialog, int i) {
         SharedPreferences.Editor edit = sharedPreferences.edit();
         edit.putBoolean(str, zArr[0]);
         edit.apply();
@@ -967,7 +967,7 @@ public class NotificationsCustomSettingsActivity extends BaseFragment implements
         return true;
     }
 
-    public void lambda$createView$9(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$9(AlertDialog alertDialog, int i) {
         SharedPreferences.Editor edit = getNotificationsSettings().edit();
         int size = this.exceptions.size();
         for (int i2 = 0; i2 < size; i2++) {
@@ -1112,7 +1112,7 @@ public class NotificationsCustomSettingsActivity extends BaseFragment implements
             @Override
             public void onItemClick(int i2) {
                 if (i2 == -1) {
-                    NotificationsCustomSettingsActivity.this.lambda$onBackPressed$321();
+                    NotificationsCustomSettingsActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

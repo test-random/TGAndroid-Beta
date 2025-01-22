@@ -731,7 +731,7 @@ public class ThemeEditorView {
                     if (motionEvent.getAction() != 0 || EditorAlert.this.scrollOffsetY == 0 || motionEvent.getY() >= EditorAlert.this.scrollOffsetY) {
                         return super.onInterceptTouchEvent(motionEvent);
                     }
-                    EditorAlert.this.dismiss();
+                    EditorAlert.this.lambda$new$0();
                     return true;
                 }
 
@@ -989,13 +989,13 @@ public class ThemeEditorView {
         }
 
         public void lambda$new$1(View view) {
-            dismiss();
+            lambda$new$0();
         }
 
         public void lambda$new$2(View view) {
             Theme.saveCurrentTheme(ThemeEditorView.this.themeInfo, true, false, false);
             setOnDismissListener((DialogInterface.OnDismissListener) null);
-            dismiss();
+            lambda$new$0();
             ThemeEditorView.this.close();
         }
 
@@ -1252,7 +1252,7 @@ public class ThemeEditorView {
         try {
             EditorAlert editorAlert = this.editorAlert;
             if (editorAlert != null) {
-                editorAlert.dismiss();
+                editorAlert.lambda$new$0();
                 this.editorAlert = null;
             }
         } catch (Exception e2) {

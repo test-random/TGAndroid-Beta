@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
@@ -40,6 +39,7 @@ import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Components.BottomPagerTabs;
 import org.telegram.ui.Components.FloatingDebug.FloatingDebugController;
 import org.telegram.ui.Components.FloatingDebug.FloatingDebugProvider;
+import org.telegram.ui.Components.MediaActivity;
 import org.telegram.ui.Components.Paint.ShapeDetector;
 import org.telegram.ui.Components.SharedMediaLayout;
 import org.telegram.ui.ProfileActivity;
@@ -85,8 +85,13 @@ public class MediaActivity extends BaseFragment implements SharedMediaLayout.Sha
     private ActionBarMenuSubItem zoomInItem;
     private ActionBarMenuSubItem zoomOutItem;
 
-    class AnonymousClass1 extends ActionBar.ActionBarMenuOnItemClick {
+    public class AnonymousClass1 extends ActionBar.ActionBarMenuOnItemClick {
         AnonymousClass1() {
+        }
+
+        public void lambda$onItemClick$0(ArrayList arrayList, AlertDialog alertDialog, int i) {
+            MediaActivity.this.getMessagesController().getStoriesController().deleteStories(MediaActivity.this.dialogId, arrayList);
+            MediaActivity.this.sharedMediaLayout.closeActionMode(false);
         }
 
         @Override
@@ -95,7 +100,7 @@ public class MediaActivity extends BaseFragment implements SharedMediaLayout.Sha
                 if (MediaActivity.this.sharedMediaLayout.closeActionMode(true)) {
                     return;
                 }
-                MediaActivity.this.lambda$onBackPressed$321();
+                MediaActivity.this.lambda$onBackPressed$323();
                 return;
             }
             if (i != 2) {
@@ -126,17 +131,16 @@ public class MediaActivity extends BaseFragment implements SharedMediaLayout.Sha
                 AlertDialog.Builder builder = new AlertDialog.Builder(MediaActivity.this.getContext(), MediaActivity.this.getResourceProvider());
                 builder.setTitle(LocaleController.getString(arrayList.size() > 1 ? R.string.DeleteStoriesTitle : R.string.DeleteStoryTitle));
                 builder.setMessage(LocaleController.formatPluralString("DeleteStoriesSubtitle", arrayList.size(), new Object[0]));
-                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i3) {
-                        MediaActivity.this.getMessagesController().getStoriesController().deleteStories(MediaActivity.this.dialogId, arrayList);
-                        MediaActivity.this.sharedMediaLayout.closeActionMode(false);
+                    public final void onClick(AlertDialog alertDialog, int i3) {
+                        MediaActivity.AnonymousClass1.this.lambda$onItemClick$0(arrayList, alertDialog, i3);
                     }
                 });
-                builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i3) {
-                        dialogInterface.dismiss();
+                    public final void onClick(AlertDialog alertDialog, int i3) {
+                        alertDialog.dismiss();
                     }
                 });
                 AlertDialog create = builder.create();

@@ -1391,6 +1391,36 @@ public class ImageLoader {
         });
     }
 
+    public static TLRPC.PhotoSize fileToSize(String str, boolean z) {
+        if (str == null) {
+            return null;
+        }
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(str, options);
+            int i = options.outWidth;
+            int i2 = options.outHeight;
+            TLRPC.TL_fileLocationToBeDeprecated tL_fileLocationToBeDeprecated = new TLRPC.TL_fileLocationToBeDeprecated();
+            tL_fileLocationToBeDeprecated.volume_id = -2147483648L;
+            tL_fileLocationToBeDeprecated.dc_id = Integer.MIN_VALUE;
+            tL_fileLocationToBeDeprecated.local_id = SharedConfig.getLastLocalId();
+            tL_fileLocationToBeDeprecated.file_reference = new byte[0];
+            TLRPC.TL_photoSize_layer127 tL_photoSize_layer127 = new TLRPC.TL_photoSize_layer127();
+            tL_photoSize_layer127.location = tL_fileLocationToBeDeprecated;
+            tL_photoSize_layer127.w = i;
+            tL_photoSize_layer127.h = i2;
+            tL_photoSize_layer127.type = (i > 100 || i2 > 100) ? (i > 320 || i2 > 320) ? (i > 800 || i2 > 800) ? (i > 1280 || i2 > 1280) ? "w" : "y" : "x" : "m" : "s";
+            File file = new File((z || tL_fileLocationToBeDeprecated.volume_id == -2147483648L) ? FileLoader.getDirectory(4) : FileLoader.getDirectory(0), tL_fileLocationToBeDeprecated.volume_id + "_" + tL_fileLocationToBeDeprecated.local_id + ".jpg");
+            new File(str).renameTo(file);
+            tL_photoSize_layer127.size = (int) file.length();
+            return tL_photoSize_layer127;
+        } catch (Exception e) {
+            FileLog.e(e);
+            return null;
+        }
+    }
+
     public static void fillPhotoSizeWithBytes(TLRPC.PhotoSize photoSize) {
         if (photoSize != null) {
             byte[] bArr = photoSize.bytes;

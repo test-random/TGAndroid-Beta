@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
@@ -39,6 +38,7 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_stars;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
@@ -55,7 +55,7 @@ import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.SelectAnimatedEmojiDialog;
 
 public class AvatarConstructorFragment extends BaseFragment {
-    public static final int[][] defaultColors = {new int[]{-11694593, -13910017, -14622003, -15801871}, new int[]{-10569989, -14692629, -12191817, -14683687}, new int[]{-16133536, -10560448, -4070106, -8331477}, new int[]{-693938, -690388, -11246, -22717}, new int[]{-636796, -1090751, -612560, -35006}, new int[]{-439392, -304000, -19910, -98718}, new int[]{-8160001, -5217281, -36183, -1938945}};
+    public static final int[][] defaultColors = {new int[]{-11302949, -11562789, -10430789, -11480359}, new int[]{-11229725, -12014137, -10234219, -10819908}, new int[]{-12927610, -11158198, -3355566, -5191850}, new int[]{-8164117, -5281560, -2200166, -2525971}, new int[]{-1287263, -1350281, -1337532, -885148}, new int[]{-1419145, -1936819, -742839, -1014448}, new int[]{-1017772, -1212871, -998847, -1003446}};
     CanvasButton avatarClickableArea;
     final ImageUpdater.AvatarFor avatarFor;
     private BackgroundSelectView backgroundSelectView;
@@ -718,16 +718,16 @@ public class AvatarConstructorFragment extends BaseFragment {
             return;
         }
         if (!this.wasChanged) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setMessage(LocaleController.getString(R.string.PhotoEditorDiscardAlert));
         builder.setTitle(LocaleController.getString(R.string.DiscardChanges));
-        builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                AvatarConstructorFragment.this.lambda$discardEditor$2(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                AvatarConstructorFragment.this.lambda$discardEditor$2(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -740,8 +740,8 @@ public class AvatarConstructorFragment extends BaseFragment {
         onDonePressed();
     }
 
-    public void lambda$discardEditor$2(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$discardEditor$2(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public void lambda$isLightStatusBar$6(ValueAnimator valueAnimator) {
@@ -805,7 +805,7 @@ public class AvatarConstructorFragment extends BaseFragment {
     public void lambda$showColorPicker$5(boolean[] zArr, View view) {
         zArr[0] = true;
         this.backgroundSelectView.selectGradient(this.colorPickerGradient);
-        this.bottomSheet.dismiss();
+        this.bottomSheet.lambda$new$0();
     }
 
     public void onDonePressed() {
@@ -818,7 +818,7 @@ public class AvatarConstructorFragment extends BaseFragment {
             delegate.onDone(previewView.backgroundGradient, previewView.documentId, previewView.document, previewView);
         }
         if (this.finishOnDone) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         }
     }
 
@@ -923,8 +923,8 @@ public class AvatarConstructorFragment extends BaseFragment {
         AndroidUtilities.requestAdjustNothing(getParentActivity(), getClassGuid());
         BottomSheet bottomSheet = new BottomSheet(getContext(), z2) {
             @Override
-            public void dismiss() {
-                super.dismiss();
+            public void lambda$new$0() {
+                super.lambda$new$0();
                 AvatarConstructorFragment.this.backgroundSelectView.selectGradient(AvatarConstructorFragment.this.colorPickerGradient);
                 AvatarConstructorFragment avatarConstructorFragment = AvatarConstructorFragment.this;
                 avatarConstructorFragment.colorPickerInAnimatoin = true;
@@ -1346,7 +1346,7 @@ public class AvatarConstructorFragment extends BaseFragment {
             private boolean firstLayout = true;
 
             @Override
-            protected void onEmojiSelected(View view, Long l, TLRPC.Document document, Integer num) {
+            protected void onEmojiSelected(View view, Long l, TLRPC.Document document, TL_stars.TL_starGiftUnique tL_starGiftUnique, Integer num) {
                 AvatarConstructorFragment.this.setPreview(l == null ? 0L : l.longValue(), document);
             }
 

@@ -464,7 +464,7 @@ public abstract class GroupCallRenderersContainer extends FrameLayout {
                 return;
             } else {
                 RTMPStreamPipOverlay.show();
-                groupCallActivity.dismiss();
+                groupCallActivity.lambda$new$0();
                 return;
             }
         }
@@ -472,7 +472,7 @@ public abstract class GroupCallRenderersContainer extends FrameLayout {
             AlertsCreator.createDrawOverlayGroupCallPermissionDialog(getContext()).show();
         } else {
             GroupCallPip.clearForce();
-            groupCallActivity.dismiss();
+            groupCallActivity.lambda$new$0();
         }
     }
 

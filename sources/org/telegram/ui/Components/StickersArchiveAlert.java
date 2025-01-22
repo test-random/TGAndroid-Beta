@@ -1,7 +1,6 @@
 package org.telegram.ui.Components;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -85,24 +84,24 @@ public class StickersArchiveAlert extends AlertDialog.Builder {
         recyclerListView.setPadding(AndroidUtilities.dp(10.0f), 0, AndroidUtilities.dp(10.0f), 0);
         recyclerListView.setGlowColor(-657673);
         linearLayout.addView(recyclerListView, LayoutHelper.createLinear(-1, -2, 0.0f, 10.0f, 0.0f, 0.0f));
-        setNegativeButton(LocaleController.getString(R.string.Close), new DialogInterface.OnClickListener() {
+        setNegativeButton(LocaleController.getString(R.string.Close), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                dialogInterface.dismiss();
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                alertDialog.dismiss();
             }
         });
         if (this.parentFragment != null) {
-            setPositiveButton(LocaleController.getString(R.string.Settings), new DialogInterface.OnClickListener() {
+            setPositiveButton(LocaleController.getString(R.string.Settings), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    StickersArchiveAlert.this.lambda$new$1(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    StickersArchiveAlert.this.lambda$new$1(alertDialog, i2);
                 }
             });
         }
     }
 
-    public void lambda$new$1(DialogInterface dialogInterface, int i) {
+    public void lambda$new$1(AlertDialog alertDialog, int i) {
         this.parentFragment.presentFragment(new StickersActivity(this.currentType, null));
-        dialogInterface.dismiss();
+        alertDialog.dismiss();
     }
 }

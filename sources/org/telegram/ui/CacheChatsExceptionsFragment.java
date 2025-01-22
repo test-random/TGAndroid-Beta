@@ -154,7 +154,7 @@ public class CacheChatsExceptionsFragment extends BaseFragment {
     }
 
     public boolean lambda$createView$0(DialogsActivity dialogsActivity, DialogsActivity dialogsActivity2, ArrayList arrayList, CharSequence charSequence, boolean z, boolean z2, int i, TopicsFragment topicsFragment) {
-        dialogsActivity.lambda$onBackPressed$321();
+        dialogsActivity.lambda$onBackPressed$323();
         CacheByChatsController.KeepMediaException keepMediaException = null;
         int i2 = 0;
         int i3 = 0;
@@ -223,7 +223,7 @@ public class CacheChatsExceptionsFragment extends BaseFragment {
         this.exceptionsDialogs.clear();
         getMessagesController().getCacheByChatsController().saveKeepMediaExceptions(this.currentType, this.exceptionsDialogs);
         updateRows();
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$3(View view, int i, float f, float f2) {
@@ -377,7 +377,7 @@ public class CacheChatsExceptionsFragment extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    CacheChatsExceptionsFragment.this.lambda$onBackPressed$321();
+                    CacheChatsExceptionsFragment.this.lambda$onBackPressed$323();
                 }
             }
         });

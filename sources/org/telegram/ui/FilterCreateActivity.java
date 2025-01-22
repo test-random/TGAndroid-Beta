@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -141,7 +140,7 @@ public class FilterCreateActivity extends BaseFragment {
         public void onItemClick(int i) {
             if (i == -1) {
                 if (FilterCreateActivity.this.checkDiscard()) {
-                    FilterCreateActivity.this.lambda$onBackPressed$321();
+                    FilterCreateActivity.this.lambda$onBackPressed$323();
                 }
             } else if (i == 1) {
                 FilterCreateActivity.this.processDone();
@@ -403,8 +402,8 @@ public class FilterCreateActivity extends BaseFragment {
 
         public class AnonymousClass1 extends AdapterWithDiffUtils {
 
-            public class C00421 extends LinkCell {
-                C00421(Context context, BaseFragment baseFragment, int i, int i2) {
+            public class C00411 extends LinkCell {
+                C00411(Context context, BaseFragment baseFragment, int i, int i2) {
                     super(context, baseFragment, i, i2);
                 }
 
@@ -428,19 +427,19 @@ public class FilterCreateActivity extends BaseFragment {
                     makeOptions.add(R.drawable.msg_copy, LocaleController.getString(R.string.CopyLink), new Runnable() {
                         @Override
                         public final void run() {
-                            FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00421.this.copy();
+                            FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00411.this.copy();
                         }
                     });
                     makeOptions.add(R.drawable.msg_qrcode, LocaleController.getString(R.string.GetQRCode), new Runnable() {
                         @Override
                         public final void run() {
-                            FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00421.this.qrcode();
+                            FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00411.this.qrcode();
                         }
                     });
                     makeOptions.add(R.drawable.msg_delete, (CharSequence) LocaleController.getString(R.string.DeleteLink), true, new Runnable() {
                         @Override
                         public final void run() {
-                            FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00421.this.deleteLink();
+                            FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00411.this.deleteLink();
                         }
                     });
                     if (LocaleController.isRTL) {
@@ -558,7 +557,7 @@ public class FilterCreateActivity extends BaseFragment {
                         textInfoPrivacyCell.setBackgroundColor(Theme.getColor(i2));
                         return new RecyclerListView.Holder(textInfoPrivacyCell);
                     }
-                    textInfoPrivacyCell = new C00421(FilterInvitesBottomSheet.this.getContext(), null, ((BottomSheet) FilterInvitesBottomSheet.this).currentAccount, FilterInvitesBottomSheet.this.filter.id);
+                    textInfoPrivacyCell = new C00411(FilterInvitesBottomSheet.this.getContext(), null, ((BottomSheet) FilterInvitesBottomSheet.this).currentAccount, FilterInvitesBottomSheet.this.filter.id);
                 }
                 i2 = Theme.key_dialogBackground;
                 textInfoPrivacyCell.setBackgroundColor(Theme.getColor(i2));
@@ -615,7 +614,7 @@ public class FilterCreateActivity extends BaseFragment {
             }
 
             public void lambda$new$0(View view) {
-                FilterInvitesBottomSheet.this.dismiss();
+                FilterInvitesBottomSheet.this.lambda$new$0();
             }
 
             @Override
@@ -671,7 +670,7 @@ public class FilterCreateActivity extends BaseFragment {
                 }
             }
             if (arrayList.isEmpty()) {
-                dismiss();
+                lambda$new$0();
                 getBaseFragment().presentFragment(new FilterChatlistActivity(this.filter, null));
                 return;
             }
@@ -692,7 +691,7 @@ public class FilterCreateActivity extends BaseFragment {
         public void lambda$createLink$3(TLRPC.TL_error tL_error, TLObject tLObject) {
             if (FilterCreateActivity.processErrors(tL_error, getBaseFragment(), BulletinFactory.of(this.bulletinContainer, null)) && (tLObject instanceof TL_chatlists.TL_chatlists_exportedChatlistInvite)) {
                 FilterCreateActivity.hideNew(0);
-                dismiss();
+                lambda$new$0();
                 getBaseFragment().getMessagesController().loadRemoteFilters(true);
                 getBaseFragment().presentFragment(new FilterChatlistActivity(this.filter, ((TL_chatlists.TL_chatlists_exportedChatlistInvite) tLObject).invite));
             }
@@ -719,7 +718,7 @@ public class FilterCreateActivity extends BaseFragment {
             ItemInner itemInner = (ItemInner) this.items.get(i2);
             int i3 = itemInner.viewType;
             if (i3 == 7) {
-                dismiss();
+                lambda$new$0();
                 getBaseFragment().presentFragment(new FilterChatlistActivity(this.filter, itemInner.link));
             } else if (i3 == 8) {
                 createLink();
@@ -799,8 +798,8 @@ public class FilterCreateActivity extends BaseFragment {
         protected RecyclerListView.SelectionAdapter createAdapter(RecyclerListView recyclerListView) {
             AnonymousClass1 anonymousClass1 = new AdapterWithDiffUtils() {
 
-                public class C00421 extends LinkCell {
-                    C00421(Context context, BaseFragment baseFragment, int i, int i2) {
+                public class C00411 extends LinkCell {
+                    C00411(Context context, BaseFragment baseFragment, int i, int i2) {
                         super(context, baseFragment, i, i2);
                     }
 
@@ -824,19 +823,19 @@ public class FilterCreateActivity extends BaseFragment {
                         makeOptions.add(R.drawable.msg_copy, LocaleController.getString(R.string.CopyLink), new Runnable() {
                             @Override
                             public final void run() {
-                                FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00421.this.copy();
+                                FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00411.this.copy();
                             }
                         });
                         makeOptions.add(R.drawable.msg_qrcode, LocaleController.getString(R.string.GetQRCode), new Runnable() {
                             @Override
                             public final void run() {
-                                FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00421.this.qrcode();
+                                FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00411.this.qrcode();
                             }
                         });
                         makeOptions.add(R.drawable.msg_delete, (CharSequence) LocaleController.getString(R.string.DeleteLink), true, new Runnable() {
                             @Override
                             public final void run() {
-                                FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00421.this.deleteLink();
+                                FilterCreateActivity.FilterInvitesBottomSheet.AnonymousClass1.C00411.this.deleteLink();
                             }
                         });
                         if (LocaleController.isRTL) {
@@ -954,7 +953,7 @@ public class FilterCreateActivity extends BaseFragment {
                             textInfoPrivacyCell.setBackgroundColor(Theme.getColor(i2));
                             return new RecyclerListView.Holder(textInfoPrivacyCell);
                         }
-                        textInfoPrivacyCell = new C00421(FilterInvitesBottomSheet.this.getContext(), null, ((BottomSheet) FilterInvitesBottomSheet.this).currentAccount, FilterInvitesBottomSheet.this.filter.id);
+                        textInfoPrivacyCell = new C00411(FilterInvitesBottomSheet.this.getContext(), null, ((BottomSheet) FilterInvitesBottomSheet.this).currentAccount, FilterInvitesBottomSheet.this.filter.id);
                     }
                     i2 = Theme.key_dialogBackground;
                     textInfoPrivacyCell.setBackgroundColor(Theme.getColor(i2));
@@ -2063,7 +2062,7 @@ public class FilterCreateActivity extends BaseFragment {
 
     public boolean checkDiscard() {
         String string;
-        DialogInterface.OnClickListener onClickListener;
+        AlertDialog.OnButtonClickListener onButtonClickListener;
         if (this.doneItem.getAlpha() != 1.0f) {
             return true;
         }
@@ -2072,28 +2071,28 @@ public class FilterCreateActivity extends BaseFragment {
             builder.setTitle(LocaleController.getString(R.string.FilterDiscardNewTitle));
             builder.setMessage(LocaleController.getString(R.string.FilterDiscardNewAlert));
             string = LocaleController.getString(R.string.FilterDiscardNewSave);
-            onClickListener = new DialogInterface.OnClickListener() {
+            onButtonClickListener = new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    FilterCreateActivity.this.lambda$checkDiscard$19(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    FilterCreateActivity.this.lambda$checkDiscard$19(alertDialog, i);
                 }
             };
         } else {
             builder.setTitle(LocaleController.getString(R.string.FilterDiscardTitle));
             builder.setMessage(LocaleController.getString(R.string.FilterDiscardAlert));
             string = LocaleController.getString(R.string.ApplyTheme);
-            onClickListener = new DialogInterface.OnClickListener() {
+            onButtonClickListener = new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    FilterCreateActivity.this.lambda$checkDiscard$20(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    FilterCreateActivity.this.lambda$checkDiscard$20(alertDialog, i);
                 }
             };
         }
-        builder.setPositiveButton(string, onClickListener);
-        builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(string, onButtonClickListener);
+        builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                FilterCreateActivity.this.lambda$checkDiscard$21(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                FilterCreateActivity.this.lambda$checkDiscard$21(alertDialog, i);
             }
         });
         showDialog(builder.create());
@@ -2134,10 +2133,10 @@ public class FilterCreateActivity extends BaseFragment {
         builder.setTitle(LocaleController.getString(R.string.FilterDelete));
         builder.setMessage(LocaleController.getString(R.string.FilterDeleteAlert));
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                FilterCreateActivity.this.lambda$deleteFolder$17(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                FilterCreateActivity.this.lambda$deleteFolder$17(alertDialog, i);
             }
         });
         AlertDialog create = builder.create();
@@ -2259,22 +2258,22 @@ public class FilterCreateActivity extends BaseFragment {
         MessagesController.getGlobalMainSettings().edit().putBoolean("n_" + i, true).apply();
     }
 
-    public void lambda$checkDiscard$19(DialogInterface dialogInterface, int i) {
+    public void lambda$checkDiscard$19(AlertDialog alertDialog, int i) {
         processDone();
     }
 
-    public void lambda$checkDiscard$20(DialogInterface dialogInterface, int i) {
+    public void lambda$checkDiscard$20(AlertDialog alertDialog, int i) {
         processDone();
     }
 
-    public void lambda$checkDiscard$21(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$checkDiscard$21(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$7(ItemInner itemInner) {
         FilterChatlistActivity filterChatlistActivity = new FilterChatlistActivity(this.filter, itemInner.link);
-        filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
-        filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda25(this));
+        filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda23(this));
+        filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
         presentFragment(filterChatlistActivity);
     }
 
@@ -2324,7 +2323,7 @@ public class FilterCreateActivity extends BaseFragment {
     }
 
     public void lambda$deleteFolder$14(Boolean bool) {
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$deleteFolder$15(AlertDialog alertDialog) {
@@ -2337,7 +2336,7 @@ public class FilterCreateActivity extends BaseFragment {
         }
         getMessagesController().removeFilter(this.filter);
         getMessagesStorage().deleteDialogFilter(this.filter);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$deleteFolder$16(final AlertDialog alertDialog, TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -2349,21 +2348,21 @@ public class FilterCreateActivity extends BaseFragment {
         });
     }
 
-    public void lambda$deleteFolder$17(DialogInterface dialogInterface, int i) {
-        final AlertDialog alertDialog;
+    public void lambda$deleteFolder$17(AlertDialog alertDialog, int i) {
+        final AlertDialog alertDialog2;
         if (getParentActivity() != null) {
-            alertDialog = new AlertDialog(getParentActivity(), 3);
-            alertDialog.setCanCancel(false);
-            alertDialog.show();
+            alertDialog2 = new AlertDialog(getParentActivity(), 3);
+            alertDialog2.setCanCancel(false);
+            alertDialog2.show();
         } else {
-            alertDialog = null;
+            alertDialog2 = null;
         }
         TLRPC.TL_messages_updateDialogFilter tL_messages_updateDialogFilter = new TLRPC.TL_messages_updateDialogFilter();
         tL_messages_updateDialogFilter.id = this.filter.id;
         getConnectionsManager().sendRequest(tL_messages_updateDialogFilter, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                FilterCreateActivity.this.lambda$deleteFolder$16(alertDialog, tLObject, tL_error);
+                FilterCreateActivity.this.lambda$deleteFolder$16(alertDialog2, tLObject, tL_error);
             }
         });
     }
@@ -2413,8 +2412,8 @@ public class FilterCreateActivity extends BaseFragment {
             getMessagesController().loadRemoteFilters(true);
             final TL_chatlists.TL_chatlists_exportedChatlistInvite tL_chatlists_exportedChatlistInvite = (TL_chatlists.TL_chatlists_exportedChatlistInvite) tLObject;
             FilterChatlistActivity filterChatlistActivity = new FilterChatlistActivity(this.filter, tL_chatlists_exportedChatlistInvite.invite);
-            filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
-            filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda25(this));
+            filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda23(this));
+            filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
             presentFragment(filterChatlistActivity);
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
@@ -2449,8 +2448,8 @@ public class FilterCreateActivity extends BaseFragment {
         }
         if (arrayList.isEmpty()) {
             FilterChatlistActivity filterChatlistActivity = new FilterChatlistActivity(this.filter, null);
-            filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
-            filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda25(this));
+            filterChatlistActivity.setOnEdit(new FilterCreateActivity$$ExternalSyntheticLambda23(this));
+            filterChatlistActivity.setOnDelete(new FilterCreateActivity$$ExternalSyntheticLambda24(this));
             presentFragment(filterChatlistActivity);
             return;
         }
@@ -2474,7 +2473,7 @@ public class FilterCreateActivity extends BaseFragment {
 
     public void lambda$processDone$23() {
         if (!this.doNotCloseWhenSave) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
             return;
         }
         this.doNotCloseWhenSave = false;
@@ -2563,7 +2562,7 @@ public class FilterCreateActivity extends BaseFragment {
         updateRows();
     }
 
-    public void lambda$showRemoveAlert$22(ItemInner itemInner, boolean z, DialogInterface dialogInterface, int i) {
+    public void lambda$showRemoveAlert$22(ItemInner itemInner, boolean z, AlertDialog alertDialog, int i) {
         if (itemInner.flags > 0) {
             this.newFilterFlags = (itemInner.flags ^ (-1)) & this.newFilterFlags;
         } else {
@@ -3018,10 +3017,10 @@ public class FilterCreateActivity extends BaseFragment {
         }
         builder.setMessage(formatString);
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        builder.setPositiveButton(LocaleController.getString(R.string.StickersRemove), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.StickersRemove), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                FilterCreateActivity.this.lambda$showRemoveAlert$22(itemInner, z, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                FilterCreateActivity.this.lambda$showRemoveAlert$22(itemInner, z, alertDialog, i);
             }
         });
         AlertDialog create = builder.create();
@@ -3254,7 +3253,7 @@ public class FilterCreateActivity extends BaseFragment {
             public void onItemClick(int i) {
                 if (i == -1) {
                     if (FilterCreateActivity.this.checkDiscard()) {
-                        FilterCreateActivity.this.lambda$onBackPressed$321();
+                        FilterCreateActivity.this.lambda$onBackPressed$323();
                     }
                 } else if (i == 1) {
                     FilterCreateActivity.this.processDone();

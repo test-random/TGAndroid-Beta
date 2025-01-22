@@ -120,7 +120,7 @@ public class MultiContactsSelectorBottomSheet extends BottomSheetWithRecyclerLis
         selectorHeaderCell.setOnCloseClickListener(new Runnable() {
             @Override
             public final void run() {
-                MultiContactsSelectorBottomSheet.this.dismiss();
+                MultiContactsSelectorBottomSheet.this.lambda$new$0();
             }
         });
         selectorHeaderCell.setText(getTitle());
@@ -410,7 +410,7 @@ public class MultiContactsSelectorBottomSheet extends BottomSheetWithRecyclerLis
             }
         }
         this.selectorListener.onUserSelected(arrayList);
-        dismiss();
+        lambda$new$0();
     }
 
     public void onSearch(String str) {
@@ -522,9 +522,9 @@ public class MultiContactsSelectorBottomSheet extends BottomSheetWithRecyclerLis
     }
 
     @Override
-    public void dismiss() {
+    public void lambda$new$0() {
         AndroidUtilities.hideKeyboard(this.searchField.getEditText());
-        super.dismiss();
+        super.lambda$new$0();
     }
 
     @Override

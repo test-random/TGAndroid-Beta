@@ -1,7 +1,6 @@
 package org.telegram.ui.web;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -569,10 +568,10 @@ public class AddressBarList extends FrameLayout {
     }
 
     public void clearRecentSearches(View view) {
-        new AlertDialog.Builder(getContext()).setTitle(LocaleController.getString(R.string.WebRecentClearTitle)).setMessage(LocaleController.getString(R.string.WebRecentClearText)).setPositiveButton(LocaleController.getString(R.string.OK), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(getContext()).setTitle(LocaleController.getString(R.string.WebRecentClearTitle)).setMessage(LocaleController.getString(R.string.WebRecentClearText)).setPositiveButton(LocaleController.getString(R.string.OK), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                AddressBarList.this.lambda$clearRecentSearches$1(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                AddressBarList.this.lambda$clearRecentSearches$1(alertDialog, i);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
     }
@@ -634,7 +633,7 @@ public class AddressBarList extends FrameLayout {
         return arrayList;
     }
 
-    public void lambda$clearRecentSearches$1(DialogInterface dialogInterface, int i) {
+    public void lambda$clearRecentSearches$1(AlertDialog alertDialog, int i) {
         clearRecentSearches(getContext());
         this.listView.adapter.update(true);
     }

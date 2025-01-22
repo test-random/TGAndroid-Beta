@@ -199,8 +199,8 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
 
     public class AnonymousClass1 extends BackupImageView {
 
-        public class C00471 extends ImageReceiver {
-            C00471(View view) {
+        public class C00451 extends ImageReceiver {
+            C00451(View view) {
                 super(view);
             }
 
@@ -216,7 +216,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                 duration.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        BotWebViewContainer.AnonymousClass1.C00471.this.lambda$setImageBitmapByKey$0(valueAnimator);
+                        BotWebViewContainer.AnonymousClass1.C00451.this.lambda$setImageBitmapByKey$0(valueAnimator);
                     }
                 });
                 duration.start();
@@ -226,7 +226,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
 
         AnonymousClass1(Context context) {
             super(context);
-            this.imageReceiver = new C00471(this);
+            this.imageReceiver = new C00451(this);
         }
 
         @Override
@@ -1804,9 +1804,9 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                     AlertDialog.Builder builder = new AlertDialog.Builder(MyWebView.this.getContext());
                     builder.setTitle(LocaleController.getString(R.string.WebDownloadAlertTitle));
                     builder.setMessage(AndroidUtilities.replaceTags(j > 0 ? LocaleController.formatString(R.string.WebDownloadAlertInfoWithSize, escape, AndroidUtilities.formatFileSize(j)) : LocaleController.formatString(R.string.WebDownloadAlertInfo, escape)));
-                    builder.setPositiveButton(LocaleController.getString(R.string.WebDownloadAlertYes), new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(LocaleController.getString(R.string.WebDownloadAlertYes), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i) {
+                        public final void onClick(AlertDialog alertDialog, int i) {
                             runnable.run();
                         }
                     });
@@ -2448,8 +2448,8 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         cellFlickerDrawable.setColors(i, 153, 204);
         AnonymousClass1 anonymousClass1 = new BackupImageView(context) {
 
-            public class C00471 extends ImageReceiver {
-                C00471(View view) {
+            public class C00451 extends ImageReceiver {
+                C00451(View view) {
                     super(view);
                 }
 
@@ -2465,7 +2465,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                     duration.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            BotWebViewContainer.AnonymousClass1.C00471.this.lambda$setImageBitmapByKey$0(valueAnimator);
+                            BotWebViewContainer.AnonymousClass1.C00451.this.lambda$setImageBitmapByKey$0(valueAnimator);
                         }
                     });
                     duration.start();
@@ -2475,7 +2475,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
 
             AnonymousClass1(Context context2) {
                 super(context2);
-                this.imageReceiver = new C00471(this);
+                this.imageReceiver = new C00451(this);
             }
 
             @Override
@@ -2649,7 +2649,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         });
     }
 
-    public void lambda$onEventReceived$11(TLObject tLObject, String[] strArr, TLRPC.TL_error tL_error, DialogInterface dialogInterface) {
+    public void lambda$onEventReceived$11(TLObject tLObject, String[] strArr, TLRPC.TL_error tL_error, AlertDialog alertDialog) {
         if (tLObject != null) {
             strArr[0] = "allowed";
             if (tLObject instanceof TLRPC.Updates) {
@@ -2659,25 +2659,25 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         if (tL_error != null) {
             unknownError(tL_error.text);
         }
-        dialogInterface.dismiss();
+        alertDialog.dismiss();
     }
 
-    public void lambda$onEventReceived$12(final String[] strArr, final DialogInterface dialogInterface, final TLObject tLObject, final TLRPC.TL_error tL_error) {
+    public void lambda$onEventReceived$12(final String[] strArr, final AlertDialog alertDialog, final TLObject tLObject, final TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BotWebViewContainer.this.lambda$onEventReceived$11(tLObject, strArr, tL_error, dialogInterface);
+                BotWebViewContainer.this.lambda$onEventReceived$11(tLObject, strArr, tL_error, alertDialog);
             }
         });
     }
 
-    public void lambda$onEventReceived$13(final String[] strArr, final DialogInterface dialogInterface, int i) {
+    public void lambda$onEventReceived$13(final String[] strArr, final AlertDialog alertDialog, int i) {
         TL_bots.allowSendMessage allowsendmessage = new TL_bots.allowSendMessage();
         allowsendmessage.bot = MessagesController.getInstance(this.currentAccount).getInputUser(this.botUser);
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(allowsendmessage, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BotWebViewContainer.this.lambda$onEventReceived$12(strArr, dialogInterface, tLObject, tL_error);
+                BotWebViewContainer.this.lambda$onEventReceived$12(strArr, alertDialog, tLObject, tL_error);
             }
         });
     }
@@ -2699,15 +2699,15 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                 return;
             } else {
                 final String[] strArr = {"cancelled"};
-                showDialog(3, new AlertDialog.Builder(getContext()).setTitle(LocaleController.getString(R.string.BotWebViewRequestWriteTitle)).setMessage(LocaleController.getString(R.string.BotWebViewRequestWriteMessage)).setPositiveButton(LocaleController.getString(R.string.BotWebViewRequestAllow), new DialogInterface.OnClickListener() {
+                showDialog(3, new AlertDialog.Builder(getContext()).setTitle(LocaleController.getString(R.string.BotWebViewRequestWriteTitle)).setMessage(LocaleController.getString(R.string.BotWebViewRequestWriteMessage)).setPositiveButton(LocaleController.getString(R.string.BotWebViewRequestAllow), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        BotWebViewContainer.this.lambda$onEventReceived$13(strArr, dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        BotWebViewContainer.this.lambda$onEventReceived$13(strArr, alertDialog, i2);
                     }
-                }).setNegativeButton(LocaleController.getString(R.string.BotWebViewRequestDontAllow), new DialogInterface.OnClickListener() {
+                }).setNegativeButton(LocaleController.getString(R.string.BotWebViewRequestDontAllow), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        dialogInterface.dismiss();
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        alertDialog.dismiss();
                     }
                 }).create(), new Runnable() {
                     @Override
@@ -2772,9 +2772,9 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         }
     }
 
-    public void lambda$onEventReceived$21(String[] strArr, boolean z, final int i, final MyWebView myWebView, DialogInterface dialogInterface, int i2) {
+    public void lambda$onEventReceived$21(String[] strArr, boolean z, final int i, final MyWebView myWebView, AlertDialog alertDialog, int i2) {
         strArr[0] = null;
-        dialogInterface.dismiss();
+        alertDialog.dismiss();
         int i3 = this.currentAccount;
         if (z) {
             MessagesController.getInstance(i3).unblockPeer(this.botUser.id, new Runnable() {
@@ -2824,7 +2824,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         notifyBiometryReceived();
     }
 
-    public void lambda$onEventReceived$26(Runnable[] runnableArr, DialogInterface dialogInterface, int i) {
+    public void lambda$onEventReceived$26(Runnable[] runnableArr, AlertDialog alertDialog, int i) {
         if (runnableArr[0] != null) {
             runnableArr[0] = null;
         }
@@ -2839,7 +2839,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         });
     }
 
-    public void lambda$onEventReceived$27(Runnable[] runnableArr, DialogInterface dialogInterface, int i) {
+    public void lambda$onEventReceived$27(Runnable[] runnableArr, AlertDialog alertDialog, int i) {
         if (runnableArr[0] != null) {
             runnableArr[0] = null;
         }
@@ -3095,8 +3095,8 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         }, 500L);
     }
 
-    public void lambda$onEventReceived$5(PopupButton popupButton, AtomicBoolean atomicBoolean, DialogInterface dialogInterface, int i) {
-        dialogInterface.dismiss();
+    public void lambda$onEventReceived$5(PopupButton popupButton, AtomicBoolean atomicBoolean, AlertDialog alertDialog, int i) {
+        alertDialog.dismiss();
         try {
             this.lastClickMs = System.currentTimeMillis();
             notifyEvent("popup_closed", new JSONObject().put("button_id", popupButton.id));
@@ -3106,8 +3106,8 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         }
     }
 
-    public void lambda$onEventReceived$6(PopupButton popupButton, AtomicBoolean atomicBoolean, DialogInterface dialogInterface, int i) {
-        dialogInterface.dismiss();
+    public void lambda$onEventReceived$6(PopupButton popupButton, AtomicBoolean atomicBoolean, AlertDialog alertDialog, int i) {
+        alertDialog.dismiss();
         try {
             this.lastClickMs = System.currentTimeMillis();
             notifyEvent("popup_closed", new JSONObject().put("button_id", popupButton.id));
@@ -3117,8 +3117,8 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
         }
     }
 
-    public void lambda$onEventReceived$7(PopupButton popupButton, AtomicBoolean atomicBoolean, DialogInterface dialogInterface, int i) {
-        dialogInterface.dismiss();
+    public void lambda$onEventReceived$7(PopupButton popupButton, AtomicBoolean atomicBoolean, AlertDialog alertDialog, int i) {
+        alertDialog.dismiss();
         try {
             this.lastClickMs = System.currentTimeMillis();
             notifyEvent("popup_closed", new JSONObject().put("button_id", popupButton.id));

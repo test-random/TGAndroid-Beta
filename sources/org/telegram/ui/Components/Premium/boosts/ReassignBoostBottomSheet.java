@@ -178,7 +178,7 @@ public class ReassignBoostBottomSheet extends BottomSheetWithRecyclerListView {
         }
 
         public static void lambda$setData$0(BottomSheet bottomSheet) {
-            bottomSheet.dismiss();
+            bottomSheet.lambda$new$0();
             NotificationCenter.getInstance(UserConfig.selectedAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.didStartedMultiGiftsSelector, new Object[0]);
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
@@ -449,7 +449,7 @@ public class ReassignBoostBottomSheet extends BottomSheetWithRecyclerListView {
     }
 
     public void lambda$new$0(TL_stories.TL_premium_myBoosts tL_premium_myBoosts, List list, HashSet hashSet, TL_stories.TL_premium_boostsStatus tL_premium_boostsStatus) {
-        dismiss();
+        lambda$new$0();
         NotificationCenter.getInstance(UserConfig.selectedAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.boostedChannelByUser, tL_premium_myBoosts, Integer.valueOf(list.size()), Integer.valueOf(hashSet.size()), tL_premium_boostsStatus);
     }
 

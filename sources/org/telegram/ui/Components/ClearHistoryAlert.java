@@ -93,7 +93,7 @@ public class ClearHistoryAlert extends BottomSheet {
         ClearHistoryAlertDelegate clearHistoryAlertDelegate = this.delegate;
         CheckBoxCell checkBoxCell = this.cell;
         clearHistoryAlertDelegate.onClearHistory(checkBoxCell != null && checkBoxCell.isChecked());
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$2(View view) {
@@ -121,11 +121,11 @@ public class ClearHistoryAlert extends BottomSheet {
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public final void run() {
-                    ClearHistoryAlert.this.dismiss();
+                    ClearHistoryAlert.this.lambda$new$0();
                 }
             }, 200L);
         } else {
-            dismiss();
+            lambda$new$0();
         }
     }
 

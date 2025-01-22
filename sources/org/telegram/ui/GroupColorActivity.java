@@ -74,8 +74,8 @@ public class GroupColorActivity extends ChannelColorActivity {
         }
         LimitReachedBottomSheet limitReachedBottomSheet = new LimitReachedBottomSheet(this, getContext(), i, this.currentAccount, this.resourceProvider) {
             @Override
-            public void dismiss() {
-                super.dismiss();
+            public void lambda$new$0() {
+                super.lambda$new$0();
                 GroupColorActivity.this.isLoading = false;
             }
 

@@ -214,8 +214,8 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
     private HashMap invitesCache = new HashMap();
     private PhotoViewer.PhotoViewerProvider provider = new PhotoViewer.EmptyPhotoViewerProvider() {
         @Override
-        public org.telegram.ui.PhotoViewer.PlaceProviderObject getPlaceForPhoto(org.telegram.messenger.MessageObject r17, org.telegram.tgnet.TLRPC.FileLocation r18, int r19, boolean r20) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChannelAdminLogActivity.AnonymousClass1.getPlaceForPhoto(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, int, boolean):org.telegram.ui.PhotoViewer$PlaceProviderObject");
+        public org.telegram.ui.PhotoViewer.PlaceProviderObject getPlaceForPhoto(org.telegram.messenger.MessageObject r17, org.telegram.tgnet.TLRPC.FileLocation r18, int r19, boolean r20, boolean r21) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChannelAdminLogActivity.AnonymousClass1.getPlaceForPhoto(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, int, boolean, boolean):org.telegram.ui.PhotoViewer$PlaceProviderObject");
         }
     };
     private final ArrayList filteredMessagesUpdatedPosition = new ArrayList();
@@ -2254,7 +2254,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
         }
     }
 
-    public void lambda$showOpenUrlAlert$24(String str, DialogInterface dialogInterface, int i) {
+    public void lambda$showOpenUrlAlert$24(String str, AlertDialog alertDialog, int i) {
         Browser.openUrl((Context) getParentActivity(), str, true);
     }
 
@@ -2876,7 +2876,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             @Override
             public void onItemClick(int i2) {
                 if (i2 == -1) {
-                    ChannelAdminLogActivity.this.lambda$onBackPressed$321();
+                    ChannelAdminLogActivity.this.lambda$onBackPressed$323();
                 }
             }
         });
@@ -3970,10 +3970,10 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTitle(LocaleController.getString("OpenUrlTitle", R.string.OpenUrlTitle));
         builder.setMessage(LocaleController.formatString("OpenUrlAlert2", R.string.OpenUrlAlert2, str));
-        builder.setPositiveButton(LocaleController.getString("Open", R.string.Open), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString("Open", R.string.Open), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChannelAdminLogActivity.this.lambda$showOpenUrlAlert$24(str, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChannelAdminLogActivity.this.lambda$showOpenUrlAlert$24(str, alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);

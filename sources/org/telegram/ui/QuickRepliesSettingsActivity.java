@@ -154,7 +154,7 @@ public class QuickRepliesSettingsActivity extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    QuickRepliesSettingsActivity.this.lambda$onBackPressed$321();
+                    QuickRepliesSettingsActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

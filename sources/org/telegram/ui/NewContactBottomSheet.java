@@ -287,7 +287,7 @@ public class NewContactBottomSheet extends BottomSheet implements AdapterView.On
         } else if (!tL_contacts_importedContacts.users.isEmpty()) {
             MessagesController.getInstance(this.currentAccount).putUsers(tL_contacts_importedContacts.users, false);
             MessagesController.getInstance(this.currentAccount).openChatOrProfileWith(tL_contacts_importedContacts.users.get(0), null, this.parentFragment, 1, false);
-            dismiss();
+            lambda$new$0();
         } else {
             if (this.parentFragment.getParentActivity() == null) {
                 return;
@@ -350,8 +350,8 @@ public class NewContactBottomSheet extends BottomSheet implements AdapterView.On
     }
 
     @Override
-    public void dismiss() {
-        super.dismiss();
+    public void lambda$new$0() {
+        super.lambda$new$0();
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {

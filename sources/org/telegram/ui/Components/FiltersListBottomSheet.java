@@ -181,7 +181,7 @@ public class FiltersListBottomSheet extends BottomSheet implements NotificationC
                 if (motionEvent.getAction() != 0 || FiltersListBottomSheet.this.scrollOffsetY == 0 || motionEvent.getY() >= FiltersListBottomSheet.this.scrollOffsetY) {
                     return super.onInterceptTouchEvent(motionEvent);
                 }
-                FiltersListBottomSheet.this.dismiss();
+                FiltersListBottomSheet.this.lambda$new$0();
                 return true;
             }
 
@@ -345,7 +345,7 @@ public class FiltersListBottomSheet extends BottomSheet implements NotificationC
 
     public void lambda$new$0(View view, int i) {
         this.delegate.didSelectFilter(this.adapter.getItem(i), view instanceof BottomSheet.BottomSheetCell ? ((BottomSheet.BottomSheetCell) view).isChecked() : false);
-        dismiss();
+        lambda$new$0();
     }
 
     private void runShadowAnimation(final boolean z) {
@@ -436,8 +436,8 @@ public class FiltersListBottomSheet extends BottomSheet implements NotificationC
     }
 
     @Override
-    public void dismiss() {
-        super.dismiss();
+    public void lambda$new$0() {
+        super.lambda$new$0();
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
     }
 

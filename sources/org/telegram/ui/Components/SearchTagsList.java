@@ -489,13 +489,13 @@ public abstract class SearchTagsList extends BlurredFrameLayout implements Notif
         AndroidUtilities.showKeyboard(editTextBoldCursor);
     }
 
-    public static void lambda$openRenameTagAlert$5(EditTextBoldCursor editTextBoldCursor, int i, TLRPC.Reaction reaction, DialogInterface dialogInterface, int i2) {
+    public static void lambda$openRenameTagAlert$5(EditTextBoldCursor editTextBoldCursor, int i, TLRPC.Reaction reaction, AlertDialog alertDialog, int i2) {
         String obj = editTextBoldCursor.getText().toString();
         if (obj.length() > 12) {
             AndroidUtilities.shakeView(editTextBoldCursor);
         } else {
             MessagesController.getInstance(i).renameSavedReactionTag(ReactionsLayoutInBubble.VisibleReaction.fromTL(reaction), obj);
-            dialogInterface.dismiss();
+            alertDialog.dismiss();
         }
     }
 
@@ -641,16 +641,16 @@ public abstract class SearchTagsList extends BlurredFrameLayout implements Notif
         linearLayout.addView(editTextBoldCursor, LayoutHelper.createLinear(-1, -2, 24.0f, 0.0f, 24.0f, 10.0f));
         builder.setView(linearLayout);
         builder.setWidth(AndroidUtilities.dp(292.0f));
-        builder.setPositiveButton(LocaleController.getString(R.string.Save), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Save), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                SearchTagsList.lambda$openRenameTagAlert$5(EditTextBoldCursor.this, i, reaction, dialogInterface, i3);
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                SearchTagsList.lambda$openRenameTagAlert$5(EditTextBoldCursor.this, i, reaction, alertDialog, i3);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                dialogInterface.dismiss();
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                alertDialog.dismiss();
             }
         });
         AlertDialog create = builder.create();

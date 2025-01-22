@@ -6,7 +6,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
@@ -1555,7 +1554,7 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
             this.keyboardMoving = false;
         }
 
-        public void lambda$selectChat$8(long j, ArrayList arrayList, DialogInterface dialogInterface, int i) {
+        public void lambda$selectChat$8(long j, ArrayList arrayList, AlertDialog alertDialog, int i) {
             this.selectedUsersByGroup.put(Long.valueOf(j), arrayList);
             Iterator it = arrayList.iterator();
             while (it.hasNext()) {
@@ -1564,7 +1563,7 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
             updateSpans(true);
             updateButton(true);
             updateCheckboxes(true);
-            dialogInterface.dismiss();
+            alertDialog.dismiss();
             this.searchField.scrollToBottom();
         }
 
@@ -1811,10 +1810,10 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
                 this.searchField.scrollToBottom();
                 return;
             }
-            (arrayList.isEmpty() ? new AlertDialog.Builder(getContext(), ((BottomSheet) StoryPrivacyBottomSheet.this).resourcesProvider).setMessage("All group members are not in your contact list.") : new AlertDialog.Builder(getContext(), ((BottomSheet) StoryPrivacyBottomSheet.this).resourcesProvider).setMessage(arrayList2.size() + " members are not in your contact list").setPositiveButton("Add " + arrayList.size() + " contacts", new DialogInterface.OnClickListener() {
+            (arrayList.isEmpty() ? new AlertDialog.Builder(getContext(), ((BottomSheet) StoryPrivacyBottomSheet.this).resourcesProvider).setMessage("All group members are not in your contact list.") : new AlertDialog.Builder(getContext(), ((BottomSheet) StoryPrivacyBottomSheet.this).resourcesProvider).setMessage(arrayList2.size() + " members are not in your contact list").setPositiveButton("Add " + arrayList.size() + " contacts", new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i3) {
-                    StoryPrivacyBottomSheet.Page.this.lambda$selectChat$8(j, arrayList, dialogInterface, i3);
+                public final void onClick(AlertDialog alertDialog, int i3) {
+                    StoryPrivacyBottomSheet.Page.this.lambda$selectChat$8(j, arrayList, alertDialog, i3);
                 }
             })).setNegativeButton("Cancel", null).show();
         }
@@ -3587,10 +3586,10 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
             spannableString.setSpan(new TypefaceSpan(AndroidUtilities.bold()), 0, spannableString.length(), 33);
             spannableStringBuilder.append((CharSequence) spannableString);
         }
-        new AlertDialog.Builder(getContext(), this.resourcesProvider).setTitle(LocaleController.getString(R.string.StoryRestrictions)).setMessage(AndroidUtilities.replaceCharSequence("%s", LocaleController.getString(R.string.StoryRestrictionsInfo), spannableStringBuilder)).setPositiveButton(LocaleController.getString(R.string.Proceed), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(getContext(), this.resourcesProvider).setTitle(LocaleController.getString(R.string.StoryRestrictions)).setMessage(AndroidUtilities.replaceCharSequence("%s", LocaleController.getString(R.string.StoryRestrictionsInfo), spannableStringBuilder)).setPositiveButton(LocaleController.getString(R.string.Proceed), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                StoryPrivacyBottomSheet.this.lambda$done$2(storyPrivacy, runnable, dialogInterface, i3);
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                StoryPrivacyBottomSheet.this.lambda$done$2(storyPrivacy, runnable, alertDialog, i3);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
     }
@@ -3812,7 +3811,7 @@ public class StoryPrivacyBottomSheet extends BottomSheet implements Notification
         this.containerView.addView(this.viewPager, LayoutHelper.createFrame(-1, -1, 119));
     }
 
-    public void lambda$done$2(StoryPrivacy storyPrivacy, Runnable runnable, DialogInterface dialogInterface, int i) {
+    public void lambda$done$2(StoryPrivacy storyPrivacy, Runnable runnable, AlertDialog alertDialog, int i) {
         done(storyPrivacy, runnable, true);
     }
 

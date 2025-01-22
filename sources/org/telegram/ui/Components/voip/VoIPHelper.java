@@ -116,9 +116,9 @@ public abstract class VoIPHelper {
             return;
         }
         if (z6 && !z && (inputPeer instanceof TLRPC.TL_inputPeerUser) && ChatObject.shouldSendAnonymously(chat) && (!ChatObject.isChannel(chat) || chat.megagroup)) {
-            new AlertDialog.Builder(activity).setTitle(LocaleController.getString(ChatObject.isChannelOrGiga(chat) ? R.string.VoipChannelVoiceChat : R.string.VoipGroupVoiceChat)).setMessage(LocaleController.getString(ChatObject.isChannelOrGiga(chat) ? R.string.VoipChannelJoinAnonymouseAlert : R.string.VoipGroupJoinAnonymouseAlert)).setPositiveButton(LocaleController.getString(R.string.VoipChatJoin), new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(activity).setTitle(LocaleController.getString(ChatObject.isChannelOrGiga(chat) ? R.string.VoipChannelVoiceChat : R.string.VoipGroupVoiceChat)).setMessage(LocaleController.getString(ChatObject.isChannelOrGiga(chat) ? R.string.VoipChannelJoinAnonymouseAlert : R.string.VoipGroupJoinAnonymouseAlert)).setPositiveButton(LocaleController.getString(R.string.VoipChatJoin), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i3) {
+                public final void onClick(AlertDialog alertDialog, int i3) {
                     VoIPHelper.doInitiateCall(TLRPC.User.this, chat, str, inputPeer, false, z2, z3, z4, activity, baseFragment, accountInstance, false, false);
                 }
             }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
@@ -302,10 +302,10 @@ public abstract class VoIPHelper {
                 str2 = sharedInstance.getChat().title;
                 i = j > 0 ? R.string.VoipOngoingChatAlert2 : R.string.VoipOngoingChatAlert;
             }
-            new AlertDialog.Builder(activity).setTitle(LocaleController.getString(callerId < 0 ? R.string.VoipOngoingChatAlertTitle : R.string.VoipOngoingAlertTitle)).setMessage(AndroidUtilities.replaceTags(LocaleController.formatString(i, str2, user != null ? ContactsController.formatName(user.first_name, user.last_name) : chat.title))).setPositiveButton(LocaleController.getString(R.string.OK), new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(activity).setTitle(LocaleController.getString(callerId < 0 ? R.string.VoipOngoingChatAlertTitle : R.string.VoipOngoingAlertTitle)).setMessage(AndroidUtilities.replaceTags(LocaleController.formatString(i, str2, user != null ? ContactsController.formatName(user.first_name, user.last_name) : chat.title))).setPositiveButton(LocaleController.getString(R.string.OK), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    VoIPHelper.lambda$initiateCall$3(TLRPC.User.this, chat, str, z, z2, z3, activity, baseFragment, accountInstance, dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    VoIPHelper.lambda$initiateCall$3(TLRPC.User.this, chat, str, z, z2, z3, activity, baseFragment, accountInstance, alertDialog, i2);
                 }
             }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
         }
@@ -352,7 +352,7 @@ public abstract class VoIPHelper {
         doInitiateCall(user, chat, str, null, false, z, z2, z3, activity, baseFragment, accountInstance, true, true);
     }
 
-    public static void lambda$initiateCall$3(final TLRPC.User user, final TLRPC.Chat chat, final String str, final boolean z, final boolean z2, final boolean z3, final Activity activity, final BaseFragment baseFragment, final AccountInstance accountInstance, DialogInterface dialogInterface, int i) {
+    public static void lambda$initiateCall$3(final TLRPC.User user, final TLRPC.Chat chat, final String str, final boolean z, final boolean z2, final boolean z3, final Activity activity, final BaseFragment baseFragment, final AccountInstance accountInstance, AlertDialog alertDialog, int i) {
         if (VoIPService.getSharedInstance() != null) {
             VoIPService.getSharedInstance().hangUp(new Runnable() {
                 @Override
@@ -365,7 +365,7 @@ public abstract class VoIPHelper {
         }
     }
 
-    public static void lambda$permissionDenied$7(Activity activity, DialogInterface dialogInterface, int i) {
+    public static void lambda$permissionDenied$7(Activity activity, AlertDialog alertDialog, int i) {
         Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
         intent.setData(Uri.fromParts("package", activity.getPackageName(), null));
         activity.startActivity(intent);
@@ -424,7 +424,7 @@ public abstract class VoIPHelper {
         checkBoxCell.setChecked(z, true);
     }
 
-    public static void lambda$showRateAlert$12(DialogInterface dialogInterface, int i) {
+    public static void lambda$showRateAlert$12(AlertDialog alertDialog, int i) {
     }
 
     public static void lambda$showRateAlert$13(Runnable runnable, DialogInterface dialogInterface) {
@@ -433,7 +433,7 @@ public abstract class VoIPHelper {
         }
     }
 
-    public static void lambda$showRateAlert$14(Context context, File file, DialogInterface dialogInterface, int i) {
+    public static void lambda$showRateAlert$14(Context context, File file, AlertDialog alertDialog, int i) {
         Intent intent = new Intent(context, (Class<?>) LaunchActivity.class);
         intent.setAction("android.intent.action.SEND");
         intent.putExtra("android.intent.extra.STREAM", Uri.fromFile(file));
@@ -512,10 +512,10 @@ public abstract class VoIPHelper {
                 return;
             }
         }
-        new AlertDialog.Builder(activity).setMessage(AndroidUtilities.replaceTags(LocaleController.getString(z ? R.string.VoipNeedMicCameraPermissionWithHint : R.string.VoipNeedMicPermissionWithHint))).setPositiveButton(LocaleController.getString(R.string.Settings), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(activity).setMessage(AndroidUtilities.replaceTags(LocaleController.getString(z ? R.string.VoipNeedMicCameraPermissionWithHint : R.string.VoipNeedMicPermissionWithHint))).setPositiveButton(LocaleController.getString(R.string.Settings), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                VoIPHelper.lambda$permissionDenied$7(activity, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                VoIPHelper.lambda$permissionDenied$7(activity, alertDialog, i2);
             }
         }).setNegativeButton(LocaleController.getString(R.string.ContactsPermissionAlertNotNow), null).setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
@@ -705,10 +705,10 @@ public abstract class VoIPHelper {
         if (!logFile.exists()) {
             zArr[0] = false;
         }
-        final AlertDialog create = new AlertDialog.Builder(context).setTitle(LocaleController.getString(R.string.CallMessageReportProblem)).setView(linearLayout).setPositiveButton(LocaleController.getString(R.string.Send), new DialogInterface.OnClickListener() {
+        final AlertDialog create = new AlertDialog.Builder(context).setTitle(LocaleController.getString(R.string.CallMessageReportProblem)).setView(linearLayout).setPositiveButton(LocaleController.getString(R.string.Send), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i4) {
-                VoIPHelper.lambda$showRateAlert$12(dialogInterface, i4);
+            public final void onClick(AlertDialog alertDialog, int i4) {
+                VoIPHelper.lambda$showRateAlert$12(alertDialog, i4);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
@@ -717,10 +717,10 @@ public abstract class VoIPHelper {
             }
         }).create();
         if (BuildVars.LOGS_ENABLED && logFile.exists()) {
-            create.setNeutralButton("Send log", new DialogInterface.OnClickListener() {
+            create.setNeutralButton("Send log", new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i4) {
-                    VoIPHelper.lambda$showRateAlert$14(context, logFile, dialogInterface, i4);
+                public final void onClick(AlertDialog alertDialog, int i4) {
+                    VoIPHelper.lambda$showRateAlert$14(context, logFile, alertDialog, i4);
                 }
             });
         }
@@ -776,9 +776,9 @@ public abstract class VoIPHelper {
         if (z2) {
             final Intent intent = new Intent("android.settings.AIRPLANE_MODE_SETTINGS");
             if (intent.resolveActivity(activity.getPackageManager()) != null) {
-                positiveButton.setNeutralButton(LocaleController.getString(R.string.VoipOfflineOpenSettings), new DialogInterface.OnClickListener() {
+                positiveButton.setNeutralButton(LocaleController.getString(R.string.VoipOfflineOpenSettings), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i) {
+                    public final void onClick(AlertDialog alertDialog, int i) {
                         activity.startActivity(intent);
                     }
                 });
@@ -804,9 +804,9 @@ public abstract class VoIPHelper {
             if (z3) {
                 final Intent intent = new Intent("android.settings.AIRPLANE_MODE_SETTINGS");
                 if (intent.resolveActivity(activity.getPackageManager()) != null) {
-                    positiveButton.setNeutralButton(LocaleController.getString(R.string.VoipOfflineOpenSettings), new DialogInterface.OnClickListener() {
+                    positiveButton.setNeutralButton(LocaleController.getString(R.string.VoipOfflineOpenSettings), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i) {
+                        public final void onClick(AlertDialog alertDialog, int i) {
                             activity.startActivity(intent);
                         }
                     });

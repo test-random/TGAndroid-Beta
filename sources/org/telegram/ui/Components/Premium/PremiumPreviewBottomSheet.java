@@ -517,7 +517,7 @@ public class PremiumPreviewBottomSheet extends BottomSheetWithRecyclerListView i
         new EmojiPacksAlert(baseFragment, getContext(), this.resourcesProvider, arrayList) {
             @Override
             protected void onCloseByLink() {
-                PremiumPreviewBottomSheet.this.dismiss();
+                PremiumPreviewBottomSheet.this.lambda$new$0();
             }
         }.show();
     }
@@ -618,8 +618,8 @@ public class PremiumPreviewBottomSheet extends BottomSheetWithRecyclerListView i
     }
 
     @Override
-    public void dismiss() {
-        super.dismiss();
+    public void lambda$new$0() {
+        super.lambda$new$0();
         NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.startAllHeavyOperations, 4);
         ValueAnimator valueAnimator = this.enterAnimator;
         if (valueAnimator != null) {

@@ -701,7 +701,7 @@ public class UsersSelectActivity extends BaseFragment implements NotificationCen
         if (filterUsersActivityDelegate != null) {
             filterUsersActivityDelegate.didSelectChats(arrayList, this.filterFlags);
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
         return true;
     }
 
@@ -796,7 +796,7 @@ public class UsersSelectActivity extends BaseFragment implements NotificationCen
             @Override
             public void onItemClick(int i5) {
                 if (i5 == -1) {
-                    UsersSelectActivity.this.lambda$onBackPressed$321();
+                    UsersSelectActivity.this.lambda$onBackPressed$323();
                 } else if (i5 == 1) {
                     UsersSelectActivity.this.onDonePressed(true);
                 }

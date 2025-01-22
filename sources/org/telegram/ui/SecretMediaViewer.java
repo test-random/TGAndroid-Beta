@@ -1304,7 +1304,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         HintView2 hintView2 = this.secretHint;
         hintView2.setMaxWidthPx(HintView2.cutInFancyHalf(string, hintView2.getTextPaint()));
         this.secretHint.setText(string);
-        this.secretHint.setInnerPadding(12, 7, 11, 7);
+        this.secretHint.setInnerPadding(12.0f, 7.0f, 11.0f, 7.0f);
         this.secretHint.setIconMargin(2);
         this.secretHint.setIconTranslate(0.0f, 0.0f);
         this.secretHint.setIcon(R.raw.fire_on);
@@ -1404,7 +1404,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         this.videoPlayerTime.setText(String.format(Locale.ROOT, "%s / %s", format, i2 >= 60 ? String.format(Locale.ROOT, "%02d:%02d:%02d", Integer.valueOf(i2 / 60), Integer.valueOf(this.videoPlayerTotalTime[0] % 60), Integer.valueOf(this.videoPlayerTotalTime[1])) : String.format(Locale.ROOT, "%02d:%02d", Integer.valueOf(i2), Integer.valueOf(this.videoPlayerTotalTime[1]))));
     }
 
-    public boolean closePhoto(boolean r19, boolean r20) {
+    public boolean closePhoto(boolean r24, boolean r25) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.SecretMediaViewer.closePhoto(boolean, boolean):boolean");
     }
 
@@ -1586,9 +1586,8 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         String str;
         int i;
         float f;
-        ?? r15;
+        float f2;
         int navigationBarColor;
-        Object obj;
         boolean z;
         ImageReceiver imageReceiver;
         BitmapDrawable bitmapDrawable;
@@ -1598,7 +1597,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         String str3;
         long j;
         MessageObject messageObject2;
-        if (this.parentActivity == null || messageObject == null || !messageObject.needDrawBluredPreview() || photoViewerProvider == null || (placeForPhoto = photoViewerProvider.getPlaceForPhoto(messageObject, null, 0, true)) == null) {
+        if (this.parentActivity == null || messageObject == null || !messageObject.needDrawBluredPreview() || photoViewerProvider == null || (placeForPhoto = photoViewerProvider.getPlaceForPhoto(messageObject, null, 0, true, false)) == null) {
             return;
         }
         this.ignoreDelete = messageObject.messageOwner.ttl == Integer.MAX_VALUE;
@@ -1664,27 +1663,27 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         } else {
             this.animateFromRadius = null;
         }
-        float f2 = placeForPhoto.viewX;
-        float f3 = rectF.left;
-        this.translationX = ((f2 + f3) + (width / 2.0f)) - (i3 / 2);
+        float f3 = placeForPhoto.viewX;
+        float f4 = rectF.left;
+        this.translationX = ((f3 + f4) + (width / 2.0f)) - (i3 / 2);
         this.translationY = ((placeForPhoto.viewY + rectF.top) + (height / 2.0f)) - (r4 / 2);
-        this.clipHorizontal = Math.abs(f3 - placeForPhoto.imageReceiver.getImageX());
+        this.clipHorizontal = Math.abs(f4 - placeForPhoto.imageReceiver.getImageX());
         int abs = (int) Math.abs(rectF.top - placeForPhoto.imageReceiver.getImageY());
         int[] iArr3 = new int[2];
         placeForPhoto.parentView.getLocationInWindow(iArr3);
         int i5 = iArr3[1];
         int i6 = Build.VERSION.SDK_INT;
-        float f4 = ((i5 - (i6 >= 21 ? 0 : AndroidUtilities.statusBarHeight)) - (placeForPhoto.viewY + rectF.top)) + placeForPhoto.clipTopAddition;
-        this.clipTop = f4;
-        float f5 = abs;
-        this.clipTop = Math.max(0.0f, Math.max(f4, f5));
+        float f5 = ((i5 - (i6 >= 21 ? 0 : AndroidUtilities.statusBarHeight)) - (placeForPhoto.viewY + rectF.top)) + placeForPhoto.clipTopAddition;
+        this.clipTop = f5;
+        float f6 = abs;
+        this.clipTop = Math.max(0.0f, Math.max(f5, f6));
         float height2 = (((placeForPhoto.viewY + rectF.top) + ((int) height)) - ((iArr3[1] + placeForPhoto.parentView.getHeight()) - (i6 >= 21 ? 0 : AndroidUtilities.statusBarHeight))) + placeForPhoto.clipBottomAddition;
         this.clipBottom = height2;
-        this.clipBottom = Math.max(0.0f, Math.max(height2, f5));
+        this.clipBottom = Math.max(0.0f, Math.max(height2, f6));
         this.clipTopOrigin = 0.0f;
-        this.clipTopOrigin = Math.max(0.0f, Math.max(0.0f, f5));
+        this.clipTopOrigin = Math.max(0.0f, Math.max(0.0f, f6));
         this.clipBottomOrigin = 0.0f;
-        this.clipBottomOrigin = Math.max(0.0f, Math.max(0.0f, f5));
+        this.clipBottomOrigin = Math.max(0.0f, Math.max(0.0f, f6));
         this.animationStartTime = System.currentTimeMillis();
         this.animateToX = 0.0f;
         this.animateToY = 0.0f;
@@ -1729,12 +1728,12 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                 String str4 = messageObject.messageOwner.attachPath;
                 imageLocation = (str4 == null || !messageObject.attachPathExists) ? ImageLocation.getForDocument(document) : ImageLocation.getForPath(str4);
                 imageReceiver = this.centerImage;
-                str3 = null;
-                f = 1.0f;
                 bitmapDrawable = this.currentThumb != null ? new BitmapDrawable(this.currentThumb.bitmap) : null;
-                placeProviderObject = placeForPhoto;
+                str3 = null;
+                f = 0.0f;
+                f2 = 1.0f;
                 j = -1;
-                obj = null;
+                placeProviderObject = placeForPhoto;
                 str2 = null;
                 str = "window";
                 messageObject2 = messageObject;
@@ -1742,10 +1741,10 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                 i2 = 1;
             } else {
                 placeProviderObject = placeForPhoto;
-                obj = null;
                 str = "window";
                 z = true;
-                f = 1.0f;
+                f = 0.0f;
+                f2 = 1.0f;
                 this.playerRetryPlayCount = 1;
                 this.actionBar.setTitle(LocaleController.getString(R.string.DisappearingVideo));
                 File file = new File(messageObject.messageOwner.attachPath);
@@ -1770,22 +1769,19 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
             }
             imageReceiver.setImage(imageLocation, str3, bitmapDrawable, j, str2, messageObject2, i2);
             i = z;
-            r15 = obj;
         } else {
             placeProviderObject = placeForPhoto;
-            Object obj2 = null;
             str = "window";
             i = 1;
             i = 1;
-            f = 1.0f;
+            f = 0.0f;
+            f2 = 1.0f;
             this.actionBar.setTitle(LocaleController.getString(R.string.DisappearingPhoto));
             TLRPC.PhotoSize closestPhotoSizeWithSize = FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, AndroidUtilities.getPhotoSize());
             this.centerImage.setImage(ImageLocation.getForObject(closestPhotoSizeWithSize, messageObject.photoThumbsObject), (String) null, this.currentThumb != null ? new BitmapDrawable(this.currentThumb.bitmap) : null, -1L, (String) null, messageObject, 2);
-            r15 = obj2;
             if (closestPhotoSizeWithSize != null) {
                 this.videoWidth = closestPhotoSizeWithSize.w;
                 this.videoHeight = closestPhotoSizeWithSize.h;
-                r15 = obj2;
             }
         }
         setCurrentCaption(messageObject, "", false, false);
@@ -1802,7 +1798,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                 }
             });
         } else {
-            this.secretDeleteTimer.setOnClickListener(r15);
+            this.secretDeleteTimer.setOnClickListener(null);
         }
         try {
             if (this.windowView.getParent() != null) {
@@ -1841,11 +1837,11 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         VideoPlayerControlFrameLayout videoPlayerControlFrameLayout = this.seekbarContainer;
         Property property2 = videoPlayerControlFrameLayout.SEEKBAR_ALPHA;
         float[] fArr = new float[i];
-        fArr[0] = f;
+        fArr[0] = f2;
         ObjectAnimator ofFloat5 = ObjectAnimator.ofFloat(videoPlayerControlFrameLayout, (Property<VideoPlayerControlFrameLayout, Float>) property2, fArr);
         VideoPlayerControlFrameLayout videoPlayerControlFrameLayout2 = this.seekbarContainer;
-        if (!this.isVideo) {
-            f = 0.0f;
+        if (this.isVideo) {
+            f = 1.0f;
         }
         float[] fArr2 = new float[i];
         fArr2[0] = f;
@@ -1878,7 +1874,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         });
         this.photoTransitionAnimationStartTime = System.currentTimeMillis();
         if (SharedConfig.getDevicePerformanceClass() == 0) {
-            this.containerView.setLayerType(2, r15);
+            this.containerView.setLayerType(2, null);
         }
         this.imageMoveAnimation.setInterpolator(new DecelerateInterpolator());
         this.photoBackgroundDrawable.frame = 0;

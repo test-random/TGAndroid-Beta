@@ -301,14 +301,13 @@ public class SuggestEmojiView extends FrameLayout implements NotificationCenter.
             Bulletin createEmojiBulletin;
             if (document == null) {
                 emojiStatus = new TLRPC.TL_emojiStatusEmpty();
-            } else if (num != null) {
-                TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = new TLRPC.TL_emojiStatusUntil();
-                tL_emojiStatusUntil.document_id = document.id;
-                tL_emojiStatusUntil.until = num.intValue();
-                emojiStatus = tL_emojiStatusUntil;
             } else {
                 TLRPC.TL_emojiStatus tL_emojiStatus = new TLRPC.TL_emojiStatus();
                 tL_emojiStatus.document_id = document.id;
+                if (num != null) {
+                    tL_emojiStatus.flags |= 1;
+                    tL_emojiStatus.until = num.intValue();
+                }
                 emojiStatus = tL_emojiStatus;
             }
             TLRPC.User currentUser = UserConfig.getInstance(UserConfig.selectedAccount).getCurrentUser();

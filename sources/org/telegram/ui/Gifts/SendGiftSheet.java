@@ -103,20 +103,20 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
 
     private SendGiftSheet(Context context, final int i, final TL_stars.StarGift starGift, GiftPremiumBottomSheet$GiftTier giftPremiumBottomSheet$GiftTier, long j, Runnable runnable) {
         super(context, null, true, false, false, false, BottomSheetWithRecyclerListView.ActionBarType.SLIDING, null);
+        String str;
         ChatActionCell chatActionCell;
-        boolean z;
         CharSequence formatString;
         this.upgrade = false;
         this.animationsLock = new AnimationNotificationsLocker();
         ColoredImageSpan[] coloredImageSpanArr = new ColoredImageSpan[1];
         this.cachedStarSpan = coloredImageSpanArr;
-        boolean z2 = j == UserConfig.getInstance(i).getClientUserId();
-        this.self = z2;
+        boolean z = j == UserConfig.getInstance(i).getClientUserId();
+        this.self = z;
         setImageReceiverNumLevel(0, 4);
         fixNavigationBar();
         this.headerPaddingTop = AndroidUtilities.dp(4.0f);
         this.headerPaddingBottom = AndroidUtilities.dp(-10.0f);
-        if (z2) {
+        if (z) {
             this.anonymous = true;
         }
         this.currentAccount = i;
@@ -125,7 +125,13 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
         this.premiumTier = giftPremiumBottomSheet$GiftTier;
         this.closeParentSheet = runnable;
         this.topPadding = 0.2f;
-        this.name = UserObject.getForcedFirstName(MessagesController.getInstance(i).getUser(Long.valueOf(j)));
+        if (j >= 0) {
+            str = UserObject.getForcedFirstName(MessagesController.getInstance(i).getUser(Long.valueOf(j)));
+        } else {
+            TLRPC.Chat chat = MessagesController.getInstance(i).getChat(Long.valueOf(-j));
+            str = chat == null ? "" : chat.title;
+        }
+        this.name = str;
         ChatActionCell chatActionCell2 = new ChatActionCell(context, false, this.resourcesProvider);
         this.actionCell = chatActionCell2;
         chatActionCell2.setDelegate(new ChatActionCell.ChatActionCellDelegate() {
@@ -150,18 +156,18 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
             }
 
             @Override
-            public void didOpenPremiumGift(ChatActionCell chatActionCell3, TLRPC.TL_premiumGiftOption tL_premiumGiftOption, String str, boolean z3) {
-                ChatActionCell.ChatActionCellDelegate.CC.$default$didOpenPremiumGift(this, chatActionCell3, tL_premiumGiftOption, str, z3);
+            public void didOpenPremiumGift(ChatActionCell chatActionCell3, TLRPC.TL_premiumGiftOption tL_premiumGiftOption, String str2, boolean z2) {
+                ChatActionCell.ChatActionCellDelegate.CC.$default$didOpenPremiumGift(this, chatActionCell3, tL_premiumGiftOption, str2, z2);
             }
 
             @Override
-            public void didOpenPremiumGiftChannel(ChatActionCell chatActionCell3, String str, boolean z3) {
-                ChatActionCell.ChatActionCellDelegate.CC.$default$didOpenPremiumGiftChannel(this, chatActionCell3, str, z3);
+            public void didOpenPremiumGiftChannel(ChatActionCell chatActionCell3, String str2, boolean z2) {
+                ChatActionCell.ChatActionCellDelegate.CC.$default$didOpenPremiumGiftChannel(this, chatActionCell3, str2, z2);
             }
 
             @Override
-            public void didPressReaction(ChatActionCell chatActionCell3, TLRPC.ReactionCount reactionCount, boolean z3, float f, float f2) {
-                ChatActionCell.ChatActionCellDelegate.CC.$default$didPressReaction(this, chatActionCell3, reactionCount, z3, f, f2);
+            public void didPressReaction(ChatActionCell chatActionCell3, TLRPC.ReactionCount reactionCount, boolean z2, float f, float f2) {
+                ChatActionCell.ChatActionCellDelegate.CC.$default$didPressReaction(this, chatActionCell3, reactionCount, z2, f, f2);
             }
 
             @Override
@@ -170,8 +176,8 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
             }
 
             @Override
-            public void forceUpdate(ChatActionCell chatActionCell3, boolean z3) {
-                ChatActionCell.ChatActionCellDelegate.CC.$default$forceUpdate(this, chatActionCell3, z3);
+            public void forceUpdate(ChatActionCell chatActionCell3, boolean z2) {
+                ChatActionCell.ChatActionCellDelegate.CC.$default$forceUpdate(this, chatActionCell3, z2);
             }
 
             @Override
@@ -218,8 +224,8 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
             }
 
             @Override
-            public void onLayout(boolean z3, int i2, int i3, int i4, int i5) {
-                super.onLayout(z3, i2, i3, i4, i5);
+            public void onLayout(boolean z2, int i2, int i3, int i4, int i5) {
+                super.onLayout(z2, i2, i3, i4, i5);
                 SendGiftSheet.this.actionCell.setTranslationY((((i5 - i3) - SendGiftSheet.this.actionCell.getMeasuredHeight()) / 2.0f) - AndroidUtilities.dp(8.0f));
                 SendGiftSheet.this.actionCell.setVisiblePart(SendGiftSheet.this.actionCell.getY(), getBackgroundSizeY());
             }
@@ -301,10 +307,10 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
         TLRPC.MessageAction messageAction = this.action;
         if (messageAction instanceof TLRPC.TL_messageActionStarGift) {
             TLRPC.TL_messageActionStarGift tL_messageActionStarGift2 = (TLRPC.TL_messageActionStarGift) messageAction;
-            boolean z3 = this.upgrade;
-            tL_messageActionStarGift2.can_upgrade = z3 || (z2 && starGift != null && starGift.can_upgrade);
-            tL_messageActionStarGift2.upgrade_stars = (!z2 && z3) ? starGift.upgrade_stars : 0L;
-            tL_messageActionStarGift2.convert_stars = z3 ? 0L : starGift.convert_stars;
+            boolean z2 = this.upgrade;
+            tL_messageActionStarGift2.can_upgrade = z2 || (z && starGift != null && starGift.can_upgrade);
+            tL_messageActionStarGift2.upgrade_stars = (!z && z2) ? starGift.upgrade_stars : 0L;
+            tL_messageActionStarGift2.convert_stars = z2 ? 0L : starGift.convert_stars;
         }
         TLRPC.TL_messageService tL_messageService = new TLRPC.TL_messageService();
         tL_messageService.id = 1;
@@ -317,10 +323,10 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
         ChatActionCell chatActionCell3 = chatActionCell;
         chatActionCell3.setMessageObject(messageObject, true);
         sizeNotifierFrameLayout.addView(chatActionCell3, LayoutHelper.createFrame(-1, -1.0f, 119, 0.0f, 8.0f, 0.0f, 8.0f));
-        boolean z4 = z2;
+        boolean z3 = z;
         EditEmojiTextCell editEmojiTextCell = new EditEmojiTextCell(context, (SizeNotifierFrameLayout) this.containerView, LocaleController.getString(starGift != null ? R.string.Gift2Message : R.string.Gift2MessageOptional), true, MessagesController.getInstance(i).stargiftsMessageLengthMax, 4, this.resourcesProvider) {
             @Override
-            protected void onFocusChanged(boolean z5) {
+            protected void onFocusChanged(boolean z4) {
             }
 
             @Override
@@ -467,7 +473,6 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
         ButtonWithCounterView buttonWithCounterView = new ButtonWithCounterView(context, this.resourcesProvider);
         this.button = buttonWithCounterView;
         if (starGift == null) {
-            z = false;
             formatString = giftPremiumBottomSheet$GiftTier != null ? LocaleController.formatString(R.string.Gift2SendPremium, giftPremiumBottomSheet$GiftTier.getFormattedPrice()) : formatString;
             linearLayout.addView(buttonWithCounterView, LayoutHelper.createLinear(-1, 48, 119, 10, 10, 10, 10));
             buttonWithCounterView.setOnClickListener(new View.OnClickListener() {
@@ -489,9 +494,8 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
             });
             this.actionBar.setTitle(getTitle());
         }
-        formatString = StarsIntroActivity.replaceStars(LocaleController.formatPluralStringComma(z4 ? "Gift2SendSelf" : "Gift2Send", (int) (starGift.stars + (this.upgrade ? starGift.upgrade_stars : 0L))), coloredImageSpanArr);
-        z = false;
-        buttonWithCounterView.setText(formatString, z);
+        formatString = StarsIntroActivity.replaceStars(LocaleController.formatPluralStringComma(z3 ? "Gift2SendSelf" : "Gift2Send", (int) (starGift.stars + (this.upgrade ? starGift.upgrade_stars : 0L))), coloredImageSpanArr);
+        buttonWithCounterView.setText(formatString, false);
         linearLayout.addView(buttonWithCounterView, LayoutHelper.createLinear(-1, 48, 119, 10, 10, 10, 10));
         buttonWithCounterView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -568,7 +572,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
                     }
                 }
                 Browser.openUrl(launchActivity, this.premiumTier.giftOption.bot_url);
-                dismiss();
+                lambda$new$0();
                 return;
             }
             return;
@@ -641,7 +645,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
         if (runnable != null) {
             runnable.run();
         }
-        dismiss();
+        lambda$new$0();
         NotificationCenter.getInstance(UserConfig.selectedAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.giftsToUserSent, new Object[0]);
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
@@ -690,10 +694,10 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
                 runnable.run();
             }
             AndroidUtilities.hideKeyboard(this.messageEdit);
-            dismiss();
+            lambda$new$0();
         } else if ("STARGIFT_USAGE_LIMITED".equalsIgnoreCase(str)) {
             AndroidUtilities.hideKeyboard(this.messageEdit);
-            dismiss();
+            lambda$new$0();
             StarsController.getInstance(this.currentAccount).makeStarGiftSoldOut(this.starGift);
             return;
         }
@@ -784,7 +788,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
                     }
                 } else if (baseFragment instanceof ProfileActivity) {
                     if (z && parentLayout.getLastFragment() == baseFragment) {
-                        baseFragment.lambda$onBackPressed$321();
+                        baseFragment.lambda$onBackPressed$323();
                     }
                     baseFragment.removeSelfFromStack();
                 }
@@ -795,7 +799,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
                 parentLayout.presentFragment(new ChatActivity(bundle), true);
             }
         }
-        dismiss();
+        lambda$new$0();
     }
 
     @Override
@@ -812,7 +816,7 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
     }
 
     @Override
-    public void dismiss() {
+    public void lambda$new$0() {
         if (this.messageEdit.editTextEmoji.getEmojiPadding() > 0) {
             this.messageEdit.editTextEmoji.hidePopup(true);
             return;
@@ -825,12 +829,15 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
         if (editEmojiTextCell != null) {
             editEmojiTextCell.editTextEmoji.onPause();
         }
-        super.dismiss();
+        super.lambda$new$0();
     }
 
     public void fillItems(ArrayList arrayList, UniversalAdapter universalAdapter) {
         UItem asShadow;
         UItem asShadow2;
+        String formatString;
+        int i;
+        String formatString2;
         arrayList.add(UItem.asCustom(-1, this.chatView));
         arrayList.add(UItem.asCustom(-2, this.messageEdit));
         TL_stars.StarGift starGift = this.starGift;
@@ -840,7 +847,12 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
             } else {
                 arrayList.add(UItem.asShadow(-3, null));
                 arrayList.add(UItem.asCheck(2, StarsIntroActivity.replaceStarsWithPlain(LocaleController.formatString(this.self ? R.string.Gift2UpgradeSelf : R.string.Gift2Upgrade, Integer.valueOf((int) this.starGift.upgrade_stars)), 0.78f)).setChecked(this.upgrade));
-                asShadow2 = UItem.asShadow(-5, AndroidUtilities.replaceArrows(AndroidUtilities.replaceSingleTag(this.self ? LocaleController.getString(R.string.Gift2UpgradeSelfInfo) : LocaleController.formatString(R.string.Gift2UpgradeInfo, this.name), new Runnable() {
+                if (this.self) {
+                    formatString2 = LocaleController.getString(R.string.Gift2UpgradeSelfInfo);
+                } else {
+                    formatString2 = LocaleController.formatString(this.dialogId >= 0 ? R.string.Gift2UpgradeInfo : R.string.Gift2UpgradeChannelInfo, this.name);
+                }
+                asShadow2 = UItem.asShadow(-5, AndroidUtilities.replaceArrows(AndroidUtilities.replaceSingleTag(formatString2, new Runnable() {
                     @Override
                     public final void run() {
                         SendGiftSheet.this.lambda$fillItems$11();
@@ -849,7 +861,16 @@ public class SendGiftSheet extends BottomSheetWithRecyclerListView {
             }
             arrayList.add(asShadow2);
             arrayList.add(UItem.asCheck(1, LocaleController.getString(this.self ? R.string.Gift2HideSelf : R.string.Gift2Hide)).setChecked(this.anonymous));
-            asShadow = UItem.asShadow(-6, this.self ? LocaleController.getString(R.string.Gift2HideSelfInfo) : LocaleController.formatString(R.string.Gift2HideInfo, this.name));
+            if (this.self) {
+                i = R.string.Gift2HideSelfInfo;
+            } else if (this.dialogId < 0) {
+                i = R.string.Gift2HideChannelInfo;
+            } else {
+                formatString = LocaleController.formatString(R.string.Gift2HideInfo, this.name);
+                asShadow = UItem.asShadow(-6, formatString);
+            }
+            formatString = LocaleController.getString(i);
+            asShadow = UItem.asShadow(-6, formatString);
         } else {
             asShadow = UItem.asShadow(-3, LocaleController.formatString(R.string.Gift2MessagePremiumInfo, this.name));
         }

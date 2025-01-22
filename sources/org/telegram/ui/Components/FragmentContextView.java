@@ -61,6 +61,7 @@ import org.telegram.tgnet.tl.TL_phone;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuSlider;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
@@ -989,7 +990,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         }
     }
 
-    public void lambda$checkCreateView$5(DialogInterface dialogInterface, int i) {
+    public void lambda$checkCreateView$5(AlertDialog alertDialog, int i) {
         BaseFragment baseFragment = this.fragment;
         if (!(baseFragment instanceof DialogsActivity)) {
             LocationController.getInstance(baseFragment.getCurrentAccount()).removeSharingLocation(this.chatActivity.getDialogId());

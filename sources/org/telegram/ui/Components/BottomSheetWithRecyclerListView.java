@@ -99,7 +99,7 @@ public abstract class BottomSheetWithRecyclerListView extends BottomSheet {
                 @Override
                 public boolean dispatchTouchEvent(MotionEvent motionEvent) {
                     if (motionEvent.getAction() == 0 && motionEvent.getY() < ((BottomSheet) BottomSheetWithRecyclerListView.this).shadowDrawable.getBounds().top) {
-                        BottomSheetWithRecyclerListView.this.dismiss();
+                        BottomSheetWithRecyclerListView.this.lambda$new$0();
                     }
                     return super.dispatchTouchEvent(motionEvent);
                 }
@@ -189,7 +189,7 @@ public abstract class BottomSheetWithRecyclerListView extends BottomSheet {
                 @Override
                 public boolean dispatchTouchEvent(MotionEvent motionEvent) {
                     if (motionEvent.getAction() == 0 && motionEvent.getY() < ((BottomSheet) BottomSheetWithRecyclerListView.this).shadowDrawable.getBounds().top) {
-                        BottomSheetWithRecyclerListView.this.dismiss();
+                        BottomSheetWithRecyclerListView.this.lambda$new$0();
                     }
                     return super.dispatchTouchEvent(motionEvent);
                 }
@@ -296,7 +296,7 @@ public abstract class BottomSheetWithRecyclerListView extends BottomSheet {
                 @Override
                 public void onItemClick(int i) {
                     if (i == -1) {
-                        BottomSheetWithRecyclerListView.this.dismiss();
+                        BottomSheetWithRecyclerListView.this.lambda$new$0();
                     }
                 }
             });

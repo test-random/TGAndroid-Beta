@@ -1,7 +1,6 @@
 package org.telegram.ui;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -584,7 +583,7 @@ public class DataUsage2Activity extends BaseFragment {
             return (i2 == 1 || i2 == 2 || i2 == 3) ? StatsController.getInstance(((BaseFragment) DataUsage2Activity.this).currentAccount).getSentItemsCount(this.currentType - 1, i) : StatsController.getInstance(((BaseFragment) DataUsage2Activity.this).currentAccount).getSentItemsCount(0, i) + StatsController.getInstance(((BaseFragment) DataUsage2Activity.this).currentAccount).getSentItemsCount(1, i) + StatsController.getInstance(((BaseFragment) DataUsage2Activity.this).currentAccount).getSentItemsCount(2, i);
         }
 
-        public void lambda$new$0(DialogInterface dialogInterface, int i) {
+        public void lambda$new$0(AlertDialog alertDialog, int i) {
             this.removedSegments.clear();
             int i2 = 0;
             while (true) {
@@ -629,10 +628,10 @@ public class DataUsage2Activity extends BaseFragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(DataUsage2Activity.this.getParentActivity());
                 builder.setTitle(LocaleController.getString(R.string.ResetStatisticsAlertTitle));
                 builder.setMessage(LocaleController.getString(R.string.ResetStatisticsAlert));
-                builder.setPositiveButton(LocaleController.getString(R.string.Reset), new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(LocaleController.getString(R.string.Reset), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i3) {
-                        DataUsage2Activity.ListView.this.lambda$new$0(dialogInterface, i3);
+                    public final void onClick(AlertDialog alertDialog, int i3) {
+                        DataUsage2Activity.ListView.this.lambda$new$0(alertDialog, i3);
                     }
                 });
                 builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -989,7 +988,7 @@ public class DataUsage2Activity extends BaseFragment {
             @Override
             public void onItemClick(int i3) {
                 if (i3 == -1) {
-                    DataUsage2Activity.this.lambda$onBackPressed$321();
+                    DataUsage2Activity.this.lambda$onBackPressed$323();
                 }
             }
         });

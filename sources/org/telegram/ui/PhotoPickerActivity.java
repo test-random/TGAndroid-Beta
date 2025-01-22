@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Outline;
@@ -163,12 +162,12 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         @Override
         public boolean cancelButtonPressed() {
             PhotoPickerActivity.this.delegate.actionButtonPressed(true, true, 0);
-            PhotoPickerActivity.this.lambda$onBackPressed$321();
+            PhotoPickerActivity.this.lambda$onBackPressed$323();
             return true;
         }
 
         @Override
-        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
+        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z, boolean z2) {
             PhotoAttachPhotoCell cellForIndex = PhotoPickerActivity.this.getCellForIndex(i);
             if (cellForIndex == null) {
                 return null;
@@ -401,12 +400,12 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         @Override
         public boolean cancelButtonPressed() {
             PhotoPickerActivity.this.delegate.actionButtonPressed(true, true, 0);
-            PhotoPickerActivity.this.lambda$onBackPressed$321();
+            PhotoPickerActivity.this.lambda$onBackPressed$323();
             return true;
         }
 
         @Override
-        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
+        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z, boolean z2) {
             PhotoAttachPhotoCell cellForIndex = PhotoPickerActivity.this.getCellForIndex(i);
             if (cellForIndex == null) {
                 return null;
@@ -793,7 +792,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                     PhotoPickerActivity.this.delegate.onOpenInPressed();
                 }
             }
-            PhotoPickerActivity.this.lambda$onBackPressed$321();
+            PhotoPickerActivity.this.lambda$onBackPressed$323();
         }
     }
 
@@ -830,7 +829,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
 
         @Override
         public boolean canCollapseSearch() {
-            PhotoPickerActivity.this.lambda$onBackPressed$321();
+            PhotoPickerActivity.this.lambda$onBackPressed$323();
             return false;
         }
 
@@ -1337,7 +1336,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         return null;
     }
 
-    public void lambda$createView$0(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$0(AlertDialog alertDialog, int i) {
         PhotoPickerActivitySearchDelegate photoPickerActivitySearchDelegate = this.searchDelegate;
         if (photoPickerActivitySearchDelegate != null) {
             photoPickerActivitySearchDelegate.shouldClearRecentSearch();
@@ -1384,10 +1383,10 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString(R.string.ClearSearchAlertTitle));
             builder.setMessage(LocaleController.getString(R.string.ClearSearchAlert));
-            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i4) {
-                    PhotoPickerActivity.this.lambda$createView$0(dialogInterface, i4);
+                public final void onClick(AlertDialog alertDialog, int i4) {
+                    PhotoPickerActivity.this.lambda$createView$0(alertDialog, i4);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1793,7 +1792,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         if (this.selectPhotoType != PhotoAlbumPickerActivity.SELECT_TYPE_WALLPAPER) {
             PhotoPickerActivityDelegate photoPickerActivityDelegate = this.delegate;
             if (photoPickerActivityDelegate == null || photoPickerActivityDelegate.canFinishFragment()) {
-                lambda$onBackPressed$321();
+                lambda$onBackPressed$323();
             }
         }
     }
@@ -2004,7 +2003,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                         PhotoPickerActivity.this.delegate.onOpenInPressed();
                     }
                 }
-                PhotoPickerActivity.this.lambda$onBackPressed$321();
+                PhotoPickerActivity.this.lambda$onBackPressed$323();
             }
         });
         if (this.isDocumentsPicker) {

@@ -94,7 +94,7 @@ public class QuickRepliesActivity extends BaseFragment implements NotificationCe
             QuickRepliesController.getInstance(((BaseFragment) QuickRepliesActivity.this).currentAccount).renameReply(i, str);
         }
 
-        public void lambda$onItemClick$1(DialogInterface dialogInterface, int i) {
+        public void lambda$onItemClick$1(AlertDialog alertDialog, int i) {
             QuickRepliesController.getInstance(((BaseFragment) QuickRepliesActivity.this).currentAccount).deleteReplies(QuickRepliesActivity.this.selected);
             QuickRepliesActivity.this.clearSelection();
         }
@@ -103,7 +103,7 @@ public class QuickRepliesActivity extends BaseFragment implements NotificationCe
         public void onItemClick(int i) {
             if (i == -1) {
                 if (QuickRepliesActivity.this.selected.isEmpty()) {
-                    QuickRepliesActivity.this.lambda$onBackPressed$321();
+                    QuickRepliesActivity.this.lambda$onBackPressed$323();
                     return;
                 } else {
                     QuickRepliesActivity.this.clearSelection();
@@ -113,10 +113,10 @@ public class QuickRepliesActivity extends BaseFragment implements NotificationCe
             if (i != 1) {
                 if (i == 2) {
                     QuickRepliesActivity quickRepliesActivity = QuickRepliesActivity.this;
-                    quickRepliesActivity.showDialog(new AlertDialog.Builder(quickRepliesActivity.getContext(), QuickRepliesActivity.this.getResourceProvider()).setTitle(LocaleController.formatPluralString("BusinessRepliesDeleteTitle", QuickRepliesActivity.this.selected.size(), new Object[0])).setMessage(LocaleController.formatPluralString("BusinessRepliesDeleteMessage", QuickRepliesActivity.this.selected.size(), new Object[0])).setPositiveButton(LocaleController.getString(R.string.Remove), new DialogInterface.OnClickListener() {
+                    quickRepliesActivity.showDialog(new AlertDialog.Builder(quickRepliesActivity.getContext(), QuickRepliesActivity.this.getResourceProvider()).setTitle(LocaleController.formatPluralString("BusinessRepliesDeleteTitle", QuickRepliesActivity.this.selected.size(), new Object[0])).setMessage(LocaleController.formatPluralString("BusinessRepliesDeleteMessage", QuickRepliesActivity.this.selected.size(), new Object[0])).setPositiveButton(LocaleController.getString(R.string.Remove), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i2) {
-                            QuickRepliesActivity.AnonymousClass1.this.lambda$onItemClick$1(dialogInterface, i2);
+                        public final void onClick(AlertDialog alertDialog, int i2) {
+                            QuickRepliesActivity.AnonymousClass1.this.lambda$onItemClick$1(alertDialog, i2);
                         }
                     }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).create());
                     return;
@@ -610,7 +610,7 @@ public class QuickRepliesActivity extends BaseFragment implements NotificationCe
         callback.run(Boolean.FALSE);
     }
 
-    public static void lambda$openRenameReplyAlert$6(EditTextBoldCursor editTextBoldCursor, Utilities.Callback callback, int i, QuickRepliesController.QuickReply quickReply, TextView textView, Utilities.Callback callback2, DialogInterface dialogInterface, int i2) {
+    public static void lambda$openRenameReplyAlert$6(EditTextBoldCursor editTextBoldCursor, Utilities.Callback callback, int i, QuickRepliesController.QuickReply quickReply, TextView textView, Utilities.Callback callback2, AlertDialog alertDialog, int i2) {
         Boolean bool;
         String obj = editTextBoldCursor.getText().toString();
         if (obj.length() <= 0 || obj.length() > 32) {
@@ -621,7 +621,7 @@ public class QuickRepliesActivity extends BaseFragment implements NotificationCe
                 if (callback2 != null) {
                     callback2.run(obj);
                 }
-                dialogInterface.dismiss();
+                alertDialog.dismiss();
                 return;
             } else {
                 AndroidUtilities.shakeView(editTextBoldCursor);
@@ -846,16 +846,16 @@ public class QuickRepliesActivity extends BaseFragment implements NotificationCe
                 return true;
             }
         });
-        builder.setPositiveButton(LocaleController.getString(R.string.Done), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Done), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                QuickRepliesActivity.lambda$openRenameReplyAlert$6(EditTextBoldCursor.this, callback2, i, quickReply, textView2, callback, dialogInterface, i3);
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                QuickRepliesActivity.lambda$openRenameReplyAlert$6(EditTextBoldCursor.this, callback2, i, quickReply, textView2, callback, alertDialog, i3);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                dialogInterface.dismiss();
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                alertDialog.dismiss();
             }
         });
         if (z2) {

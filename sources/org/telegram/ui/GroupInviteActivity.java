@@ -3,7 +3,6 @@ package org.telegram.ui;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -166,7 +165,7 @@ public class GroupInviteActivity extends BaseFragment implements NotificationCen
         }
     }
 
-    public void lambda$createView$0(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$0(AlertDialog alertDialog, int i) {
         generateLink(true);
     }
 
@@ -187,10 +186,10 @@ public class GroupInviteActivity extends BaseFragment implements NotificationCen
                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                         builder.setMessage(LocaleController.getString(R.string.RevokeAlert));
                         builder.setTitle(LocaleController.getString(R.string.RevokeLink));
-                        builder.setPositiveButton(LocaleController.getString(R.string.RevokeButton), new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton(LocaleController.getString(R.string.RevokeButton), new AlertDialog.OnButtonClickListener() {
                             @Override
-                            public final void onClick(DialogInterface dialogInterface, int i2) {
-                                GroupInviteActivity.this.lambda$createView$0(dialogInterface, i2);
+                            public final void onClick(AlertDialog alertDialog, int i2) {
+                                GroupInviteActivity.this.lambda$createView$0(alertDialog, i2);
                             }
                         });
                         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -248,7 +247,7 @@ public class GroupInviteActivity extends BaseFragment implements NotificationCen
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    GroupInviteActivity.this.lambda$onBackPressed$321();
+                    GroupInviteActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

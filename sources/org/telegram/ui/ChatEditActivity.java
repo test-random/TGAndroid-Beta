@@ -190,8 +190,8 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
         }
 
         @Override
-        public org.telegram.ui.PhotoViewer.PlaceProviderObject getPlaceForPhoto(org.telegram.messenger.MessageObject r7, org.telegram.tgnet.TLRPC.FileLocation r8, int r9, boolean r10) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatEditActivity.AnonymousClass1.getPlaceForPhoto(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, int, boolean):org.telegram.ui.PhotoViewer$PlaceProviderObject");
+        public org.telegram.ui.PhotoViewer.PlaceProviderObject getPlaceForPhoto(org.telegram.messenger.MessageObject r6, org.telegram.tgnet.TLRPC.FileLocation r7, int r8, boolean r9, boolean r10) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatEditActivity.AnonymousClass1.getPlaceForPhoto(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, int, boolean, boolean):org.telegram.ui.PhotoViewer$PlaceProviderObject");
         }
 
         @Override
@@ -272,15 +272,15 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
             if ((editTextEmoji2 == null || this.currentUser.first_name.equals(editTextEmoji2.getText().toString())) && ((editTextBoldCursor2 = this.descriptionTextView) == null || str4.equals(editTextBoldCursor2.getText().toString()))) {
                 return true;
             }
-            builder = new AlertDialog.Builder(getParentActivity()).setTitle(LocaleController.getString("UserRestrictionsApplyChanges", R.string.UserRestrictionsApplyChanges)).setMessage(LocaleController.getString(R.string.BotSettingsChangedAlert)).setPositiveButton(LocaleController.getString("ApplyTheme", R.string.ApplyTheme), new DialogInterface.OnClickListener() {
+            builder = new AlertDialog.Builder(getParentActivity()).setTitle(LocaleController.getString("UserRestrictionsApplyChanges", R.string.UserRestrictionsApplyChanges)).setMessage(LocaleController.getString(R.string.BotSettingsChangedAlert)).setPositiveButton(LocaleController.getString("ApplyTheme", R.string.ApplyTheme), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    ChatEditActivity.this.lambda$checkDiscard$42(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    ChatEditActivity.this.lambda$checkDiscard$42(alertDialog, i2);
                 }
-            }).setNegativeButton(LocaleController.getString("PassportDiscard", R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+            }).setNegativeButton(LocaleController.getString("PassportDiscard", R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    ChatEditActivity.this.lambda$checkDiscard$43(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    ChatEditActivity.this.lambda$checkDiscard$43(alertDialog, i2);
                 }
             });
         } else {
@@ -301,16 +301,16 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
                 str = "GroupSettingsChangedAlert";
             }
             builder.setMessage(LocaleController.getString(str, i));
-            builder.setPositiveButton(LocaleController.getString("ApplyTheme", R.string.ApplyTheme), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString("ApplyTheme", R.string.ApplyTheme), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    ChatEditActivity.this.lambda$checkDiscard$44(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    ChatEditActivity.this.lambda$checkDiscard$44(alertDialog, i2);
                 }
             });
-            builder.setNegativeButton(LocaleController.getString("PassportDiscard", R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(LocaleController.getString("PassportDiscard", R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    ChatEditActivity.this.lambda$checkDiscard$45(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    ChatEditActivity.this.lambda$checkDiscard$45(alertDialog, i2);
                 }
             });
         }
@@ -349,20 +349,20 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
         return i;
     }
 
-    public void lambda$checkDiscard$42(DialogInterface dialogInterface, int i) {
+    public void lambda$checkDiscard$42(AlertDialog alertDialog, int i) {
         processDone();
     }
 
-    public void lambda$checkDiscard$43(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$checkDiscard$43(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
-    public void lambda$checkDiscard$44(DialogInterface dialogInterface, int i) {
+    public void lambda$checkDiscard$44(AlertDialog alertDialog, int i) {
         processDone();
     }
 
-    public void lambda$checkDiscard$45(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$checkDiscard$45(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$10(TLRPC.MessageMedia messageMedia, int i, boolean z, int i2) {
@@ -655,7 +655,7 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
         } else {
             getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.closeChats, new Object[0]);
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
         getNotificationCenter().lambda$postNotificationNameOnUIThread$1(NotificationCenter.needDeleteDialog, Long.valueOf(-this.currentChat.id), null, this.currentChat, Boolean.valueOf(z));
     }
 
@@ -877,7 +877,7 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
 
     public void lambda$processDone$46() {
         this.progressDialog.dismiss();
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$processDone$47(TL_bots.setBotInfo setbotinfo, TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -1050,7 +1050,7 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
                 }
             }
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     private void setAvatar() {
@@ -1282,7 +1282,7 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
     }
 
     @Override
-    public void didStartUpload(boolean z) {
+    public void didStartUpload(boolean z, boolean z2) {
         RadialProgressView radialProgressView = this.avatarProgressView;
         if (radialProgressView == null) {
             return;
@@ -1316,6 +1316,11 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
     @Override
     public boolean dismissDialogOnPause(Dialog dialog) {
         return this.imageUpdater.dismissDialogOnPause(dialog) && super.dismissDialogOnPause(dialog);
+    }
+
+    @Override
+    public PhotoViewer.PlaceProviderObject getCloseIntoObject() {
+        return ImageUpdater.ImageUpdaterDelegate.CC.$default$getCloseIntoObject(this);
     }
 
     @Override
@@ -1575,6 +1580,11 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
 
     public void showConvertTooltip() {
         this.undoView.showWithAction(0L, 76, (Runnable) null);
+    }
+
+    @Override
+    public boolean supportsBulletin() {
+        return ImageUpdater.ImageUpdaterDelegate.CC.$default$supportsBulletin(this);
     }
 
     public void updateColorCell() {

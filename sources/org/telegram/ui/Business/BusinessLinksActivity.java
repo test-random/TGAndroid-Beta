@@ -240,15 +240,15 @@ public class BusinessLinksActivity extends UniversalFragment implements Notifica
         openRenameAlert(getContext(), this.currentAccount, tL_businessChatLink, this.resourceProvider, false);
     }
 
-    public void lambda$onLongClick$11(TL_account.TL_businessChatLink tL_businessChatLink, DialogInterface dialogInterface, int i) {
+    public void lambda$onLongClick$11(TL_account.TL_businessChatLink tL_businessChatLink, AlertDialog alertDialog, int i) {
         BusinessLinksController.getInstance(this.currentAccount).deleteLinkUndoable(this, tL_businessChatLink.link);
     }
 
     public void lambda$onLongClick$12(final TL_account.TL_businessChatLink tL_businessChatLink) {
-        AlertDialog create = new AlertDialog.Builder(getContext(), getResourceProvider()).setTitle(LocaleController.getString(R.string.BusinessLinksDeleteTitle)).setMessage(LocaleController.getString(R.string.BusinessLinksDeleteMessage)).setPositiveButton(LocaleController.getString(R.string.Remove), new DialogInterface.OnClickListener() {
+        AlertDialog create = new AlertDialog.Builder(getContext(), getResourceProvider()).setTitle(LocaleController.getString(R.string.BusinessLinksDeleteTitle)).setMessage(LocaleController.getString(R.string.BusinessLinksDeleteMessage)).setPositiveButton(LocaleController.getString(R.string.Remove), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                BusinessLinksActivity.this.lambda$onLongClick$11(tL_businessChatLink, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                BusinessLinksActivity.this.lambda$onLongClick$11(tL_businessChatLink, alertDialog, i);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).create();
         showDialog(create);
@@ -294,13 +294,13 @@ public class BusinessLinksActivity extends UniversalFragment implements Notifica
         return true;
     }
 
-    public static void lambda$openRenameAlert$1(EditTextBoldCursor editTextBoldCursor, int i, TL_account.TL_businessChatLink tL_businessChatLink, DialogInterface dialogInterface, int i2) {
+    public static void lambda$openRenameAlert$1(EditTextBoldCursor editTextBoldCursor, int i, TL_account.TL_businessChatLink tL_businessChatLink, AlertDialog alertDialog, int i2) {
         String obj = editTextBoldCursor.getText().toString();
         if (obj.length() > 32) {
             AndroidUtilities.shakeView(editTextBoldCursor);
         } else {
             BusinessLinksController.getInstance(i).editLinkTitle(tL_businessChatLink.link, obj);
-            dialogInterface.dismiss();
+            alertDialog.dismiss();
         }
     }
 
@@ -421,16 +421,16 @@ public class BusinessLinksActivity extends UniversalFragment implements Notifica
                 return lambda$openRenameAlert$0;
             }
         });
-        builder.setPositiveButton(LocaleController.getString(R.string.Done), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Done), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                BusinessLinksActivity.lambda$openRenameAlert$1(EditTextBoldCursor.this, i, tL_businessChatLink, dialogInterface, i3);
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                BusinessLinksActivity.lambda$openRenameAlert$1(EditTextBoldCursor.this, i, tL_businessChatLink, alertDialog, i3);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                dialogInterface.dismiss();
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                alertDialog.dismiss();
             }
         });
         if (z2) {

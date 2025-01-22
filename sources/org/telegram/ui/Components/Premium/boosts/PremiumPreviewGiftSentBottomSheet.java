@@ -172,7 +172,7 @@ public class PremiumPreviewGiftSentBottomSheet extends PremiumPreviewBottomSheet
     }
 
     public void lambda$init$0(View view) {
-        dismiss();
+        lambda$new$0();
     }
 
     public static void show(List list) {

@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -189,7 +188,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             }
             BaseFragment baseFragment = (BaseFragment) ((BaseFragment) ChatUsersActivity.this).parentLayout.getFragmentStack().get(((BaseFragment) ChatUsersActivity.this).parentLayout.getFragmentStack().size() - 2);
             if (!(baseFragment instanceof ChatEditActivity)) {
-                ChatUsersActivity.this.lambda$onBackPressed$321();
+                ChatUsersActivity.this.lambda$onBackPressed$323();
                 return;
             }
             baseFragment.removeSelfFromStack();
@@ -198,7 +197,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             ChatEditActivity chatEditActivity = new ChatEditActivity(bundle);
             chatEditActivity.setInfo(ChatUsersActivity.this.info);
             ((BaseFragment) ChatUsersActivity.this).parentLayout.addFragmentToStack(chatEditActivity, ((BaseFragment) ChatUsersActivity.this).parentLayout.getFragmentStack().size() - 1);
-            ChatUsersActivity.this.lambda$onBackPressed$321();
+            ChatUsersActivity.this.lambda$onBackPressed$323();
             chatEditActivity.showConvertTooltip();
         }
 
@@ -1147,16 +1146,16 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             str = "GroupSettingsChangedAlert";
         }
         builder.setMessage(LocaleController.getString(str, i));
-        builder.setPositiveButton(LocaleController.getString("ApplyTheme", R.string.ApplyTheme), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString("ApplyTheme", R.string.ApplyTheme), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                ChatUsersActivity.this.lambda$checkDiscard$23(dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                ChatUsersActivity.this.lambda$checkDiscard$23(alertDialog, i2);
             }
         });
-        builder.setNegativeButton(LocaleController.getString("PassportDiscard", R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString("PassportDiscard", R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                ChatUsersActivity.this.lambda$checkDiscard$24(dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                ChatUsersActivity.this.lambda$checkDiscard$24(alertDialog, i2);
             }
         });
         showDialog(builder.create());
@@ -1319,28 +1318,28 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
         return false;
     }
 
-    public void lambda$checkDiscard$23(DialogInterface dialogInterface, int i) {
+    public void lambda$checkDiscard$23(AlertDialog alertDialog, int i) {
         processDone();
     }
 
-    public void lambda$checkDiscard$24(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$checkDiscard$24(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public static void lambda$createMenuForParticipant$10(Utilities.Callback callback) {
         callback.run(0);
     }
 
-    public static void lambda$createMenuForParticipant$11(Utilities.Callback callback, DialogInterface dialogInterface, int i) {
+    public static void lambda$createMenuForParticipant$11(Utilities.Callback callback, AlertDialog alertDialog, int i) {
         callback.run(1);
     }
 
     public void lambda$createMenuForParticipant$12(TLObject tLObject, TLRPC.User user, final Utilities.Callback callback) {
         if ((tLObject instanceof TLRPC.TL_channelParticipantAdmin) || (tLObject instanceof TLRPC.TL_chatParticipantAdmin)) {
-            showDialog(new AlertDialog.Builder(getParentActivity()).setTitle(LocaleController.getString("AppName", R.string.AppName)).setMessage(LocaleController.formatString("AdminWillBeRemoved", R.string.AdminWillBeRemoved, UserObject.getUserName(user))).setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
+            showDialog(new AlertDialog.Builder(getParentActivity()).setTitle(LocaleController.getString("AppName", R.string.AppName)).setMessage(LocaleController.formatString("AdminWillBeRemoved", R.string.AdminWillBeRemoved, UserObject.getUserName(user))).setPositiveButton(LocaleController.getString("OK", R.string.OK), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    ChatUsersActivity.lambda$createMenuForParticipant$11(Utilities.Callback.this, dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    ChatUsersActivity.lambda$createMenuForParticipant$11(Utilities.Callback.this, alertDialog, i);
                 }
             }).setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null).create());
         } else {
@@ -1471,7 +1470,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
         this.hideMembersToggleLoading = false;
     }
 
-    public void lambda$createView$4(TLRPC.User user, TLObject tLObject, TLRPC.TL_chatAdminRights tL_chatAdminRights, TLRPC.TL_chatBannedRights tL_chatBannedRights, String str, boolean z, DialogInterface dialogInterface, int i) {
+    public void lambda$createView$4(TLRPC.User user, TLObject tLObject, TLRPC.TL_chatAdminRights tL_chatAdminRights, TLRPC.TL_chatBannedRights tL_chatBannedRights, String str, boolean z, AlertDialog alertDialog, int i) {
         openRightsEdit(user.id, tLObject, tL_chatAdminRights, tL_chatBannedRights, str, z, this.selectType == 1 ? 0 : 1, false);
     }
 
@@ -2149,7 +2148,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             if (chatUsersActivityDelegate != null) {
                 chatUsersActivityDelegate.didKickParticipant(j);
             }
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         }
     }
 
@@ -2346,7 +2345,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     removeSelfFromStack();
                     return;
                 } else {
-                    lambda$onBackPressed$321();
+                    lambda$onBackPressed$323();
                     return;
                 }
             }

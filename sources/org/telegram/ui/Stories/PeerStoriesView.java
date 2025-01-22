@@ -3168,16 +3168,16 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
             AlertDialog alertDialog = new AlertDialog(getContext(), 0, this.resourcesProvider);
             alertDialog.setTitle(LocaleController.getString(R.string.StealthModeConfirmTitle));
             alertDialog.setMessage(LocaleController.getString(R.string.StealthModeConfirmMessage));
-            alertDialog.setPositiveButton(LocaleController.getString(R.string.Proceed), new DialogInterface.OnClickListener() {
+            alertDialog.setPositiveButton(LocaleController.getString(R.string.Proceed), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i3) {
+                public final void onClick(AlertDialog alertDialog2, int i3) {
                     runnable.run();
                 }
             });
-            alertDialog.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+            alertDialog.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i3) {
-                    dialogInterface.dismiss();
+                public final void onClick(AlertDialog alertDialog2, int i3) {
+                    alertDialog2.dismiss();
                 }
             });
             alertDialog.show();
@@ -4035,16 +4035,16 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), this.resourcesProvider);
         builder.setTitle(LocaleController.getString(isBotsPreview() ? R.string.DeleteBotPreviewTitle : R.string.DeleteStoryTitle));
         builder.setMessage(LocaleController.getString(isBotsPreview() ? R.string.DeleteBotPreviewSubtitle : R.string.DeleteStorySubtitle));
-        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                PeerStoriesView.this.lambda$deleteStory$35(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                PeerStoriesView.this.lambda$deleteStory$35(alertDialog, i);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
+            public final void onClick(AlertDialog alertDialog, int i) {
+                alertDialog.dismiss();
             }
         });
         AlertDialog create = builder.create();
@@ -4291,7 +4291,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
         this.storyContainer.invalidate();
     }
 
-    public void lambda$checkRecordLocked$48(boolean z, DialogInterface dialogInterface, int i) {
+    public void lambda$checkRecordLocked$48(boolean z, AlertDialog alertDialog, int i) {
         ChatActivityEnterView chatActivityEnterView = this.chatActivityEnterView;
         if (chatActivityEnterView != null) {
             if (z) {
@@ -4417,7 +4417,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
         Browser.openUrl(context, str);
     }
 
-    public void lambda$deleteStory$35(DialogInterface dialogInterface, int i) {
+    public void lambda$deleteStory$35(AlertDialog alertDialog, int i) {
         this.currentStory.cancelOrDelete();
         updateStoryItems();
         if (this.isActive && this.count == 0) {
@@ -4636,7 +4636,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
         this.delegate.setIsHintVisible(false);
     }
 
-    public void lambda$new$9(android.view.View r12) {
+    public void lambda$new$9(android.view.View r13) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stories.PeerStoriesView.lambda$new$9(android.view.View):void");
     }
 
@@ -5089,7 +5089,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
             LaunchActivity.instance.startActivityForResult(Intent.createChooser(intent, LocaleController.getString(R.string.StickersShare)), 500);
             return;
         }
-        ShareAlert shareAlert = new ShareAlert(this.storyViewer.fragment.getContext(), null, null, createLink, null, false, createLink, null, false, false, !DISABLE_STORY_REPOSTING && MessagesController.getInstance(this.currentAccount).storiesEnabled() && (!(this.isChannel || UserObject.isService(this.dialogId)) || ChatObject.isPublic(this.isChannel ? MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(-this.dialogId)) : null)), new WrappedResourceProvider(this.resourcesProvider) {
+        ShareAlert shareAlert = new ShareAlert(this.storyViewer.fragment.getContext(), null, null, createLink, null, false, createLink, null, false, false, !DISABLE_STORY_REPOSTING && MessagesController.getInstance(this.currentAccount).storiesEnabled() && (!(this.isChannel || UserObject.isService(this.dialogId)) || ChatObject.isPublic(this.isChannel ? MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(-this.dialogId)) : null)), null, new WrappedResourceProvider(this.resourcesProvider) {
             @Override
             public void appendColors() {
                 this.sparseIntArray.put(Theme.key_chat_emojiPanelBackground, ColorUtils.blendARGB(-16777216, -1, 0.2f));
@@ -5106,8 +5106,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
             public void onSend(LongSparseArray longSparseArray, int i, TLRPC.TL_forumTopic tL_forumTopic) {
                 Bulletin createSimpleBulletin;
                 super.onSend(longSparseArray, i, tL_forumTopic);
-                PeerStoriesView peerStoriesView = PeerStoriesView.this;
-                BulletinFactory of = BulletinFactory.of(peerStoriesView.storyContainer, peerStoriesView.resourcesProvider);
+                BulletinFactory of = BulletinFactory.of(PeerStoriesView.this.storyContainer, this.resourcesProvider);
                 if (of != null) {
                     if (longSparseArray.size() == 1) {
                         long keyAt = longSparseArray.keyAt(0);
@@ -5644,10 +5643,10 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
             i = R.string.DiscardVoiceMessageDescription;
         }
         builder.setMessage(LocaleController.getString(i));
-        builder.setPositiveButton(LocaleController.getString(R.string.DiscardVoiceMessageAction), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.DiscardVoiceMessageAction), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                PeerStoriesView.this.lambda$checkRecordLocked$48(z, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                PeerStoriesView.this.lambda$checkRecordLocked$48(z, alertDialog, i2);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Continue), null);

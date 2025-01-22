@@ -1,7 +1,6 @@
 package org.telegram.ui.Business;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
@@ -184,12 +183,12 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
         this.listView.smoothScrollToPosition(0);
     }
 
-    public void lambda$onBackPressed$5(DialogInterface dialogInterface, int i) {
+    public void lambda$onBackPressed$5(AlertDialog alertDialog, int i) {
         processDone();
     }
 
-    public void lambda$onBackPressed$6(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$onBackPressed$6(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public Boolean lambda$onClick$2(View view, Object obj, TLRPC.Document document, Boolean bool) {
@@ -214,7 +213,7 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
             if (this.inputSticker != null) {
                 getMessagesController().loadFullUser(getUserConfig().getCurrentUser(), 0, true);
             }
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         }
     }
 
@@ -307,7 +306,7 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
 
     public void setCustomSticker(String str, TLRPC.InputDocument inputDocument) {
         UniversalAdapter universalAdapter;
-        this.chatAttachAlert.dismiss();
+        this.chatAttachAlert.lambda$new$0();
         this.inputStickerPath = str;
         this.inputSticker = inputDocument;
         this.stickerRandom = false;
@@ -521,7 +520,7 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
             public void onItemClick(int i2) {
                 if (i2 == -1) {
                     if (BusinessIntroActivity.this.onBackPressed()) {
-                        BusinessIntroActivity.this.lambda$onBackPressed$321();
+                        BusinessIntroActivity.this.lambda$onBackPressed$323();
                     }
                 } else if (i2 == 1) {
                     BusinessIntroActivity.this.processDone();
@@ -627,16 +626,16 @@ public class BusinessIntroActivity extends UniversalFragment implements Notifica
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.UnsavedChanges));
         builder.setMessage(LocaleController.getString(R.string.BusinessIntroUnsavedChanges));
-        builder.setPositiveButton(LocaleController.getString(R.string.ApplyTheme), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.ApplyTheme), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                BusinessIntroActivity.this.lambda$onBackPressed$5(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                BusinessIntroActivity.this.lambda$onBackPressed$5(alertDialog, i);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                BusinessIntroActivity.this.lambda$onBackPressed$6(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                BusinessIntroActivity.this.lambda$onBackPressed$6(alertDialog, i);
             }
         });
         showDialog(builder.create());

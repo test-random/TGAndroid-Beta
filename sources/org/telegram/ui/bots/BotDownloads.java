@@ -996,7 +996,7 @@ public class BotDownloads {
         animatedTextView.setText(sb);
     }
 
-    public static void lambda$showAlert$1(boolean[] zArr, Utilities.Callback callback, DialogInterface dialogInterface, int i) {
+    public static void lambda$showAlert$1(boolean[] zArr, Utilities.Callback callback, AlertDialog alertDialog, int i) {
         if (zArr[0]) {
             return;
         }
@@ -1004,7 +1004,7 @@ public class BotDownloads {
         zArr[0] = true;
     }
 
-    public static void lambda$showAlert$2(boolean[] zArr, Utilities.Callback callback, DialogInterface dialogInterface, int i) {
+    public static void lambda$showAlert$2(boolean[] zArr, Utilities.Callback callback, AlertDialog alertDialog, int i) {
         if (zArr[0]) {
             return;
         }
@@ -1066,16 +1066,16 @@ public class BotDownloads {
         linearLayout.addView(linearLayout2, LayoutHelper.createLinear(-1, -2, 23, 0, 0, 0, 2));
         builder.setView(linearLayout);
         final boolean[] zArr = new boolean[1];
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                BotDownloads.lambda$showAlert$1(zArr, callback, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                BotDownloads.lambda$showAlert$1(zArr, callback, alertDialog, i2);
             }
         });
-        builder.setPositiveButton(LocaleController.getString(R.string.BotDownloadFileDownload), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.BotDownloadFileDownload), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                BotDownloads.lambda$showAlert$2(zArr, callback, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                BotDownloads.lambda$showAlert$2(zArr, callback, alertDialog, i2);
             }
         });
         AlertDialog create = builder.create();

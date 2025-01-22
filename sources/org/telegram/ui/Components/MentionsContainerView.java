@@ -252,8 +252,8 @@ public abstract class MentionsContainerView extends BlurredFrameLayout implement
         }
 
         @Override
-        public org.telegram.ui.PhotoViewer.PlaceProviderObject getPlaceForPhoto(org.telegram.messenger.MessageObject r5, org.telegram.tgnet.TLRPC.FileLocation r6, int r7, boolean r8) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.MentionsContainerView.AnonymousClass5.getPlaceForPhoto(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, int, boolean):org.telegram.ui.PhotoViewer$PlaceProviderObject");
+        public org.telegram.ui.PhotoViewer.PlaceProviderObject getPlaceForPhoto(org.telegram.messenger.MessageObject r4, org.telegram.tgnet.TLRPC.FileLocation r5, int r6, boolean r7, boolean r8) {
+            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.MentionsContainerView.AnonymousClass5.getPlaceForPhoto(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, int, boolean, boolean):org.telegram.ui.PhotoViewer$PlaceProviderObject");
         }
 
         @Override
@@ -481,8 +481,8 @@ public abstract class MentionsContainerView extends BlurredFrameLayout implement
             }
 
             @Override
-            public org.telegram.ui.PhotoViewer.PlaceProviderObject getPlaceForPhoto(org.telegram.messenger.MessageObject r5, org.telegram.tgnet.TLRPC.FileLocation r6, int r7, boolean r8) {
-                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.MentionsContainerView.AnonymousClass5.getPlaceForPhoto(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, int, boolean):org.telegram.ui.PhotoViewer$PlaceProviderObject");
+            public org.telegram.ui.PhotoViewer.PlaceProviderObject getPlaceForPhoto(org.telegram.messenger.MessageObject r4, org.telegram.tgnet.TLRPC.FileLocation r5, int r6, boolean r7, boolean r8) {
+                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.MentionsContainerView.AnonymousClass5.getPlaceForPhoto(org.telegram.messenger.MessageObject, org.telegram.tgnet.TLRPC$FileLocation, int, boolean, boolean):org.telegram.ui.PhotoViewer$PlaceProviderObject");
             }
 
             @Override

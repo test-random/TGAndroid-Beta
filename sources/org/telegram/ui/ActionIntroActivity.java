@@ -1,6 +1,5 @@
 package org.telegram.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -59,7 +58,7 @@ public class ActionIntroActivity extends BaseFragment implements LocationControl
         return true;
     }
 
-    public void lambda$createView$1(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$1(AlertDialog alertDialog, int i) {
         presentFragment(new LoginActivity().changePhoneNumber(), true);
     }
 
@@ -79,10 +78,10 @@ public class ActionIntroActivity extends BaseFragment implements LocationControl
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString(R.string.PhoneNumberChangeTitle));
             builder.setMessage(LocaleController.getString(R.string.PhoneNumberAlert));
-            builder.setPositiveButton(LocaleController.getString(R.string.Change), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.Change), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    ActionIntroActivity.this.lambda$createView$1(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    ActionIntroActivity.this.lambda$createView$1(alertDialog, i2);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -129,7 +128,7 @@ public class ActionIntroActivity extends BaseFragment implements LocationControl
         getParentLayout().closeLastFragment(true);
     }
 
-    public void lambda$onRequestPermissionsResultFragment$6(DialogInterface dialogInterface, int i) {
+    public void lambda$onRequestPermissionsResultFragment$6(AlertDialog alertDialog, int i) {
         try {
             Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
             intent.setData(Uri.parse("package:" + ApplicationLoader.applicationContext.getPackageName()));
@@ -258,10 +257,10 @@ public class ActionIntroActivity extends BaseFragment implements LocationControl
     public void onRequestPermissionsResultFragment(int i, String[] strArr, int[] iArr) {
         if (getParentActivity() != null && i == 34) {
             if (iArr.length <= 0 || iArr[0] != 0) {
-                new AlertDialog.Builder(getParentActivity()).setMessage(AndroidUtilities.replaceTags(LocaleController.getString(R.string.QRCodePermissionNoCameraWithHint))).setPositiveButton(LocaleController.getString(R.string.PermissionOpenSettings), new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(getParentActivity()).setMessage(AndroidUtilities.replaceTags(LocaleController.getString(R.string.QRCodePermissionNoCameraWithHint))).setPositiveButton(LocaleController.getString(R.string.PermissionOpenSettings), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        ActionIntroActivity.this.lambda$onRequestPermissionsResultFragment$6(dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        ActionIntroActivity.this.lambda$onRequestPermissionsResultFragment$6(alertDialog, i2);
                     }
                 }).setNegativeButton(LocaleController.getString(R.string.ContactsPermissionAlertNotNow), null).setTopAnimation(R.raw.permission_request_camera, 72, false, Theme.getColor(Theme.key_dialogTopBackground)).show();
             } else {

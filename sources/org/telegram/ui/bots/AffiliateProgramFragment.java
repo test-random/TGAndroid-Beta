@@ -1,7 +1,6 @@
 package org.telegram.ui.bots;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -320,10 +319,10 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
         bulletinTextView3.setTextColor(Theme.getColor(i, this.resourceProvider));
         bulletinTextView3.setText(AndroidUtilities.replaceTags(LocaleController.getString(R.string.AffiliateProgramStopText3)));
         linearLayout.addView(bulletinTextView3, LayoutHelper.createLinear(-1, -2, 0.0f, 0.0f, 0.0f, 10.0f));
-        new AlertDialog.Builder(getContext(), this.resourceProvider).setTitle(LocaleController.getString(R.string.AffiliateProgramAlert)).setView(linearLayout).setPositiveButton(LocaleController.getString(R.string.AffiliateProgramStopButton), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(getContext(), this.resourceProvider).setTitle(LocaleController.getString(R.string.AffiliateProgramAlert)).setView(linearLayout).setPositiveButton(LocaleController.getString(R.string.AffiliateProgramStopButton), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                AffiliateProgramFragment.this.lambda$end$10(dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                AffiliateProgramFragment.this.lambda$end$10(alertDialog, i2);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).makeRed(-1).show();
     }
@@ -398,9 +397,9 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
             int i = this.program.duration_months;
             tableView.addRow(string, i <= 0 ? LocaleController.getString(R.string.Infinity) : (i < 12 || i % 12 != 0) ? LocaleController.formatPluralString("Months", i, new Object[0]) : LocaleController.formatPluralString("Years", i / 12, new Object[0]));
             frameLayout.addView(tableView, LayoutHelper.createFrame(-1, -2.0f, 119, 24.0f, 0.0f, 24.0f, 0.0f));
-            new AlertDialog.Builder(context, this.resourceProvider).setTitle(LocaleController.getString(R.string.AffiliateProgramAlert)).setMessage(LocaleController.getString(this.new_program ? R.string.AffiliateProgramStartAlertText : R.string.AffiliateProgramUpdateAlertText)).setView(frameLayout).setPositiveButton(LocaleController.getString(this.new_program ? R.string.AffiliateProgramStartAlertButton : R.string.AffiliateProgramUpdateAlertButton), new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(context, this.resourceProvider).setTitle(LocaleController.getString(R.string.AffiliateProgramAlert)).setMessage(LocaleController.getString(this.new_program ? R.string.AffiliateProgramStartAlertText : R.string.AffiliateProgramUpdateAlertText)).setView(frameLayout).setPositiveButton(LocaleController.getString(this.new_program ? R.string.AffiliateProgramStartAlertButton : R.string.AffiliateProgramUpdateAlertButton), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
+                public final void onClick(AlertDialog alertDialog, int i2) {
                     runnable.run();
                 }
             }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).show();
@@ -420,16 +419,16 @@ public class AffiliateProgramFragment extends GradientHeaderActivity implements 
         }
     }
 
-    public void lambda$end$10(DialogInterface dialogInterface, int i) {
+    public void lambda$end$10(AlertDialog alertDialog, int i) {
         TL_bots.updateStarRefProgram updatestarrefprogram = new TL_bots.updateStarRefProgram();
         updatestarrefprogram.bot = getMessagesController().getInputUser(this.bot_id);
         updatestarrefprogram.commission_permille = 0;
-        final AlertDialog alertDialog = new AlertDialog(getContext(), 3);
-        alertDialog.showDelayed(150L);
+        final AlertDialog alertDialog2 = new AlertDialog(getContext(), 3);
+        alertDialog2.showDelayed(150L);
         getConnectionsManager().sendRequest(updatestarrefprogram, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                AffiliateProgramFragment.this.lambda$end$9(alertDialog, tLObject, tL_error);
+                AffiliateProgramFragment.this.lambda$end$9(alertDialog2, tLObject, tL_error);
             }
         });
     }

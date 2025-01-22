@@ -107,7 +107,7 @@ public class ChangeUsernameActivity extends BaseFragment {
         AnonymousClass3() {
         }
 
-        public void lambda$onItemClick$0(TLRPC.TL_username tL_username, boolean z, DialogInterface dialogInterface, int i) {
+        public void lambda$onItemClick$0(TLRPC.TL_username tL_username, boolean z, AlertDialog alertDialog, int i) {
             ChangeUsernameActivity.this.toggleUsername(tL_username, z, true);
         }
 
@@ -120,10 +120,10 @@ public class ChangeUsernameActivity extends BaseFragment {
             } else {
                 tL_username.active = z;
                 ChangeUsernameActivity.this.toggleUsername(i, z);
-                new AlertDialog.Builder(ChangeUsernameActivity.this.getContext(), ChangeUsernameActivity.this.getResourceProvider()).setTitle(LocaleController.getString(R.string.UsernameActivateErrorTitle)).setMessage(LocaleController.getString(R.string.UsernameActivateErrorMessage)).setPositiveButton(LocaleController.getString(R.string.OK), new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(ChangeUsernameActivity.this.getContext(), ChangeUsernameActivity.this.getResourceProvider()).setTitle(LocaleController.getString(R.string.UsernameActivateErrorTitle)).setMessage(LocaleController.getString(R.string.UsernameActivateErrorMessage)).setPositiveButton(LocaleController.getString(R.string.OK), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        ChangeUsernameActivity.AnonymousClass3.this.lambda$onItemClick$0(tL_username, z2, dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        ChangeUsernameActivity.AnonymousClass3.this.lambda$onItemClick$0(tL_username, z2, alertDialog, i2);
                     }
                 }).show();
             }
@@ -139,7 +139,7 @@ public class ChangeUsernameActivity extends BaseFragment {
             });
         }
 
-        public void lambda$onItemClick$3(final TLRPC.TL_username tL_username, final int i, View view, DialogInterface dialogInterface, int i2) {
+        public void lambda$onItemClick$3(final TLRPC.TL_username tL_username, final int i, View view, AlertDialog alertDialog, int i2) {
             TL_bots.toggleUsername toggleusername;
             final boolean z = tL_username.active;
             final String str = tL_username.username;
@@ -181,15 +181,15 @@ public class ChangeUsernameActivity extends BaseFragment {
                 return;
             }
             if (!tL_username.editable) {
-                new AlertDialog.Builder(ChangeUsernameActivity.this.getContext(), ChangeUsernameActivity.this.getResourceProvider()).setTitle(LocaleController.getString(tL_username.active ? R.string.UsernameDeactivateLink : R.string.UsernameActivateLink)).setMessage(LocaleController.getString(tL_username.active ? R.string.UsernameDeactivateLinkProfileMessage : R.string.UsernameActivateLinkProfileMessage)).setPositiveButton(LocaleController.getString(tL_username.active ? R.string.Hide : R.string.Show), new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(ChangeUsernameActivity.this.getContext(), ChangeUsernameActivity.this.getResourceProvider()).setTitle(LocaleController.getString(tL_username.active ? R.string.UsernameDeactivateLink : R.string.UsernameActivateLink)).setMessage(LocaleController.getString(tL_username.active ? R.string.UsernameDeactivateLinkProfileMessage : R.string.UsernameActivateLinkProfileMessage)).setPositiveButton(LocaleController.getString(tL_username.active ? R.string.Hide : R.string.Show), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        ChangeUsernameActivity.AnonymousClass3.this.lambda$onItemClick$3(tL_username, i, view, dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        ChangeUsernameActivity.AnonymousClass3.this.lambda$onItemClick$3(tL_username, i, view, alertDialog, i2);
                     }
-                }).setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+                }).setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        dialogInterface.dismiss();
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        alertDialog.dismiss();
                     }
                 }).show();
             } else {
@@ -1184,7 +1184,7 @@ public class ChangeUsernameActivity extends BaseFragment {
         MessagesController.getInstance(this.currentAccount).putUsers(arrayList, false);
         MessagesStorage.getInstance(this.currentAccount).putUsersAndChats(arrayList, null, false, true);
         UserConfig.getInstance(this.currentAccount).saveConfig(true);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$saveName$7(AlertDialog alertDialog) {
@@ -1193,7 +1193,7 @@ public class ChangeUsernameActivity extends BaseFragment {
         } catch (Exception e) {
             FileLog.e(e);
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$saveName$8(AlertDialog alertDialog) {
@@ -1221,7 +1221,7 @@ public class ChangeUsernameActivity extends BaseFragment {
 
     public void saveName() {
         if (this.botId != 0) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
             return;
         }
         if (this.username.startsWith("@")) {
@@ -1240,7 +1240,7 @@ public class ChangeUsernameActivity extends BaseFragment {
             publicUsername = "";
         }
         if (publicUsername.equals(this.username)) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
             return;
         }
         final AlertDialog alertDialog = new AlertDialog(getParentActivity(), 3);
@@ -1317,7 +1317,7 @@ public class ChangeUsernameActivity extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    ChangeUsernameActivity.this.lambda$onBackPressed$321();
+                    ChangeUsernameActivity.this.lambda$onBackPressed$323();
                 } else if (i == 1) {
                     ChangeUsernameActivity.this.sendReorder();
                     ChangeUsernameActivity.this.saveName();

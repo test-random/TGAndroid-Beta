@@ -311,7 +311,15 @@ public abstract class PreviewView extends FrameLayout {
         }
 
         @Override
-        public void onVideoLeftChange(float f) {
+        public void onVideoLeftChange(int i, float f) {
+            if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                return;
+            }
+            ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoLeft = f;
+        }
+
+        @Override
+        public void onVideoLeftChange(boolean z, float f) {
             if (PreviewView.this.entry == null) {
                 return;
             }
@@ -320,15 +328,7 @@ public abstract class PreviewView extends FrameLayout {
             if (PreviewView.this.videoPlayer == null || PreviewView.this.videoPlayer.getDuration() == -9223372036854775807L) {
                 return;
             }
-            PreviewView.this.seekTo(f * ((float) r0.videoPlayer.getDuration()));
-        }
-
-        @Override
-        public void onVideoLeftChange(int i, float f) {
-            if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
-                return;
-            }
-            ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoLeft = f;
+            PreviewView.this.seekTo(f * ((float) r5.videoPlayer.getDuration()));
         }
 
         @Override
@@ -340,20 +340,20 @@ public abstract class PreviewView extends FrameLayout {
         }
 
         @Override
-        public void onVideoRightChange(float f) {
-            if (PreviewView.this.entry == null) {
-                return;
-            }
-            PreviewView.this.entry.right = f;
-            PreviewView.this.entry.editedMedia = true;
-        }
-
-        @Override
         public void onVideoRightChange(int i, float f) {
             if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
                 return;
             }
             ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoRight = f;
+        }
+
+        @Override
+        public void onVideoRightChange(boolean z, float f) {
+            if (PreviewView.this.entry == null) {
+                return;
+            }
+            PreviewView.this.entry.right = f;
+            PreviewView.this.entry.editedMedia = true;
         }
 
         @Override
@@ -1862,7 +1862,15 @@ public abstract class PreviewView extends FrameLayout {
                 }
 
                 @Override
-                public void onVideoLeftChange(float f) {
+                public void onVideoLeftChange(int i, float f) {
+                    if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
+                        return;
+                    }
+                    ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoLeft = f;
+                }
+
+                @Override
+                public void onVideoLeftChange(boolean z, float f) {
                     if (PreviewView.this.entry == null) {
                         return;
                     }
@@ -1871,15 +1879,7 @@ public abstract class PreviewView extends FrameLayout {
                     if (PreviewView.this.videoPlayer == null || PreviewView.this.videoPlayer.getDuration() == -9223372036854775807L) {
                         return;
                     }
-                    PreviewView.this.seekTo(f * ((float) r0.videoPlayer.getDuration()));
-                }
-
-                @Override
-                public void onVideoLeftChange(int i, float f) {
-                    if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
-                        return;
-                    }
-                    ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoLeft = f;
+                    PreviewView.this.seekTo(f * ((float) r5.videoPlayer.getDuration()));
                 }
 
                 @Override
@@ -1891,20 +1891,20 @@ public abstract class PreviewView extends FrameLayout {
                 }
 
                 @Override
-                public void onVideoRightChange(float f) {
-                    if (PreviewView.this.entry == null) {
-                        return;
-                    }
-                    PreviewView.this.entry.right = f;
-                    PreviewView.this.entry.editedMedia = true;
-                }
-
-                @Override
                 public void onVideoRightChange(int i, float f) {
                     if (PreviewView.this.entry == null || PreviewView.this.entry.collageContent == null || i < 0 || i >= PreviewView.this.entry.collageContent.size()) {
                         return;
                     }
                     ((StoryEntry) PreviewView.this.entry.collageContent.get(i)).videoRight = f;
+                }
+
+                @Override
+                public void onVideoRightChange(boolean z, float f) {
+                    if (PreviewView.this.entry == null) {
+                        return;
+                    }
+                    PreviewView.this.entry.right = f;
+                    PreviewView.this.entry.editedMedia = true;
                 }
 
                 @Override

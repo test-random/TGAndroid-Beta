@@ -31,16 +31,22 @@ public class UserObject {
         if (emojiStatus == null || MessagesController.getInstance(UserConfig.selectedAccount).premiumFeaturesBlocked()) {
             return null;
         }
-        if (!(emojiStatus instanceof TLRPC.TL_emojiStatus)) {
-            if (emojiStatus instanceof TLRPC.TL_emojiStatusUntil) {
-                TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = (TLRPC.TL_emojiStatusUntil) emojiStatus;
-                if (tL_emojiStatusUntil.until > ((int) (System.currentTimeMillis() / 1000))) {
-                    j = tL_emojiStatusUntil.document_id;
-                }
+        if (emojiStatus instanceof TLRPC.TL_emojiStatus) {
+            TLRPC.TL_emojiStatus tL_emojiStatus = (TLRPC.TL_emojiStatus) emojiStatus;
+            if ((tL_emojiStatus.flags & 1) != 0 && tL_emojiStatus.until <= ((int) (System.currentTimeMillis() / 1000))) {
+                return null;
             }
-            return null;
+            j = tL_emojiStatus.document_id;
+        } else {
+            if (!(emojiStatus instanceof TLRPC.TL_emojiStatusCollectible)) {
+                return null;
+            }
+            TLRPC.TL_emojiStatusCollectible tL_emojiStatusCollectible = (TLRPC.TL_emojiStatusCollectible) emojiStatus;
+            if ((tL_emojiStatusCollectible.flags & 1) != 0 && tL_emojiStatusCollectible.until <= ((int) (System.currentTimeMillis() / 1000))) {
+                return null;
+            }
+            j = tL_emojiStatusCollectible.document_id;
         }
-        j = ((TLRPC.TL_emojiStatus) emojiStatus).document_id;
         return Long.valueOf(j);
     }
 
@@ -93,6 +99,17 @@ public class UserObject {
         return null;
     }
 
+    public static long getProfileCollectibleId(TLRPC.User user) {
+        if (user == null) {
+            return 0L;
+        }
+        TLRPC.EmojiStatus emojiStatus = user.emoji_status;
+        if (emojiStatus instanceof TLRPC.TL_emojiStatusCollectible) {
+            return ((TLRPC.TL_emojiStatusCollectible) emojiStatus).collectible_id;
+        }
+        return 0L;
+    }
+
     public static int getProfileColorId(TLRPC.User user) {
         if (user == null) {
             return 0;
@@ -106,6 +123,12 @@ public class UserObject {
 
     public static long getProfileEmojiId(TLRPC.User user) {
         TLRPC.TL_peerColor tL_peerColor;
+        if (user != null) {
+            TLRPC.EmojiStatus emojiStatus = user.emoji_status;
+            if (emojiStatus instanceof TLRPC.TL_emojiStatusCollectible) {
+                return ((TLRPC.TL_emojiStatusCollectible) emojiStatus).pattern_document_id;
+            }
+        }
         if (user == null || (tL_peerColor = user.profile_color) == null || (tL_peerColor.flags & 2) == 0) {
             return 0L;
         }

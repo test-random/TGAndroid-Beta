@@ -1,7 +1,6 @@
 package org.telegram.ui;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -154,7 +153,7 @@ public class DilogCacheBottomSheet extends BottomSheetWithRecyclerListView {
 
             @Override
             public void dismiss() {
-                DilogCacheBottomSheet.this.dismiss();
+                DilogCacheBottomSheet.this.lambda$new$0();
             }
 
             @Override
@@ -195,12 +194,12 @@ public class DilogCacheBottomSheet extends BottomSheetWithRecyclerListView {
         }
     }
 
-    public void lambda$createButton$1(DialogInterface dialogInterface, int i) {
-        dismiss();
+    public void lambda$createButton$1(AlertDialog alertDialog, int i) {
+        lambda$new$0();
     }
 
-    public void lambda$createButton$2(DialogInterface dialogInterface, int i) {
-        dismiss();
+    public void lambda$createButton$2(AlertDialog alertDialog, int i) {
+        lambda$new$0();
         this.cacheDelegate.cleanupDialogFiles(this.entities, this.clearViewData, this.cacheModel);
     }
 
@@ -208,16 +207,16 @@ public class DilogCacheBottomSheet extends BottomSheetWithRecyclerListView {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(LocaleController.getString(R.string.ClearCache));
         builder.setMessage(LocaleController.getString(R.string.ClearCacheForChat));
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                DilogCacheBottomSheet.this.lambda$createButton$1(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                DilogCacheBottomSheet.this.lambda$createButton$1(alertDialog, i);
             }
         });
-        builder.setPositiveButton(LocaleController.getString(R.string.Clear), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Clear), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                DilogCacheBottomSheet.this.lambda$createButton$2(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                DilogCacheBottomSheet.this.lambda$createButton$2(alertDialog, i);
             }
         });
         AlertDialog create = builder.create();

@@ -53,9 +53,9 @@ public class SessionBottomSheet extends BottomSheet {
             this.val$fragment = baseFragment;
         }
 
-        public void lambda$onClick$0(Callback callback, TLRPC.TL_authorization tL_authorization, DialogInterface dialogInterface, int i) {
+        public void lambda$onClick$0(Callback callback, TLRPC.TL_authorization tL_authorization, AlertDialog alertDialog, int i) {
             callback.onSessionTerminated(tL_authorization);
-            SessionBottomSheet.this.dismiss();
+            SessionBottomSheet.this.lambda$new$0();
         }
 
         @Override
@@ -66,10 +66,10 @@ public class SessionBottomSheet extends BottomSheet {
             String string = LocaleController.getString(R.string.Terminate);
             final Callback callback = this.val$callback;
             final TLRPC.TL_authorization tL_authorization = this.val$session;
-            builder.setPositiveButton(string, new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(string, new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    SessionBottomSheet.AnonymousClass8.this.lambda$onClick$0(callback, tL_authorization, dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    SessionBottomSheet.AnonymousClass8.this.lambda$onClick$0(callback, tL_authorization, alertDialog, i);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);

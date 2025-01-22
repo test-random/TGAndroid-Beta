@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -130,7 +129,7 @@ public class ChatAttachAlertPollLayout extends ChatAttachAlert.AttachAlertLayout
         AnonymousClass9() {
         }
 
-        public void lambda$onClearEmojiRecent$0(DialogInterface dialogInterface, int i) {
+        public void lambda$onClearEmojiRecent$0(AlertDialog alertDialog, int i) {
             ChatAttachAlertPollLayout.this.emojiView.clearRecentEmoji();
         }
 
@@ -199,10 +198,10 @@ public class ChatAttachAlertPollLayout extends ChatAttachAlert.AttachAlertLayout
             AlertDialog.Builder builder = new AlertDialog.Builder(ChatAttachAlertPollLayout.this.getContext(), ChatAttachAlertPollLayout.this.resourcesProvider);
             builder.setTitle(LocaleController.getString(R.string.ClearRecentEmojiTitle));
             builder.setMessage(LocaleController.getString(R.string.ClearRecentEmojiText));
-            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    ChatAttachAlertPollLayout.AnonymousClass9.this.lambda$onClearEmojiRecent$0(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    ChatAttachAlertPollLayout.AnonymousClass9.this.lambda$onClearEmojiRecent$0(alertDialog, i);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1043,10 +1042,10 @@ public class ChatAttachAlertPollLayout extends ChatAttachAlert.AttachAlertLayout
             AlertDialog.Builder builder = new AlertDialog.Builder(this.parentAlert.baseFragment.getParentActivity());
             builder.setTitle(LocaleController.getString(R.string.CancelPollAlertTitle));
             builder.setMessage(LocaleController.getString(R.string.CancelPollAlertText));
-            builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    ChatAttachAlertPollLayout.this.lambda$checkDiscard$2(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    ChatAttachAlertPollLayout.this.lambda$checkDiscard$2(alertDialog, i2);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1194,8 +1193,8 @@ public class ChatAttachAlertPollLayout extends ChatAttachAlert.AttachAlertLayout
         this.emojiView.setTranslationY(AndroidUtilities.lerp(f, f2, ((Float) valueAnimator.getAnimatedValue()).floatValue()));
     }
 
-    public void lambda$checkDiscard$2(DialogInterface dialogInterface, int i) {
-        this.parentAlert.dismiss();
+    public void lambda$checkDiscard$2(AlertDialog alertDialog, int i) {
+        this.parentAlert.lambda$new$0();
     }
 
     public void lambda$hideEmojiPopup$4(ValueAnimator valueAnimator) {

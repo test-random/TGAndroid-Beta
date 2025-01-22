@@ -3249,7 +3249,7 @@ public class StatisticActivity extends BaseFragment implements NotificationCente
                 List fragmentStack2 = getParentLayout().getFragmentStack();
                 BaseFragment baseFragment2 = fragmentStack2.size() >= 2 ? (BaseFragment) fragmentStack2.get(fragmentStack2.size() - 2) : null;
                 if (!booleanValue) {
-                    lambda$onBackPressed$321();
+                    lambda$onBackPressed$323();
                     if (baseFragment2 instanceof ProfileActivity) {
                         BoostDialogs.showBulletin(baseFragment2, chat, false);
                         return;
@@ -3260,7 +3260,7 @@ public class StatisticActivity extends BaseFragment implements NotificationCente
                 if (baseFragment2 instanceof ProfileActivity) {
                     getParentLayout().removeFragmentFromStack(baseFragment2);
                 }
-                lambda$onBackPressed$321();
+                lambda$onBackPressed$323();
                 if (baseFragment3 instanceof ChatActivity) {
                     BoostDialogs.showBulletin(baseFragment3, chat, true);
                     return;

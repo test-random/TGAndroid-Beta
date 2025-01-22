@@ -679,7 +679,7 @@ public class GroupVoipInviteAlert extends UsersAlertBase {
     public void lambda$new$0(View view, int i) {
         if (i == this.addNewRow) {
             this.delegate.copyInviteLink();
-            dismiss();
+            lambda$new$0();
         } else if (view instanceof ManageChatUserCell) {
             ManageChatUserCell manageChatUserCell = (ManageChatUserCell) view;
             if (this.invitedUsers.contains(Long.valueOf(manageChatUserCell.getUserId()))) {

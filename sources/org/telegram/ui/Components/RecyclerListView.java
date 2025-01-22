@@ -702,13 +702,13 @@ public class RecyclerListView extends RecyclerView {
             private View doubleTapView;
             final RecyclerListView val$this$0;
 
-            public class RunnableC00351 implements Runnable {
+            public class RunnableC00341 implements Runnable {
                 final int val$position;
                 final View val$view;
                 final float val$x;
                 final float val$y;
 
-                RunnableC00351(View view, int i, float f, float f2) {
+                RunnableC00341(View view, int i, float f, float f2) {
                     r2 = view;
                     r3 = i;
                     r4 = f;
@@ -775,7 +775,7 @@ public class RecyclerListView extends RecyclerView {
                         final float val$x;
                         final float val$y;
 
-                        RunnableC00351(View view2, int i2, float x2, float y2) {
+                        RunnableC00341(View view2, int i2, float x2, float y2) {
                             r2 = view2;
                             r3 = i2;
                             r4 = x2;
@@ -898,13 +898,13 @@ public class RecyclerListView extends RecyclerView {
                 private View doubleTapView;
                 final RecyclerListView val$this$0;
 
-                public class RunnableC00351 implements Runnable {
+                public class RunnableC00341 implements Runnable {
                     final int val$position;
                     final View val$view;
                     final float val$x;
                     final float val$y;
 
-                    RunnableC00351(View view2, int i2, float x2, float y2) {
+                    RunnableC00341(View view2, int i2, float x2, float y2) {
                         r2 = view2;
                         r3 = i2;
                         r4 = x2;
@@ -971,7 +971,7 @@ public class RecyclerListView extends RecyclerView {
                             final float val$x;
                             final float val$y;
 
-                            RunnableC00351(View view22, int i22, float x22, float y22) {
+                            RunnableC00341(View view22, int i22, float x22, float y22) {
                                 r2 = view22;
                                 r3 = i22;
                                 r4 = x22;
@@ -2305,28 +2305,32 @@ public class RecyclerListView extends RecyclerView {
     }
 
     public void drawSectionBackground(Canvas canvas, int i, int i2, int i3) {
-        if (i2 < i) {
+        drawSectionBackground(canvas, i, i2, i3, 0, 0);
+    }
+
+    public void drawSectionBackground(Canvas canvas, int i, int i2, int i3, int i4, int i5) {
+        if (i2 < i || i < 0 || i2 < 0) {
             return;
         }
-        int i4 = Integer.MAX_VALUE;
-        int i5 = Integer.MIN_VALUE;
-        for (int i6 = 0; i6 < getChildCount(); i6++) {
-            View childAt = getChildAt(i6);
+        int i6 = Integer.MAX_VALUE;
+        int i7 = Integer.MIN_VALUE;
+        for (int i8 = 0; i8 < getChildCount(); i8++) {
+            View childAt = getChildAt(i8);
             if (childAt != null) {
                 int childAdapterPosition = getChildAdapterPosition(childAt);
                 int top = childAt.getTop();
                 if (childAdapterPosition >= i && childAdapterPosition <= i2) {
-                    i4 = Math.min(top, i4);
-                    i5 = Math.max((int) (top + (childAt.getHeight() * childAt.getAlpha())), i5);
+                    i6 = Math.min(top, i6);
+                    i7 = Math.max((int) (top + (childAt.getHeight() * childAt.getAlpha())), i7);
                 }
             }
         }
-        if (i4 < i5) {
+        if (i6 < i7) {
             if (this.backgroundPaint == null) {
                 this.backgroundPaint = new Paint(1);
             }
             this.backgroundPaint.setColor(i3);
-            canvas.drawRect(0.0f, i4, getWidth(), i5, this.backgroundPaint);
+            canvas.drawRect(0.0f, i6 - i4, getWidth(), i7 + i5, this.backgroundPaint);
         }
     }
 

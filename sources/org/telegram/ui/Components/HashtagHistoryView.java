@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.util.Property;
@@ -100,7 +99,7 @@ public abstract class HashtagHistoryView extends FrameLayout {
         arrayList.add(UItem.asButton(0, R.drawable.msg_clear_recent, LocaleController.getString(R.string.ClearHistory)));
     }
 
-    public void lambda$onLongClick$0(String str, DialogInterface dialogInterface, int i) {
+    public void lambda$onLongClick$0(String str, AlertDialog alertDialog, int i) {
         HashtagSearchController.getInstance(this.currentAccount).removeHashtagFromHistory(str);
         update();
     }
@@ -124,10 +123,10 @@ public abstract class HashtagHistoryView extends FrameLayout {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), this.resourcesProvider);
         builder.setTitle(LocaleController.getString(R.string.ClearSearchSingleAlertTitle));
         builder.setMessage(LocaleController.formatString(R.string.ClearSearchSingleHashtagAlertText, str));
-        builder.setPositiveButton(LocaleController.getString(R.string.ClearSearchRemove), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.ClearSearchRemove), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i3) {
-                HashtagHistoryView.this.lambda$onLongClick$0(str, dialogInterface, i3);
+            public final void onClick(AlertDialog alertDialog, int i3) {
+                HashtagHistoryView.this.lambda$onLongClick$0(str, alertDialog, i3);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);

@@ -2,7 +2,6 @@ package org.telegram.ui;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -626,7 +625,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
             });
         }
 
-        public void lambda$new$0(DialogInterface dialogInterface, int i) {
+        public void lambda$new$0(AlertDialog alertDialog, int i) {
             doClearCache();
         }
 
@@ -641,10 +640,10 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
                 str = " (" + ((Object) this.valueTextView.getText()) + ")";
             }
             sb.append(str);
-            AlertDialog create = builder.setTitle(sb.toString()).setMessage(LocaleController.getString(R.string.StorageUsageInfo)).setPositiveButton(this.textView.getText(), new DialogInterface.OnClickListener() {
+            AlertDialog create = builder.setTitle(sb.toString()).setMessage(LocaleController.getString(R.string.StorageUsageInfo)).setPositiveButton(this.textView.getText(), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    CacheControlActivity.ClearCacheButtonInternal.this.lambda$new$0(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    CacheControlActivity.ClearCacheButtonInternal.this.lambda$new$0(alertDialog, i);
                 }
             }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).create();
             CacheControlActivity.this.showDialog(create);
@@ -1767,10 +1766,10 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
         spannableStringBuilder.append((CharSequence) AndroidUtilities.replaceTags(LocaleController.formatString("LocalDatabaseClearText2", R.string.LocalDatabaseClearText2, AndroidUtilities.formatFileSize(this.databaseSize))));
         builder.setMessage(spannableStringBuilder);
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        builder.setPositiveButton(LocaleController.getString(R.string.CacheClear), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.CacheClear), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                CacheControlActivity.this.lambda$clearDatabase$24(z, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                CacheControlActivity.this.lambda$clearDatabase$24(z, alertDialog, i);
             }
         });
         AlertDialog create = builder.create();
@@ -1788,10 +1787,10 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(LocaleController.getString(R.string.ClearCache));
         builder.setMessage(LocaleController.getString(R.string.ClearCacheForChats));
-        builder.setPositiveButton(LocaleController.getString(R.string.Clear), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Clear), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                CacheControlActivity.this.lambda$clearSelectedFiles$20(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                CacheControlActivity.this.lambda$clearSelectedFiles$20(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -2048,13 +2047,13 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
         }
     }
 
-    public void lambda$clearDatabase$24(boolean z, DialogInterface dialogInterface, int i) {
+    public void lambda$clearDatabase$24(boolean z, AlertDialog alertDialog, int i) {
         if (getParentActivity() == null) {
             return;
         }
-        AlertDialog alertDialog = new AlertDialog(getParentActivity(), 3);
-        this.progressDialog = alertDialog;
-        alertDialog.setCanCancel(false);
+        AlertDialog alertDialog2 = new AlertDialog(getParentActivity(), 3);
+        this.progressDialog = alertDialog2;
+        alertDialog2.setCanCancel(false);
         this.progressDialog.showDelayed(500L);
         MessagesController.getInstance(this.currentAccount).clearQueryTime();
         if (z) {
@@ -2064,7 +2063,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
         }
     }
 
-    public void lambda$clearSelectedFiles$20(DialogInterface dialogInterface, int i) {
+    public void lambda$clearSelectedFiles$20(AlertDialog alertDialog, int i) {
         DialogFileEntities removeSelectedFiles = this.cacheModel.removeSelectedFiles();
         if (removeSelectedFiles.totalSize > 0) {
             cleanupDialogFiles(removeSelectedFiles, null, null);
@@ -2747,7 +2746,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
                     }
                 }
                 if (!((BaseFragment) CacheControlActivity.this).actionBar.isActionModeShowed()) {
-                    CacheControlActivity.this.lambda$onBackPressed$321();
+                    CacheControlActivity.this.lambda$onBackPressed$323();
                     return;
                 }
                 CacheModel cacheModel = CacheControlActivity.this.cacheModel;

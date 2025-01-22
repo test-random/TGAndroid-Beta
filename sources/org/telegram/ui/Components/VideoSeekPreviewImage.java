@@ -15,14 +15,18 @@ import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
 import java.io.File;
+import java.util.Iterator;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Bitmaps;
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.FileLoader;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.Components.VideoPlayer;
 
 public abstract class VideoSeekPreviewImage extends View {
     private Paint bitmapPaint;
@@ -37,16 +41,18 @@ public abstract class VideoSeekPreviewImage extends View {
     private AnimatedFileDrawable fileDrawable;
     private Drawable frameDrawable;
     private String frameTime;
+    private boolean isQualities;
     private boolean isYoutube;
     private int lastYoutubePosition;
     private Runnable loadRunnable;
     private Matrix matrix;
+    private boolean open;
     private Paint paint;
     private float pendingProgress;
     private int pixelWidth;
     private Runnable progressRunnable;
     private boolean ready;
-    private TextPaint textPaint;
+    private final TextPaint textPaint;
     private int timeWidth;
     private Uri videoUri;
     private PhotoViewerWebView webView;
@@ -55,7 +61,7 @@ public abstract class VideoSeekPreviewImage extends View {
     private int ytImageWidth;
     private int ytImageX;
     private int ytImageY;
-    private Path ytPath;
+    private final Path ytPath;
 
     public interface VideoSeekPreviewImageDelegate {
         void onReady();
@@ -64,7 +70,8 @@ public abstract class VideoSeekPreviewImage extends View {
     public VideoSeekPreviewImage(Context context, VideoSeekPreviewImageDelegate videoSeekPreviewImageDelegate) {
         super(context);
         this.currentPixel = -1;
-        this.textPaint = new TextPaint(1);
+        TextPaint textPaint = new TextPaint(1);
+        this.textPaint = textPaint;
         this.dstR = new RectF();
         this.paint = new Paint(2);
         this.bitmapPaint = new Paint(2);
@@ -73,8 +80,8 @@ public abstract class VideoSeekPreviewImage extends View {
         this.ytPath = new Path();
         setVisibility(4);
         this.frameDrawable = context.getResources().getDrawable(R.drawable.videopreview);
-        this.textPaint.setTextSize(AndroidUtilities.dp(13.0f));
-        this.textPaint.setColor(-1);
+        textPaint.setTextSize(AndroidUtilities.dp(13.0f));
+        textPaint.setColor(-1);
         this.delegate = videoSeekPreviewImageDelegate;
         ImageReceiver imageReceiver = new ImageReceiver();
         this.youtubeBoardsReceiver = imageReceiver;
@@ -97,7 +104,7 @@ public abstract class VideoSeekPreviewImage extends View {
         });
     }
 
-    public void lambda$close$5() {
+    public void lambda$close$7() {
         this.pendingProgress = 0.0f;
         AnimatedFileDrawable animatedFileDrawable = this.fileDrawable;
         if (animatedFileDrawable != null) {
@@ -138,6 +145,7 @@ public abstract class VideoSeekPreviewImage extends View {
     }
 
     public void lambda$open$3() {
+        this.open = true;
         this.loadRunnable = null;
         if (this.fileDrawable != null) {
             this.ready = true;
@@ -145,7 +153,58 @@ public abstract class VideoSeekPreviewImage extends View {
         }
     }
 
-    public void lambda$open$4(Uri uri) {
+    public void lambda$open$4(VideoPlayer.VideoUri videoUri) {
+        Object obj;
+        File pathToAttach;
+        if (videoUri.isCached()) {
+            this.fileDrawable = new AnimatedFileDrawable(new File(videoUri.uri.getPath()), true, 0L, 0, null, null, null, 0L, 0, true, null);
+        } else {
+            int i = UserConfig.selectedAccount;
+            try {
+                i = Utilities.parseInt((CharSequence) videoUri.uri.getQueryParameter("account")).intValue();
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+            int i2 = i;
+            try {
+                obj = FileLoader.getInstance(i2).getParentObject(Utilities.parseInt((CharSequence) videoUri.uri.getQueryParameter("rid")).intValue());
+            } catch (Exception e2) {
+                FileLog.e(e2);
+                obj = null;
+            }
+            Object obj2 = obj;
+            TLRPC.Document document = videoUri.document;
+            if (FileLoader.getInstance(i2).isLoadingFile(FileLoader.getAttachFileName(document))) {
+                pathToAttach = new File(FileLoader.getDirectory(4), document.dc_id + "_" + document.id + ".temp");
+            } else {
+                pathToAttach = FileLoader.getInstance(i2).getPathToAttach(document, false);
+            }
+            this.fileDrawable = new AnimatedFileDrawable(new File(pathToAttach.getAbsolutePath()), true, document.size, 1, document, null, obj2, 0L, i2, true, null);
+        }
+        this.duration = this.fileDrawable.getDurationMs();
+        float f = this.pendingProgress;
+        if (f != 0.0f) {
+            setProgress(f, this.pixelWidth);
+            this.pendingProgress = 0.0f;
+        }
+        AndroidUtilities.runOnUIThread(new Runnable() {
+            @Override
+            public final void run() {
+                VideoSeekPreviewImage.this.lambda$open$3();
+            }
+        });
+    }
+
+    public void lambda$open$5() {
+        this.open = true;
+        this.loadRunnable = null;
+        if (this.fileDrawable != null) {
+            this.ready = true;
+            this.delegate.onReady();
+        }
+    }
+
+    public void lambda$open$6(Uri uri) {
         File pathToAttach;
         if ("tg".equals(uri.getScheme())) {
             int intValue = Utilities.parseInt((CharSequence) uri.getQueryParameter("account")).intValue();
@@ -179,7 +238,7 @@ public abstract class VideoSeekPreviewImage extends View {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                VideoSeekPreviewImage.this.lambda$open$3();
+                VideoSeekPreviewImage.this.lambda$open$5();
             }
         });
     }
@@ -228,7 +287,7 @@ public abstract class VideoSeekPreviewImage extends View {
             return;
         }
         int max = Math.max(200, AndroidUtilities.dp(100.0f));
-        final Bitmap frameAtTime = this.fileDrawable.getFrameAtTime(j);
+        final Bitmap frameAtTime = this.fileDrawable.getFrameAtTime(j, false);
         if (frameAtTime != null) {
             int width = frameAtTime.getWidth();
             int height = frameAtTime.getHeight();
@@ -274,7 +333,7 @@ public abstract class VideoSeekPreviewImage extends View {
         Utilities.globalQueue.postRunnable(new Runnable() {
             @Override
             public final void run() {
-                VideoSeekPreviewImage.this.lambda$close$5();
+                VideoSeekPreviewImage.this.lambda$close$7();
             }
         });
         setVisibility(4);
@@ -284,6 +343,7 @@ public abstract class VideoSeekPreviewImage extends View {
         this.currentPixel = -1;
         this.videoUri = null;
         this.ready = false;
+        this.open = false;
     }
 
     public boolean isReady() {
@@ -346,16 +406,69 @@ public abstract class VideoSeekPreviewImage extends View {
         if (uri == null || uri.equals(this.videoUri)) {
             return;
         }
+        if (this.open) {
+            close();
+        }
+        this.isQualities = false;
         this.videoUri = uri;
         DispatchQueue dispatchQueue = Utilities.globalQueue;
         Runnable runnable = new Runnable() {
             @Override
             public final void run() {
-                VideoSeekPreviewImage.this.lambda$open$4(uri);
+                VideoSeekPreviewImage.this.lambda$open$6(uri);
             }
         };
         this.loadRunnable = runnable;
         dispatchQueue.postRunnable(runnable);
+    }
+
+    public void open(final VideoPlayer.VideoUri videoUri) {
+        if (videoUri == null || videoUri.uri.equals(this.videoUri)) {
+            return;
+        }
+        if (this.open) {
+            close();
+        }
+        this.isQualities = true;
+        this.videoUri = videoUri.uri;
+        DispatchQueue dispatchQueue = Utilities.globalQueue;
+        Runnable runnable = new Runnable() {
+            @Override
+            public final void run() {
+                VideoSeekPreviewImage.this.lambda$open$4(videoUri);
+            }
+        };
+        this.loadRunnable = runnable;
+        dispatchQueue.postRunnable(runnable);
+    }
+
+    public void open(VideoPlayer videoPlayer) {
+        VideoPlayer.Quality currentQuality;
+        if (videoPlayer == null) {
+            return;
+        }
+        if (videoPlayer.getQualitiesCount() <= 0) {
+            open(videoPlayer.getCurrentUri());
+            return;
+        }
+        VideoPlayer.VideoUri videoUri = null;
+        for (int i = 0; i < videoPlayer.getQualitiesCount(); i++) {
+            Iterator it = videoPlayer.getQuality(i).uris.iterator();
+            while (it.hasNext()) {
+                VideoPlayer.VideoUri videoUri2 = (VideoPlayer.VideoUri) it.next();
+                if (videoUri == null || ((!videoUri.isCached() && videoUri2.isCached()) || (videoUri.isCached() == videoUri2.isCached() && videoUri2.width * videoUri2.height < videoUri.width * videoUri.height))) {
+                    videoUri = videoUri2;
+                }
+            }
+        }
+        if (videoUri != null && !videoUri.isCached() && (currentQuality = videoPlayer.getCurrentQuality()) != null) {
+            videoUri = currentQuality.getDownloadUri();
+        }
+        if (videoUri == null || videoUri.isCached()) {
+            open(videoUri);
+        } else {
+            close();
+        }
     }
 
     public void setProgress(final float f, int i) {

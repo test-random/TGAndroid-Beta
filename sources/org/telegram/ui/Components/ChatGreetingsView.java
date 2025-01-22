@@ -257,7 +257,7 @@ public abstract class ChatGreetingsView extends LinearLayout {
         BaseFragment lastFragment = LaunchActivity.getLastFragment();
         if (lastFragment != null) {
             lastFragment.presentFragment(new PremiumPreviewFragment("contact"));
-            bottomSheet.dismiss();
+            bottomSheet.lambda$new$0();
         }
     }
 

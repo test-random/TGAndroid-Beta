@@ -9,17 +9,27 @@ public abstract class CompatDrawable extends Drawable {
     public final Paint paint = new Paint(1);
 
     public CompatDrawable(View view) {
-        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View view2) {
-                CompatDrawable.this.onAttachedToWindow();
-            }
+        if (view != null) {
+            view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View view2) {
+                    CompatDrawable.this.onAttachedToWindow();
+                }
 
-            @Override
-            public void onViewDetachedFromWindow(View view2) {
-                CompatDrawable.this.onDetachedToWindow();
+                @Override
+                public void onViewDetachedFromWindow(View view2) {
+                    CompatDrawable.this.onDetachedToWindow();
+                }
+            });
+            if (view.isAttachedToWindow()) {
+                view.post(new Runnable() {
+                    @Override
+                    public final void run() {
+                        CompatDrawable.this.onAttachedToWindow();
+                    }
+                });
             }
-        });
+        }
     }
 
     @Override

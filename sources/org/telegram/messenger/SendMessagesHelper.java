@@ -1,6 +1,5 @@
 package org.telegram.messenger;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
@@ -51,6 +50,7 @@ import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_stories;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Business.QuickRepliesController;
 import org.telegram.ui.Cells.ChatMessageCell;
@@ -999,6 +999,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
     public static class SendingMediaInfo {
         public boolean canDeleteAfter;
         public String caption;
+        public String coverPath;
         public TLRPC.VideoSize emojiMarkup;
         public ArrayList<TLRPC.MessageEntity> entities;
         public boolean forceImage;
@@ -3079,7 +3080,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
     public static void lambda$sendCallback$26(String str) {
     }
 
-    public void lambda$sendCallback$28(final boolean z, final MessageObject messageObject, final TLRPC.KeyboardButton keyboardButton, final ChatActivity chatActivity, DialogInterface dialogInterface, int i) {
+    public void lambda$sendCallback$28(final boolean z, final MessageObject messageObject, final TLRPC.KeyboardButton keyboardButton, final ChatActivity chatActivity, AlertDialog alertDialog, int i) {
         final TwoStepVerificationActivity twoStepVerificationActivity = new TwoStepVerificationActivity();
         twoStepVerificationActivity.setDelegate(0, new TwoStepVerificationActivity.TwoStepVerificationActivityDelegate() {
             @Override
@@ -3090,7 +3091,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         chatActivity.presentFragment(twoStepVerificationActivity);
     }
 
-    public static void lambda$sendCallback$29(ChatActivity chatActivity, DialogInterface dialogInterface, int i) {
+    public static void lambda$sendCallback$29(ChatActivity chatActivity, AlertDialog alertDialog, int i) {
         chatActivity.presentFragment(new TwoStepVerificationSetupActivity(6, null));
     }
 
@@ -5088,11 +5089,11 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
     }
 
     public int sendMessage(ArrayList<MessageObject> arrayList, long j, boolean z, boolean z2, boolean z3, int i) {
-        return sendMessage(arrayList, j, z, z2, z3, i, null);
+        return sendMessage(arrayList, j, z, z2, z3, i, null, -1);
     }
 
-    public int sendMessage(java.util.ArrayList<org.telegram.messenger.MessageObject> r65, final long r66, boolean r68, boolean r69, boolean r70, final int r71, org.telegram.messenger.MessageObject r72) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.sendMessage(java.util.ArrayList, long, boolean, boolean, boolean, int, org.telegram.messenger.MessageObject):int");
+    public int sendMessage(java.util.ArrayList<org.telegram.messenger.MessageObject> r67, final long r68, boolean r70, boolean r71, boolean r72, final int r73, org.telegram.messenger.MessageObject r74, int r75) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.sendMessage(java.util.ArrayList, long, boolean, boolean, boolean, int, org.telegram.messenger.MessageObject, int):int");
     }
 
     public void sendMessage(org.telegram.messenger.SendMessagesHelper.SendMessageParams r103) {

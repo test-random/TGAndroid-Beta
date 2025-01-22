@@ -193,7 +193,7 @@ public class AdminLogFilterAlert2 extends BottomSheetWithRecyclerListView {
             this.selectedAdmins = null;
         }
         this.delegate.didSelectRights(this.currentFilter, this.selectedAdmins);
-        dismiss();
+        lambda$new$0();
     }
 
     @Override

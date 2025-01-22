@@ -76,6 +76,7 @@ public abstract class DrawerProfileCell extends FrameLayout implements Notificat
     private Rect srcRect;
     StarParticlesView.Drawable starParticlesDrawable;
     private AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable status;
+    private Long statusGiftId;
     private boolean updateRightDrawable;
 
     public static class AnimatedStatusView extends View {
@@ -472,6 +473,10 @@ public abstract class DrawerProfileCell extends FrameLayout implements Notificat
         return this.nameTextView;
     }
 
+    public Long getEmojiStatusGiftId() {
+        return this.statusGiftId;
+    }
+
     public void getEmojiStatusLocation(Rect rect) {
         if (this.nameTextView.getRightDrawable() == null) {
             rect.set(this.nameTextView.getWidth() - 1, (this.nameTextView.getHeight() / 2) - 1, this.nameTextView.getWidth() + 1, (this.nameTextView.getHeight() / 2) + 1);
@@ -571,8 +576,6 @@ public abstract class DrawerProfileCell extends FrameLayout implements Notificat
     }
 
     public void setUser(TLRPC.User user, boolean z) {
-        Drawable drawable;
-        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable;
         int i = UserConfig.selectedAccount;
         int i2 = this.lastAccount;
         if (i != i2) {
@@ -590,6 +593,7 @@ public abstract class DrawerProfileCell extends FrameLayout implements Notificat
             return;
         }
         this.accountsShown = z;
+        boolean z2 = false;
         setArrowState(false);
         CharSequence userName = UserObject.getUserName(user);
         try {
@@ -598,29 +602,30 @@ public abstract class DrawerProfileCell extends FrameLayout implements Notificat
         }
         this.drawPremium = false;
         this.nameTextView.setText(userName);
+        this.statusGiftId = null;
         Long emojiStatusDocumentId = UserObject.getEmojiStatusDocumentId(user);
         if (emojiStatusDocumentId != null) {
+            z2 = user.emoji_status instanceof TLRPC.TL_emojiStatusCollectible;
             this.animatedStatus.animate().alpha(1.0f).setDuration(200L).start();
             this.nameTextView.setDrawablePadding(AndroidUtilities.dp(4.0f));
             this.status.set(emojiStatusDocumentId.longValue(), true);
-        } else {
-            if (user.premium) {
-                this.animatedStatus.animate().alpha(1.0f).setDuration(200L).start();
-                this.nameTextView.setDrawablePadding(AndroidUtilities.dp(4.0f));
-                if (this.premiumStar == null) {
-                    this.premiumStar = getResources().getDrawable(R.drawable.msg_premium_liststar).mutate();
-                }
-                this.premiumStar.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chats_menuPhoneCats), PorterDuff.Mode.MULTIPLY));
-                swapAnimatedEmojiDrawable = this.status;
-                drawable = this.premiumStar;
-            } else {
-                drawable = null;
-                this.animatedStatus.animateChange(null);
-                this.animatedStatus.animate().alpha(0.0f).setDuration(200L).start();
-                swapAnimatedEmojiDrawable = this.status;
+            if (z2) {
+                this.statusGiftId = Long.valueOf(((TLRPC.TL_emojiStatusCollectible) user.emoji_status).collectible_id);
             }
-            swapAnimatedEmojiDrawable.set(drawable, true);
+        } else if (user.premium) {
+            this.animatedStatus.animate().alpha(1.0f).setDuration(200L).start();
+            this.nameTextView.setDrawablePadding(AndroidUtilities.dp(4.0f));
+            if (this.premiumStar == null) {
+                this.premiumStar = getResources().getDrawable(R.drawable.msg_premium_liststar).mutate();
+            }
+            this.premiumStar.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chats_menuPhoneCats), PorterDuff.Mode.MULTIPLY));
+            this.status.set(this.premiumStar, true);
+        } else {
+            this.animatedStatus.animateChange(null);
+            this.animatedStatus.animate().alpha(0.0f).setDuration(200L).start();
+            this.status.set((Drawable) null, true);
         }
+        this.status.setParticles(z2, true);
         this.animatedStatus.setColor(Theme.getColor(Theme.isCurrentThemeDark() ? Theme.key_chats_verifiedBackground : Theme.key_chats_menuPhoneCats));
         this.status.setColor(Integer.valueOf(Theme.getColor(Theme.isCurrentThemeDark() ? Theme.key_chats_verifiedBackground : Theme.key_chats_menuPhoneCats)));
         this.phoneTextView.setText(PhoneFormat.getInstance().format("+" + user.phone));

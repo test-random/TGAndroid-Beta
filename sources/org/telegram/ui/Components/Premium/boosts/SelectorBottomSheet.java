@@ -128,7 +128,7 @@ public class SelectorBottomSheet extends BottomSheetWithRecyclerListView {
         selectorHeaderCell.setOnCloseClickListener(new Runnable() {
             @Override
             public final void run() {
-                SelectorBottomSheet.this.dismiss();
+                SelectorBottomSheet.this.lambda$new$0();
             }
         });
         selectorHeaderCell.setText(getTitle());
@@ -258,7 +258,7 @@ public class SelectorBottomSheet extends BottomSheetWithRecyclerListView {
     public void lambda$hasChanges$11() {
         this.selectedIds.clear();
         this.openedIds.clear();
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$loadData$6(List list) {
@@ -632,7 +632,7 @@ public class SelectorBottomSheet extends BottomSheetWithRecyclerListView {
     }
 
     @Override
-    public void dismiss() {
+    public void lambda$new$0() {
         Runnable runnable = this.onCloseClick;
         if (runnable != null) {
             runnable.run();

@@ -82,6 +82,7 @@ import org.telegram.ui.Stories.recorder.GalleryListView;
 
 public abstract class GalleryListView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
     private static final MediaController.AlbumEntry draftsAlbum = new MediaController.AlbumEntry(-1, null, null);
+    private final float ASPECT_RATIO;
     private final ActionBar actionBar;
     private boolean actionBarShown;
     private final AnimatedFloat actionBarT;
@@ -291,7 +292,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
         @Override
         public void getPositionForScrollProgress(RecyclerListView recyclerListView, float f, int[] iArr) {
             int totalItemsCount = getTotalItemsCount();
-            int width = (int) (((int) (((recyclerListView.getWidth() - recyclerListView.getPaddingLeft()) - recyclerListView.getPaddingRight()) / GalleryListView.this.layoutManager.getSpanCount())) * 1.39f);
+            int width = (int) (((int) (((recyclerListView.getWidth() - recyclerListView.getPaddingLeft()) - recyclerListView.getPaddingRight()) / GalleryListView.this.layoutManager.getSpanCount())) * GalleryListView.this.ASPECT_RATIO);
             int ceil = (int) Math.ceil(totalItemsCount / GalleryListView.this.layoutManager.getSpanCount());
             float lerp = (AndroidUtilities.lerp(0, Math.max(0, r2 - ((AndroidUtilities.displaySize.y - recyclerListView.getPaddingTop()) - recyclerListView.getPaddingBottom())), f) / (ceil * width)) * ceil;
             int round = Math.round(lerp);
@@ -302,7 +303,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
         @Override
         public float getScrollProgress(RecyclerListView recyclerListView) {
             int totalItemsCount = getTotalItemsCount();
-            return (Math.max(0, recyclerListView.computeVerticalScrollOffset() - GalleryListView.this.getPadding()) - recyclerListView.getPaddingTop()) / ((((int) Math.ceil(totalItemsCount / GalleryListView.this.layoutManager.getSpanCount())) * ((int) (((int) (((recyclerListView.getWidth() - recyclerListView.getPaddingLeft()) - recyclerListView.getPaddingRight()) / GalleryListView.this.layoutManager.getSpanCount())) * 1.39f))) - (AndroidUtilities.displaySize.y - recyclerListView.getPaddingTop()));
+            return (Math.max(0, recyclerListView.computeVerticalScrollOffset() - GalleryListView.this.getPadding()) - recyclerListView.getPaddingTop()) / ((((int) Math.ceil(totalItemsCount / GalleryListView.this.layoutManager.getSpanCount())) * ((int) (((int) (((recyclerListView.getWidth() - recyclerListView.getPaddingLeft()) - recyclerListView.getPaddingRight()) / GalleryListView.this.layoutManager.getSpanCount())) * GalleryListView.this.ASPECT_RATIO))) - (AndroidUtilities.displaySize.y - recyclerListView.getPaddingTop()));
         }
 
         @Override
@@ -364,7 +365,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
                 GalleryListView galleryListView3 = GalleryListView.this;
                 cell = galleryListView2.headerView = new HeaderView(galleryListView3.getContext(), GalleryListView.this.onlyPhotos);
             } else {
-                cell = new Cell(GalleryListView.this.getContext(), GalleryListView.this.resourcesProvider);
+                cell = new Cell(GalleryListView.this.getContext(), GalleryListView.this.resourcesProvider, GalleryListView.this.ASPECT_RATIO);
             }
             return new RecyclerListView.Holder(cell);
         }
@@ -385,6 +386,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
 
     public static class Cell extends FrameLayout {
         private static int allQueuesIndex;
+        private float aspectRatio;
         private final Paint bgPaint;
         private Bitmap bitmap;
         private final Matrix bitmapMatrix;
@@ -426,7 +428,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
             }
         };
 
-        public Cell(Context context, Theme.ResourcesProvider resourcesProvider) {
+        public Cell(Context context, Theme.ResourcesProvider resourcesProvider, float f) {
             super(context);
             this.bitmapPaint = new Paint(3);
             Paint paint = new Paint(1);
@@ -449,6 +451,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
             this.clipPath = new Path();
             this.radii = new float[8];
             this.paintUnderCheck = new Paint(1);
+            this.aspectRatio = f;
             paint.setColor(285212671);
             paint2.setColor(1275068416);
             textPaint.setTypeface(AndroidUtilities.bold());
@@ -552,7 +555,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
                 return null;
             }
             int min = (int) Math.min(AndroidUtilities.displaySize.x / 3.0f, AndroidUtilities.dp(330.0f));
-            int i2 = (int) (min * 1.39f);
+            int i2 = (int) (min * this.aspectRatio);
             if (obj instanceof MediaController.PhotoEntry) {
                 MediaController.PhotoEntry photoEntry = (MediaController.PhotoEntry) obj;
                 BitmapFactory.Options options = new BitmapFactory.Options();
@@ -563,7 +566,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
                 options.inDither = true;
                 options.inJustDecodeBounds = false;
                 Bitmap readBitmap = readBitmap(photoEntry, options);
-                if (readBitmap != null && readBitmap.getHeight() / readBitmap.getWidth() < 1.39f) {
+                if (readBitmap != null && readBitmap.getHeight() / readBitmap.getWidth() < this.aspectRatio) {
                     if (photoEntry.gradientTopColor == 0 && photoEntry.gradientBottomColor == 0 && !readBitmap.isRecycled()) {
                         iArr2 = DominantColors.getColorsSync(true, readBitmap, true);
                         photoEntry.gradientTopColor = iArr2[0];
@@ -758,7 +761,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
         private void updateMatrix() {
             Bitmap bitmap;
             if (getMeasuredWidth() > 0 && getMeasuredHeight() > 0 && (bitmap = this.bitmap) != null) {
-                float max = ((float) bitmap.getHeight()) / ((float) this.bitmap.getWidth()) > 1.29f ? Math.max(getMeasuredWidth() / this.bitmap.getWidth(), getMeasuredHeight() / this.bitmap.getHeight()) : getMeasuredWidth() / this.bitmap.getWidth();
+                float max = ((float) bitmap.getHeight()) / ((float) this.bitmap.getWidth()) > this.aspectRatio - 0.1f ? Math.max(getMeasuredWidth() / this.bitmap.getWidth(), getMeasuredHeight() / this.bitmap.getHeight()) : getMeasuredWidth() / this.bitmap.getWidth();
                 this.bitmapMatrix.reset();
                 this.bitmapMatrix.postScale(max, max);
                 this.bitmapMatrix.postTranslate((getMeasuredWidth() - (this.bitmap.getWidth() * max)) / 2.0f, (getMeasuredHeight() - (max * this.bitmap.getHeight())) / 2.0f);
@@ -864,7 +867,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
         @Override
         protected void onMeasure(int i, int i2) {
             int size = View.MeasureSpec.getSize(i);
-            super.onMeasure(View.MeasureSpec.makeMeasureSpec(size, 1073741824), View.MeasureSpec.makeMeasureSpec((int) (size * 1.39f), 1073741824));
+            super.onMeasure(View.MeasureSpec.makeMeasureSpec(size, 1073741824), View.MeasureSpec.makeMeasureSpec((int) (size * this.aspectRatio), 1073741824));
             updateMatrix();
         }
 
@@ -944,7 +947,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
                         i3 = 0;
                     }
                 }
-                i4 = Math.max(0, (AndroidUtilities.displaySize.y - AndroidUtilities.dp(62.0f)) - (((int) (((int) (size / GalleryListView.this.layoutManager.getSpanCount())) * 1.39f)) * ((int) Math.ceil(i3 / GalleryListView.this.layoutManager.getSpanCount()))));
+                i4 = Math.max(0, (AndroidUtilities.displaySize.y - AndroidUtilities.dp(62.0f)) - (((int) (((int) (size / GalleryListView.this.layoutManager.getSpanCount())) * GalleryListView.this.ASPECT_RATIO)) * ((int) Math.ceil(i3 / GalleryListView.this.layoutManager.getSpanCount()))));
             }
             setMeasuredDimension(size, i4);
         }
@@ -965,7 +968,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
             textView.setTextSize(1, 16.0f);
             this.textView.setTextColor(-1);
             this.textView.setTypeface(AndroidUtilities.bold());
-            this.textView.setText(LocaleController.getString(z ? R.string.AddImage : R.string.ChoosePhotoOrVideo));
+            this.textView.setText(GalleryListView.this.getTitle());
             addView(this.textView, LayoutHelper.createFrame(-1, -1.0f, 119, 0.0f, 0.0f, z ? 32.0f : 0.0f, 0.0f));
         }
     }
@@ -1168,6 +1171,10 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
     }
 
     public GalleryListView(int i, Context context, Theme.ResourcesProvider resourcesProvider, MediaController.AlbumEntry albumEntry, boolean z) {
+        this(i, context, resourcesProvider, albumEntry, z, 1.39f);
+    }
+
+    public GalleryListView(int i, Context context, Theme.ResourcesProvider resourcesProvider, MediaController.AlbumEntry albumEntry, boolean z, float f) {
         super(context);
         TextView textView;
         int i2;
@@ -1179,6 +1186,7 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
         ArrayList arrayList = new ArrayList();
         this.drafts = arrayList;
         this.selectedPhotos = new ArrayList();
+        this.ASPECT_RATIO = f;
         this.currentAccount = i;
         this.resourcesProvider = resourcesProvider;
         this.onlyPhotos = z;
@@ -1743,7 +1751,8 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
         canvas.restore();
     }
 
-    protected abstract void firstLayout();
+    protected void firstLayout() {
+    }
 
     public int getPadding() {
         return (int) (AndroidUtilities.displaySize.y * 0.35f);
@@ -1751,6 +1760,10 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
 
     public MediaController.AlbumEntry getSelectedAlbum() {
         return this.selectedAlbum;
+    }
+
+    public String getTitle() {
+        return LocaleController.getString(this.onlyPhotos ? R.string.AddImage : R.string.ChoosePhotoOrVideo);
     }
 
     public boolean isMultiple() {
@@ -1786,7 +1799,8 @@ public abstract class GalleryListView extends FrameLayout implements Notificatio
         Cell.cleanupQueues();
     }
 
-    protected abstract void onFullScreen(boolean z);
+    protected void onFullScreen(boolean z) {
+    }
 
     @Override
     protected void onMeasure(int i, int i2) {

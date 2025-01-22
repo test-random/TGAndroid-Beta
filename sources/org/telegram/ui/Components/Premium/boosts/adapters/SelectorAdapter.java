@@ -71,6 +71,15 @@ public class SelectorAdapter extends AdapterWithDiffUtils {
             return item;
         }
 
+        public static Item asChat(TLRPC.Chat chat, boolean z) {
+            Item item = new Item(3, true);
+            item.chat = chat;
+            item.user = null;
+            item.peer = null;
+            item.checked = z;
+            return item;
+        }
+
         public static Item asCountry(TLRPC.TL_help_country tL_help_country, boolean z) {
             Item item = new Item(6, true);
             item.country = tL_help_country;

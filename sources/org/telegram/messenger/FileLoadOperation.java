@@ -1086,15 +1086,6 @@ public class FileLoadOperation {
         }
         FileLog.e("FileLoadOperation " + getFileName() + " removing stream listener " + fileLoadOperationStream);
         this.streamListeners.remove(fileLoadOperationStream);
-        if (!this.isStory && this.streamListeners.isEmpty()) {
-            Utilities.stageQueue.cancelRunnable(this.cancelAfterNoStreamListeners);
-            Utilities.stageQueue.postRunnable(this.cancelAfterNoStreamListeners, 1200L);
-        } else {
-            if (this.streamListeners.isEmpty()) {
-                return;
-            }
-            Utilities.stageQueue.cancelRunnable(this.cancelAfterNoStreamListeners);
-        }
     }
 
     public void lambda$requestFileOffsets$21(TLObject tLObject, TLRPC.TL_error tL_error) {

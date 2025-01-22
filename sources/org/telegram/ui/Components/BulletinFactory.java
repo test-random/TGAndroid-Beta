@@ -1179,7 +1179,9 @@ public final class BulletinFactory {
 
     public void showForError(TLRPC.TL_error tL_error) {
         if (LaunchActivity.isActive) {
-            createErrorBulletin(tL_error == null ? LocaleController.formatString(R.string.UnknownError, new Object[0]) : LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text)).show();
+            Bulletin createErrorBulletin = createErrorBulletin(tL_error == null ? LocaleController.formatString(R.string.UnknownError, new Object[0]) : LocaleController.formatString(R.string.UnknownErrorCode, tL_error.text));
+            createErrorBulletin.hideAfterBottomSheet = false;
+            createErrorBulletin.show();
         }
     }
 

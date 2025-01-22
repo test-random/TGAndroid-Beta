@@ -1,7 +1,6 @@
 package org.telegram.ui.Components;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -126,7 +125,7 @@ public abstract class StickersDialogs {
         });
     }
 
-    public static void lambda$showDeleteForEveryOneDialog$7(Runnable runnable, TLRPC.StickerSet stickerSet, DialogInterface dialogInterface, int i) {
+    public static void lambda$showDeleteForEveryOneDialog$7(Runnable runnable, TLRPC.StickerSet stickerSet, AlertDialog alertDialog, int i) {
         runnable.run();
         TLRPC.TL_stickers_deleteStickerSet tL_stickers_deleteStickerSet = new TLRPC.TL_stickers_deleteStickerSet();
         tL_stickers_deleteStickerSet.stickerset = MediaDataController.getInputStickerSet(stickerSet);
@@ -142,10 +141,10 @@ public abstract class StickersDialogs {
         return (charSequence.length() > 0 && Character.isWhitespace(charSequence.charAt(0)) && (TextUtils.isEmpty(editTextBoldCursor.getText()) || i3 == 0)) ? "" : charSequence;
     }
 
-    public static void lambda$showNameEditorDialog$1(AlertDialog alertDialog, DialogInterface dialogInterface, EditTextBoldCursor editTextBoldCursor, Boolean bool) {
+    public static void lambda$showNameEditorDialog$1(AlertDialog alertDialog, AlertDialog alertDialog2, EditTextBoldCursor editTextBoldCursor, Boolean bool) {
         alertDialog.dismiss();
         if (bool.booleanValue()) {
-            dialogInterface.dismiss();
+            alertDialog2.dismiss();
             return;
         }
         editTextBoldCursor.setErrorText(".");
@@ -154,7 +153,7 @@ public abstract class StickersDialogs {
         AndroidUtilities.showKeyboard(editTextBoldCursor);
     }
 
-    public static void lambda$showNameEditorDialog$2(final EditTextBoldCursor editTextBoldCursor, Utilities.Callback2 callback2, Context context, boolean z, final DialogInterface dialogInterface, int i) {
+    public static void lambda$showNameEditorDialog$2(final EditTextBoldCursor editTextBoldCursor, Utilities.Callback2 callback2, Context context, boolean z, final AlertDialog alertDialog, int i) {
         String trim = editTextBoldCursor.getText().toString().trim();
         if (TextUtils.isEmpty(trim) || TextUtils.isEmpty(AndroidUtilities.translitSafe(trim.toString()))) {
             editTextBoldCursor.setErrorText(".");
@@ -167,19 +166,19 @@ public abstract class StickersDialogs {
         if (callback2 == null) {
             return;
         }
-        final AlertDialog alertDialog = new AlertDialog(context, 3, z ? null : new DarkThemeResourceProvider());
-        alertDialog.showDelayed(250L);
+        final AlertDialog alertDialog2 = new AlertDialog(context, 3, z ? null : new DarkThemeResourceProvider());
+        alertDialog2.showDelayed(250L);
         callback2.run(trim, new Utilities.Callback() {
             @Override
             public final void run(Object obj) {
-                StickersDialogs.lambda$showNameEditorDialog$1(AlertDialog.this, dialogInterface, editTextBoldCursor, (Boolean) obj);
+                StickersDialogs.lambda$showNameEditorDialog$1(AlertDialog.this, alertDialog, editTextBoldCursor, (Boolean) obj);
             }
         });
     }
 
-    public static void lambda$showNameEditorDialog$3(EditTextBoldCursor editTextBoldCursor, DialogInterface dialogInterface, int i) {
+    public static void lambda$showNameEditorDialog$3(EditTextBoldCursor editTextBoldCursor, AlertDialog alertDialog, int i) {
         AndroidUtilities.hideKeyboard(editTextBoldCursor);
-        dialogInterface.dismiss();
+        alertDialog.dismiss();
     }
 
     public static boolean lambda$showNameEditorDialog$4(AlertDialog alertDialog, TextView textView, int i, KeyEvent keyEvent) {
@@ -259,10 +258,10 @@ public abstract class StickersDialogs {
         if (stickerSet == null) {
             return;
         }
-        AlertDialog create = new AlertDialog.Builder(context, resourcesProvider).setTitle(LocaleController.getString(R.string.StickersDeleteStickerSetTitle)).setMessage(LocaleController.getString(R.string.StickersDeleteStickerSetDescription)).setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+        AlertDialog create = new AlertDialog.Builder(context, resourcesProvider).setTitle(LocaleController.getString(R.string.StickersDeleteStickerSetTitle)).setMessage(LocaleController.getString(R.string.StickersDeleteStickerSetDescription)).setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                StickersDialogs.lambda$showDeleteForEveryOneDialog$7(runnable, stickerSet, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                StickersDialogs.lambda$showDeleteForEveryOneDialog$7(runnable, stickerSet, alertDialog, i);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).create();
         create.show();
@@ -336,16 +335,16 @@ public abstract class StickersDialogs {
         }
         builder.setView(frameLayout);
         builder.setCustomViewOffset(4);
-        builder.setPositiveButton(LocaleController.getString(z ? R.string.Done : R.string.Create), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(z ? R.string.Done : R.string.Create), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                StickersDialogs.lambda$showNameEditorDialog$2(EditTextBoldCursor.this, callback2, context, z, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                StickersDialogs.lambda$showNameEditorDialog$2(EditTextBoldCursor.this, callback2, context, z, alertDialog, i2);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                StickersDialogs.lambda$showNameEditorDialog$3(EditTextBoldCursor.this, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                StickersDialogs.lambda$showNameEditorDialog$3(EditTextBoldCursor.this, alertDialog, i2);
             }
         });
         final AlertDialog show = builder.show();

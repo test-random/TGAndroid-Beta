@@ -147,16 +147,16 @@ public class ShareDialogCell extends FrameLayout implements NotificationCenter.N
         super(context);
         int i2;
         float f;
-        this.avatarDrawable = new AvatarDrawable() {
+        this.currentAccount = UserConfig.selectedAccount;
+        this.premiumBlockedT = new AnimatedFloat(this, 0L, 350L, CubicBezierInterpolator.EASE_OUT_QUINT);
+        this.resourcesProvider = resourcesProvider;
+        this.avatarDrawable = new AvatarDrawable(resourcesProvider) {
             @Override
             public void invalidateSelf() {
                 super.invalidateSelf();
                 ShareDialogCell.this.imageView.invalidate();
             }
         };
-        this.currentAccount = UserConfig.selectedAccount;
-        this.premiumBlockedT = new AnimatedFloat(this, 0L, 350L, CubicBezierInterpolator.EASE_OUT_QUINT);
-        this.resourcesProvider = resourcesProvider;
         setWillNotDraw(false);
         this.currentType = i;
         BackupImageView backupImageView = new BackupImageView(context);
@@ -178,7 +178,7 @@ public class ShareDialogCell extends FrameLayout implements NotificationCenter.N
         };
         this.nameTextView = textView;
         NotificationCenter.listenEmojiLoading(textView);
-        textView.setTextColor(getThemedColor(this.premiumBlocked ? Theme.key_windowBackgroundWhiteGrayText5 : i == 1 ? Theme.key_voipgroup_nameText : Theme.key_dialogTextBlack));
+        textView.setTextColor(getThemedColor(this.premiumBlocked ? Theme.key_windowBackgroundWhiteGrayText5 : Theme.key_dialogTextBlack));
         textView.setTextSize(1, 12.0f);
         textView.setMaxLines(2);
         textView.setGravity(49);
@@ -187,7 +187,7 @@ public class ShareDialogCell extends FrameLayout implements NotificationCenter.N
         addView(textView, LayoutHelper.createFrame(-1, -2.0f, 51, 6.0f, i == 2 ? 58.0f : 66.0f, 6.0f, 0.0f));
         SimpleTextView simpleTextView = new SimpleTextView(context);
         this.topicTextView = simpleTextView;
-        simpleTextView.setTextColor(getThemedColor(i == 1 ? Theme.key_voipgroup_nameText : Theme.key_dialogTextBlack));
+        simpleTextView.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
         simpleTextView.setTextSize(12);
         simpleTextView.setMaxLines(2);
         simpleTextView.setGravity(49);
@@ -195,7 +195,7 @@ public class ShareDialogCell extends FrameLayout implements NotificationCenter.N
         addView(simpleTextView, LayoutHelper.createFrame(-1, -2.0f, 51, 6.0f, i == 2 ? 58.0f : 66.0f, 6.0f, 0.0f));
         CheckBox2 checkBox2 = new CheckBox2(context, 21, resourcesProvider);
         this.checkBox = checkBox2;
-        checkBox2.setColor(Theme.key_dialogRoundCheckBox, i == 1 ? Theme.key_voipgroup_inviteMembersBackground : Theme.key_dialogBackground, Theme.key_dialogRoundCheckBoxCheck);
+        checkBox2.setColor(Theme.key_dialogRoundCheckBox, Theme.key_dialogBackground, Theme.key_dialogRoundCheckBoxCheck);
         checkBox2.setDrawUnchecked(false);
         checkBox2.setDrawBackgroundAsArc(4);
         checkBox2.setProgressDelegate(new CheckBoxBase.ProgressDelegate() {
@@ -238,7 +238,7 @@ public class ShareDialogCell extends FrameLayout implements NotificationCenter.N
             boolean z = this.premiumBlocked;
             boolean z2 = this.user != null && MessagesController.getInstance(this.currentAccount).isUserPremiumBlocked(this.user.id);
             this.premiumBlocked = z2;
-            this.nameTextView.setTextColor(getThemedColor(z2 ? Theme.key_windowBackgroundWhiteGrayText5 : this.currentType == 1 ? Theme.key_voipgroup_nameText : Theme.key_dialogTextBlack));
+            this.nameTextView.setTextColor(getThemedColor(z2 ? Theme.key_windowBackgroundWhiteGrayText5 : Theme.key_dialogTextBlack));
             if (this.premiumBlocked != z) {
                 invalidate();
             }
@@ -327,7 +327,7 @@ public class ShareDialogCell extends FrameLayout implements NotificationCenter.N
                 this.user = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(j));
                 boolean isUserPremiumBlocked = MessagesController.getInstance(this.currentAccount).isUserPremiumBlocked(j);
                 this.premiumBlocked = isUserPremiumBlocked;
-                this.nameTextView.setTextColor(getThemedColor(isUserPremiumBlocked ? Theme.key_windowBackgroundWhiteGrayText5 : this.currentType == 1 ? Theme.key_voipgroup_nameText : Theme.key_dialogTextBlack));
+                this.nameTextView.setTextColor(getThemedColor(isUserPremiumBlocked ? Theme.key_windowBackgroundWhiteGrayText5 : Theme.key_dialogTextBlack));
                 this.premiumBlockedT.set(this.premiumBlocked, true);
                 invalidate();
                 this.avatarDrawable.setInfo(this.currentAccount, this.user);

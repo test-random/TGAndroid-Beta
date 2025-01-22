@@ -1,7 +1,6 @@
 package org.telegram.ui;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.SpannableStringBuilder;
@@ -214,10 +213,10 @@ public class LinkEditActivity extends BaseFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setMessage(LocaleController.getString(R.string.RevokeAlert));
         builder.setTitle(LocaleController.getString(R.string.RevokeLink));
-        builder.setPositiveButton(LocaleController.getString(R.string.RevokeButton), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.RevokeButton), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                LinkEditActivity.this.lambda$createView$9(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                LinkEditActivity.this.lambda$createView$9(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -315,9 +314,9 @@ public class LinkEditActivity extends BaseFragment {
         this.ignoreSet = false;
     }
 
-    public void lambda$createView$9(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$9(AlertDialog alertDialog, int i) {
         this.callback.revokeLink(this.inviteToEdit);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$getThemeDescriptions$16() {
@@ -364,7 +363,7 @@ public class LinkEditActivity extends BaseFragment {
         if (callback != null) {
             callback.onLinkCreated(tLObject);
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$onCreateClicked$13(final TLObject tLObject, final TLRPC.TL_error tL_error) {
@@ -393,7 +392,7 @@ public class LinkEditActivity extends BaseFragment {
         if (callback != null) {
             callback.onLinkEdited(this.inviteToEdit, tLObject);
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$onCreateClicked$15(final TLObject tLObject, final TLRPC.TL_error tL_error) {
@@ -453,10 +452,10 @@ public class LinkEditActivity extends BaseFragment {
     }
 
     @Override
-    public void lambda$onBackPressed$321() {
+    public void lambda$onBackPressed$323() {
         this.scrollView.getLayoutParams().height = this.scrollView.getHeight();
         this.finished = true;
-        super.lambda$onBackPressed$321();
+        super.lambda$onBackPressed$323();
     }
 
     @Override

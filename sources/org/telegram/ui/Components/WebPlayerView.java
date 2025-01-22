@@ -1249,6 +1249,9 @@ public class WebPlayerView extends ViewGroup implements VideoPlayer.VideoPlayerD
     }
 
     public static String getYouTubeVideoId(String str) {
+        if (str == null) {
+            return null;
+        }
         Matcher matcher = youtubeIdRegex.matcher(str);
         if (matcher.find()) {
             return matcher.group(1);

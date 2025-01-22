@@ -1,7 +1,6 @@
 package org.telegram.ui.Business;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -242,12 +241,12 @@ public class ChatbotsActivity extends BaseFragment {
         }
     }
 
-    public void lambda$onBackPressed$7(DialogInterface dialogInterface, int i) {
+    public void lambda$onBackPressed$7(AlertDialog alertDialog, int i) {
         processDone();
     }
 
-    public void lambda$onBackPressed$8(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$onBackPressed$8(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public void lambda$processDone$4(TLRPC.TL_error tL_error, TLObject tLObject, int[] iArr, ArrayList arrayList) {
@@ -266,7 +265,7 @@ public class ChatbotsActivity extends BaseFragment {
         if (i == arrayList.size()) {
             BusinessChatbotController.getInstance(this.currentAccount).invalidate(true);
             getMessagesController().clearFullUsers();
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         }
     }
 
@@ -346,7 +345,7 @@ public class ChatbotsActivity extends BaseFragment {
             return;
         }
         if (!hasChanges()) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
             return;
         }
         if (this.recipientsHelper.validate(this.listView)) {
@@ -374,7 +373,7 @@ public class ChatbotsActivity extends BaseFragment {
                 }
             }
             if (arrayList.isEmpty()) {
-                lambda$onBackPressed$321();
+                lambda$onBackPressed$323();
                 return;
             }
             final int[] iArr = {0};
@@ -440,7 +439,7 @@ public class ChatbotsActivity extends BaseFragment {
             public void onItemClick(int i) {
                 if (i == -1) {
                     if (ChatbotsActivity.this.onBackPressed()) {
-                        ChatbotsActivity.this.lambda$onBackPressed$321();
+                        ChatbotsActivity.this.lambda$onBackPressed$323();
                     }
                 } else if (i == 1) {
                     ChatbotsActivity.this.processDone();
@@ -617,16 +616,16 @@ public class ChatbotsActivity extends BaseFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.UnsavedChanges));
         builder.setMessage(LocaleController.getString(R.string.BusinessBotUnsavedChanges));
-        builder.setPositiveButton(LocaleController.getString(R.string.ApplyTheme), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.ApplyTheme), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChatbotsActivity.this.lambda$onBackPressed$7(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChatbotsActivity.this.lambda$onBackPressed$7(alertDialog, i);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChatbotsActivity.this.lambda$onBackPressed$8(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChatbotsActivity.this.lambda$onBackPressed$8(alertDialog, i);
             }
         });
         showDialog(builder.create());

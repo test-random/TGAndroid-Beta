@@ -2325,8 +2325,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             }
 
             @Override
-            public void dismiss() {
-                super.dismiss();
+            public void lambda$new$0() {
+                super.lambda$new$0();
                 if (ChatActivityEnterView.this.trendingStickersAlert == this) {
                     ChatActivityEnterView.this.trendingStickersAlert = null;
                 }
@@ -2339,7 +2339,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         AnonymousClass72() {
         }
 
-        public void lambda$onClearEmojiRecent$3(DialogInterface dialogInterface, int i) {
+        public void lambda$onClearEmojiRecent$3(AlertDialog alertDialog, int i) {
             ChatActivityEnterView.this.emojiView.clearRecentEmoji();
         }
 
@@ -2498,10 +2498,10 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivityEnterView.this.parentActivity, ChatActivityEnterView.this.resourcesProvider);
             builder.setTitle(LocaleController.getString(R.string.ClearRecentEmojiTitle));
             builder.setMessage(LocaleController.getString(R.string.ClearRecentEmojiText));
-            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    ChatActivityEnterView.AnonymousClass72.this.lambda$onClearEmojiRecent$3(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    ChatActivityEnterView.AnonymousClass72.this.lambda$onClearEmojiRecent$3(alertDialog, i);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -2630,7 +2630,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         @Override
         public void onStickerSelected(View view, TLRPC.Document document, String str, Object obj, MessageObject.SendAnimationData sendAnimationData, boolean z, int i) {
             if (ChatActivityEnterView.this.trendingStickersAlert != null) {
-                ChatActivityEnterView.this.trendingStickersAlert.dismiss();
+                ChatActivityEnterView.this.trendingStickersAlert.lambda$new$0();
                 ChatActivityEnterView.this.trendingStickersAlert = null;
             }
             if (ChatActivityEnterView.this.slowModeTimer > 0 && !isInScheduleMode()) {
@@ -2703,8 +2703,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     }
 
                     @Override
-                    public void dismiss() {
-                        super.dismiss();
+                    public void lambda$new$0() {
+                        super.lambda$new$0();
                         if (ChatActivityEnterView.this.trendingStickersAlert == this) {
                             ChatActivityEnterView.this.trendingStickersAlert = null;
                         }
@@ -8342,7 +8342,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         SharedPrefsHelper.setWebViewConfirmShown(this.currentAccount, j, true);
     }
 
-    public void lambda$didPressedBotButton$64(MessageObject messageObject, TLRPC.KeyboardButton keyboardButton, DialogInterface dialogInterface, int i) {
+    public void lambda$didPressedBotButton$64(MessageObject messageObject, TLRPC.KeyboardButton keyboardButton, AlertDialog alertDialog, int i) {
         int checkSelfPermission;
         if (Build.VERSION.SDK_INT >= 23) {
             checkSelfPermission = this.parentActivity.checkSelfPermission("android.permission.ACCESS_COARSE_LOCATION");
@@ -8365,7 +8365,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         }
         TLRPC.User user = this.accountInstance.getMessagesController().getUser(Long.valueOf(j));
         if (user == null) {
-            dialogsActivity.lambda$onBackPressed$321();
+            dialogsActivity.lambda$onBackPressed$323();
             return true;
         }
         long j3 = ((MessagesStorage.TopicKey) arrayList.get(0)).dialogId;
@@ -8387,7 +8387,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 return true;
             }
         }
-        dialogsActivity.lambda$onBackPressed$321();
+        dialogsActivity.lambda$onBackPressed$323();
         return true;
     }
 
@@ -8423,7 +8423,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             }
             ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_sendBotRequestedPeer, null);
         }
-        dialogsActivity.lambda$onBackPressed$321();
+        dialogsActivity.lambda$onBackPressed$323();
         return true;
     }
 
@@ -10328,10 +10328,10 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     AlertDialog.Builder builder = new AlertDialog.Builder(this.parentActivity);
                     builder.setTitle(LocaleController.getString("ShareYouLocationTitle", R.string.ShareYouLocationTitle));
                     builder.setMessage(LocaleController.getString("ShareYouLocationInfo", R.string.ShareYouLocationInfo));
-                    builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i2) {
-                            ChatActivityEnterView.this.lambda$didPressedBotButton$64(messageObject22, keyboardButton2, dialogInterface, i2);
+                        public final void onClick(AlertDialog alertDialog, int i2) {
+                            ChatActivityEnterView.this.lambda$didPressedBotButton$64(messageObject22, keyboardButton2, alertDialog, i2);
                         }
                     });
                     builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);

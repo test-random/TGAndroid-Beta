@@ -1,7 +1,6 @@
 package org.telegram.ui.Components;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.text.SpannableStringBuilder;
 import android.view.View;
@@ -177,28 +176,28 @@ public class TermsOfServiceView extends FrameLayout {
         });
     }
 
-    public void lambda$new$2(DialogInterface dialogInterface, int i) {
-        final AlertDialog alertDialog = new AlertDialog(getContext(), 3);
-        alertDialog.setCanCancel(false);
+    public void lambda$new$2(AlertDialog alertDialog, int i) {
+        final AlertDialog alertDialog2 = new AlertDialog(getContext(), 3);
+        alertDialog2.setCanCancel(false);
         TL_account.deleteAccount deleteaccount = new TL_account.deleteAccount();
         deleteaccount.reason = "Decline ToS update";
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(deleteaccount, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                TermsOfServiceView.this.lambda$new$1(alertDialog, tLObject, tL_error);
+                TermsOfServiceView.this.lambda$new$1(alertDialog2, tLObject, tL_error);
             }
         });
-        alertDialog.show();
+        alertDialog2.show();
     }
 
-    public void lambda$new$3(DialogInterface dialogInterface, int i) {
+    public void lambda$new$3(AlertDialog alertDialog, int i) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage(LocaleController.getString(R.string.TosDeclineDeleteAccount));
         builder.setTitle(LocaleController.getString(R.string.AppName));
-        builder.setPositiveButton(LocaleController.getString(R.string.Deactivate), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Deactivate), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface2, int i2) {
-                TermsOfServiceView.this.lambda$new$2(dialogInterface2, i2);
+            public final void onClick(AlertDialog alertDialog2, int i2) {
+                TermsOfServiceView.this.lambda$new$2(alertDialog2, i2);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -208,10 +207,10 @@ public class TermsOfServiceView extends FrameLayout {
     public void lambda$new$4(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         builder.setTitle(LocaleController.getString(R.string.TermsOfService));
-        builder.setPositiveButton(LocaleController.getString(R.string.DeclineDeactivate), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.DeclineDeactivate), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                TermsOfServiceView.this.lambda$new$3(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                TermsOfServiceView.this.lambda$new$3(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Back), null);
@@ -219,7 +218,7 @@ public class TermsOfServiceView extends FrameLayout {
         builder.show();
     }
 
-    public void lambda$new$5(DialogInterface dialogInterface, int i) {
+    public void lambda$new$5(AlertDialog alertDialog, int i) {
         accept();
     }
 
@@ -230,10 +229,10 @@ public class TermsOfServiceView extends FrameLayout {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         builder.setTitle(LocaleController.getString(R.string.TosAgeTitle));
-        builder.setPositiveButton(LocaleController.getString(R.string.Agree), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Agree), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                TermsOfServiceView.this.lambda$new$5(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                TermsOfServiceView.this.lambda$new$5(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);

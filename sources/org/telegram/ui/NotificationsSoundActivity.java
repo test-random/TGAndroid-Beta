@@ -2,7 +2,6 @@ package org.telegram.ui;
 
 import android.content.ClipData;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -158,9 +157,9 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
         public static void lambda$deleteSelectedMessages$2(TLObject tLObject, TLRPC.TL_error tL_error) {
         }
 
-        public void lambda$onItemClick$1(DialogInterface dialogInterface, int i) {
+        public void lambda$onItemClick$1(AlertDialog alertDialog, int i) {
             deleteSelectedMessages();
-            dialogInterface.dismiss();
+            alertDialog.dismiss();
         }
 
         @Override
@@ -171,7 +170,7 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
                     NotificationsSoundActivity.this.hideActionMode();
                     return;
                 } else {
-                    NotificationsSoundActivity.this.lambda$onBackPressed$321();
+                    NotificationsSoundActivity.this.lambda$onBackPressed$323();
                     return;
                 }
             }
@@ -179,16 +178,16 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
                 AlertDialog.Builder builder = new AlertDialog.Builder(NotificationsSoundActivity.this.getParentActivity(), NotificationsSoundActivity.this.resourcesProvider);
                 builder.setTitle(LocaleController.formatPluralString("DeleteTones", NotificationsSoundActivity.this.selectedTones.size(), new Object[0]));
                 builder.setMessage(AndroidUtilities.replaceTags(LocaleController.formatPluralString("DeleteTonesMessage", NotificationsSoundActivity.this.selectedTones.size(), new Object[0])));
-                builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(LocaleController.getString(R.string.Cancel), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        dialogInterface.dismiss();
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        alertDialog.dismiss();
                     }
                 });
-                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        NotificationsSoundActivity.AnonymousClass1.this.lambda$onItemClick$1(dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        NotificationsSoundActivity.AnonymousClass1.this.lambda$onItemClick$1(alertDialog, i2);
                     }
                 });
                 TextView textView = (TextView) builder.show().getButton(-1);
@@ -925,7 +924,7 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
             z = false;
         }
         if (z) {
-            this.chatAttachAlert.dismiss();
+            this.chatAttachAlert.lambda$new$0();
         }
     }
 

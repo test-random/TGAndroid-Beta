@@ -159,7 +159,7 @@ public class ExplainStarsSheet extends BottomSheetWithRecyclerListView {
     }
 
     public void lambda$new$0(View view) {
-        dismiss();
+        lambda$new$0();
     }
 
     @Override

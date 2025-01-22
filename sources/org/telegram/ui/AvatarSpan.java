@@ -9,6 +9,7 @@ import android.view.View;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.MessagesController;
+import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AvatarDrawable;
@@ -100,6 +101,11 @@ public class AvatarSpan extends ReplacementSpan {
 
     public void setImageDrawable(Drawable drawable) {
         this.imageReceiver.setImageBitmap(drawable);
+    }
+
+    public void setObject(TLObject tLObject) {
+        this.avatarDrawable.setInfo(this.currentAccount, tLObject);
+        this.imageReceiver.setForUserOrChat(tLObject, this.avatarDrawable);
     }
 
     public void setParent(View view) {

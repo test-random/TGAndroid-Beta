@@ -12,6 +12,7 @@ import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.CornerPathEffect;
+import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -84,6 +85,16 @@ public class HintView2 extends View {
     private long duration;
     private AnimatedEmojiSpan.EmojiGroupedSpans emojiGroupedSpans;
     private boolean firstDraw;
+    private boolean flicker;
+    private final RectF flickerBounds;
+    private Paint flickerFillPaint;
+    private LinearGradient flickerGradient;
+    private Matrix flickerGradientMatrix;
+    private long flickerStart;
+    private LinearGradient flickerStrokeGradient;
+    private Paint flickerStrokePaint;
+    private Path flickerStrokePath;
+    private float flickerStrokePathExtrude;
     private boolean hideByTouch;
     private final Runnable hideRunnable;
     private Drawable icon;
@@ -101,12 +112,14 @@ public class HintView2 extends View {
     private Runnable onHidden;
     private LinkSpanDrawable.LinksTextView.OnLinkPress onLongPressListener;
     private LinkSpanDrawable.LinksTextView.OnLinkPress onPressListener;
+    private final RectF oval;
     protected final Path path;
     private float pathLastHeight;
     private float pathLastWidth;
     private boolean pathSet;
     private LinkSpanDrawable pressedLink;
     private boolean repeatedBounce;
+    private boolean roundWithCornerEffect;
     protected float rounding;
     private Drawable selectorDrawable;
     private AnimatedFloat show;
@@ -141,6 +154,7 @@ public class HintView2 extends View {
         this.useAlpha = true;
         this.useBlur = false;
         this.textMaxWidth = -1;
+        this.roundWithCornerEffect = true;
         this.rounding = AndroidUtilities.dp(8.0f);
         this.innerPadding = new RectF(AndroidUtilities.dp(11.0f), AndroidUtilities.dp(6.0f), AndroidUtilities.dp(11.0f), AndroidUtilities.dp(7.0f));
         this.closeButtonMargin = AndroidUtilities.dp(2.0f);
@@ -168,8 +182,10 @@ public class HintView2 extends View {
         this.bounce = new ButtonBounce(this, 2.0f, 5.0f);
         this.boundsWithArrow = new Rect();
         this.bounds = new RectF();
+        this.flickerBounds = new RectF();
         this.path = new Path();
         this.firstDraw = true;
+        this.oval = new RectF();
         this.direction = i;
         paint.setColor(-433575896);
         paint.setPathEffect(new CornerPathEffect(this.rounding));
@@ -177,7 +193,7 @@ public class HintView2 extends View {
         this.textDrawable = animatedTextDrawable;
         animatedTextDrawable.setAnimationProperties(0.4f, 0L, 320L, cubicBezierInterpolator);
         this.textDrawable.setCallback(this);
-        setTextSize(14);
+        setTextSize(14.0f);
         setTextColor(-1);
     }
 
@@ -332,6 +348,140 @@ public class HintView2 extends View {
         return (int) Math.ceil(Math.max(f2, f3));
     }
 
+    private void fillPath(Path path, float f, float f2, float f3, RectF rectF, Rect rect) {
+        float f4;
+        float f5 = f / 2.0f;
+        float f6 = f2 / 2.0f;
+        float min = Math.min(this.rounding, Math.min(f5, f6));
+        int i = this.direction;
+        if (i == 1 || i == 3) {
+            float clamp = Utilities.clamp((this.roundWithCornerEffect ? AndroidUtilities.lerp(getPaddingLeft(), getMeasuredWidth() - getPaddingRight(), this.joint) : AndroidUtilities.lerp(getPaddingLeft() + min + this.arrowHalfWidth, ((getMeasuredWidth() - getPaddingRight()) - min) - this.arrowHalfWidth, this.joint)) + this.jointTranslate, getMeasuredWidth() - getPaddingRight(), getPaddingLeft());
+            float min2 = Math.min(Math.max(getPaddingLeft(), clamp - f5) + f, getMeasuredWidth() - getPaddingRight());
+            float f7 = min2 - f;
+            float f8 = this.arrowHalfWidth;
+            float clamp2 = Utilities.clamp(clamp, (min2 - min) - f8, f7 + min + f8);
+            if (this.direction == 1) {
+                rectF.set(f7, getPaddingTop() + this.arrowHeight, min2, getPaddingTop() + this.arrowHeight + f2);
+            } else {
+                rectF.set(f7, ((getMeasuredHeight() - this.arrowHeight) - getPaddingBottom()) - f2, min2, (getMeasuredHeight() - this.arrowHeight) - getPaddingBottom());
+            }
+            f4 = clamp2;
+        } else {
+            float clamp3 = Utilities.clamp((this.roundWithCornerEffect ? AndroidUtilities.lerp(getPaddingTop(), getMeasuredHeight() - getPaddingBottom(), this.joint) : AndroidUtilities.lerp(getPaddingTop() + min + this.arrowHalfWidth, ((getMeasuredHeight() - getPaddingBottom()) - min) - this.arrowHalfWidth, this.joint)) + this.jointTranslate, getMeasuredHeight() - getPaddingBottom(), getPaddingTop());
+            float min3 = Math.min(Math.max(getPaddingTop(), clamp3 - f6) + f2, getMeasuredHeight() - getPaddingBottom());
+            float f9 = min3 - f2;
+            float f10 = this.arrowHalfWidth;
+            f4 = Utilities.clamp(clamp3, (min3 - min) - f10, f9 + min + f10);
+            if (this.direction == 0) {
+                rectF.set(getPaddingLeft() + this.arrowHeight, f9, getPaddingLeft() + this.arrowHeight + f, min3);
+            } else {
+                rectF.set(((getMeasuredWidth() - getPaddingRight()) - this.arrowHeight) - f, f9, (getMeasuredWidth() - getPaddingRight()) - this.arrowHeight, min3);
+            }
+        }
+        float f11 = -f3;
+        rectF.inset(f11, f11);
+        if (rect != null) {
+            rect.set((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom);
+        }
+        path.rewind();
+        if (this.roundWithCornerEffect) {
+            path.moveTo(rectF.left, rectF.bottom);
+        } else {
+            RectF rectF2 = this.oval;
+            float f12 = rectF.left;
+            float f13 = rectF.bottom;
+            float f14 = min * 2.0f;
+            rectF2.set(f12, f13 - f14, f14 + f12, f13);
+            path.arcTo(this.oval, 90.0f, 90.0f);
+        }
+        if (this.direction == 0) {
+            path.lineTo(rectF.left, this.arrowHalfWidth + f4 + AndroidUtilities.dp(2.0f));
+            path.lineTo(rectF.left, this.arrowHalfWidth + f4);
+            path.lineTo(rectF.left - this.arrowHeight, AndroidUtilities.dp(1.0f) + f4);
+            float f15 = rectF.left - this.arrowHeight;
+            this.arrowX = f15;
+            this.arrowY = f4;
+            path.lineTo(f15, f4 - AndroidUtilities.dp(1.0f));
+            path.lineTo(rectF.left, f4 - this.arrowHalfWidth);
+            path.lineTo(rectF.left, (f4 - this.arrowHalfWidth) - AndroidUtilities.dp(2.0f));
+            if (rect != null) {
+                rect.left = (int) (rect.left - this.arrowHeight);
+            }
+        }
+        if (this.roundWithCornerEffect) {
+            path.lineTo(rectF.left, rectF.top);
+        } else {
+            RectF rectF3 = this.oval;
+            float f16 = rectF.left;
+            float f17 = rectF.top;
+            float f18 = min * 2.0f;
+            rectF3.set(f16, f17, f16 + f18, f18 + f17);
+            path.arcTo(this.oval, 180.0f, 90.0f);
+        }
+        if (this.direction == 1) {
+            path.lineTo((f4 - this.arrowHalfWidth) - AndroidUtilities.dp(2.0f), rectF.top);
+            path.lineTo(f4 - this.arrowHalfWidth, rectF.top);
+            path.lineTo(f4 - AndroidUtilities.dp(1.0f), rectF.top - this.arrowHeight);
+            this.arrowX = f4;
+            this.arrowY = rectF.top - this.arrowHeight;
+            path.lineTo(AndroidUtilities.dp(1.0f) + f4, rectF.top - this.arrowHeight);
+            path.lineTo(this.arrowHalfWidth + f4, rectF.top);
+            path.lineTo(this.arrowHalfWidth + f4 + AndroidUtilities.dp(2.0f), rectF.top);
+            if (rect != null) {
+                rect.top = (int) (rect.top - this.arrowHeight);
+            }
+        }
+        if (this.roundWithCornerEffect) {
+            path.lineTo(rectF.right, rectF.top);
+        } else {
+            RectF rectF4 = this.oval;
+            float f19 = rectF.right;
+            float f20 = min * 2.0f;
+            float f21 = rectF.top;
+            rectF4.set(f19 - f20, f21, f19, f20 + f21);
+            path.arcTo(this.oval, 270.0f, 90.0f);
+        }
+        if (this.direction == 2) {
+            path.lineTo(rectF.right, (f4 - this.arrowHalfWidth) - AndroidUtilities.dp(2.0f));
+            path.lineTo(rectF.right, f4 - this.arrowHalfWidth);
+            path.lineTo(rectF.right + this.arrowHeight, f4 - AndroidUtilities.dp(1.0f));
+            float f22 = rectF.right + this.arrowHeight;
+            this.arrowX = f22;
+            this.arrowY = f4;
+            path.lineTo(f22, AndroidUtilities.dp(1.0f) + f4);
+            path.lineTo(rectF.right, this.arrowHalfWidth + f4);
+            path.lineTo(rectF.right, this.arrowHalfWidth + f4 + AndroidUtilities.dp(2.0f));
+            if (rect != null) {
+                rect.right = (int) (rect.right + this.arrowHeight);
+            }
+        }
+        if (this.roundWithCornerEffect) {
+            path.lineTo(rectF.right, rectF.bottom);
+        } else {
+            RectF rectF5 = this.oval;
+            float f23 = rectF.right;
+            float f24 = min * 2.0f;
+            float f25 = rectF.bottom;
+            rectF5.set(f23 - f24, f25 - f24, f23, f25);
+            path.arcTo(this.oval, 0.0f, 90.0f);
+        }
+        if (this.direction == 3) {
+            path.lineTo(this.arrowHalfWidth + f4 + AndroidUtilities.dp(2.0f), rectF.bottom);
+            path.lineTo(this.arrowHalfWidth + f4, rectF.bottom);
+            path.lineTo(AndroidUtilities.dp(1.0f) + f4, rectF.bottom + this.arrowHeight);
+            this.arrowX = f4;
+            this.arrowY = rectF.bottom + this.arrowHeight;
+            path.lineTo(f4 - AndroidUtilities.dp(1.0f), rectF.bottom + this.arrowHeight);
+            path.lineTo(f4 - this.arrowHalfWidth, rectF.bottom);
+            path.lineTo((f4 - this.arrowHalfWidth) - AndroidUtilities.dp(2.0f), rectF.bottom);
+            if (rect != null) {
+                rect.bottom = (int) (rect.bottom + this.arrowHeight);
+            }
+        }
+        path.close();
+        this.pathSet = true;
+    }
+
     private int getTextMaxWidth() {
         int measuredWidth = (getMeasuredWidth() - getPaddingLeft()) - getPaddingRight();
         RectF rectF = this.innerPadding;
@@ -473,100 +623,6 @@ public class HintView2 extends View {
         }
     }
 
-    private void rewindPath(float f, float f2) {
-        float clamp;
-        int i = this.direction;
-        if (i == 1 || i == 3) {
-            float clamp2 = Utilities.clamp(AndroidUtilities.lerp(getPaddingLeft(), getMeasuredWidth() - getPaddingRight(), this.joint) + this.jointTranslate, getMeasuredWidth() - getPaddingRight(), getPaddingLeft());
-            float min = Math.min(Math.max(getPaddingLeft(), clamp2 - (f / 2.0f)) + f, getMeasuredWidth() - getPaddingRight());
-            float f3 = min - f;
-            float f4 = this.rounding;
-            float f5 = this.arrowHalfWidth;
-            clamp = Utilities.clamp(clamp2, (min - f4) - f5, f4 + f3 + f5);
-            if (this.direction == 1) {
-                this.bounds.set(f3, getPaddingTop() + this.arrowHeight, min, getPaddingTop() + this.arrowHeight + f2);
-            } else {
-                this.bounds.set(f3, ((getMeasuredHeight() - this.arrowHeight) - getPaddingBottom()) - f2, min, (getMeasuredHeight() - this.arrowHeight) - getPaddingBottom());
-            }
-        } else {
-            float clamp3 = Utilities.clamp(AndroidUtilities.lerp(getPaddingTop(), getMeasuredHeight() - getPaddingBottom(), this.joint) + this.jointTranslate, getMeasuredHeight() - getPaddingBottom(), getPaddingTop());
-            float min2 = Math.min(Math.max(getPaddingTop(), clamp3 - (f2 / 2.0f)) + f2, getMeasuredHeight() - getPaddingBottom());
-            float f6 = min2 - f2;
-            float f7 = this.rounding;
-            float f8 = this.arrowHalfWidth;
-            clamp = Utilities.clamp(clamp3, (min2 - f7) - f8, f7 + f6 + f8);
-            if (this.direction == 0) {
-                this.bounds.set(getPaddingLeft() + this.arrowHeight, f6, getPaddingLeft() + this.arrowHeight + f, min2);
-            } else {
-                this.bounds.set(((getMeasuredWidth() - getPaddingRight()) - this.arrowHeight) - f, f6, (getMeasuredWidth() - getPaddingRight()) - this.arrowHeight, min2);
-            }
-        }
-        Rect rect = this.boundsWithArrow;
-        RectF rectF = this.bounds;
-        rect.set((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom);
-        this.path.rewind();
-        Path path = this.path;
-        RectF rectF2 = this.bounds;
-        path.moveTo(rectF2.left, rectF2.bottom);
-        if (this.direction == 0) {
-            this.path.lineTo(this.bounds.left, this.arrowHalfWidth + clamp + AndroidUtilities.dp(2.0f));
-            this.path.lineTo(this.bounds.left, this.arrowHalfWidth + clamp);
-            this.path.lineTo(this.bounds.left - this.arrowHeight, AndroidUtilities.dp(1.0f) + clamp);
-            float f9 = this.bounds.left - this.arrowHeight;
-            this.arrowX = f9;
-            this.arrowY = clamp;
-            this.path.lineTo(f9, clamp - AndroidUtilities.dp(1.0f));
-            this.path.lineTo(this.bounds.left, clamp - this.arrowHalfWidth);
-            this.path.lineTo(this.bounds.left, (clamp - this.arrowHalfWidth) - AndroidUtilities.dp(2.0f));
-            this.boundsWithArrow.left = (int) (r10.left - this.arrowHeight);
-        }
-        Path path2 = this.path;
-        RectF rectF3 = this.bounds;
-        path2.lineTo(rectF3.left, rectF3.top);
-        if (this.direction == 1) {
-            this.path.lineTo((clamp - this.arrowHalfWidth) - AndroidUtilities.dp(2.0f), this.bounds.top);
-            this.path.lineTo(clamp - this.arrowHalfWidth, this.bounds.top);
-            this.path.lineTo(clamp - AndroidUtilities.dp(1.0f), this.bounds.top - this.arrowHeight);
-            this.arrowX = clamp;
-            this.arrowY = this.bounds.top - this.arrowHeight;
-            this.path.lineTo(AndroidUtilities.dp(1.0f) + clamp, this.bounds.top - this.arrowHeight);
-            this.path.lineTo(this.arrowHalfWidth + clamp, this.bounds.top);
-            this.path.lineTo(this.arrowHalfWidth + clamp + AndroidUtilities.dp(2.0f), this.bounds.top);
-            this.boundsWithArrow.top = (int) (r10.top - this.arrowHeight);
-        }
-        Path path3 = this.path;
-        RectF rectF4 = this.bounds;
-        path3.lineTo(rectF4.right, rectF4.top);
-        if (this.direction == 2) {
-            this.path.lineTo(this.bounds.right, (clamp - this.arrowHalfWidth) - AndroidUtilities.dp(2.0f));
-            this.path.lineTo(this.bounds.right, clamp - this.arrowHalfWidth);
-            this.path.lineTo(this.bounds.right + this.arrowHeight, clamp - AndroidUtilities.dp(1.0f));
-            float f10 = this.bounds.right + this.arrowHeight;
-            this.arrowX = f10;
-            this.arrowY = clamp;
-            this.path.lineTo(f10, AndroidUtilities.dp(1.0f) + clamp);
-            this.path.lineTo(this.bounds.right, this.arrowHalfWidth + clamp);
-            this.path.lineTo(this.bounds.right, this.arrowHalfWidth + clamp + AndroidUtilities.dp(2.0f));
-            this.boundsWithArrow.right = (int) (r10.right + this.arrowHeight);
-        }
-        Path path4 = this.path;
-        RectF rectF5 = this.bounds;
-        path4.lineTo(rectF5.right, rectF5.bottom);
-        if (this.direction == 3) {
-            this.path.lineTo(this.arrowHalfWidth + clamp + AndroidUtilities.dp(2.0f), this.bounds.bottom);
-            this.path.lineTo(this.arrowHalfWidth + clamp, this.bounds.bottom);
-            this.path.lineTo(AndroidUtilities.dp(1.0f) + clamp, this.bounds.bottom + this.arrowHeight);
-            this.arrowX = clamp;
-            this.arrowY = this.bounds.bottom + this.arrowHeight;
-            this.path.lineTo(clamp - AndroidUtilities.dp(1.0f), this.bounds.bottom + this.arrowHeight);
-            this.path.lineTo(clamp - this.arrowHalfWidth, this.bounds.bottom);
-            this.path.lineTo((clamp - this.arrowHalfWidth) - AndroidUtilities.dp(2.0f), this.bounds.bottom);
-            this.boundsWithArrow.bottom = (int) (r10.bottom + this.arrowHeight);
-        }
-        this.path.close();
-        this.pathSet = true;
-    }
-
     private void updateBlurBounds() {
         if (!this.useBlur || this.blurBitmapShader == null || this.blurBitmapMatrix == null) {
             return;
@@ -596,20 +652,21 @@ public class HintView2 extends View {
     @Override
     public void dispatchDraw(Canvas canvas) {
         float f;
-        float f2;
+        Canvas canvas2;
+        int i;
         if (this.drawingMyBlur) {
             return;
         }
         if (this.multiline && this.textLayout == null) {
             return;
         }
-        float f3 = this.show.set(this.shown && !this.firstDraw);
+        float f2 = this.show.set(this.shown && !this.firstDraw);
         if (this.firstDraw) {
             this.firstDraw = false;
             invalidate();
         }
-        float f4 = 0.0f;
-        if (f3 <= 0.0f) {
+        float f3 = 0.0f;
+        if (f2 <= 0.0f) {
             return;
         }
         float currentWidth = this.multiline ? this.textLayoutWidth : this.textDrawable.getCurrentWidth();
@@ -627,18 +684,23 @@ public class HintView2 extends View {
             currentWidth += this.iconWidth + this.iconMargin;
             height = Math.max(this.iconHeight, height);
         }
+        float f4 = currentWidth;
         RectF rectF = this.innerPadding;
-        float f5 = rectF.left + currentWidth + rectF.right;
+        float f5 = rectF.left + f4 + rectF.right;
         float f6 = rectF.top + height + rectF.bottom;
         if (!this.pathSet || Math.abs(f5 - this.pathLastWidth) > 0.1f || Math.abs(f6 - this.pathLastHeight) > 0.1f) {
+            Path path = this.path;
             this.pathLastWidth = f5;
             this.pathLastHeight = f6;
-            rewindPath(f5, f6);
+            fillPath(path, f5, f6, 0.0f, this.bounds, this.boundsWithArrow);
+            if (this.flicker) {
+                fillPath(this.flickerStrokePath, f5, f6, this.flickerStrokePathExtrude, this.flickerBounds, null);
+            }
         }
-        float f7 = this.useAlpha ? f3 : 1.0f;
+        float f7 = this.useAlpha ? f2 : 1.0f;
         canvas.save();
-        if (f3 < 1.0f && this.useScale) {
-            float lerp = AndroidUtilities.lerp(0.5f, 1.0f, f3);
+        if (f2 < 1.0f && this.useScale) {
+            float lerp = AndroidUtilities.lerp(0.5f, 1.0f, f2);
             canvas.scale(lerp, lerp, this.arrowX, this.arrowY);
         }
         float scale = this.bounce.getScale(0.025f);
@@ -646,11 +708,11 @@ public class HintView2 extends View {
             canvas.scale(scale, scale, this.arrowX, this.arrowY);
         }
         if (this.bounceT != 1.0f) {
-            int i = this.direction;
-            if (i == 3 || i == 1) {
-                canvas.translate(0.0f, (this.bounceT - 1.0f) * Math.max(i == 3 ? getPaddingBottom() : getPaddingTop(), AndroidUtilities.dp(24.0f)) * (this.direction == 1 ? -1 : 1));
+            int i2 = this.direction;
+            if (i2 == 3 || i2 == 1) {
+                canvas.translate(0.0f, (this.bounceT - 1.0f) * Math.max(i2 == 3 ? getPaddingBottom() : getPaddingTop(), AndroidUtilities.dp(24.0f)) * (this.direction == 1 ? -1 : 1));
             } else {
-                canvas.translate((this.bounceT - 1.0f) * Math.max(i == 0 ? getPaddingLeft() : getPaddingRight(), AndroidUtilities.dp(24.0f)) * (this.direction == 0 ? -1 : 1), 0.0f);
+                canvas.translate((this.bounceT - 1.0f) * Math.max(i2 == 0 ? getPaddingLeft() : getPaddingRight(), AndroidUtilities.dp(24.0f)) * (this.direction == 0 ? -1 : 1), 0.0f);
             }
         }
         updateBlurBounds();
@@ -686,7 +748,7 @@ public class HintView2 extends View {
                 float f12 = this.iconTy + f10;
                 float f13 = this.iconHeight / 2.0f;
                 drawable2.setBounds((int) f11, (int) (f12 - f13), (int) (f11 + this.iconWidth), (int) (f12 + f13));
-                f4 = 0.0f + this.iconWidth + this.iconMargin;
+                f3 = 0.0f + this.iconWidth + this.iconMargin;
             } else {
                 float f14 = (this.iconTx + rectF3.right) - (rectF4.right / 2.0f);
                 float f15 = this.iconTy + f10;
@@ -695,13 +757,10 @@ public class HintView2 extends View {
             }
             this.icon.setAlpha((int) (f7 * 255.0f));
             this.icon.draw(canvas);
-            f2 = f4;
-        } else {
-            f2 = 0.0f;
         }
         if (this.multiline) {
             canvas.saveLayerAlpha(0.0f, 0.0f, getWidth(), Math.max(getHeight(), f6), (int) (f7 * 255.0f), 31);
-            float f17 = ((f2 + this.bounds.left) + this.innerPadding.left) - this.textLayoutLeft;
+            float f17 = ((f3 + this.bounds.left) + this.innerPadding.left) - this.textLayoutLeft;
             this.textX = f17;
             float f18 = f10 - (this.textLayoutHeight / 2.0f);
             this.textY = f18;
@@ -710,9 +769,13 @@ public class HintView2 extends View {
                 invalidate();
             }
             this.textLayout.draw(canvas);
+            i = 2113929215;
+            canvas2 = canvas;
             AnimatedEmojiSpan.drawAnimatedEmojis(canvas, this.textLayout, this.emojiGroupedSpans, 0.0f, null, 0.0f, 0.0f, 0.0f, 1.0f);
             canvas.restore();
         } else {
+            canvas2 = canvas;
+            i = 2113929215;
             CharSequence charSequence = this.textToSet;
             if (charSequence != null) {
                 this.textDrawable.setText(charSequence, this.shown);
@@ -722,15 +785,15 @@ public class HintView2 extends View {
             float f19 = this.bounds.left;
             float f20 = this.innerPadding.left;
             float f21 = this.textLayoutHeight / 2.0f;
-            animatedTextDrawable.setBounds((int) (f2 + f19 + f20), (int) (f10 - f21), (int) (f19 + f20 + currentWidth), (int) (f10 + f21));
+            animatedTextDrawable.setBounds((int) (f3 + f19 + f20), (int) (f10 - f21), (int) (f19 + f20 + f4), (int) (f10 + f21));
             this.textDrawable.setAlpha((int) (f7 * 255.0f));
-            this.textDrawable.draw(canvas);
+            this.textDrawable.draw(canvas2);
         }
         if (this.closeButton) {
             if (this.closeButtonDrawable == null) {
                 Drawable mutate2 = getContext().getResources().getDrawable(R.drawable.msg_mini_close_tooltip).mutate();
                 this.closeButtonDrawable = mutate2;
-                mutate2.setColorFilter(new PorterDuffColorFilter(2113929215, PorterDuff.Mode.MULTIPLY));
+                mutate2.setColorFilter(new PorterDuffColorFilter(i, PorterDuff.Mode.MULTIPLY));
             }
             this.closeButtonDrawable.setAlpha((int) (f7 * 255.0f));
             Drawable drawable3 = this.closeButtonDrawable;
@@ -738,7 +801,7 @@ public class HintView2 extends View {
             int centerY = (int) (this.bounds.centerY() - (this.closeButtonDrawable.getIntrinsicHeight() / 2.0f));
             RectF rectF5 = this.bounds;
             drawable3.setBounds(intrinsicWidth, centerY, (int) (rectF5.right - (this.innerPadding.right * 0.66f)), (int) (rectF5.centerY() + (this.closeButtonDrawable.getIntrinsicHeight() / 2.0f)));
-            this.closeButtonDrawable.draw(canvas);
+            this.closeButtonDrawable.draw(canvas2);
         }
         canvas.restore();
     }
@@ -751,6 +814,17 @@ public class HintView2 extends View {
             canvas.restore();
         }
         canvas.drawPath(this.path, this.backgroundPaint);
+        if (this.flicker) {
+            int dp = AndroidUtilities.dp(64.0f);
+            float currentTimeMillis = (-dp) + ((((float) ((System.currentTimeMillis() - this.flickerStart) % 4000)) / 4000.0f) * ((this.pathLastWidth * 4.0f) + (dp * 2)));
+            this.flickerGradientMatrix.reset();
+            this.flickerGradientMatrix.postTranslate(this.bounds.left + currentTimeMillis, 0.0f);
+            this.flickerGradient.setLocalMatrix(this.flickerGradientMatrix);
+            this.flickerStrokeGradient.setLocalMatrix(this.flickerGradientMatrix);
+            canvas.drawPath(this.path, this.flickerFillPaint);
+            canvas.drawPath(this.flickerStrokePath, this.flickerStrokePaint);
+            invalidate();
+        }
     }
 
     public CharSequence getText() {
@@ -846,8 +920,17 @@ public class HintView2 extends View {
         return this;
     }
 
+    public HintView2 setArrowSize(float f, float f2) {
+        this.arrowHalfWidth = AndroidUtilities.dpf2(f);
+        this.arrowHeight = AndroidUtilities.dpf2(f2);
+        return this;
+    }
+
     public HintView2 setBgColor(int i) {
-        this.backgroundPaint.setColor(i);
+        if (this.backgroundPaint.getColor() != i) {
+            this.backgroundPaint.setColor(i);
+            invalidate();
+        }
         return this;
     }
 
@@ -871,6 +954,27 @@ public class HintView2 extends View {
 
     public HintView2 setDuration(long j) {
         this.duration = j;
+        return this;
+    }
+
+    public HintView2 setFlicker(float f, int i) {
+        this.flicker = true;
+        this.flickerStart = System.currentTimeMillis();
+        this.flickerStrokePath = new Path();
+        this.flickerStrokePathExtrude = AndroidUtilities.dpf2(f) / 2.0f;
+        this.flickerFillPaint = new Paint(1);
+        this.flickerStrokePaint = new Paint(1);
+        Shader.TileMode tileMode = Shader.TileMode.CLAMP;
+        LinearGradient linearGradient = new LinearGradient(0.0f, 0.0f, AndroidUtilities.dp(64.0f), 0.0f, new int[]{Theme.multAlpha(i, 0.0f), Theme.multAlpha(i, 1.0f), Theme.multAlpha(i, 0.0f)}, new float[]{0.0f, 0.5f, 1.0f}, tileMode);
+        this.flickerStrokeGradient = linearGradient;
+        this.flickerStrokePaint.setShader(linearGradient);
+        this.flickerGradient = new LinearGradient(0.0f, 0.0f, AndroidUtilities.dp(64.0f), 0.0f, new int[]{Theme.multAlpha(i, 0.0f), Theme.multAlpha(i, 0.5f), Theme.multAlpha(i, 0.0f)}, new float[]{0.0f, 0.5f, 1.0f}, tileMode);
+        this.flickerGradientMatrix = new Matrix();
+        this.flickerFillPaint.setShader(this.flickerGradient);
+        this.flickerStrokePaint.setStyle(Paint.Style.STROKE);
+        this.flickerStrokePaint.setStrokeJoin(Paint.Join.ROUND);
+        this.flickerStrokePaint.setStrokeCap(Paint.Cap.ROUND);
+        this.flickerStrokePaint.setStrokeWidth(AndroidUtilities.dpf2(f));
         return this;
     }
 
@@ -915,8 +1019,8 @@ public class HintView2 extends View {
         return this;
     }
 
-    public HintView2 setInnerPadding(int i, int i2, int i3, int i4) {
-        this.innerPadding.set(AndroidUtilities.dp(i), AndroidUtilities.dp(i2), AndroidUtilities.dp(i3), AndroidUtilities.dp(i4));
+    public HintView2 setInnerPadding(float f, float f2, float f3, float f4) {
+        this.innerPadding.set(AndroidUtilities.dpf2(f), AndroidUtilities.dpf2(f2), AndroidUtilities.dpf2(f3), AndroidUtilities.dpf2(f4));
         return this;
     }
 
@@ -971,15 +1075,21 @@ public class HintView2 extends View {
 
     public HintView2 setRounding(float f) {
         this.rounding = AndroidUtilities.dp(f);
-        this.backgroundPaint.setPathEffect(new CornerPathEffect(this.rounding));
+        this.backgroundPaint.setPathEffect(this.roundWithCornerEffect ? new CornerPathEffect(this.rounding) : null);
         Paint paint = this.cutSelectorPaint;
         if (paint != null) {
-            paint.setPathEffect(new CornerPathEffect(this.rounding));
+            paint.setPathEffect(this.roundWithCornerEffect ? new CornerPathEffect(this.rounding) : null);
         }
         Paint paint2 = this.blurCutPaint;
         if (paint2 != null) {
-            paint2.setPathEffect(new CornerPathEffect(this.rounding));
+            paint2.setPathEffect(this.roundWithCornerEffect ? new CornerPathEffect(this.rounding) : null);
         }
+        return this;
+    }
+
+    public HintView2 setRoundingWithCornerEffect(boolean z) {
+        this.roundWithCornerEffect = z;
+        this.backgroundPaint.setPathEffect(z ? new CornerPathEffect(this.rounding) : null);
         return this;
     }
 
@@ -1048,10 +1158,15 @@ public class HintView2 extends View {
         return this;
     }
 
-    public HintView2 setTextSize(int i) {
-        float f = i;
-        this.textDrawable.setTextSize(AndroidUtilities.dp(f));
-        this.textPaint.setTextSize(AndroidUtilities.dp(f));
+    public HintView2 setTextSize(float f) {
+        this.textDrawable.setTextSize(AndroidUtilities.dpf2(f));
+        this.textPaint.setTextSize(AndroidUtilities.dpf2(f));
+        return this;
+    }
+
+    public HintView2 setTextTypeface(Typeface typeface) {
+        this.textDrawable.setTypeface(typeface);
+        this.textPaint.setTypeface(typeface);
         return this;
     }
 

@@ -67,7 +67,7 @@ public class ChangeBioActivity extends BaseFragment {
         }
         userFull.about = str;
         NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.userInfoDidLoad, Long.valueOf(user.id), userFull);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$saveName$3(AlertDialog alertDialog, TLRPC.TL_error tL_error, TL_account.updateProfile updateprofile) {
@@ -113,7 +113,7 @@ public class ChangeBioActivity extends BaseFragment {
         }
         final String replace = this.firstNameField.getText().toString().replace("\n", "");
         if (str.equals(replace)) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
             return;
         }
         final AlertDialog alertDialog = new AlertDialog(getParentActivity(), 3);
@@ -148,7 +148,7 @@ public class ChangeBioActivity extends BaseFragment {
             @Override
             public void onItemClick(int i2) {
                 if (i2 == -1) {
-                    ChangeBioActivity.this.lambda$onBackPressed$321();
+                    ChangeBioActivity.this.lambda$onBackPressed$323();
                 } else if (i2 == 1) {
                     ChangeBioActivity.this.saveName();
                 }

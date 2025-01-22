@@ -615,16 +615,16 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.UserRestrictionsApplyChanges));
         builder.setMessage(AndroidUtilities.replaceTags(LocaleController.formatString("UserRestrictionsApplyChangesText", R.string.UserRestrictionsApplyChangesText, MessagesController.getInstance(this.currentAccount).getChat(Long.valueOf(this.chatId)).title)));
-        builder.setPositiveButton(LocaleController.getString(R.string.ApplyTheme), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.ApplyTheme), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                ChatRightsEditActivity.this.lambda$checkDiscard$23(dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                ChatRightsEditActivity.this.lambda$checkDiscard$23(alertDialog, i2);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                ChatRightsEditActivity.this.lambda$checkDiscard$24(dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                ChatRightsEditActivity.this.lambda$checkDiscard$24(alertDialog, i2);
             }
         });
         showDialog(builder.create());
@@ -754,12 +754,12 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
         return i == this.sendStickersRow || i == this.embedLinksRow || i == this.sendPollsRow || i == this.sendPhotosRow || i == this.sendVideosRow || i == this.sendFilesRow || i == this.sendMusicRow || i == this.sendRoundRow || i == this.sendVoiceRow || i == this.channelPostMessagesRow || i == this.channelEditMessagesRow || i == this.channelDeleteMessagesRow || i == this.channelPostStoriesRow || i == this.channelEditStoriesRow || i == this.channelDeleteStoriesRow;
     }
 
-    public void lambda$checkDiscard$23(DialogInterface dialogInterface, int i) {
+    public void lambda$checkDiscard$23(AlertDialog alertDialog, int i) {
         onDonePressed();
     }
 
-    public void lambda$checkDiscard$24(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$checkDiscard$24(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$0(int i, TimePicker timePicker, int i2, int i3) {
@@ -954,7 +954,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
                     if (chatRightsEditActivityDelegate != null) {
                         chatRightsEditActivityDelegate.didSetRights(0, this.adminRights, this.bannedRights, this.currentRank);
                     }
-                    lambda$onBackPressed$321();
+                    lambda$onBackPressed$323();
                     return;
                 }
                 if (i5 == 1) {
@@ -1291,7 +1291,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
         }
     }
 
-    public void lambda$initTransfer$10(DialogInterface dialogInterface, int i) {
+    public void lambda$initTransfer$10(AlertDialog alertDialog, int i) {
         presentFragment(new TwoStepVerificationSetupActivity(6, null));
     }
 
@@ -1321,7 +1321,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
                 this.delegate.didChangeOwner(this.currentUser);
                 removeSelfFromStack();
                 twoStepVerificationActivity.needHideProgress();
-                twoStepVerificationActivity.lambda$onBackPressed$321();
+                twoStepVerificationActivity.lambda$onBackPressed$323();
                 return;
             }
             return;
@@ -1336,10 +1336,10 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString(this.isChannel ? R.string.EditAdminChannelTransfer : R.string.EditAdminGroupTransfer));
             builder.setMessage(AndroidUtilities.replaceTags(LocaleController.formatString("EditAdminTransferReadyAlertText", R.string.EditAdminTransferReadyAlertText, this.currentChat.title, UserObject.getFirstName(this.currentUser))));
-            builder.setPositiveButton(LocaleController.getString(R.string.EditAdminTransferChangeOwner), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.EditAdminTransferChangeOwner), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    ChatRightsEditActivity.this.lambda$initTransfer$9(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    ChatRightsEditActivity.this.lambda$initTransfer$9(alertDialog, i2);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1358,7 +1358,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
                 if (!tL_error.text.equals("CHANNELS_TOO_MUCH")) {
                     if (twoStepVerificationActivity != null) {
                         twoStepVerificationActivity.needHideProgress();
-                        twoStepVerificationActivity.lambda$onBackPressed$321();
+                        twoStepVerificationActivity.lambda$onBackPressed$323();
                     }
                     AlertsCreator.showAddUserAlert(tL_error.text, this, this.isChannel, tL_channels_editCreator);
                     return;
@@ -1429,10 +1429,10 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
                 linearLayout3.addView(textView3, LayoutHelper.createLinear(-1, -2));
             }
             if ("PASSWORD_MISSING".equals(tL_error.text)) {
-                builder2.setPositiveButton(LocaleController.getString(R.string.EditAdminTransferSetPassword), new DialogInterface.OnClickListener() {
+                builder2.setPositiveButton(LocaleController.getString(R.string.EditAdminTransferSetPassword), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i4) {
-                        ChatRightsEditActivity.this.lambda$initTransfer$10(dialogInterface, i4);
+                    public final void onClick(AlertDialog alertDialog, int i4) {
+                        ChatRightsEditActivity.this.lambda$initTransfer$10(alertDialog, i4);
                     }
                 });
                 i = R.string.Cancel;
@@ -1468,7 +1468,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
         }
     }
 
-    public void lambda$initTransfer$9(DialogInterface dialogInterface, int i) {
+    public void lambda$initTransfer$9(AlertDialog alertDialog, int i) {
         final TwoStepVerificationActivity twoStepVerificationActivity = new TwoStepVerificationActivity();
         twoStepVerificationActivity.setDelegate(0, new TwoStepVerificationActivity.TwoStepVerificationActivityDelegate() {
             @Override
@@ -1492,7 +1492,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
         if (chatRightsEditActivityDelegate != null) {
             TLRPC.TL_chatAdminRights tL_chatAdminRights = this.adminRights;
             chatRightsEditActivityDelegate.didSetRights((tL_chatAdminRights.change_info || tL_chatAdminRights.post_messages || tL_chatAdminRights.edit_messages || tL_chatAdminRights.delete_messages || tL_chatAdminRights.ban_users || tL_chatAdminRights.invite_users || (this.isForum && tL_chatAdminRights.manage_topics) || tL_chatAdminRights.pin_messages || tL_chatAdminRights.add_admins || tL_chatAdminRights.anonymous || tL_chatAdminRights.manage_call || ((this.isChannel && (tL_chatAdminRights.post_stories || tL_chatAdminRights.edit_stories || tL_chatAdminRights.delete_stories)) || tL_chatAdminRights.other)) ? 1 : 0, tL_chatAdminRights, this.bannedRights, this.currentRank);
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         }
     }
 
@@ -1548,7 +1548,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
         return true;
     }
 
-    public void lambda$onDonePressed$21(DialogInterface dialogInterface, int i) {
+    public void lambda$onDonePressed$21(AlertDialog alertDialog, int i) {
         setLoading(true);
         Runnable runnable = new Runnable() {
             @Override
@@ -1914,7 +1914,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
             public void onItemClick(int i3) {
                 if (i3 == -1) {
                     if (ChatRightsEditActivity.this.checkDiscard()) {
-                        ChatRightsEditActivity.this.lambda$onBackPressed$321();
+                        ChatRightsEditActivity.this.lambda$onBackPressed$323();
                     }
                 } else if (i3 == 1) {
                     ChatRightsEditActivity.this.onDonePressed();
@@ -2018,7 +2018,7 @@ public class ChatRightsEditActivity extends BaseFragment implements Notification
                 if (iNavigationLayout == null || iNavigationLayout.getLastFragment() != this) {
                     removeSelfFromStack();
                 } else {
-                    lambda$onBackPressed$321();
+                    lambda$onBackPressed$323();
                 }
             }
         }

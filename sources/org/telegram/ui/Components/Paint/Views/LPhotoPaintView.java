@@ -224,7 +224,7 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
         AnonymousClass22() {
         }
 
-        public void lambda$onClearEmojiRecent$0(DialogInterface dialogInterface, int i) {
+        public void lambda$onClearEmojiRecent$0(AlertDialog alertDialog, int i) {
             LPhotoPaintView.this.emojiView.clearRecentEmoji();
         }
 
@@ -292,10 +292,10 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
             AlertDialog.Builder builder = new AlertDialog.Builder(LPhotoPaintView.this.getContext(), LPhotoPaintView.this.resourcesProvider);
             builder.setTitle(LocaleController.getString(R.string.ClearRecentEmojiTitle));
             builder.setMessage(LocaleController.getString(R.string.ClearRecentEmojiText));
-            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    LPhotoPaintView.AnonymousClass22.this.lambda$onClearEmojiRecent$0(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    LPhotoPaintView.AnonymousClass22.this.lambda$onClearEmojiRecent$0(alertDialog, i);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -2872,7 +2872,7 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
                     }
                     LPhotoPaintView lPhotoPaintView = LPhotoPaintView.this;
                     lPhotoPaintView.appearAnimation(lPhotoPaintView.createPhoto(str, true));
-                    chatAttachAlert.dismiss();
+                    chatAttachAlert.lambda$new$0();
                 } catch (Throwable th) {
                     FileLog.e(th);
                 }
@@ -3454,9 +3454,9 @@ public abstract class LPhotoPaintView extends SizeNotifierFrameLayoutPhoto imple
         AlertDialog.Builder builder = new AlertDialog.Builder(activity, this.resourcesProvider);
         builder.setMessage(LocaleController.getString(R.string.PhotoEditorDiscardAlert));
         builder.setTitle(LocaleController.getString(R.string.DiscardChanges));
-        builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
+            public final void onClick(AlertDialog alertDialog, int i) {
                 runnable.run();
             }
         });

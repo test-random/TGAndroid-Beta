@@ -520,7 +520,7 @@ public class StoryLinkSheet extends BottomSheetWithRecyclerListView implements N
                 this.whenDone.run(webPagePreview);
                 this.whenDone = null;
             }
-            dismiss();
+            lambda$new$0();
         }
     }
 
@@ -570,10 +570,10 @@ public class StoryLinkSheet extends BottomSheetWithRecyclerListView implements N
     }
 
     @Override
-    public void dismiss() {
+    public void lambda$new$0() {
         AndroidUtilities.hideKeyboard(this.urlEditText.editText);
         AndroidUtilities.hideKeyboard(this.nameEditText.editText);
-        super.dismiss();
+        super.lambda$new$0();
         NotificationCenter.getInstance(this.currentAccount).removeObserver(this, NotificationCenter.didReceivedWebpagesInUpdates);
     }
 

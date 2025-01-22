@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -116,7 +115,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         @Override
         public void onItemClick(int i) {
             if (i == -1) {
-                PasscodeActivity.this.lambda$onBackPressed$321();
+                PasscodeActivity.this.lambda$onBackPressed$323();
                 return;
             }
             if (i == 1) {
@@ -362,7 +361,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         processDone();
     }
 
-    public void lambda$createView$2(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$2(AlertDialog alertDialog, int i) {
         SharedConfig.passcodeHash = "";
         SharedConfig.appLocked = false;
         SharedConfig.saveConfig();
@@ -381,14 +380,14 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
             i2++;
         }
         NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.didSetPasscode, new Object[0]);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public static String lambda$createView$3(int i) {
         return i == 0 ? LocaleController.getString(R.string.AutoLockDisabled) : i == 1 ? LocaleController.formatString("AutoLockInTime", R.string.AutoLockInTime, LocaleController.formatPluralString("Minutes", 1, new Object[0])) : i == 2 ? LocaleController.formatString("AutoLockInTime", R.string.AutoLockInTime, LocaleController.formatPluralString("Minutes", 5, new Object[0])) : i == 3 ? LocaleController.formatString("AutoLockInTime", R.string.AutoLockInTime, LocaleController.formatPluralString("Hours", 1, new Object[0])) : i == 4 ? LocaleController.formatString("AutoLockInTime", R.string.AutoLockInTime, LocaleController.formatPluralString("Hours", 5, new Object[0])) : "";
     }
 
-    public void lambda$createView$4(NumberPicker numberPicker, int i, DialogInterface dialogInterface, int i2) {
+    public void lambda$createView$4(NumberPicker numberPicker, int i, AlertDialog alertDialog, int i2) {
         int i3;
         int value = numberPicker.getValue();
         if (value == 0) {
@@ -413,10 +412,10 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         int i2 = 0;
         if (view.isEnabled()) {
             if (i == this.disablePasscodeRow) {
-                AlertDialog create = new AlertDialog.Builder(getParentActivity()).setTitle(LocaleController.getString(R.string.DisablePasscode)).setMessage(LocaleController.getString(R.string.DisablePasscodeConfirmMessage)).setNegativeButton(LocaleController.getString(R.string.Cancel), null).setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), new DialogInterface.OnClickListener() {
+                AlertDialog create = new AlertDialog.Builder(getParentActivity()).setTitle(LocaleController.getString(R.string.DisablePasscode)).setMessage(LocaleController.getString(R.string.DisablePasscodeConfirmMessage)).setNegativeButton(LocaleController.getString(R.string.Cancel), null).setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i3) {
-                        PasscodeActivity.this.lambda$createView$2(dialogInterface, i3);
+                    public final void onClick(AlertDialog alertDialog, int i3) {
+                        PasscodeActivity.this.lambda$createView$2(alertDialog, i3);
                     }
                 }).create();
                 create.show();
@@ -476,10 +475,10 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                     }
                 });
                 builder.setView(numberPicker);
-                builder.setNegativeButton(LocaleController.getString(R.string.Done), new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(LocaleController.getString(R.string.Done), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i4) {
-                        PasscodeActivity.this.lambda$createView$4(numberPicker, i, dialogInterface, i4);
+                    public final void onClick(AlertDialog alertDialog, int i4) {
+                        PasscodeActivity.this.lambda$createView$4(numberPicker, i, alertDialog, i4);
                     }
                 });
                 showDialog(builder.create());
@@ -494,10 +493,10 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                 }
             });
             builder.setView(numberPicker);
-            builder.setNegativeButton(LocaleController.getString(R.string.Done), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(LocaleController.getString(R.string.Done), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i4) {
-                    PasscodeActivity.this.lambda$createView$4(numberPicker, i, dialogInterface, i4);
+                public final void onClick(AlertDialog alertDialog, int i4) {
+                    PasscodeActivity.this.lambda$createView$4(numberPicker, i, alertDialog, i4);
                 }
             });
             showDialog(builder.create());
@@ -564,7 +563,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         if (z) {
             presentFragment(new PasscodeActivity(0), true);
         } else {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         }
         NotificationCenter.getGlobalInstance().lambda$postNotificationNameOnUIThread$1(NotificationCenter.didSetPasscode, new Object[0]);
     }

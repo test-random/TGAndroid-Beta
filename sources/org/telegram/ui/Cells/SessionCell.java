@@ -99,7 +99,7 @@ public class SessionCell extends FrameLayout {
         return createDrawable(i, tL_authorization);
     }
 
-    public static org.telegram.ui.Components.CombinedDrawable createDrawable(int r6, org.telegram.tgnet.TLRPC.TL_authorization r7) {
+    public static org.telegram.ui.Components.CombinedDrawable createDrawable(int r8, org.telegram.tgnet.TLRPC.TL_authorization r9) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.SessionCell.createDrawable(int, org.telegram.tgnet.TLRPC$TL_authorization):org.telegram.ui.Components.CombinedDrawable");
     }
 

@@ -233,13 +233,13 @@ public class CreateGroupCallBottomSheet extends BottomSheetWithRecyclerListView 
 
     public void lambda$new$0(View view) {
         this.selectAfterDismiss = MessagesController.getInstance(this.currentAccount).getInputPeer(MessageObject.getPeerId(this.selectedPeer));
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$1(View view) {
         this.selectAfterDismiss = MessagesController.getInstance(this.currentAccount).getInputPeer(MessageObject.getPeerId(this.selectedPeer));
         this.isScheduleSelected = true;
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$2(View view, int i) {

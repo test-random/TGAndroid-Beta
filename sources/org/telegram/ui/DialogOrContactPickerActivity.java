@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -130,7 +129,7 @@ public class DialogOrContactPickerActivity extends BaseFragment {
         showBlockAlert(user);
     }
 
-    public void lambda$showBlockAlert$3(TLRPC.User user, DialogInterface dialogInterface, int i) {
+    public void lambda$showBlockAlert$3(TLRPC.User user, AlertDialog alertDialog, int i) {
         int i2;
         if (MessagesController.isSupportUser(user)) {
             i2 = R.string.ErrorOccurred;
@@ -139,7 +138,7 @@ public class DialogOrContactPickerActivity extends BaseFragment {
             i2 = R.string.UserBlocked;
         }
         AlertsCreator.showSimpleToast(this, LocaleController.getString(i2));
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public static float lambda$static$0(float f) {
@@ -172,10 +171,10 @@ public class DialogOrContactPickerActivity extends BaseFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.BlockUser));
         builder.setMessage(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureBlockContact2", R.string.AreYouSureBlockContact2, ContactsController.formatName(user.first_name, user.last_name))));
-        builder.setPositiveButton(LocaleController.getString(R.string.BlockContact), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.BlockContact), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                DialogOrContactPickerActivity.this.lambda$showBlockAlert$3(user, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                DialogOrContactPickerActivity.this.lambda$showBlockAlert$3(user, alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -246,7 +245,7 @@ public class DialogOrContactPickerActivity extends BaseFragment {
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    DialogOrContactPickerActivity.this.lambda$onBackPressed$321();
+                    DialogOrContactPickerActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

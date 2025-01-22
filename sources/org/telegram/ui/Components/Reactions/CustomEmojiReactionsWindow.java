@@ -40,6 +40,7 @@ import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_stars;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
@@ -115,7 +116,7 @@ public class CustomEmojiReactionsWindow {
         }
 
         @Override
-        protected void onEmojiSelected(View view, Long l, TLRPC.Document document, Integer num) {
+        protected void onEmojiSelected(View view, Long l, TLRPC.Document document, TL_stars.TL_starGiftUnique tL_starGiftUnique, Integer num) {
             if (this.val$baseFragment != null) {
                 ReactionsContainerLayout reactionsContainerLayout = this.val$reactionsContainerLayout;
                 if (!reactionsContainerLayout.channelReactions && reactionsContainerLayout.getWindowType() != 13 && !UserConfig.getInstance(this.val$baseFragment.getCurrentAccount()).isPremium()) {

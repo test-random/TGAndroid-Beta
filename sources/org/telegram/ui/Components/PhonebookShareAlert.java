@@ -341,7 +341,7 @@ public class PhonebookShareAlert extends BottomSheet {
 
     public void lambda$new$4(boolean z, int i) {
         this.delegate.didSelectContact(this.currentUser, z, i, 0L, false);
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$5(Theme.ResourcesProvider resourcesProvider, View view) {
@@ -476,7 +476,7 @@ public class PhonebookShareAlert extends BottomSheet {
             }, resourcesProvider);
         } else {
             this.delegate.didSelectContact(this.currentUser, true, 0, 0L, false);
-            dismiss();
+            lambda$new$0();
         }
     }
 

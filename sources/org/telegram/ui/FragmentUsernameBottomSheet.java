@@ -47,7 +47,7 @@ public abstract class FragmentUsernameBottomSheet {
 
     public static void lambda$open$2(Runnable runnable, BottomSheet bottomSheet, View view) {
         runnable.run();
-        bottomSheet.dismiss();
+        bottomSheet.lambda$new$0();
     }
 
     public static void open(final Context context, final int i, String str, TLObject tLObject, final TL_fragment.TL_collectibleInfo tL_collectibleInfo, final Theme.ResourcesProvider resourcesProvider) {

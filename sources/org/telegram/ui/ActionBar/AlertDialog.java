@@ -45,6 +45,7 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.Utilities;
+import org.telegram.messenger.browser.Browser;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedFloat;
@@ -101,18 +102,18 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
     private CharSequence message;
     private TextView messageTextView;
     private boolean messageTextViewClickable;
-    private DialogInterface.OnClickListener negativeButtonListener;
+    private OnButtonClickListener negativeButtonListener;
     private CharSequence negativeButtonText;
-    private DialogInterface.OnClickListener neutralButtonListener;
+    private OnButtonClickListener neutralButtonListener;
     private CharSequence neutralButtonText;
     private boolean notDrawBackgroundOnTopView;
-    private DialogInterface.OnClickListener onBackButtonListener;
+    private OnButtonClickListener onBackButtonListener;
     private DialogInterface.OnCancelListener onCancelListener;
     private DialogInterface.OnClickListener onClickListener;
     private DialogInterface.OnDismissListener onDismissListener;
     private ViewTreeObserver.OnScrollChangedListener onScrollChangedListener;
     private Utilities.Callback overridenDissmissListener;
-    private DialogInterface.OnClickListener positiveButtonListener;
+    private OnButtonClickListener positiveButtonListener;
     private CharSequence positiveButtonText;
     private FrameLayout progressViewContainer;
     private int progressViewStyle;
@@ -484,20 +485,20 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
             return this;
         }
 
-        public Builder setNegativeButton(CharSequence charSequence, DialogInterface.OnClickListener onClickListener) {
+        public Builder setNegativeButton(CharSequence charSequence, OnButtonClickListener onButtonClickListener) {
             this.alertDialog.negativeButtonText = charSequence;
-            this.alertDialog.negativeButtonListener = onClickListener;
+            this.alertDialog.negativeButtonListener = onButtonClickListener;
             return this;
         }
 
-        public Builder setNeutralButton(CharSequence charSequence, DialogInterface.OnClickListener onClickListener) {
+        public Builder setNeutralButton(CharSequence charSequence, OnButtonClickListener onButtonClickListener) {
             this.alertDialog.neutralButtonText = charSequence;
-            this.alertDialog.neutralButtonListener = onClickListener;
+            this.alertDialog.neutralButtonListener = onButtonClickListener;
             return this;
         }
 
-        public Builder setOnBackButtonListener(DialogInterface.OnClickListener onClickListener) {
-            this.alertDialog.onBackButtonListener = onClickListener;
+        public Builder setOnBackButtonListener(OnButtonClickListener onButtonClickListener) {
+            this.alertDialog.onBackButtonListener = onButtonClickListener;
             return this;
         }
 
@@ -516,9 +517,9 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
             return this;
         }
 
-        public Builder setPositiveButton(CharSequence charSequence, DialogInterface.OnClickListener onClickListener) {
+        public Builder setPositiveButton(CharSequence charSequence, OnButtonClickListener onButtonClickListener) {
             this.alertDialog.positiveButtonText = charSequence;
-            this.alertDialog.positiveButtonListener = onClickListener;
+            this.alertDialog.positiveButtonListener = onButtonClickListener;
             return this;
         }
 
@@ -595,6 +596,10 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                 i++;
             }
         }
+    }
+
+    public interface OnButtonClickListener {
+        void onClick(AlertDialog alertDialog, int i);
     }
 
     public AlertDialog(Context context, int i) {
@@ -680,30 +685,39 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         dismiss();
     }
 
-    public void lambda$inflateContent$2(View view) {
-        DialogInterface.OnClickListener onClickListener = this.positiveButtonListener;
-        if (onClickListener != null) {
-            onClickListener.onClick(this, -1);
+    public void lambda$inflateContent$2(TextViewWithLoading textViewWithLoading, View view) {
+        if (textViewWithLoading.isLoading()) {
+            return;
+        }
+        OnButtonClickListener onButtonClickListener = this.positiveButtonListener;
+        if (onButtonClickListener != null) {
+            onButtonClickListener.onClick(this, -1);
         }
         if (this.dismissDialogByButtons) {
             dismiss();
         }
     }
 
-    public void lambda$inflateContent$3(View view) {
-        DialogInterface.OnClickListener onClickListener = this.negativeButtonListener;
-        if (onClickListener != null) {
-            onClickListener.onClick(this, -2);
+    public void lambda$inflateContent$3(TextViewWithLoading textViewWithLoading, View view) {
+        if (textViewWithLoading.isLoading()) {
+            return;
+        }
+        OnButtonClickListener onButtonClickListener = this.negativeButtonListener;
+        if (onButtonClickListener != null) {
+            onButtonClickListener.onClick(this, -2);
         }
         if (this.dismissDialogByButtons) {
             cancel();
         }
     }
 
-    public void lambda$inflateContent$4(View view) {
-        DialogInterface.OnClickListener onClickListener = this.neutralButtonListener;
-        if (onClickListener != null) {
-            onClickListener.onClick(this, -2);
+    public void lambda$inflateContent$4(TextViewWithLoading textViewWithLoading, View view) {
+        if (textViewWithLoading.isLoading()) {
+            return;
+        }
+        OnButtonClickListener onButtonClickListener = this.neutralButtonListener;
+        if (onButtonClickListener != null) {
+            onButtonClickListener.onClick(this, -2);
         }
         if (this.dismissDialogByButtons) {
             dismiss();
@@ -733,6 +747,19 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         this.containerView.invalidate();
     }
 
+    public static void lambda$makeButtonLoading$6(View view) {
+        if (view instanceof TextViewWithLoading) {
+            ((TextViewWithLoading) view).setLoading(true, true);
+        }
+    }
+
+    public void lambda$makeButtonLoading$7(View view) {
+        if (view instanceof TextViewWithLoading) {
+            ((TextViewWithLoading) view).setLoading(false, true);
+        }
+        dismiss();
+    }
+
     public void lambda$new$0() {
         if (isShowing()) {
             return;
@@ -743,7 +770,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         }
     }
 
-    public void lambda$showCancelAlert$6(DialogInterface dialogInterface, int i) {
+    public void lambda$showCancelAlert$8(AlertDialog alertDialog, int i) {
         DialogInterface.OnCancelListener onCancelListener = this.onCancelListener;
         if (onCancelListener != null) {
             onCancelListener.onCancel(this);
@@ -751,7 +778,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         dismiss();
     }
 
-    public void lambda$showCancelAlert$7(DialogInterface dialogInterface) {
+    public void lambda$showCancelAlert$9(DialogInterface dialogInterface) {
         this.cancelDialog = null;
     }
 
@@ -890,12 +917,28 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         this.scrollContainer.invalidate();
     }
 
+    public Browser.Progress makeButtonLoading(int i) {
+        final View button = getButton(i);
+        this.dismissDialogByButtons = false;
+        return new Browser.Progress(new Runnable() {
+            @Override
+            public final void run() {
+                AlertDialog.lambda$makeButtonLoading$6(button);
+            }
+        }, new Runnable() {
+            @Override
+            public final void run() {
+                AlertDialog.this.lambda$makeButtonLoading$7(button);
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        DialogInterface.OnClickListener onClickListener = this.onBackButtonListener;
-        if (onClickListener != null) {
-            onClickListener.onClick(this, -2);
+        OnButtonClickListener onButtonClickListener = this.onBackButtonListener;
+        if (onButtonClickListener != null) {
+            onButtonClickListener.onClick(this, -2);
         }
     }
 
@@ -1004,14 +1047,14 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         }
     }
 
-    public void setNegativeButton(CharSequence charSequence, DialogInterface.OnClickListener onClickListener) {
+    public void setNegativeButton(CharSequence charSequence, OnButtonClickListener onButtonClickListener) {
         this.negativeButtonText = charSequence;
-        this.negativeButtonListener = onClickListener;
+        this.negativeButtonListener = onButtonClickListener;
     }
 
-    public void setNeutralButton(CharSequence charSequence, DialogInterface.OnClickListener onClickListener) {
+    public void setNeutralButton(CharSequence charSequence, OnButtonClickListener onButtonClickListener) {
         this.neutralButtonText = charSequence;
-        this.neutralButtonListener = onClickListener;
+        this.neutralButtonListener = onButtonClickListener;
     }
 
     @Override
@@ -1020,13 +1063,13 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         super.setOnCancelListener(onCancelListener);
     }
 
-    public void setPositiveButton(CharSequence charSequence, DialogInterface.OnClickListener onClickListener) {
+    public void setPositiveButton(CharSequence charSequence, OnButtonClickListener onButtonClickListener) {
         this.positiveButtonText = charSequence;
-        this.positiveButtonListener = onClickListener;
+        this.positiveButtonListener = onButtonClickListener;
     }
 
-    public void setPositiveButtonListener(DialogInterface.OnClickListener onClickListener) {
-        this.positiveButtonListener = onClickListener;
+    public void setPositiveButtonListener(OnButtonClickListener onButtonClickListener) {
+        this.positiveButtonListener = onButtonClickListener;
     }
 
     public void setProgress(int i) {
@@ -1090,16 +1133,16 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
             builder.setTitle(LocaleController.getString(R.string.StopLoadingTitle));
             builder.setMessage(LocaleController.getString(R.string.StopLoading));
             builder.setPositiveButton(LocaleController.getString(R.string.WaitMore), null);
-            builder.setNegativeButton(LocaleController.getString(R.string.Stop), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(LocaleController.getString(R.string.Stop), new OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    AlertDialog.this.lambda$showCancelAlert$6(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    AlertDialog.this.lambda$showCancelAlert$8(alertDialog, i);
                 }
             });
             builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public final void onDismiss(DialogInterface dialogInterface) {
-                    AlertDialog.this.lambda$showCancelAlert$7(dialogInterface);
+                    AlertDialog.this.lambda$showCancelAlert$9(dialogInterface);
                 }
             });
             try {

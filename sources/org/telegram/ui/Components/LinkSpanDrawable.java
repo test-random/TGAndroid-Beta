@@ -57,8 +57,8 @@ public class LinkSpanDrawable {
     private final float selectionAlpha;
 
     public static class ClickableSmallTextView extends SimpleTextView {
-        private Paint linkBackgroundPaint;
-        private LinkCollector links;
+        private final Paint linkBackgroundPaint;
+        private final LinkCollector links;
         private LinkSpanDrawable pressedLink;
         private Theme.ResourcesProvider resourcesProvider;
 
@@ -411,6 +411,86 @@ public class LinkSpanDrawable {
 
         public void setAdditionalInvalidate(Runnable runnable) {
             this.additionalInvalidate = runnable;
+        }
+    }
+
+    public static class LinksSimpleTextView extends SimpleTextView {
+        private final LinkCollector links;
+        private LinkSpanDrawable pressedLink;
+        private Theme.ResourcesProvider resourcesProvider;
+
+        public LinksSimpleTextView(Context context, Theme.ResourcesProvider resourcesProvider) {
+            super(context);
+            this.links = new LinkCollector(this);
+            this.resourcesProvider = resourcesProvider;
+        }
+
+        public ClickableSpan hit(int i, int i2) {
+            Layout layout = getLayout();
+            if (layout == null) {
+                return null;
+            }
+            int layoutX = (int) (i - getLayoutX());
+            int layoutY = (int) (i2 - getLayoutY());
+            int lineForVertical = layout.getLineForVertical(layoutY);
+            float f = layoutX;
+            int offsetForHorizontal = layout.getOffsetForHorizontal(lineForVertical, f);
+            float lineLeft = layout.getLineLeft(lineForVertical);
+            if (lineLeft <= f && lineLeft + layout.getLineWidth(lineForVertical) >= f && layoutY >= 0 && layoutY <= layout.getHeight()) {
+                ClickableSpan[] clickableSpanArr = (ClickableSpan[]) new SpannableString(layout.getText()).getSpans(offsetForHorizontal, offsetForHorizontal, ClickableSpan.class);
+                if (clickableSpanArr.length != 0 && !AndroidUtilities.isAccessibilityScreenReaderEnabled()) {
+                    return clickableSpanArr[0];
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            canvas.save();
+            canvas.translate(getLayoutX(), getLayoutY());
+            if (this.links.draw(canvas)) {
+                invalidate();
+            }
+            canvas.restore();
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent motionEvent) {
+            if (this.links != null) {
+                Layout layout = getLayout();
+                ClickableSpan hit = hit((int) motionEvent.getX(), (int) motionEvent.getY());
+                if (hit != null && motionEvent.getAction() == 0) {
+                    LinkSpanDrawable linkSpanDrawable = new LinkSpanDrawable(hit, this.resourcesProvider, motionEvent.getX(), motionEvent.getY());
+                    this.pressedLink = linkSpanDrawable;
+                    this.links.addLink(linkSpanDrawable);
+                    SpannableString spannableString = new SpannableString(layout.getText());
+                    int spanStart = spannableString.getSpanStart(this.pressedLink.getSpan());
+                    int spanEnd = spannableString.getSpanEnd(this.pressedLink.getSpan());
+                    LinkPath obtainNewPath = this.pressedLink.obtainNewPath();
+                    obtainNewPath.setCurrentLayout(layout, spanStart, 0.0f);
+                    layout.getSelectionPath(spanStart, spanEnd, obtainNewPath);
+                    return true;
+                }
+                if (motionEvent.getAction() == 1) {
+                    this.links.clear();
+                    LinkSpanDrawable linkSpanDrawable2 = this.pressedLink;
+                    if (linkSpanDrawable2 != null && linkSpanDrawable2.getSpan() == hit) {
+                        if (this.pressedLink.getSpan() instanceof ClickableSpan) {
+                            ((ClickableSpan) this.pressedLink.getSpan()).onClick(this);
+                        }
+                        this.pressedLink = null;
+                        return true;
+                    }
+                    this.pressedLink = null;
+                }
+                if (motionEvent.getAction() == 3) {
+                    this.links.clear();
+                    this.pressedLink = null;
+                }
+            }
+            return this.pressedLink != null || super.onTouchEvent(motionEvent);
         }
     }
 

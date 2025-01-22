@@ -53,7 +53,7 @@ public class GiftInfoBottomSheet extends BottomSheetWithRecyclerListView {
 
         @Override
         protected void dismiss() {
-            GiftInfoBottomSheet.this.dismiss();
+            GiftInfoBottomSheet.this.lambda$new$0();
         }
 
         @Override

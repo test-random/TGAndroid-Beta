@@ -268,7 +268,7 @@ public class ChatAttachAlertPhotoLayoutPreview extends ChatAttachAlert.AttachAle
             }
 
             @Override
-            public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
+            public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z, boolean z2) {
                 MediaController.PhotoEntry photoEntry;
                 ArrayList arrayList;
                 PhotoViewer.PlaceProviderObject placeProviderObject = null;
@@ -311,7 +311,7 @@ public class ChatAttachAlertPhotoLayoutPreview extends ChatAttachAlert.AttachAle
                         ImageReceiver imageReceiver = mediaCell.image;
                         placeProviderObject.imageReceiver = imageReceiver;
                         placeProviderObject.thumb = imageReceiver.getBitmapSafe();
-                        placeProviderObject.radius = r13;
+                        placeProviderObject.radius = r12;
                         RectF rectF = mediaCell.roundRadiuses;
                         int[] iArr2 = {(int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom};
                         placeProviderObject.clipTopAddition = (int) (-PreviewGroupsView.this.getY());

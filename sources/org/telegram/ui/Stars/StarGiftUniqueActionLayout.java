@@ -132,7 +132,7 @@ public class StarGiftUniqueActionLayout {
         if (stargiftattributebackdrop2 != null) {
             this.emoji.setColor(Integer.valueOf(stargiftattributebackdrop2.pattern_color | (-16777216)));
         }
-        StarGiftPatterns.drawPatterns(canvas, 1, this.emoji, this.backgroundRect.width(), this.backgroundRect.height(), 1.0f, 1.1f);
+        StarGiftPatterns.drawPattern(canvas, 1, this.emoji, this.backgroundRect.width(), this.backgroundRect.height(), 1.0f, 1.1f);
         canvas.restore();
         this.imageReceiver.setImageCoords(width - (AndroidUtilities.dp(110.0f) / 2.0f), AndroidUtilities.dp(10.0f), AndroidUtilities.dp(110.0f), AndroidUtilities.dp(110.0f));
         this.imageReceiver.draw(canvas);
@@ -210,7 +210,7 @@ public class StarGiftUniqueActionLayout {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftUniqueActionLayout.onTouchEvent(float, float, android.view.MotionEvent):boolean");
     }
 
-    public void set(org.telegram.messenger.MessageObject r11, boolean r12) {
+    public void set(org.telegram.messenger.MessageObject r13, boolean r14) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Stars.StarGiftUniqueActionLayout.set(org.telegram.messenger.MessageObject, boolean):void");
     }
 }

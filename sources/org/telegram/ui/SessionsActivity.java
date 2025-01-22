@@ -1,7 +1,6 @@
 package org.telegram.ui;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -652,13 +651,13 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
         });
     }
 
-    public void lambda$createView$12(int i, boolean[] zArr, DialogInterface dialogInterface, int i2) {
+    public void lambda$createView$12(int i, boolean[] zArr, AlertDialog alertDialog, int i2) {
         if (getParentActivity() == null) {
             return;
         }
-        final AlertDialog alertDialog = new AlertDialog(getParentActivity(), 3);
-        alertDialog.setCanCancel(false);
-        alertDialog.show();
+        final AlertDialog alertDialog2 = new AlertDialog(getParentActivity(), 3);
+        alertDialog2.setCanCancel(false);
+        alertDialog2.show();
         if (this.currentType == 0) {
             int i3 = this.otherSessionsStartRow;
             final TLRPC.TL_authorization tL_authorization = (TLRPC.TL_authorization) ((i < i3 || i >= this.otherSessionsEndRow) ? this.passwordSessions.get(i - this.passwordSessionsStartRow) : this.sessions.get(i - i3));
@@ -667,7 +666,7 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
             ConnectionsManager.getInstance(this.currentAccount).sendRequest(resetauthorization, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    SessionsActivity.this.lambda$createView$9(alertDialog, tL_authorization, tLObject, tL_error);
+                    SessionsActivity.this.lambda$createView$9(alertDialog2, tL_authorization, tLObject, tL_error);
                 }
             });
             return;
@@ -678,7 +677,7 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(resetwebauthorization, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                SessionsActivity.this.lambda$createView$11(alertDialog, tL_webAuthorization, tLObject, tL_error);
+                SessionsActivity.this.lambda$createView$11(alertDialog2, tL_webAuthorization, tLObject, tL_error);
             }
         });
         if (zArr[0]) {
@@ -739,10 +738,10 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
                 builder2.setTitle(LocaleController.getString(R.string.TerminateWebSessionsTitle));
                 i2 = R.string.Disconnect;
             }
-            builder2.setPositiveButton(LocaleController.getString(i2), new DialogInterface.OnClickListener() {
+            builder2.setPositiveButton(LocaleController.getString(i2), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i6) {
-                    SessionsActivity.this.lambda$createView$6(dialogInterface, i6);
+                public final void onClick(AlertDialog alertDialog, int i6) {
+                    SessionsActivity.this.lambda$createView$6(alertDialog, i6);
                 }
             });
             builder2.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -796,10 +795,10 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
                 builder3.setView(frameLayout);
                 charSequence = string;
             }
-            builder3.setPositiveButton(charSequence, new DialogInterface.OnClickListener() {
+            builder3.setPositiveButton(charSequence, new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i7) {
-                    SessionsActivity.this.lambda$createView$12(i, zArr, dialogInterface, i7);
+                public final void onClick(AlertDialog alertDialog, int i7) {
+                    SessionsActivity.this.lambda$createView$12(i, zArr, alertDialog, i7);
                 }
             });
             builder3.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -867,7 +866,7 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
         });
     }
 
-    public void lambda$createView$6(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$6(AlertDialog alertDialog, int i) {
         TLObject resetwebauthorizations;
         ConnectionsManager connectionsManager;
         RequestDelegate requestDelegate;
@@ -1026,7 +1025,7 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
         });
     }
 
-    public void lambda$onRequestPermissionsResultFragment$20(DialogInterface dialogInterface, int i) {
+    public void lambda$onRequestPermissionsResultFragment$20(AlertDialog alertDialog, int i) {
         try {
             Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
             intent.setData(Uri.parse("package:" + ApplicationLoader.applicationContext.getPackageName()));
@@ -1157,7 +1156,7 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
             @Override
             public void onItemClick(int i3) {
                 if (i3 == -1) {
-                    SessionsActivity.this.lambda$onBackPressed$321();
+                    SessionsActivity.this.lambda$onBackPressed$323();
                 }
             }
         });
@@ -1330,10 +1329,10 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
     public void onRequestPermissionsResultFragment(int i, String[] strArr, int[] iArr) {
         if (getParentActivity() != null && i == 34) {
             if (iArr.length <= 0 || iArr[0] != 0) {
-                new AlertDialog.Builder(getParentActivity()).setMessage(AndroidUtilities.replaceTags(LocaleController.getString(R.string.QRCodePermissionNoCameraWithHint))).setPositiveButton(LocaleController.getString(R.string.PermissionOpenSettings), new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(getParentActivity()).setMessage(AndroidUtilities.replaceTags(LocaleController.getString(R.string.QRCodePermissionNoCameraWithHint))).setPositiveButton(LocaleController.getString(R.string.PermissionOpenSettings), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        SessionsActivity.this.lambda$onRequestPermissionsResultFragment$20(dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        SessionsActivity.this.lambda$onRequestPermissionsResultFragment$20(alertDialog, i2);
                     }
                 }).setNegativeButton(LocaleController.getString(R.string.ContactsPermissionAlertNotNow), null).setTopAnimation(R.raw.permission_request_camera, 72, false, Theme.getColor(Theme.key_dialogTopBackground)).show();
             } else {

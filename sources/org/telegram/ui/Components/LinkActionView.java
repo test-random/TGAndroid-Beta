@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.drawable.ColorDrawable;
 import android.text.SpannableStringBuilder;
@@ -319,7 +318,7 @@ public class LinkActionView extends LinearLayout {
         }
     }
 
-    public void lambda$new$3(DialogInterface dialogInterface, int i) {
+    public void lambda$new$3(AlertDialog alertDialog, int i) {
         Delegate delegate = this.delegate;
         if (delegate != null) {
             delegate.removeLink();
@@ -330,10 +329,10 @@ public class LinkActionView extends LinearLayout {
         AlertDialog.Builder builder = new AlertDialog.Builder(baseFragment.getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.DeleteLink));
         builder.setMessage(LocaleController.getString(R.string.DeleteLinkHelp));
-        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                LinkActionView.this.lambda$new$3(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                LinkActionView.this.lambda$new$3(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -476,7 +475,7 @@ public class LinkActionView extends LinearLayout {
         }
     }
 
-    public void lambda$revokeLink$10(DialogInterface dialogInterface, int i) {
+    public void lambda$revokeLink$10(AlertDialog alertDialog, int i) {
         Delegate delegate = this.delegate;
         if (delegate != null) {
             delegate.revokeLink();
@@ -490,10 +489,10 @@ public class LinkActionView extends LinearLayout {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.fragment.getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.RevokeLink));
         builder.setMessage(LocaleController.getString(R.string.RevokeAlert));
-        builder.setPositiveButton(LocaleController.getString(R.string.RevokeButton), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.RevokeButton), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                LinkActionView.this.lambda$revokeLink$10(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                LinkActionView.this.lambda$revokeLink$10(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -514,8 +513,8 @@ public class LinkActionView extends LinearLayout {
         }
         QRCodeBottomSheet qRCodeBottomSheet = new QRCodeBottomSheet(context, string, str, str2, false) {
             @Override
-            public void dismiss() {
-                super.dismiss();
+            public void lambda$new$0() {
+                super.lambda$new$0();
                 LinkActionView.this.qrCodeBottomSheet = null;
             }
         };

@@ -276,10 +276,10 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString("ResetNotificationsAlertTitle", R.string.ResetNotificationsAlertTitle));
             builder.setMessage(LocaleController.getString("ResetNotificationsAlert", R.string.ResetNotificationsAlert));
-            builder.setPositiveButton(LocaleController.getString("Reset", R.string.Reset), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString("Reset", R.string.Reset), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i4) {
-                    NotificationsSettingsActivity.this.lambda$createView$6(dialogInterface, i4);
+                public final void onClick(AlertDialog alertDialog, int i4) {
+                    NotificationsSettingsActivity.this.lambda$createView$6(alertDialog, i4);
                 }
             });
             builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
@@ -492,7 +492,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         });
     }
 
-    public void lambda$createView$6(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$6(AlertDialog alertDialog, int i) {
         if (this.reseting) {
             return;
         }
@@ -538,7 +538,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.NotificationsSettingsActivity.lambda$loadExceptions$2(java.util.ArrayList):void");
     }
 
-    public void lambda$showExceptionsAlert$11(ArrayList arrayList, ArrayList arrayList2, DialogInterface dialogInterface, int i) {
+    public void lambda$showExceptionsAlert$11(ArrayList arrayList, ArrayList arrayList2, AlertDialog alertDialog, int i) {
         presentFragment(new NotificationsCustomSettingsActivity(-1, arrayList, arrayList2));
     }
 
@@ -600,15 +600,15 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setMessage(AndroidUtilities.replaceTags(arrayList.size() == 1 ? LocaleController.formatString("NotificationsExceptionsSingleAlert", R.string.NotificationsExceptionsSingleAlert, str) : LocaleController.formatString("NotificationsExceptionsAlert", R.string.NotificationsExceptionsAlert, str)));
         builder.setTitle(LocaleController.getString("NotificationsExceptions", R.string.NotificationsExceptions));
-        builder.setNeutralButton(LocaleController.getString("ViewExceptions", R.string.ViewExceptions), new DialogInterface.OnClickListener() {
+        builder.setNeutralButton(LocaleController.getString("ViewExceptions", R.string.ViewExceptions), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                NotificationsSettingsActivity.this.lambda$showExceptionsAlert$11(arrayList, arrayList2, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                NotificationsSettingsActivity.this.lambda$showExceptionsAlert$11(arrayList, arrayList2, alertDialog, i2);
             }
         });
-        builder.setNegativeButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString("OK", R.string.OK), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
+            public final void onClick(AlertDialog alertDialog, int i2) {
                 runnable.run();
             }
         });
@@ -624,7 +624,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    NotificationsSettingsActivity.this.lambda$onBackPressed$321();
+                    NotificationsSettingsActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

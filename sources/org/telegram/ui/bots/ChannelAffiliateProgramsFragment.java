@@ -411,9 +411,9 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         });
     }
 
-    public void lambda$createView$6(TL_payments.connectedBotStarRef connectedbotstarref, DialogInterface dialogInterface, int i) {
-        final AlertDialog alertDialog = new AlertDialog(getParentActivity(), 3);
-        alertDialog.showDelayed(200L);
+    public void lambda$createView$6(TL_payments.connectedBotStarRef connectedbotstarref, AlertDialog alertDialog, int i) {
+        final AlertDialog alertDialog2 = new AlertDialog(getParentActivity(), 3);
+        alertDialog2.showDelayed(200L);
         TL_payments.editConnectedStarRefBot editconnectedstarrefbot = new TL_payments.editConnectedStarRefBot();
         editconnectedstarrefbot.link = connectedbotstarref.url;
         editconnectedstarrefbot.peer = MessagesController.getInstance(this.currentAccount).getInputPeer(this.dialogId);
@@ -421,16 +421,16 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         getConnectionsManager().sendRequest(editconnectedstarrefbot, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                ChannelAffiliateProgramsFragment.this.lambda$createView$5(alertDialog, tLObject, tL_error);
+                ChannelAffiliateProgramsFragment.this.lambda$createView$5(alertDialog2, tLObject, tL_error);
             }
         });
     }
 
     public void lambda$createView$7(Context context, TLRPC.User user, final TL_payments.connectedBotStarRef connectedbotstarref) {
-        new AlertDialog.Builder(context, this.resourceProvider).setTitle(LocaleController.getString(R.string.LeaveAffiliateLink)).setMessage(AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LeaveAffiliateLinkAlert, UserObject.getUserName(user)))).setPositiveButton(LocaleController.getString(R.string.LeaveAffiliateLinkButton), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(context, this.resourceProvider).setTitle(LocaleController.getString(R.string.LeaveAffiliateLink)).setMessage(AndroidUtilities.replaceTags(LocaleController.formatString(R.string.LeaveAffiliateLinkAlert, UserObject.getUserName(user)))).setPositiveButton(LocaleController.getString(R.string.LeaveAffiliateLinkButton), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChannelAffiliateProgramsFragment.this.lambda$createView$6(connectedbotstarref, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChannelAffiliateProgramsFragment.this.lambda$createView$6(connectedbotstarref, alertDialog, i);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).makeRed(-1).show();
     }

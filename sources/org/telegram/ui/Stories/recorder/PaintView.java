@@ -365,7 +365,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         AnonymousClass33() {
         }
 
-        public void lambda$onClearEmojiRecent$0(DialogInterface dialogInterface, int i) {
+        public void lambda$onClearEmojiRecent$0(AlertDialog alertDialog, int i) {
             PaintView.this.emojiView.clearRecentEmoji();
         }
 
@@ -433,10 +433,10 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             AlertDialog.Builder builder = new AlertDialog.Builder(PaintView.this.getContext(), PaintView.this.resourcesProvider);
             builder.setTitle(LocaleController.getString(R.string.ClearRecentEmojiTitle));
             builder.setMessage(LocaleController.getString(R.string.ClearRecentEmojiText));
-            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    PaintView.AnonymousClass33.this.lambda$onClearEmojiRecent$0(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    PaintView.AnonymousClass33.this.lambda$onClearEmojiRecent$0(alertDialog, i);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -2306,7 +2306,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
 
     public void lambda$openStickersView$25(EmojiBottomSheet emojiBottomSheet, Weather.State state) {
         if (state != null) {
-            emojiBottomSheet.dismiss();
+            emojiBottomSheet.lambda$new$0();
             onOpenCloseStickersAlert(false);
             appearAnimation(createWeatherView(state, false));
         }
@@ -2371,7 +2371,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
             return Boolean.FALSE;
         }
         if (num.intValue() == 2) {
-            emojiBottomSheet.dismiss();
+            emojiBottomSheet.lambda$new$0();
             onGalleryClick();
             return Boolean.TRUE;
         }
@@ -2418,7 +2418,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         }
         zArr[0] = false;
         showLinkAlert(null);
-        emojiBottomSheet.dismiss();
+        emojiBottomSheet.lambda$new$0();
         return Boolean.TRUE;
     }
 
@@ -3279,7 +3279,7 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
                 callback.run(messageObject);
                 ChatAttachAlert chatAttachAlert2 = r4[0];
                 if (chatAttachAlert2 != null) {
-                    chatAttachAlert2.dismiss();
+                    chatAttachAlert2.lambda$new$0();
                 }
             }
         }, false, true, false, this.resourcesProvider);
@@ -4815,11 +4815,11 @@ public abstract class PaintView extends SizeNotifierFrameLayoutPhoto implements 
         });
         EmojiBottomSheet emojiBottomSheet = this.emojiPopup;
         if (emojiBottomSheet != null) {
-            emojiBottomSheet.dismiss();
+            emojiBottomSheet.lambda$new$0();
         }
         ColorPickerBottomSheet colorPickerBottomSheet = this.colorPickerBottomSheet;
         if (colorPickerBottomSheet != null) {
-            colorPickerBottomSheet.dismiss();
+            colorPickerBottomSheet.lambda$new$0();
         }
     }
 

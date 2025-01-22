@@ -6,7 +6,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -685,7 +684,7 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
         return i == 6 && onDonePressed(true);
     }
 
-    public void lambda$createView$2(TLRPC.User user, DialogInterface dialogInterface, int i) {
+    public void lambda$createView$2(TLRPC.User user, AlertDialog alertDialog, int i) {
         this.delegate2.needAddBot(user);
         if (this.editText.length() > 0) {
             this.editText.setText((CharSequence) null);
@@ -774,10 +773,10 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
                                         if (ChatObject.canAddAdmins(chat)) {
                                             builder2.setTitle(LocaleController.getString(R.string.AddBotAdminAlert));
                                             builder2.setMessage(LocaleController.getString(R.string.AddBotAsAdmin));
-                                            builder2.setPositiveButton(LocaleController.getString(R.string.AddAsAdmin), new DialogInterface.OnClickListener() {
+                                            builder2.setPositiveButton(LocaleController.getString(R.string.AddAsAdmin), new AlertDialog.OnButtonClickListener() {
                                                 @Override
-                                                public final void onClick(DialogInterface dialogInterface, int i2) {
-                                                    GroupCreateActivity.this.lambda$createView$2(user, dialogInterface, i2);
+                                                public final void onClick(AlertDialog alertDialog, int i2) {
+                                                    GroupCreateActivity.this.lambda$createView$2(user, alertDialog, i2);
                                                 }
                                             });
                                             builder2.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -836,7 +835,7 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
         checkBoxCellArr[0].setChecked(!r1.isChecked(), true);
     }
 
-    public void lambda$onDonePressed$8(CheckBoxCell[] checkBoxCellArr, DialogInterface dialogInterface, int i) {
+    public void lambda$onDonePressed$8(CheckBoxCell[] checkBoxCellArr, AlertDialog alertDialog, int i) {
         int i2 = 0;
         CheckBoxCell checkBoxCell = checkBoxCellArr[0];
         if (checkBoxCell != null && checkBoxCell.isChecked()) {
@@ -858,7 +857,7 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
         if (contactsAddActivityDelegate != null) {
             contactsAddActivityDelegate.didSelectUsers(arrayList, i);
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public boolean onDonePressed(boolean z) {
@@ -924,10 +923,10 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
                 });
                 builder.setView(linearLayout);
             }
-            builder.setPositiveButton(LocaleController.getString(R.string.Add), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.Add), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    GroupCreateActivity.this.lambda$onDonePressed$8(checkBoxCellArr, dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    GroupCreateActivity.this.lambda$onDonePressed$8(checkBoxCellArr, alertDialog, i2);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -962,7 +961,7 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
                     if (groupCreateActivityDelegate != null) {
                         groupCreateActivityDelegate.didSelectUsers(this.selectedPremium != null, this.selectedMiniapps != null, arrayList2);
                     }
-                    lambda$onBackPressed$321();
+                    lambda$onBackPressed$323();
                 } else {
                     Bundle bundle2 = new Bundle();
                     int size = arrayList2.size();

@@ -1,7 +1,6 @@
 package org.telegram.ui.bots;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
@@ -65,7 +64,7 @@ public abstract class BotVerifySheet {
         });
     }
 
-    public static void lambda$openRemoveVerify$8(final boolean[] zArr, int i, long j, long j2, final Utilities.Callback callback, DialogInterface dialogInterface, int i2) {
+    public static void lambda$openRemoveVerify$8(final boolean[] zArr, int i, long j, long j2, final Utilities.Callback callback, AlertDialog alertDialog, int i2) {
         if (zArr[0]) {
             return;
         }
@@ -90,7 +89,7 @@ public abstract class BotVerifySheet {
     public static void lambda$openSheet$3(ButtonWithCounterView buttonWithCounterView, TLObject tLObject, BottomSheet bottomSheet, Utilities.Callback callback) {
         buttonWithCounterView.setLoading(false);
         if (tLObject instanceof TLRPC.TL_boolTrue) {
-            bottomSheet.dismiss();
+            bottomSheet.lambda$new$0();
             callback.run(Boolean.FALSE);
         }
     }
@@ -135,10 +134,10 @@ public abstract class BotVerifySheet {
         String str;
         TLRPC.Chat chat;
         if (topicsFragment != null) {
-            topicsFragment.lambda$onBackPressed$321();
+            topicsFragment.lambda$onBackPressed$323();
             dialogsActivity.removeSelfFromStack();
         } else {
-            dialogsActivity.lambda$onBackPressed$321();
+            dialogsActivity.lambda$onBackPressed$323();
         }
         BaseFragment safeLastFragment = LaunchActivity.getSafeLastFragment();
         if (safeLastFragment == null) {
@@ -217,10 +216,10 @@ public abstract class BotVerifySheet {
         frameLayout2.addView(simpleTextView, LayoutHelper.createFrame(-2, -2.0f, 19, 57.0f, 0.0f, 10.0f, 0.0f));
         frameLayout.addView(frameLayout2, LayoutHelper.createFrame(-2, -2.0f, 17, 16.0f, 0.0f, 16.0f, 0.0f));
         final boolean[] zArr = new boolean[1];
-        new AlertDialog.Builder(context).setTitle(LocaleController.getString(R.string.BotRemoveVerificationTitle)).setMessage(LocaleController.getString(j2 >= 0 ? R.string.BotRemoveVerificationText : R.string.BotRemoveVerificationChatText)).setView(frameLayout).setNegativeButton(LocaleController.getString(R.string.Cancel), null).setPositiveButton(LocaleController.getString(R.string.Remove), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(context).setTitle(LocaleController.getString(R.string.BotRemoveVerificationTitle)).setMessage(LocaleController.getString(j2 >= 0 ? R.string.BotRemoveVerificationText : R.string.BotRemoveVerificationChatText)).setView(frameLayout).setNegativeButton(LocaleController.getString(R.string.Cancel), null).setPositiveButton(LocaleController.getString(R.string.Remove), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                BotVerifySheet.lambda$openRemoveVerify$8(zArr, i, j, j2, callback, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                BotVerifySheet.lambda$openRemoveVerify$8(zArr, i, j, j2, callback, alertDialog, i2);
             }
         }).makeRed(-1).show();
     }

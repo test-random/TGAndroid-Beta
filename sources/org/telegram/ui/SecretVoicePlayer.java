@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -439,17 +438,17 @@ public class SecretVoicePlayer extends Dialog {
         }
     }
 
-    public void lambda$onBackPressed$3(DialogInterface dialogInterface, int i) {
-        AlertDialog alertDialog = this.backDialog;
-        if (alertDialog != null) {
-            alertDialog.dismiss();
+    public void lambda$onBackPressed$3(AlertDialog alertDialog, int i) {
+        AlertDialog alertDialog2 = this.backDialog;
+        if (alertDialog2 != null) {
+            alertDialog2.dismiss();
         }
     }
 
-    public void lambda$onBackPressed$4(DialogInterface dialogInterface, int i) {
-        AlertDialog alertDialog = this.backDialog;
-        if (alertDialog != null) {
-            alertDialog.dismiss();
+    public void lambda$onBackPressed$4(AlertDialog alertDialog, int i) {
+        AlertDialog alertDialog2 = this.backDialog;
+        if (alertDialog2 != null) {
+            alertDialog2.dismiss();
             this.backDialog = null;
         }
         dismiss();
@@ -617,15 +616,15 @@ public class SecretVoicePlayer extends Dialog {
             super.onBackPressed();
             return;
         }
-        AlertDialog create = new AlertDialog.Builder(getContext(), this.resourcesProvider).setTitle(LocaleController.getString(this.isRound ? R.string.VideoOnceCloseTitle : R.string.VoiceOnceCloseTitle)).setMessage(LocaleController.getString(this.isRound ? R.string.VideoOnceCloseMessage : R.string.VoiceOnceCloseMessage)).setPositiveButton(LocaleController.getString(R.string.Continue), new DialogInterface.OnClickListener() {
+        AlertDialog create = new AlertDialog.Builder(getContext(), this.resourcesProvider).setTitle(LocaleController.getString(this.isRound ? R.string.VideoOnceCloseTitle : R.string.VoiceOnceCloseTitle)).setMessage(LocaleController.getString(this.isRound ? R.string.VideoOnceCloseMessage : R.string.VoiceOnceCloseMessage)).setPositiveButton(LocaleController.getString(R.string.Continue), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                SecretVoicePlayer.this.lambda$onBackPressed$3(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog2, int i) {
+                SecretVoicePlayer.this.lambda$onBackPressed$3(alertDialog2, i);
             }
-        }).setNegativeButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+        }).setNegativeButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                SecretVoicePlayer.this.lambda$onBackPressed$4(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog2, int i) {
+                SecretVoicePlayer.this.lambda$onBackPressed$4(alertDialog2, i);
             }
         }).create();
         this.backDialog = create;

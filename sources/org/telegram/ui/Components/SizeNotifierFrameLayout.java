@@ -514,7 +514,7 @@ public class SizeNotifierFrameLayout extends FrameLayout {
         RenderEffect createBlurEffect;
         RenderEffect createColorFilterEffect;
         RenderEffect createChainEffect;
-        int alpha = Color.alpha(Theme.getColor((DRAW_USING_RENDERNODE() && SharedConfig.getDevicePerformanceClass() == 2) ? Theme.key_chat_BlurAlpha : Theme.key_chat_BlurAlphaSlow));
+        int alpha = Color.alpha(Theme.getColor((DRAW_USING_RENDERNODE() && SharedConfig.getDevicePerformanceClass() == 2) ? Theme.key_chat_BlurAlpha : Theme.key_chat_BlurAlphaSlow, getResourceProvider()));
         if (!SharedConfig.chatBlurEnabled()) {
             canvas.drawRect(rect, paint);
             return;

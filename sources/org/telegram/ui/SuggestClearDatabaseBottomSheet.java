@@ -1,7 +1,6 @@
 package org.telegram.ui;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -69,12 +68,12 @@ public class SuggestClearDatabaseBottomSheet extends BottomSheet {
     public static void dismissDialog() {
         SuggestClearDatabaseBottomSheet suggestClearDatabaseBottomSheet = dialog;
         if (suggestClearDatabaseBottomSheet != null) {
-            suggestClearDatabaseBottomSheet.dismiss();
+            suggestClearDatabaseBottomSheet.lambda$new$0();
             dialog = null;
         }
     }
 
-    public void lambda$new$0(BaseFragment baseFragment, DialogInterface dialogInterface, int i) {
+    public void lambda$new$0(BaseFragment baseFragment, AlertDialog alertDialog, int i) {
         if (baseFragment.getParentActivity() == null) {
             return;
         }
@@ -87,10 +86,10 @@ public class SuggestClearDatabaseBottomSheet extends BottomSheet {
         builder.setTitle(LocaleController.getString(R.string.LocalDatabaseClearTextTitle));
         builder.setMessage(LocaleController.getString(R.string.LocalDatabaseClearText));
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        builder.setPositiveButton(LocaleController.getString(R.string.CacheClear), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.CacheClear), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                SuggestClearDatabaseBottomSheet.this.lambda$new$0(baseFragment, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                SuggestClearDatabaseBottomSheet.this.lambda$new$0(baseFragment, alertDialog, i);
             }
         });
         AlertDialog create = builder.create();
@@ -110,8 +109,8 @@ public class SuggestClearDatabaseBottomSheet extends BottomSheet {
     }
 
     @Override
-    public void dismiss() {
-        super.dismiss();
+    public void lambda$new$0() {
+        super.lambda$new$0();
         dialog = null;
     }
 }

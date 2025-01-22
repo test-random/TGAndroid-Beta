@@ -96,10 +96,10 @@ public class ReactionsLayoutInBubble {
     public int width;
     public int x;
     public int y;
-    private static Paint paint = new Paint(1);
-    private static Paint tagPaint = new Paint(1);
-    private static Paint cutTagPaint = new Paint(1);
-    private static TextPaint textPaint = new TextPaint(1);
+    private static final Paint paint = new Paint(1);
+    private static final Paint tagPaint = new Paint(1);
+    private static final Paint cutTagPaint = new Paint(1);
+    private static final TextPaint textPaint = new TextPaint(1);
     private static final ButtonsComparator comparator = new ButtonsComparator();
     private static int pointer = 1;
     private static final Comparator usersComparator = new Comparator() {
@@ -114,7 +114,7 @@ public class ReactionsLayoutInBubble {
     ArrayList outButtons = new ArrayList();
     HashMap lastDrawingReactionButtons = new HashMap();
     HashMap lastDrawingReactionButtonsTmp = new HashMap();
-    HashMap animatedReactions = new HashMap();
+    final HashMap animatedReactions = new HashMap();
     private final ArrayList reactionLineWidths = new ArrayList();
     private final RectF scrimRect = new RectF();
     private final Rect scrimRect2 = new Rect();
@@ -942,9 +942,10 @@ public class ReactionsLayoutInBubble {
 
     public static void initPaints(Theme.ResourcesProvider resourcesProvider) {
         paint.setColor(Theme.getColor(Theme.key_chat_inLoader, resourcesProvider));
-        textPaint.setColor(Theme.getColor(Theme.key_featuredStickers_buttonText, resourcesProvider));
-        textPaint.setTextSize(AndroidUtilities.dp(12.0f));
-        textPaint.setTypeface(AndroidUtilities.bold());
+        TextPaint textPaint2 = textPaint;
+        textPaint2.setColor(Theme.getColor(Theme.key_featuredStickers_buttonText, resourcesProvider));
+        textPaint2.setTextSize(AndroidUtilities.dp(12.0f));
+        textPaint2.setTypeface(AndroidUtilities.bold());
         cutTagPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
     }
 

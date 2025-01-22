@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -148,7 +147,7 @@ public class PollCreateActivity extends BaseFragment implements NotificationCent
 
         public void lambda$onItemClick$0(TLRPC.TL_messageMediaPoll tL_messageMediaPoll, HashMap hashMap, boolean z, int i) {
             PollCreateActivity.this.delegate.sendPoll(tL_messageMediaPoll, hashMap, z, i);
-            PollCreateActivity.this.lambda$onBackPressed$321();
+            PollCreateActivity.this.lambda$onBackPressed$323();
         }
 
         @Override
@@ -242,7 +241,7 @@ public class PollCreateActivity extends BaseFragment implements NotificationCent
             } else if (!PollCreateActivity.this.checkDiscard()) {
                 return;
             }
-            PollCreateActivity.this.lambda$onBackPressed$321();
+            PollCreateActivity.this.lambda$onBackPressed$323();
         }
     }
 
@@ -250,7 +249,7 @@ public class PollCreateActivity extends BaseFragment implements NotificationCent
         AnonymousClass9() {
         }
 
-        public void lambda$onClearEmojiRecent$0(DialogInterface dialogInterface, int i) {
+        public void lambda$onClearEmojiRecent$0(AlertDialog alertDialog, int i) {
             PollCreateActivity.this.emojiView.clearRecentEmoji();
         }
 
@@ -319,10 +318,10 @@ public class PollCreateActivity extends BaseFragment implements NotificationCent
             AlertDialog.Builder builder = new AlertDialog.Builder(PollCreateActivity.this.getContext(), ((BaseFragment) PollCreateActivity.this).resourceProvider);
             builder.setTitle(LocaleController.getString(R.string.ClearRecentEmojiTitle));
             builder.setMessage(LocaleController.getString(R.string.ClearRecentEmojiText));
-            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.ClearButton), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    PollCreateActivity.AnonymousClass9.this.lambda$onClearEmojiRecent$0(dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    PollCreateActivity.AnonymousClass9.this.lambda$onClearEmojiRecent$0(alertDialog, i);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -976,10 +975,10 @@ public class PollCreateActivity extends BaseFragment implements NotificationCent
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString(R.string.CancelPollAlertTitle));
             builder.setMessage(LocaleController.getString(R.string.CancelPollAlertText));
-            builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i2) {
-                    PollCreateActivity.this.lambda$checkDiscard$1(dialogInterface, i2);
+                public final void onClick(AlertDialog alertDialog, int i2) {
+                    PollCreateActivity.this.lambda$checkDiscard$1(alertDialog, i2);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1070,8 +1069,8 @@ public class PollCreateActivity extends BaseFragment implements NotificationCent
         this.emojiView.setTranslationY(AndroidUtilities.lerp(f, f2, ((Float) valueAnimator.getAnimatedValue()).floatValue()));
     }
 
-    public void lambda$checkDiscard$1(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$checkDiscard$1(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$0(View view, int i) {

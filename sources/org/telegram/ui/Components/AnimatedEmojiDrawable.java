@@ -43,6 +43,7 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.SelectAnimatedEmojiDialog;
+import org.telegram.ui.Stars.StarsReactionsSheet;
 
 public class AnimatedEmojiDrawable extends Drawable {
     private static boolean LOG_MEMORY_LEAK = false;
@@ -381,16 +382,19 @@ public class AnimatedEmojiDrawable extends Drawable {
         private final android.graphics.Rect bounds;
         private int cacheType;
         public boolean center;
-        private AnimatedFloat changeProgress;
+        private final AnimatedFloat changeProgress;
         private ColorFilter colorFilter;
         private int colorFilterLastColor;
-        private Drawable[] drawables;
+        private final Drawable[] drawables;
+        private boolean hasParticles;
         private boolean invalidateParent;
         private Integer lastColor;
         private int offsetX;
         private int offsetY;
-        private OvershootInterpolator overshootInterpolator;
+        private final OvershootInterpolator overshootInterpolator;
         private View parentView;
+        private StarsReactionsSheet.Particles particles;
+        private final AnimatedFloat particlesAlpha;
         private View secondParent;
         private int size;
 
@@ -409,13 +413,18 @@ public class AnimatedEmojiDrawable extends Drawable {
         public SwapAnimatedEmojiDrawable(View view, boolean z, int i, int i2) {
             this.center = false;
             this.overshootInterpolator = new OvershootInterpolator(2.0f);
-            this.changeProgress = new AnimatedFloat((View) null, 300L, CubicBezierInterpolator.EASE_OUT);
+            CubicBezierInterpolator cubicBezierInterpolator = CubicBezierInterpolator.EASE_OUT;
+            AnimatedFloat animatedFloat = new AnimatedFloat((View) null, 300L, cubicBezierInterpolator);
+            this.changeProgress = animatedFloat;
+            AnimatedFloat animatedFloat2 = new AnimatedFloat((View) null, 300L, cubicBezierInterpolator);
+            this.particlesAlpha = animatedFloat2;
             this.drawables = new Drawable[2];
             this.alpha = 255;
             this.bounds = new android.graphics.Rect();
-            AnimatedFloat animatedFloat = this.changeProgress;
             this.parentView = view;
             animatedFloat.setParent(view);
+            this.parentView = view;
+            animatedFloat2.setParent(view);
             this.size = i;
             this.cacheType = i2;
             this.invalidateParent = z;
@@ -455,6 +464,15 @@ public class AnimatedEmojiDrawable extends Drawable {
             float f = this.changeProgress.set(1.0f);
             this.bounds.set(getBounds());
             this.bounds.offset(this.offsetX, this.offsetY);
+            float f2 = this.particlesAlpha.set(this.hasParticles);
+            if (f2 > 0.0f) {
+                this.particles.setBounds(this.bounds);
+                this.particles.process();
+                StarsReactionsSheet.Particles particles = this.particles;
+                Integer num = this.lastColor;
+                particles.draw(canvas, Theme.multAlpha(num == null ? -1 : num.intValue(), f2));
+                invalidate();
+            }
             Drawable drawable = this.drawables[1];
             if (drawable != null && f < 1.0f) {
                 drawable.setAlpha((int) (this.alpha * (1.0f - f)));
@@ -755,7 +773,34 @@ public class AnimatedEmojiDrawable extends Drawable {
 
         public void setParentView(View view) {
             this.changeProgress.setParent(view);
+            this.particlesAlpha.setParent(view);
             this.parentView = view;
+        }
+
+        public void setParticles(boolean z, boolean z2) {
+            StarsReactionsSheet.Particles particles;
+            if (this.hasParticles == z) {
+                return;
+            }
+            if (z2) {
+                if (this.particles == null) {
+                    this.particles = new StarsReactionsSheet.Particles(1, 8);
+                }
+                this.hasParticles = z;
+            } else {
+                this.hasParticles = z;
+                if (z && this.particles == null) {
+                    particles = new StarsReactionsSheet.Particles(1, 8);
+                } else {
+                    if (!z && this.particles != null) {
+                        particles = null;
+                    }
+                    this.particlesAlpha.set(z, true);
+                }
+                this.particles = particles;
+                this.particlesAlpha.set(z, true);
+            }
+            invalidate();
         }
 
         public void setSecondParent(View view) {

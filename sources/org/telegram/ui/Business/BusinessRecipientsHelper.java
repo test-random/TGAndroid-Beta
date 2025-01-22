@@ -1,6 +1,5 @@
 package org.telegram.ui.Business;
 
-import android.content.DialogInterface;
 import android.view.View;
 import java.util.ArrayList;
 import org.telegram.messenger.AndroidUtilities;
@@ -85,7 +84,7 @@ public class BusinessRecipientsHelper {
         return LocaleController.getString(i != 1 ? i != 2 ? i != 4 ? R.string.FilterNonContacts : R.string.FilterContacts : R.string.FilterNewChats : R.string.FilterExistingChats);
     }
 
-    public void lambda$onClick$0(int i, boolean z, UItem uItem, DialogInterface dialogInterface, int i2) {
+    public void lambda$onClick$0(int i, boolean z, UItem uItem, AlertDialog alertDialog, int i2) {
         if (i == 0) {
             (!z ? this.neverShow : this.alwaysShow).remove(Long.valueOf(uItem.dialogId));
         } else if (z) {
@@ -388,10 +387,10 @@ public class BusinessRecipientsHelper {
         final int flag = str == null ? 0 : getFlag(str);
         String peerName = flag == 0 ? this.fragment.getMessagesController().getPeerName(uItem.dialogId) : getFlagName(flag);
         BaseFragment baseFragment = this.fragment;
-        baseFragment.showDialog(new AlertDialog.Builder(baseFragment.getContext(), this.fragment.getResourceProvider()).setTitle(LocaleController.getString(!z ? R.string.BusinessRecipientsRemoveExcludeTitle : R.string.BusinessRecipientsRemoveIncludeTitle)).setMessage(LocaleController.formatString(!z ? R.string.BusinessRecipientsRemoveExcludeMessage : R.string.BusinessRecipientsRemoveIncludeMessage, peerName)).setPositiveButton(LocaleController.getString(R.string.Remove), new DialogInterface.OnClickListener() {
+        baseFragment.showDialog(new AlertDialog.Builder(baseFragment.getContext(), this.fragment.getResourceProvider()).setTitle(LocaleController.getString(!z ? R.string.BusinessRecipientsRemoveExcludeTitle : R.string.BusinessRecipientsRemoveIncludeTitle)).setMessage(LocaleController.formatString(!z ? R.string.BusinessRecipientsRemoveExcludeMessage : R.string.BusinessRecipientsRemoveIncludeMessage, peerName)).setPositiveButton(LocaleController.getString(R.string.Remove), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                BusinessRecipientsHelper.this.lambda$onClick$0(flag, z, uItem, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                BusinessRecipientsHelper.this.lambda$onClick$0(flag, z, uItem, alertDialog, i2);
             }
         }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).create());
         return true;

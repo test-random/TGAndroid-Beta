@@ -138,11 +138,11 @@ public class ContentPreviewViewer {
 
     public class AnonymousClass1 implements Runnable {
 
-        class ViewOnClickListenerC00391 implements View.OnClickListener {
+        class ViewOnClickListenerC00381 implements View.OnClickListener {
             final ArrayList val$actions;
             final boolean val$inFavs;
 
-            ViewOnClickListenerC00391(ArrayList arrayList, boolean z) {
+            ViewOnClickListenerC00381(ArrayList arrayList, boolean z) {
                 this.val$actions = arrayList;
                 this.val$inFavs = z;
             }

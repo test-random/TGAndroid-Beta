@@ -2,7 +2,6 @@ package org.telegram.ui;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -496,21 +495,21 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
             });
         }
 
-        public void lambda$onCreateViewHolder$5(final MessagesController.DialogFilter dialogFilter, DialogInterface dialogInterface, int i) {
-            final AlertDialog alertDialog;
+        public void lambda$onCreateViewHolder$5(final MessagesController.DialogFilter dialogFilter, AlertDialog alertDialog, int i) {
+            final AlertDialog alertDialog2;
             if (FiltersSetupActivity.this.getParentActivity() != null) {
-                alertDialog = new AlertDialog(FiltersSetupActivity.this.getParentActivity(), 3);
-                alertDialog.setCanCancel(false);
-                alertDialog.show();
+                alertDialog2 = new AlertDialog(FiltersSetupActivity.this.getParentActivity(), 3);
+                alertDialog2.setCanCancel(false);
+                alertDialog2.show();
             } else {
-                alertDialog = null;
+                alertDialog2 = null;
             }
             TLRPC.TL_messages_updateDialogFilter tL_messages_updateDialogFilter = new TLRPC.TL_messages_updateDialogFilter();
             tL_messages_updateDialogFilter.id = dialogFilter.id;
             FiltersSetupActivity.this.getConnectionsManager().sendRequest(tL_messages_updateDialogFilter, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    FiltersSetupActivity.ListAdapter.this.lambda$onCreateViewHolder$4(alertDialog, dialogFilter, tLObject, tL_error);
+                    FiltersSetupActivity.ListAdapter.this.lambda$onCreateViewHolder$4(alertDialog2, dialogFilter, tLObject, tL_error);
                 }
             });
         }
@@ -529,10 +528,10 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
             builder.setTitle(LocaleController.getString(R.string.FilterDelete));
             builder.setMessage(LocaleController.getString(R.string.FilterDeleteAlert));
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-            builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i) {
-                    FiltersSetupActivity.ListAdapter.this.lambda$onCreateViewHolder$5(dialogFilter, dialogInterface, i);
+                public final void onClick(AlertDialog alertDialog, int i) {
+                    FiltersSetupActivity.ListAdapter.this.lambda$onCreateViewHolder$5(dialogFilter, alertDialog, i);
                 }
             });
             AlertDialog create = builder.create();
@@ -1164,7 +1163,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    FiltersSetupActivity.this.lambda$onBackPressed$321();
+                    FiltersSetupActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

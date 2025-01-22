@@ -931,8 +931,6 @@ public class ConnectionsManager extends BaseController {
 
     public static native void native_resumeNetwork(int i, boolean z);
 
-    public static native void native_seSystemLangCode(int i, String str);
-
     public static native void native_sendRequest(int i, long j, int i2, int i3, int i4, boolean z, int i5);
 
     public static native void native_setIpStrategy(int i, byte b);

@@ -100,7 +100,7 @@ public class BottomSheetTabsOverlay extends FrameLayout {
 
         public static void lambda$onAnimationEnd$0(BottomSheetTabs.WebTabData webTabData, Sheet sheet, Bitmap bitmap) {
             webTabData.previewBitmap = bitmap;
-            sheet.mo1009getWindowView().setDrawingFromOverlay(false);
+            sheet.mo997getWindowView().setDrawingFromOverlay(false);
             sheet.release();
         }
 
@@ -131,7 +131,7 @@ public class BottomSheetTabsOverlay extends FrameLayout {
                 canvas.translate(0.0f, -this.val$tab.viewScroll);
                 view.draw(canvas);
             }
-            this.val$sheet.mo1009getWindowView().setDrawingFromOverlay(false);
+            this.val$sheet.mo997getWindowView().setDrawingFromOverlay(false);
             this.val$sheet.release();
             BottomSheetTabsOverlay.this.dismissingSheet = null;
             BottomSheetTabsOverlay.this.invalidate();
@@ -149,7 +149,7 @@ public class BottomSheetTabsOverlay extends FrameLayout {
 
         int getNavigationBarColor(int i);
 
-        SheetView mo1009getWindowView();
+        SheetView mo997getWindowView();
 
         boolean hadDialog();
 
@@ -478,10 +478,10 @@ public class BottomSheetTabsOverlay extends FrameLayout {
             int i = this.pos[0];
             int[] iArr = this.pos2;
             rectF.offset(i - iArr[0], r1[1] - iArr[1]);
-            SheetView mo1009getWindowView = this.dismissingSheet.mo1009getWindowView();
+            SheetView mo997getWindowView = this.dismissingSheet.mo997getWindowView();
             RectF rectF2 = this.rect;
             float f = this.dismissProgress;
-            float drawInto = mo1009getWindowView.drawInto(canvas, rectF2, f, this.clipRect, f, false);
+            float drawInto = mo997getWindowView.drawInto(canvas, rectF2, f, this.clipRect, f, false);
             if (this.dismissingTab != null) {
                 this.clipPath.rewind();
                 this.clipPath.addRoundRect(this.clipRect, drawInto, drawInto, Path.Direction.CW);
@@ -525,10 +525,10 @@ public class BottomSheetTabsOverlay extends FrameLayout {
     }
 
     public static void lambda$dismissSheet$3(Sheet sheet) {
-        if (sheet == null || sheet.mo1009getWindowView() == null) {
+        if (sheet == null || sheet.mo997getWindowView() == null) {
             return;
         }
-        sheet.mo1009getWindowView().setDrawingFromOverlay(true);
+        sheet.mo997getWindowView().setDrawingFromOverlay(true);
     }
 
     public void lambda$dismissSheet$4(ValueAnimator valueAnimator) {

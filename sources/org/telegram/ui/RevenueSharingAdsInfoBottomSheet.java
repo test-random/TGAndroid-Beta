@@ -192,16 +192,16 @@ public class RevenueSharingAdsInfoBottomSheet extends BottomSheetWithRecyclerLis
             return;
         }
         safeLastFragment.presentFragment(new PremiumPreviewFragment(PremiumPreviewFragment.featureTypeToServerString(3)));
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$2() {
-        dismiss();
+        lambda$new$0();
         Browser.openUrl(getContext(), LocaleController.getString(R.string.PromoteUrl));
     }
 
     public void lambda$new$3(View view) {
-        dismiss();
+        lambda$new$0();
     }
 
     public static RevenueSharingAdsInfoBottomSheet showAlert(Context context, BaseFragment baseFragment, boolean z, Theme.ResourcesProvider resourcesProvider) {

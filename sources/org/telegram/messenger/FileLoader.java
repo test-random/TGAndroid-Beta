@@ -58,14 +58,14 @@ public class FileLoader extends BaseController {
     private int lastReferenceId;
     private final ConcurrentHashMap<String, FileLoadOperation> loadOperationPaths;
     private final ConcurrentHashMap<String, LoadOperationUIObject> loadOperationPathsUI;
-    private HashMap<String, Boolean> loadingVideos;
-    private ConcurrentHashMap<Integer, Object> parentObjectReferences;
+    private final HashMap<String, Boolean> loadingVideos;
+    private final ConcurrentHashMap<Integer, Object> parentObjectReferences;
     private int priorityIncreasePointer;
     private final FileLoaderPriorityQueue[] smallFilesQueue;
     private final ConcurrentHashMap<String, FileUploadOperation> uploadOperationPaths;
     private final ConcurrentHashMap<String, FileUploadOperation> uploadOperationPathsEnc;
     private final LinkedList<FileUploadOperation> uploadOperationQueue;
-    private HashMap<String, Long> uploadSizes;
+    private final HashMap<String, Long> uploadSizes;
     private final LinkedList<FileUploadOperation> uploadSmallOperationQueue;
     private static volatile DispatchQueue fileLoaderQueue = new DispatchQueue("fileUploadQueue");
     private static SparseArray<File> mediaDirs = null;

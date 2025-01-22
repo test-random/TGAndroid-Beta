@@ -423,14 +423,17 @@ public abstract class StoriesUtilities {
             setColorId(-1, z);
         }
 
-        public void setColorId(int i, boolean z) {
-            MessagesController.PeerColors peerColors = MessagesController.getInstance(this.currentAccount).profilePeerColors;
-            MessagesController.PeerColor color = peerColors == null ? null : peerColors.getColor(i);
-            if (color != null) {
-                setColors(color.getStoryColor1(Theme.isCurrentThemeDark()), color.getStoryColor2(Theme.isCurrentThemeDark()), z);
+        public void setColor(MessagesController.PeerColor peerColor, boolean z) {
+            if (peerColor != null) {
+                setColors(peerColor.getStoryColor1(Theme.isCurrentThemeDark()), peerColor.getStoryColor2(Theme.isCurrentThemeDark()), z);
             } else {
                 resetColors(z);
             }
+        }
+
+        public void setColorId(int i, boolean z) {
+            MessagesController.PeerColors peerColors = MessagesController.getInstance(this.currentAccount).profilePeerColors;
+            setColor(peerColors == null ? null : peerColors.getColor(i), z);
         }
 
         public void setUser(TLRPC.User user, boolean z) {

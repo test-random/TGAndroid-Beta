@@ -75,7 +75,6 @@ public class TimelineView extends View {
     private int collageSelected;
     private final ArrayList collageTracks;
     private final ArrayList collageWaveforms;
-    private final ViewGroup container;
     private long coverEnd;
     private long coverStart;
     private TimelineDelegate delegate;
@@ -314,10 +313,10 @@ public class TimelineView extends View {
             public static void $default$onVideoOffsetChange(TimelineDelegate timelineDelegate, int i, long j) {
             }
 
-            public static void $default$onVideoRightChange(TimelineDelegate timelineDelegate, float f) {
+            public static void $default$onVideoRightChange(TimelineDelegate timelineDelegate, int i, float f) {
             }
 
-            public static void $default$onVideoRightChange(TimelineDelegate timelineDelegate, int i, float f) {
+            public static void $default$onVideoRightChange(TimelineDelegate timelineDelegate, boolean z, float f) {
             }
 
             public static void $default$onVideoSelected(TimelineDelegate timelineDelegate, int i) {
@@ -356,15 +355,15 @@ public class TimelineView extends View {
 
         void onRoundVolumeChange(float f);
 
-        void onVideoLeftChange(float f);
-
         void onVideoLeftChange(int i, float f);
+
+        void onVideoLeftChange(boolean z, float f);
 
         void onVideoOffsetChange(int i, long j);
 
-        void onVideoRightChange(float f);
-
         void onVideoRightChange(int i, float f);
+
+        void onVideoRightChange(boolean z, float f);
 
         void onVideoSelected(int i);
 
@@ -843,7 +842,6 @@ public class TimelineView extends View {
         this.scrollingCollage = -1;
         this.scrolling = false;
         this.selectedVideoRadii = new float[8];
-        this.container = viewGroup;
         this.previewContainer = view;
         this.resourcesProvider = resourcesProvider;
         paint7.setColor(Integer.MAX_VALUE);

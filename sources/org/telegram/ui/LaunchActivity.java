@@ -45,14 +45,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.common.primitives.Longs;
 import j$.util.function.Consumer;
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -171,6 +170,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     public static Runnable onResumeStaticCallback;
     private static LaunchActivity staticInstanceForAlerts;
     public static boolean systemBlurEnabled;
+    private static Pattern timestampPattern;
     public static Runnable whenResumed;
     private ActionBarLayout actionBarLayout;
     private long alreadyShownFreeDiscSpaceAlertForced;
@@ -377,25 +377,50 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
 
         @Override
-        protected void onEmojiSelected(View view, Long l, TLRPC.Document document, Integer num) {
+        protected void onEmojiSelected(View view, Long l, TLRPC.Document document, TL_stars.TL_starGiftUnique tL_starGiftUnique, Integer num) {
+            TLRPC.TL_emojiStatus tL_emojiStatus;
             TLRPC.EmojiStatus emojiStatus;
             if (l == null) {
                 emojiStatus = new TLRPC.TL_emojiStatusEmpty();
-            } else if (num != null) {
-                TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = new TLRPC.TL_emojiStatusUntil();
-                tL_emojiStatusUntil.document_id = l.longValue();
-                tL_emojiStatusUntil.until = num.intValue();
-                emojiStatus = tL_emojiStatusUntil;
             } else {
-                TLRPC.TL_emojiStatus tL_emojiStatus = new TLRPC.TL_emojiStatus();
-                tL_emojiStatus.document_id = l.longValue();
+                if (tL_starGiftUnique != null) {
+                    TL_stars.SavedStarGift findUserStarGift = StarsController.getInstance(LaunchActivity.this.currentAccount).findUserStarGift(tL_starGiftUnique.id);
+                    if (findUserStarGift != null && MessagesController.getGlobalMainSettings().getInt("statusgiftpage", 0) < 2) {
+                        MessagesController.getGlobalMainSettings().edit().putInt("statusgiftpage", MessagesController.getGlobalMainSettings().getInt("statusgiftpage", 0) + 1).apply();
+                        Context context = getContext();
+                        int i = LaunchActivity.this.currentAccount;
+                        new StarGiftSheet(context, i, UserConfig.getInstance(i).getClientUserId(), null).set(findUserStarGift).setupWearPage().show();
+                        if (r15[0] != null) {
+                            LaunchActivity.this.selectAnimatedEmojiDialog = null;
+                            r15[0].dismiss();
+                            return;
+                        }
+                        return;
+                    }
+                    TLRPC.TL_inputEmojiStatusCollectible tL_inputEmojiStatusCollectible = new TLRPC.TL_inputEmojiStatusCollectible();
+                    tL_inputEmojiStatusCollectible.collectible_id = tL_starGiftUnique.id;
+                    tL_emojiStatus = tL_inputEmojiStatusCollectible;
+                    if (num != null) {
+                        tL_inputEmojiStatusCollectible.flags |= 1;
+                        tL_inputEmojiStatusCollectible.until = num.intValue();
+                        tL_emojiStatus = tL_inputEmojiStatusCollectible;
+                    }
+                } else {
+                    TLRPC.TL_emojiStatus tL_emojiStatus2 = new TLRPC.TL_emojiStatus();
+                    if (num != null) {
+                        tL_emojiStatus2.flags |= 1;
+                        tL_emojiStatus2.until = num.intValue();
+                    }
+                    tL_emojiStatus2.document_id = l.longValue();
+                    tL_emojiStatus = tL_emojiStatus2;
+                }
                 emojiStatus = tL_emojiStatus;
             }
-            MessagesController.getInstance(LaunchActivity.this.currentAccount).updateEmojiStatus(emojiStatus);
+            MessagesController.getInstance(LaunchActivity.this.currentAccount).updateEmojiStatus(emojiStatus, tL_starGiftUnique);
             TLRPC.User currentUser = UserConfig.getInstance(LaunchActivity.this.currentAccount).getCurrentUser();
             if (currentUser != null) {
-                for (int i = 0; i < LaunchActivity.this.sideMenu.getChildCount(); i++) {
-                    View childAt = LaunchActivity.this.sideMenu.getChildAt(i);
+                for (int i2 = 0; i2 < LaunchActivity.this.sideMenu.getChildCount(); i2++) {
+                    View childAt = LaunchActivity.this.sideMenu.getChildAt(i2);
                     if (childAt instanceof DrawerUserCell) {
                         DrawerUserCell drawerUserCell = (DrawerUserCell) childAt;
                         drawerUserCell.setAccount(drawerUserCell.getAccountNumber());
@@ -422,6 +447,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             if (drawerLayoutContainer != null) {
                 drawerLayoutContainer.closeDrawer();
             }
+        }
+
+        @Override
+        protected boolean willApplyEmoji(View view, Long l, TLRPC.Document document, TL_stars.TL_starGiftUnique tL_starGiftUnique, Integer num) {
+            return tL_starGiftUnique == null || StarsController.getInstance(LaunchActivity.this.currentAccount).findUserStarGift(tL_starGiftUnique.id) == null || MessagesController.getGlobalMainSettings().getInt("statusgiftpage", 0) >= 2;
         }
     }
 
@@ -1224,25 +1254,45 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     public static int getTimestampFromLink(Uri uri) {
-        int i;
         String query = uri.getPathSegments().contains("video") ? uri.getQuery() : uri.getQueryParameter("t") != null ? uri.getQueryParameter("t") : null;
-        if (query == null) {
+        if (TextUtils.isEmpty(query)) {
             return -1;
         }
-        try {
-            i = Integer.parseInt(query);
-        } catch (Throwable unused) {
-            i = -1;
+        if (timestampPattern == null) {
+            timestampPattern = Pattern.compile("^\\??(?:(\\d+)[dD])?(?:(\\d+)h)?(?:(\\d+)[mM])?(?:(\\d+)[sS])?$");
         }
-        if (i == -1) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+        try {
+            Matcher matcher = timestampPattern.matcher(query);
+            if (matcher.matches()) {
+                String group = matcher.group(1);
+                String group2 = matcher.group(2);
+                String group3 = matcher.group(3);
+                String group4 = matcher.group(4);
+                int i = 0;
+                int parseInt = TextUtils.isEmpty(group) ? 0 : Integer.parseInt(group);
+                int parseInt2 = TextUtils.isEmpty(group2) ? 0 : Integer.parseInt(group2);
+                int parseInt3 = TextUtils.isEmpty(group3) ? 0 : Integer.parseInt(group3);
+                if (!TextUtils.isEmpty(group4)) {
+                    i = Integer.parseInt(group4);
+                }
+                return i + (parseInt3 * 60) + (parseInt2 * 3600) + (parseInt * 86400);
+            }
+        } catch (Throwable unused) {
+        }
+        try {
+            return Integer.parseInt(query);
+        } catch (Throwable unused2) {
+            if (!query.contains(":")) {
+                return -1;
+            }
+            String[] split = query.split(":");
             try {
-                return (int) ((simpleDateFormat.parse(query).getTime() - simpleDateFormat.parse("00:00").getTime()) / 1000);
-            } catch (ParseException e) {
-                e.printStackTrace();
+                return Integer.parseInt(split.length - 1 < 0 ? "0" : split[split.length - 1]) + (Integer.parseInt(split.length - 2 < 0 ? "0" : split[split.length - 2]) * 60) + (Integer.parseInt(split.length - 3 < 0 ? "0" : split[split.length - 3]) * 3600) + (Integer.parseInt(split.length - 4 >= 0 ? split[split.length - 4] : "0") * 86400);
+            } catch (Exception e) {
+                FileLog.e(e);
+                return -1;
             }
         }
-        return i;
     }
 
     private boolean handleIntent(Intent intent, boolean z, boolean z2, boolean z3) {
@@ -1468,7 +1518,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
     }
 
-    public static void lambda$didReceivedNotification$142(int i, DialogInterface dialogInterface, int i2) {
+    public static void lambda$didReceivedNotification$142(int i, AlertDialog alertDialog, int i2) {
         ArrayList arrayList = mainFragmentsStack;
         if (arrayList.isEmpty()) {
             return;
@@ -1476,7 +1526,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         MessagesController.getInstance(i).openByUserName("spambot", (BaseFragment) arrayList.get(arrayList.size() - 1), 1);
     }
 
-    public void lambda$didReceivedNotification$143(DialogInterface dialogInterface, int i) {
+    public void lambda$didReceivedNotification$143(AlertDialog alertDialog, int i) {
         MessagesController.getInstance(this.currentAccount).performLogout(2);
     }
 
@@ -1488,7 +1538,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
     }
 
-    public void lambda$didReceivedNotification$145(final HashMap hashMap, final int i, DialogInterface dialogInterface, int i2) {
+    public void lambda$didReceivedNotification$145(final HashMap hashMap, final int i, AlertDialog alertDialog, int i2) {
         ArrayList arrayList = mainFragmentsStack;
         if (!arrayList.isEmpty() && AndroidUtilities.isMapsInstalled((BaseFragment) arrayList.get(arrayList.size() - 1))) {
             LocationActivity locationActivity = new LocationActivity(0);
@@ -1502,15 +1552,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
     }
 
-    public static void lambda$didReceivedNotification$146(int i, HashMap hashMap, boolean z, boolean z2, DialogInterface dialogInterface, int i2) {
+    public static void lambda$didReceivedNotification$146(int i, HashMap hashMap, boolean z, boolean z2, AlertDialog alertDialog, int i2) {
         ContactsController.getInstance(i).syncPhoneBookByAlert(hashMap, z, z2, false);
     }
 
-    public static void lambda$didReceivedNotification$147(int i, HashMap hashMap, boolean z, boolean z2, DialogInterface dialogInterface, int i2) {
+    public static void lambda$didReceivedNotification$147(int i, HashMap hashMap, boolean z, boolean z2, AlertDialog alertDialog, int i2) {
         ContactsController.getInstance(i).syncPhoneBookByAlert(hashMap, z, z2, true);
     }
 
-    public static void lambda$didReceivedNotification$148(int i, HashMap hashMap, boolean z, boolean z2, DialogInterface dialogInterface, int i2) {
+    public static void lambda$didReceivedNotification$148(int i, HashMap hashMap, boolean z, boolean z2, AlertDialog alertDialog, int i2) {
         ContactsController.getInstance(i).syncPhoneBookByAlert(hashMap, z, z2, true);
     }
 
@@ -1761,7 +1811,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         });
     }
 
-    public void lambda$handleIntent$31(BaseFragment baseFragment, String str, String str2, DialogInterface dialogInterface, int i) {
+    public void lambda$handleIntent$31(BaseFragment baseFragment, String str, String str2, AlertDialog alertDialog, int i) {
         NewContactBottomSheet newContactBottomSheet = new NewContactBottomSheet(baseFragment, this);
         newContactBottomSheet.setInitialPhoneNumber(str, false);
         if (str2 != null) {
@@ -3306,7 +3356,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         });
     }
 
-    public void lambda$runLinkRequest$74(long j, int i, TLRPC.User user, String str, DialogInterface dialogInterface, int i2) {
+    public void lambda$runLinkRequest$74(long j, int i, TLRPC.User user, String str, AlertDialog alertDialog, int i2) {
         Bundle bundle = new Bundle();
         bundle.putBoolean("scrollToTopOnResume", true);
         long j2 = -j;
@@ -3327,10 +3377,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             builder.setTitle(LocaleController.getString(i3));
             builder.setMessage(AndroidUtilities.replaceTags(LocaleController.formatString("AddMembersAlertNamesText", R.string.AddMembersAlertNamesText, UserObject.getUserName(user), chat == null ? "" : chat.title)));
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-            builder.setPositiveButton(LocaleController.getString(i3), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(i3), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i4) {
-                    LaunchActivity.this.lambda$runLinkRequest$74(j, i, user, str2, dialogInterface, i4);
+                public final void onClick(AlertDialog alertDialog, int i4) {
+                    LaunchActivity.this.lambda$runLinkRequest$74(j, i, user, str2, alertDialog, i4);
                 }
             });
             builder.show();
@@ -4093,7 +4143,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         this.visibleDialogs.clear();
     }
 
-    public void lambda$showLanguageAlertInternal$160(LocaleController.LocaleInfo[] localeInfoArr, DialogInterface dialogInterface, int i) {
+    public void lambda$showLanguageAlertInternal$160(LocaleController.LocaleInfo[] localeInfoArr, AlertDialog alertDialog, int i) {
         LocaleController.getInstance().applyLanguage(localeInfoArr[0], true, false, this.currentAccount);
         rebuildAllFragments(true);
     }
@@ -5445,7 +5495,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 } else if (this.rightActionBarLayout.getView().getVisibility() == 0 && !this.rightActionBarLayout.getFragmentStack().isEmpty()) {
                     BaseFragment baseFragment = this.rightActionBarLayout.getFragmentStack().get(this.rightActionBarLayout.getFragmentStack().size() - 1);
                     if (baseFragment.onBackPressed()) {
-                        baseFragment.lambda$onBackPressed$321();
+                        baseFragment.lambda$onBackPressed$323();
                         return;
                     }
                     return;
@@ -6148,8 +6198,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         BaseFragment lastFragment;
         int i;
         View view;
-        int i2;
         AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable;
+        int i2;
+        DrawerProfileCell drawerProfileCell;
         WindowInsets rootWindowInsets;
         WindowInsets rootWindowInsets2;
         int stableInsetLeft;
@@ -6160,17 +6211,17 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow[] selectAnimatedEmojiDialogWindowArr = new SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow[1];
         TLRPC.User user = MessagesController.getInstance(UserConfig.selectedAccount).getUser(Long.valueOf(UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId()));
         if (childAt instanceof DrawerProfileCell) {
-            DrawerProfileCell drawerProfileCell = (DrawerProfileCell) childAt;
-            AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable emojiStatusDrawable = drawerProfileCell.getEmojiStatusDrawable();
+            DrawerProfileCell drawerProfileCell2 = (DrawerProfileCell) childAt;
+            AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable emojiStatusDrawable = drawerProfileCell2.getEmojiStatusDrawable();
             if (emojiStatusDrawable != null) {
                 emojiStatusDrawable.play();
             }
-            View emojiStatusDrawableParent = drawerProfileCell.getEmojiStatusDrawableParent();
+            View emojiStatusDrawableParent = drawerProfileCell2.getEmojiStatusDrawableParent();
             if (emojiStatusDrawable != null) {
                 boolean z = emojiStatusDrawable.getDrawable() instanceof AnimatedEmojiDrawable;
             }
             Rect rect = AndroidUtilities.rectTmp2;
-            drawerProfileCell.getEmojiStatusLocation(rect);
+            drawerProfileCell2.getEmojiStatusLocation(rect);
             int dp = (-(childAt.getHeight() - rect.centerY())) - AndroidUtilities.dp(16.0f);
             i = rect.centerX();
             if (Build.VERSION.SDK_INT >= 23 && getWindow() != null && getWindow().getDecorView() != null) {
@@ -6182,43 +6233,72 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
             }
             i2 = dp;
+            drawerProfileCell = drawerProfileCell2;
             swapAnimatedEmojiDrawable = emojiStatusDrawable;
             view = emojiStatusDrawableParent;
         } else {
             i = 0;
             view = null;
-            i2 = 0;
             swapAnimatedEmojiDrawable = null;
+            i2 = 0;
+            drawerProfileCell = null;
         }
         View view2 = view;
+        int i3 = i2;
+        AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable2 = swapAnimatedEmojiDrawable;
         AnonymousClass12 anonymousClass12 = new SelectAnimatedEmojiDialog(lastFragment, this, true, Integer.valueOf(i), 0, null) {
             final SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow[] val$popup;
 
-            AnonymousClass12(BaseFragment lastFragment2, Context this, boolean z2, Integer num, int i3, Theme.ResourcesProvider resourcesProvider, SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow[] selectAnimatedEmojiDialogWindowArr2) {
-                super(lastFragment2, this, z2, num, i3, resourcesProvider);
+            AnonymousClass12(BaseFragment lastFragment2, Context this, boolean z2, Integer num, int i4, Theme.ResourcesProvider resourcesProvider, SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow[] selectAnimatedEmojiDialogWindowArr2) {
+                super(lastFragment2, this, z2, num, i4, resourcesProvider);
                 r15 = selectAnimatedEmojiDialogWindowArr2;
             }
 
             @Override
-            protected void onEmojiSelected(View view3, Long l, TLRPC.Document document, Integer num) {
+            protected void onEmojiSelected(View view3, Long l, TLRPC.Document document, TL_stars.TL_starGiftUnique tL_starGiftUnique, Integer num) {
+                TLRPC.TL_emojiStatus tL_emojiStatus;
                 TLRPC.EmojiStatus emojiStatus;
                 if (l == null) {
                     emojiStatus = new TLRPC.TL_emojiStatusEmpty();
-                } else if (num != null) {
-                    TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = new TLRPC.TL_emojiStatusUntil();
-                    tL_emojiStatusUntil.document_id = l.longValue();
-                    tL_emojiStatusUntil.until = num.intValue();
-                    emojiStatus = tL_emojiStatusUntil;
                 } else {
-                    TLRPC.TL_emojiStatus tL_emojiStatus = new TLRPC.TL_emojiStatus();
-                    tL_emojiStatus.document_id = l.longValue();
+                    if (tL_starGiftUnique != null) {
+                        TL_stars.SavedStarGift findUserStarGift = StarsController.getInstance(LaunchActivity.this.currentAccount).findUserStarGift(tL_starGiftUnique.id);
+                        if (findUserStarGift != null && MessagesController.getGlobalMainSettings().getInt("statusgiftpage", 0) < 2) {
+                            MessagesController.getGlobalMainSettings().edit().putInt("statusgiftpage", MessagesController.getGlobalMainSettings().getInt("statusgiftpage", 0) + 1).apply();
+                            Context context = getContext();
+                            int i4 = LaunchActivity.this.currentAccount;
+                            new StarGiftSheet(context, i4, UserConfig.getInstance(i4).getClientUserId(), null).set(findUserStarGift).setupWearPage().show();
+                            if (r15[0] != null) {
+                                LaunchActivity.this.selectAnimatedEmojiDialog = null;
+                                r15[0].dismiss();
+                                return;
+                            }
+                            return;
+                        }
+                        TLRPC.TL_inputEmojiStatusCollectible tL_inputEmojiStatusCollectible = new TLRPC.TL_inputEmojiStatusCollectible();
+                        tL_inputEmojiStatusCollectible.collectible_id = tL_starGiftUnique.id;
+                        tL_emojiStatus = tL_inputEmojiStatusCollectible;
+                        if (num != null) {
+                            tL_inputEmojiStatusCollectible.flags |= 1;
+                            tL_inputEmojiStatusCollectible.until = num.intValue();
+                            tL_emojiStatus = tL_inputEmojiStatusCollectible;
+                        }
+                    } else {
+                        TLRPC.TL_emojiStatus tL_emojiStatus2 = new TLRPC.TL_emojiStatus();
+                        if (num != null) {
+                            tL_emojiStatus2.flags |= 1;
+                            tL_emojiStatus2.until = num.intValue();
+                        }
+                        tL_emojiStatus2.document_id = l.longValue();
+                        tL_emojiStatus = tL_emojiStatus2;
+                    }
                     emojiStatus = tL_emojiStatus;
                 }
-                MessagesController.getInstance(LaunchActivity.this.currentAccount).updateEmojiStatus(emojiStatus);
+                MessagesController.getInstance(LaunchActivity.this.currentAccount).updateEmojiStatus(emojiStatus, tL_starGiftUnique);
                 TLRPC.User currentUser = UserConfig.getInstance(LaunchActivity.this.currentAccount).getCurrentUser();
                 if (currentUser != null) {
-                    for (int i3 = 0; i3 < LaunchActivity.this.sideMenu.getChildCount(); i3++) {
-                        View childAt2 = LaunchActivity.this.sideMenu.getChildAt(i3);
+                    for (int i22 = 0; i22 < LaunchActivity.this.sideMenu.getChildCount(); i22++) {
+                        View childAt2 = LaunchActivity.this.sideMenu.getChildAt(i22);
                         if (childAt2 instanceof DrawerUserCell) {
                             DrawerUserCell drawerUserCell = (DrawerUserCell) childAt2;
                             drawerUserCell.setAccount(drawerUserCell.getAccountNumber());
@@ -6246,16 +6326,21 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     drawerLayoutContainer.closeDrawer();
                 }
             }
+
+            @Override
+            protected boolean willApplyEmoji(View view3, Long l, TLRPC.Document document, TL_stars.TL_starGiftUnique tL_starGiftUnique, Integer num) {
+                return tL_starGiftUnique == null || StarsController.getInstance(LaunchActivity.this.currentAccount).findUserStarGift(tL_starGiftUnique.id) == null || MessagesController.getGlobalMainSettings().getInt("statusgiftpage", 0) >= 2;
+            }
         };
         if (user != null) {
             anonymousClass12.setExpireDateHint(DialogObject.getEmojiStatusUntil(user.emoji_status));
         }
-        anonymousClass12.setSelected((swapAnimatedEmojiDrawable == null || !(swapAnimatedEmojiDrawable.getDrawable() instanceof AnimatedEmojiDrawable)) ? null : Long.valueOf(((AnimatedEmojiDrawable) swapAnimatedEmojiDrawable.getDrawable()).getDocumentId()));
+        anonymousClass12.setSelected((drawerProfileCell == null || drawerProfileCell.getEmojiStatusGiftId() == null) ? (swapAnimatedEmojiDrawable2 == null || !(swapAnimatedEmojiDrawable2.getDrawable() instanceof AnimatedEmojiDrawable)) ? null : Long.valueOf(((AnimatedEmojiDrawable) swapAnimatedEmojiDrawable2.getDrawable()).getDocumentId()) : drawerProfileCell.getEmojiStatusGiftId());
         anonymousClass12.setSaveState(2);
-        anonymousClass12.setScrimDrawable(swapAnimatedEmojiDrawable, view2);
+        anonymousClass12.setScrimDrawable(swapAnimatedEmojiDrawable2, view2);
         AnonymousClass13 anonymousClass13 = new SelectAnimatedEmojiDialog.SelectAnimatedEmojiDialogWindow(anonymousClass12, -2, -2) {
-            AnonymousClass13(View anonymousClass122, int i3, int i22) {
-                super(anonymousClass122, i3, i22);
+            AnonymousClass13(View anonymousClass122, int i4, int i22) {
+                super(anonymousClass122, i4, i22);
             }
 
             @Override
@@ -6266,7 +6351,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         };
         this.selectAnimatedEmojiDialog = anonymousClass13;
         selectAnimatedEmojiDialogWindowArr2[0] = anonymousClass13;
-        anonymousClass13.showAsDropDown(this.sideMenu.getChildAt(0), 0, i2, 48);
+        anonymousClass13.showAsDropDown(this.sideMenu.getChildAt(0), 0, i3, 48);
         selectAnimatedEmojiDialogWindowArr2[0].dimBehind();
     }
 

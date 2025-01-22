@@ -722,10 +722,10 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
             }
         }
         if (topicsFragment != null) {
-            topicsFragment.lambda$onBackPressed$321();
+            topicsFragment.lambda$onBackPressed$323();
             dialogsActivity.removeSelfFromStack();
         } else {
-            dialogsActivity.lambda$onBackPressed$321();
+            dialogsActivity.lambda$onBackPressed$323();
         }
         return true;
     }
@@ -791,7 +791,7 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
             }
         });
         safeLastFragment.presentFragment(dialogsActivity);
-        dismiss();
+        lambda$new$0();
         if (runnable != null) {
             runnable.run();
         }
@@ -895,8 +895,8 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
     }
 
     @Override
-    public void dismiss() {
-        super.dismiss();
+    public void lambda$new$0() {
+        super.lambda$new$0();
         if (this.openedDialogsActivity || this.sent) {
             return;
         }

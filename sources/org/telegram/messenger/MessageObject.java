@@ -67,7 +67,10 @@ import org.telegram.ui.Components.Text;
 import org.telegram.ui.Components.TranscribeButton;
 import org.telegram.ui.Components.URLSpanNoUnderlineBold;
 import org.telegram.ui.Components.VideoPlayer;
+import org.telegram.ui.Components.WebPlayerView;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
+import org.telegram.ui.LaunchActivity;
+import org.telegram.ui.PhotoViewer;
 import org.telegram.ui.Stars.StarsIntroActivity;
 import org.telegram.ui.Stories.StoriesController;
 
@@ -136,6 +139,8 @@ public class MessageObject {
     public boolean business;
     public Boolean cachedIsSupergroup;
     public VideoPlayer.VideoUri cachedQuality;
+    public Float cachedSavedTimestamp;
+    private Integer cachedStartsTimestamp;
     public boolean cancelEditing;
     public CharSequence caption;
     private boolean captionTranslated;
@@ -192,6 +197,7 @@ public class MessageObject {
     public ArrayList<String> highlightedWords;
     public boolean isDateObject;
     public boolean isDownloadingFile;
+    private Boolean isEmbedVideoCached;
     public boolean isMediaSpoilersRevealed;
     public boolean isMediaSpoilersRevealedInSharedMedia;
     public Boolean isOutOwnerCached;
@@ -237,6 +243,7 @@ public class MessageObject {
     public boolean messageTrimmedToHighlightCut;
     public String monthKey;
     public boolean notime;
+    public boolean openedInViewer;
     public int overrideLinkColor;
     public long overrideLinkEmoji;
     public StoriesController.StoriesList parentStoriesList;
@@ -4858,6 +4865,11 @@ public class MessageObject {
         return document != null ? document : (!hasVideoQualities() || (videoUri = this.highestQuality) == null) ? getDocument(this.messageOwner) : videoUri.document;
     }
 
+    public TLRPC.Document getDocumentFast() {
+        TLRPC.Document document = this.emojiAnimatedSticker;
+        return document != null ? document : getDocument(this.messageOwner);
+    }
+
     public String getDocumentName() {
         return FileLoader.getDocumentFileName(getDocument());
     }
@@ -4950,6 +4962,10 @@ public class MessageObject {
 
     public String getFileName() {
         return getDocument() != null ? getFileName(getDocument()) : getFileName(this.messageOwner);
+    }
+
+    public String getFileNameFast() {
+        return getDocumentFast() != null ? getFileName(getDocumentFast()) : getFileName(this.messageOwner);
     }
 
     public Long getForwardedFromId() {
@@ -5470,6 +5486,41 @@ public class MessageObject {
         }
     }
 
+    public float getVideoSavedProgress() {
+        if (this.cachedSavedTimestamp != null) {
+            return PhotoViewer.getSavedProgressFast(this);
+        }
+        float savedProgress = PhotoViewer.getSavedProgress(this);
+        this.cachedSavedTimestamp = Float.valueOf(savedProgress);
+        return savedProgress;
+    }
+
+    public int getVideoStartsTimestamp() {
+        String str;
+        Integer num = this.cachedStartsTimestamp;
+        if (num != null) {
+            return num.intValue();
+        }
+        if (isVideo()) {
+            TLRPC.MessageMedia media = getMedia(this);
+            int i = media.video_timestamp;
+            if (i != 0) {
+                return i;
+            }
+            TLRPC.WebPage webPage = media.webpage;
+            if (webPage != null && (str = webPage.url) != null) {
+                try {
+                    int timestampFromLink = LaunchActivity.getTimestampFromLink(Uri.parse(str));
+                    this.cachedStartsTimestamp = Integer.valueOf(timestampFromLink);
+                    return timestampFromLink;
+                } catch (Exception unused) {
+                }
+            }
+        }
+        this.cachedStartsTimestamp = -1;
+        return -1;
+    }
+
     public CharSequence getVoiceTranscription() {
         String str;
         TLRPC.Message message = this.messageOwner;
@@ -5815,6 +5866,24 @@ public class MessageObject {
 
     public boolean isEditingMedia() {
         return getMedia(this.messageOwner) instanceof TLRPC.TL_messageMediaPhoto ? getMedia(this.messageOwner).photo.id == 0 : (getMedia(this.messageOwner) instanceof TLRPC.TL_messageMediaDocument) && getMedia(this.messageOwner).document.dc_id == 0;
+    }
+
+    public boolean isEmbedVideo() {
+        TLRPC.MessageMedia messageMedia;
+        TLRPC.WebPage webPage;
+        TLRPC.MessageMedia messageMedia2;
+        Boolean bool = this.isEmbedVideoCached;
+        boolean z = false;
+        if (bool != null) {
+            TLRPC.Message message = this.messageOwner;
+            return (message == null || (messageMedia2 = message.media) == null || messageMedia2.webpage == null || !bool.booleanValue()) ? false : true;
+        }
+        TLRPC.Message message2 = this.messageOwner;
+        if (message2 != null && (messageMedia = message2.media) != null && (webPage = messageMedia.webpage) != null && !TextUtils.isEmpty(WebPlayerView.getYouTubeVideoId(webPage.url))) {
+            z = true;
+        }
+        this.isEmbedVideoCached = Boolean.valueOf(z);
+        return z;
     }
 
     public boolean isExpiredLiveLocation(int i) {

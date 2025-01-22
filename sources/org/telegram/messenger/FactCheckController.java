@@ -333,7 +333,7 @@ public class FactCheckController {
         AndroidUtilities.showKeyboard(editTextCaption);
     }
 
-    public void lambda$openFactCheckEditor$8(EditTextCaption editTextCaption, int i, MessageObject messageObject, boolean z, DialogInterface dialogInterface, int i2) {
+    public void lambda$openFactCheckEditor$8(EditTextCaption editTextCaption, int i, MessageObject messageObject, boolean z, AlertDialog alertDialog, int i2) {
         if (editTextCaption.getText().toString().length() > i) {
             AndroidUtilities.shakeView(editTextCaption);
             return;
@@ -344,7 +344,7 @@ public class FactCheckController {
         CharSequence charSequence = charSequenceArr[0];
         tL_textWithEntities.text = charSequence == null ? "" : charSequence.toString();
         applyFactCheck(messageObject, tL_textWithEntities, z);
-        dialogInterface.dismiss();
+        alertDialog.dismiss();
     }
 
     public static void lambda$saveToDatabase$6(MessagesStorage messagesStorage, TLRPC.TL_factCheck tL_factCheck) {
@@ -656,16 +656,16 @@ public class FactCheckController {
         builder.setView(linearLayout);
         builder.setWidth(AndroidUtilities.dp(292.0f));
         final boolean z5 = z3;
-        builder.setPositiveButton(LocaleController.getString(R.string.Done), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Done), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                FactCheckController.this.lambda$openFactCheckEditor$8(editTextCaption, i, messageObject, z5, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                FactCheckController.this.lambda$openFactCheckEditor$8(editTextCaption, i, messageObject, z5, alertDialog, i2);
             }
         });
-        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                dialogInterface.dismiss();
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                alertDialog.dismiss();
             }
         });
         AlertDialog create = builder.create();

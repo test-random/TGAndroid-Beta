@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
@@ -301,10 +300,10 @@ public class ProfileNotificationsActivity extends BaseFragment implements Notifi
         this.animatorSet.start();
     }
 
-    public void lambda$createView$0(String str, DialogInterface dialogInterface, int i) {
+    public void lambda$createView$0(String str, AlertDialog alertDialog, int i) {
         this.needReset = true;
         MessagesController.getNotificationsSettings(this.currentAccount).edit().putBoolean("custom_" + str, false).remove("notify2_" + str).apply();
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
         ProfileNotificationsActivityDelegate profileNotificationsActivityDelegate = this.delegate;
         if (profileNotificationsActivityDelegate != null) {
             profileNotificationsActivityDelegate.didRemoveException(this.dialogId);
@@ -353,10 +352,10 @@ public class ProfileNotificationsActivity extends BaseFragment implements Notifi
         if (view.isEnabled()) {
             Parcelable parcelable = null;
             if (i == this.customResetRow) {
-                AlertDialog create = new AlertDialog.Builder(context, this.resourcesProvider).setTitle(LocaleController.getString(R.string.ResetCustomNotificationsAlertTitle)).setMessage(LocaleController.getString(R.string.ResetCustomNotificationsAlert)).setPositiveButton(LocaleController.getString(R.string.Reset), new DialogInterface.OnClickListener() {
+                AlertDialog create = new AlertDialog.Builder(context, this.resourcesProvider).setTitle(LocaleController.getString(R.string.ResetCustomNotificationsAlertTitle)).setMessage(LocaleController.getString(R.string.ResetCustomNotificationsAlert)).setPositiveButton(LocaleController.getString(R.string.Reset), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        ProfileNotificationsActivity.this.lambda$createView$0(str, dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        ProfileNotificationsActivity.this.lambda$createView$0(str, alertDialog, i2);
                     }
                 }).setNegativeButton(LocaleController.getString(R.string.Cancel), null).create();
                 showDialog(create);

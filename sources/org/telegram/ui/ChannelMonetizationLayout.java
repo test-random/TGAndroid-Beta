@@ -2,7 +2,6 @@ package org.telegram.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -616,7 +615,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
             setOrientation(1);
             LinearLayout linearLayout = new LinearLayout(context);
             this.layout = linearLayout;
-            linearLayout.setOrientation(0);
+            linearLayout.setOrientation(1);
             addView(linearLayout, LayoutHelper.createLinear(-1, -2, 22.0f, 9.0f, 22.0f, 0.0f));
             for (int i = 0; i < 2; i++) {
                 this.amountContainer[i] = new LinearLayout(context);
@@ -652,33 +651,47 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         }
 
         public void set(ProceedOverview proceedOverview) {
+            String str;
             SpannableStringBuilder spannableStringBuilder;
             int indexOf;
             LinearLayout linearLayout;
             this.titleView.setText(proceedOverview.text);
             int i = 0;
             while (i < 2) {
-                String str = i == 0 ? proceedOverview.crypto_currency : proceedOverview.crypto_currency2;
+                String str2 = i == 0 ? proceedOverview.crypto_currency : proceedOverview.crypto_currency2;
                 long j = i == 0 ? proceedOverview.amount : proceedOverview.amount2;
                 if (i == 0 && !proceedOverview.contains1) {
                     linearLayout = this.amountContainer[i];
                 } else if (i != 1 || proceedOverview.contains2) {
-                    SpannableStringBuilder spannableStringBuilder2 = new SpannableStringBuilder(str + " ");
-                    if ("TON".equalsIgnoreCase(str)) {
+                    SpannableStringBuilder spannableStringBuilder2 = new SpannableStringBuilder(str2 + " ");
+                    if ("TON".equalsIgnoreCase(str2)) {
                         DecimalFormat decimalFormat = this.formatter;
                         double d = proceedOverview.crypto_amount;
                         Double.isNaN(d);
-                        spannableStringBuilder2.append((CharSequence) decimalFormat.format(d / 1.0E9d));
-                        spannableStringBuilder = ChannelMonetizationLayout.replaceTON(spannableStringBuilder2, this.cryptoAmountView[i].getPaint(), 0.87f, true);
-                    } else if ("XTR".equalsIgnoreCase(str)) {
-                        spannableStringBuilder2.append(i == 0 ? LocaleController.formatNumber(proceedOverview.crypto_amount, ' ') : StarsIntroActivity.formatStarsAmount(proceedOverview.crypto_amount2, 0.8f, ' '));
-                        spannableStringBuilder = StarsIntroActivity.replaceStarsWithPlain(spannableStringBuilder2, 0.8f);
+                        String format = decimalFormat.format(d / 1.0E9d);
+                        int indexOf2 = format.indexOf(46);
+                        str = "TON";
+                        if (indexOf2 >= 0) {
+                            double d2 = proceedOverview.crypto_amount;
+                            Double.isNaN(d2);
+                            spannableStringBuilder2.append((CharSequence) LocaleController.formatNumber((long) Math.floor(d2 / 1.0E9d), ' '));
+                            spannableStringBuilder2.append((CharSequence) format.substring(indexOf2));
+                        } else {
+                            spannableStringBuilder2.append((CharSequence) format);
+                        }
+                        spannableStringBuilder = ChannelMonetizationLayout.replaceTON(spannableStringBuilder2, this.cryptoAmountView[i].getPaint(), 1.05f, true);
                     } else {
-                        spannableStringBuilder2.append((CharSequence) Long.toString(proceedOverview.crypto_amount));
-                        spannableStringBuilder = spannableStringBuilder2;
+                        str = "TON";
+                        if ("XTR".equalsIgnoreCase(str2)) {
+                            spannableStringBuilder2.append(i == 0 ? LocaleController.formatNumber(proceedOverview.crypto_amount, ' ') : StarsIntroActivity.formatStarsAmount(proceedOverview.crypto_amount2, 0.8f, ' '));
+                            spannableStringBuilder = StarsIntroActivity.replaceStarsWithPlain(spannableStringBuilder2, 0.7f);
+                        } else {
+                            spannableStringBuilder2.append((CharSequence) Long.toString(proceedOverview.crypto_amount));
+                            spannableStringBuilder = spannableStringBuilder2;
+                        }
                     }
                     SpannableStringBuilder spannableStringBuilder3 = new SpannableStringBuilder(spannableStringBuilder);
-                    if ("TON".equalsIgnoreCase(str) && (indexOf = TextUtils.indexOf(spannableStringBuilder3, ".")) >= 0) {
+                    if (str.equalsIgnoreCase(str2) && (indexOf = TextUtils.indexOf(spannableStringBuilder3, ".")) >= 0) {
                         spannableStringBuilder3.setSpan(new RelativeSizeSpan(0.8125f), indexOf, spannableStringBuilder3.length(), 33);
                     }
                     this.amountContainer[i].setVisibility(0);
@@ -1354,7 +1367,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         });
     }
 
-    public void lambda$initWithdraw$20(DialogInterface dialogInterface, int i) {
+    public void lambda$initWithdraw$20(AlertDialog alertDialog, int i) {
         this.fragment.presentFragment(new TwoStepVerificationSetupActivity(6, null));
     }
 
@@ -1381,7 +1394,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         int i2;
         if (tL_error == null) {
             twoStepVerificationActivity.needHideProgress();
-            twoStepVerificationActivity.lambda$onBackPressed$321();
+            twoStepVerificationActivity.lambda$onBackPressed$323();
             if (tLObject instanceof TL_stats.TL_broadcastRevenueWithdrawalUrl) {
                 Browser.openUrl(getContext(), ((TL_stats.TL_broadcastRevenueWithdrawalUrl) tLObject).url);
                 return;
@@ -1406,7 +1419,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
             }
             if (twoStepVerificationActivity != null) {
                 twoStepVerificationActivity.needHideProgress();
-                twoStepVerificationActivity.lambda$onBackPressed$321();
+                twoStepVerificationActivity.lambda$onBackPressed$323();
             }
             BulletinFactory.showError(tL_error);
             return;
@@ -1471,10 +1484,10 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
             linearLayout3.addView(textView3, LayoutHelper.createLinear(-1, -2));
         }
         if ("PASSWORD_MISSING".equals(tL_error.text)) {
-            builder.setPositiveButton(LocaleController.getString(R.string.EditAdminTransferSetPassword), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.EditAdminTransferSetPassword), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i5) {
-                    ChannelMonetizationLayout.this.lambda$initWithdraw$20(dialogInterface, i5);
+                public final void onClick(AlertDialog alertDialog, int i5) {
+                    ChannelMonetizationLayout.this.lambda$initWithdraw$20(alertDialog, i5);
                 }
             });
             i2 = R.string.Cancel;
@@ -1861,7 +1874,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         buttonWithCounterView.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view2) {
-                BottomSheet.this.dismiss();
+                BottomSheet.this.lambda$new$0();
             }
         });
         linearLayout.addView(buttonWithCounterView, LayoutHelper.createLinear(-1, 48, 55, 10, 25, 10, 14));
@@ -2182,7 +2195,7 @@ public class ChannelMonetizationLayout extends SizeNotifierFrameLayout implement
         buttonWithCounterView.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                BottomSheet.this.dismiss();
+                BottomSheet.this.lambda$new$0();
             }
         });
         bottomSheet = bottomSheet3;

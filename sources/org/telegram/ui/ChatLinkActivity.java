@@ -613,7 +613,7 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
         if (this.isChannel) {
             return;
         }
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public void lambda$createView$2(final AlertDialog[] alertDialogArr, TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -643,7 +643,7 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
         showDialog(alertDialogArr[0]);
     }
 
-    public void lambda$createView$5(DialogInterface dialogInterface, int i) {
+    public void lambda$createView$5(AlertDialog alertDialog, int i) {
         TLRPC.InputChannel inputChannel;
         if (this.isChannel && this.info.linked_chat_id == 0) {
             return;
@@ -739,10 +739,10 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
             }
             builder.setTitle(string);
             builder.setMessage(AndroidUtilities.replaceTags(formatString));
-            builder.setPositiveButton(LocaleController.getString(R.string.DiscussionUnlink), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(LocaleController.getString(R.string.DiscussionUnlink), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i3) {
-                    ChatLinkActivity.this.lambda$createView$5(dialogInterface, i3);
+                public final void onClick(AlertDialog alertDialog, int i3) {
+                    ChatLinkActivity.this.lambda$createView$5(alertDialog, i3);
                 }
             });
             builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -800,10 +800,10 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
             }
         }, 1000L);
         if (baseFragment == null) {
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         } else {
             removeSelfFromStack();
-            baseFragment.lambda$onBackPressed$321();
+            baseFragment.lambda$onBackPressed$323();
         }
     }
 
@@ -879,7 +879,7 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
         showDialog(this.waitingForFullChatProgressAlert);
     }
 
-    public void lambda$showLinkAlert$9(TLRPC.ChatFull chatFull, TLRPC.Chat chat, DialogInterface dialogInterface, int i) {
+    public void lambda$showLinkAlert$9(TLRPC.ChatFull chatFull, TLRPC.Chat chat, AlertDialog alertDialog, int i) {
         if (chatFull.hidden_prehistory) {
             getMessagesController().toggleChannelInvitesHistory(chat.id, false);
         }
@@ -989,10 +989,10 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
         frameLayout.addView(textView, LayoutHelper.createFrame(-2, -2.0f, (LocaleController.isRTL ? 5 : 3) | 48, 24.0f, 57.0f, 24.0f, 9.0f));
         avatarDrawable.setInfo(this.currentAccount, chat);
         backupImageView.setForUserOrChat(chat, avatarDrawable);
-        builder.setPositiveButton(LocaleController.getString(R.string.DiscussionLinkGroup), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.DiscussionLinkGroup), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                ChatLinkActivity.this.lambda$showLinkAlert$9(chatFull, chat, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                ChatLinkActivity.this.lambda$showLinkAlert$9(chatFull, chat, alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -1068,7 +1068,7 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    ChatLinkActivity.this.lambda$onBackPressed$321();
+                    ChatLinkActivity.this.lambda$onBackPressed$323();
                 }
             }
         });
@@ -1188,7 +1188,7 @@ public class ChatLinkActivity extends BaseFragment implements NotificationCenter
                         removeSelfFromStack();
                         return;
                     } else {
-                        lambda$onBackPressed$321();
+                        lambda$onBackPressed$323();
                         return;
                     }
                 }

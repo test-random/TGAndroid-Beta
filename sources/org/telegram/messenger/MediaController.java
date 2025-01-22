@@ -1089,6 +1089,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         public CropState cropState;
         public ArrayList<VideoEditedInfo.MediaEntity> croppedMediaEntities;
         public String croppedPaintPath;
+        public boolean customThumb;
+        public long customThumbSavedPosition;
         public VideoEditedInfo editedInfo;
         public long effectId;
         public ArrayList<TLRPC.MessageEntity> entities;

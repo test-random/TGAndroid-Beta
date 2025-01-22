@@ -1376,7 +1376,7 @@ public abstract class BotPreviewsEditContainer extends FrameLayout implements No
             Object obj = item.object;
             if (obj instanceof TranslateController.Language) {
                 callback.run(((TranslateController.Language) obj).code);
-                dismiss();
+                lambda$new$0();
             }
         }
 

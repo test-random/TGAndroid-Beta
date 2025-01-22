@@ -1,7 +1,6 @@
 package org.telegram.ui.Components;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -62,10 +61,10 @@ public abstract class PermissionRequest {
         for (String str2 : strArr) {
             shouldShowRequestPermissionRationale = activity.shouldShowRequestPermissionRationale(str2);
             if (!shouldShowRequestPermissionRationale) {
-                new AlertDialog.Builder(activity, null).setTopAnimation(i, 72, false, Theme.getColor(Theme.key_dialogTopBackground)).setMessage(AndroidUtilities.replaceTags(LocaleController.getString(i2))).setPositiveButton(LocaleController.getString(R.string.PermissionOpenSettings), new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(activity, null).setTopAnimation(i, 72, false, Theme.getColor(Theme.key_dialogTopBackground)).setMessage(AndroidUtilities.replaceTags(LocaleController.getString(i2))).setPositiveButton(LocaleController.getString(R.string.PermissionOpenSettings), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i3) {
-                        PermissionRequest.lambda$ensureEitherPermission$0(activity, dialogInterface, i3);
+                    public final void onClick(AlertDialog alertDialog, int i3) {
+                        PermissionRequest.lambda$ensureEitherPermission$0(activity, alertDialog, i3);
                     }
                 }).setNegativeButton(LocaleController.getString(R.string.ContactsPermissionAlertNotNow), null).create().show();
                 if (callback != null) {
@@ -103,7 +102,7 @@ public abstract class PermissionRequest {
         return checkSelfPermission == 0;
     }
 
-    public static void lambda$ensureEitherPermission$0(Activity activity, DialogInterface dialogInterface, int i) {
+    public static void lambda$ensureEitherPermission$0(Activity activity, AlertDialog alertDialog, int i) {
         try {
             Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
             intent.setData(Uri.parse("package:" + ApplicationLoader.applicationContext.getPackageName()));

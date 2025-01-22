@@ -1,7 +1,6 @@
 package org.telegram.messenger;
 
 import android.app.ActivityManager;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -812,7 +811,7 @@ public class SharedConfig {
     public static void lambda$checkSdCard$0() {
     }
 
-    public static void lambda$checkSdCard$1(DialogInterface dialogInterface, int i) {
+    public static void lambda$checkSdCard$1(AlertDialog alertDialog, int i) {
     }
 
     public static void lambda$checkSdCard$2() {
@@ -832,10 +831,10 @@ public class SharedConfig {
         AlertDialog.Builder builder = new AlertDialog.Builder(lastFragment.getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.SdCardError));
         builder.setSubtitle(LocaleController.getString(R.string.SdCardErrorDescription));
-        builder.setPositiveButton(LocaleController.getString(R.string.DoNotUseSDCard), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.DoNotUseSDCard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                SharedConfig.lambda$checkSdCard$1(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                SharedConfig.lambda$checkSdCard$1(alertDialog, i);
             }
         });
         AlertDialog create = builder.create();

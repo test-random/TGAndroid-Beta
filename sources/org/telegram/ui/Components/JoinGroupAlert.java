@@ -55,7 +55,7 @@ public class JoinGroupAlert extends BottomSheet {
     }
 
     public void lambda$new$0(View view) {
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$1() {
@@ -67,7 +67,7 @@ public class JoinGroupAlert extends BottomSheet {
     }
 
     public void lambda$new$10(final int i, View view) {
-        dismiss();
+        lambda$new$0();
         final TLRPC.TL_messages_importChatInvite tL_messages_importChatInvite = new TLRPC.TL_messages_importChatInvite();
         tL_messages_importChatInvite.hash = this.hash;
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_messages_importChatInvite, new RequestDelegate() {
@@ -91,7 +91,7 @@ public class JoinGroupAlert extends BottomSheet {
                 }
             });
         }
-        dismiss();
+        lambda$new$0();
         return false;
     }
 
@@ -116,7 +116,7 @@ public class JoinGroupAlert extends BottomSheet {
                 AlertsCreator.processError(this.currentAccount, tL_error, this.fragment, tL_messages_importChatInvite, new Object[0]);
             }
         }
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$6(final boolean z, final TLRPC.TL_messages_importChatInvite tL_messages_importChatInvite, TLObject tLObject, final TLRPC.TL_error tL_error) {
@@ -139,7 +139,7 @@ public class JoinGroupAlert extends BottomSheet {
             MessagesController.getInstance(this.currentAccount).addUserToChat(this.currentChat.id, UserConfig.getInstance(this.currentAccount).getCurrentUser(), 0, null, null, true, new Runnable() {
                 @Override
                 public final void run() {
-                    JoinGroupAlert.this.dismiss();
+                    JoinGroupAlert.this.lambda$new$0();
                 }
             }, new MessagesController.ErrorDelegate() {
                 @Override

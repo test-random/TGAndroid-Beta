@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
@@ -11,6 +13,7 @@ import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -261,6 +264,15 @@ public class TableView extends android.widget.TableLayout {
         setColumnStretchable(1, true);
     }
 
+    public static void lambda$addRowMonospaced$0(CharSequence charSequence, Runnable runnable, View view) {
+        AndroidUtilities.addToClipboard(charSequence);
+        runnable.run();
+    }
+
+    public static void lambda$addRowUserWithEmojiStatus$1(long r6, int r8, org.telegram.ui.Components.AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable r9, org.telegram.ui.Components.LinkSpanDrawable.LinksSimpleTextView r10, android.graphics.drawable.Drawable r11, int r12, java.lang.Object[] r13) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.TableView.lambda$addRowUserWithEmojiStatus$1(long, int, org.telegram.ui.Components.AnimatedEmojiDrawable$SwapAnimatedEmojiDrawable, org.telegram.ui.Components.LinkSpanDrawable$LinksSimpleTextView, android.graphics.drawable.Drawable, int, java.lang.Object[]):void");
+    }
+
     public TableRowFullContent addFullRow(CharSequence charSequence) {
         SpoilersTextView spoilersTextView = new SpoilersTextView(getContext());
         spoilersTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, this.resourcesProvider));
@@ -356,6 +368,36 @@ public class TableView extends android.widget.TableLayout {
         return addRowUnpadded(charSequence, linksTextView);
     }
 
+    public TableRow addRowMonospaced(CharSequence charSequence, final CharSequence charSequence2, int i, final Runnable runnable) {
+        FrameLayout frameLayout = new FrameLayout(getContext());
+        frameLayout.setPadding(AndroidUtilities.dp(12.66f), AndroidUtilities.dp(9.33f), AndroidUtilities.dp(10.66f), AndroidUtilities.dp(9.33f));
+        TextView textView = new TextView(getContext());
+        textView.setTypeface(AndroidUtilities.getTypeface("fonts/rmono.ttf"));
+        textView.setTextSize(1, i);
+        textView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, this.resourcesProvider));
+        textView.setMaxLines(4);
+        textView.setSingleLine(false);
+        textView.setText(charSequence2);
+        frameLayout.addView(textView, LayoutHelper.createFrame(-1, -1.0f, 119, 0.0f, 0.0f, 34.0f, 0.0f));
+        if (runnable != null) {
+            ImageView imageView = new ImageView(getContext());
+            imageView.setImageResource(R.drawable.msg_copy);
+            imageView.setScaleType(ImageView.ScaleType.CENTER);
+            int i2 = Theme.key_windowBackgroundWhiteBlueIcon;
+            imageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(i2, this.resourcesProvider), PorterDuff.Mode.SRC_IN));
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public final void onClick(View view) {
+                    TableView.lambda$addRowMonospaced$0(charSequence2, runnable, view);
+                }
+            });
+            ScaleStateListAnimator.apply(imageView);
+            imageView.setBackground(Theme.createSelectorDrawable(Theme.multAlpha(Theme.getColor(i2, this.resourcesProvider), 0.1f), 7));
+            frameLayout.addView(imageView, LayoutHelper.createFrame(30, 30, 21));
+        }
+        return addRowUnpadded(charSequence, frameLayout);
+    }
+
     public TableRow addRowUnpadded(CharSequence charSequence, View view) {
         TableRow tableRow = new TableRow(getContext());
         tableRow.addView(new TableRowTitle(this, charSequence), new TableRow.LayoutParams(-2, -1));
@@ -440,6 +482,41 @@ public class TableView extends android.widget.TableLayout {
             return null;
         }
         return addRowUnpadded(charSequence, textViewButtons);
+    }
+
+    public android.widget.TableRow addRowUserWithEmojiStatus(java.lang.CharSequence r16, final int r17, final long r18, final java.lang.Runnable r20) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.TableView.addRowUserWithEmojiStatus(java.lang.CharSequence, int, long, java.lang.Runnable):android.widget.TableRow");
+    }
+
+    public TableRow addWalletAddressRow(CharSequence charSequence, final CharSequence charSequence2, final Runnable runnable) {
+        FrameLayout frameLayout = new FrameLayout(getContext());
+        LinkSpanDrawable.LinksTextView linksTextView = new LinkSpanDrawable.LinksTextView(getContext());
+        linksTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmono.ttf"));
+        linksTextView.setTextSize(1, 13.0f);
+        linksTextView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, this.resourcesProvider));
+        linksTextView.setLinkTextColor(Theme.getColor(Theme.key_chat_messageLinkIn, this.resourcesProvider));
+        linksTextView.setMaxLines(4);
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(charSequence2);
+        spannableStringBuilder.insert(spannableStringBuilder.length() / 2, (CharSequence) "\n");
+        if (runnable != null) {
+            spannableStringBuilder.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(View view) {
+                    AndroidUtilities.addToClipboard(charSequence2);
+                    runnable.run();
+                }
+
+                @Override
+                public void updateDrawState(TextPaint textPaint) {
+                    textPaint.setColor(textPaint.linkColor);
+                }
+            }, 0, spannableStringBuilder.length(), 33);
+        }
+        linksTextView.setText(spannableStringBuilder);
+        linksTextView.setDisablePaddingsOffsetY(true);
+        linksTextView.setPadding(AndroidUtilities.dp(12.66f), AndroidUtilities.dp(9.33f), AndroidUtilities.dp(10.66f), AndroidUtilities.dp(9.33f));
+        frameLayout.addView(linksTextView, LayoutHelper.createFrame(-1, -1.0f, 119, 0.0f, 0.0f, 0.0f, 0.0f));
+        return addRowUnpadded(charSequence, frameLayout);
     }
 
     public void clear() {

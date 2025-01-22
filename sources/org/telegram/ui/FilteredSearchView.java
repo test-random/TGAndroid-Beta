@@ -836,7 +836,7 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
         };
         this.provider = new PhotoViewer.EmptyPhotoViewerProvider() {
             @Override
-            public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z) {
+            public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i, boolean z, boolean z2) {
                 ImageReceiver photoImage;
                 ContextLinkCell contextLinkCell;
                 View pinnedHeader;

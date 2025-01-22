@@ -91,7 +91,7 @@ import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.MessagesController$$ExternalSyntheticLambda96;
+import org.telegram.messenger.MessagesController$$ExternalSyntheticLambda100;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
@@ -304,6 +304,7 @@ public abstract class Theme {
     public static TextPaint chat_topicTextPaint;
     public static TextPaint chat_unlockExtendedMediaTextPaint;
     public static Paint chat_urlPaint;
+    public static Paint chat_videoProgressPaint;
     public static Paint checkboxSquare_backgroundPaint;
     public static Paint checkboxSquare_checkPaint;
     public static Paint checkboxSquare_eraserPaint;
@@ -5667,6 +5668,7 @@ public abstract class Theme {
             chat_composeBackgroundPaint = new Paint();
             chat_radialProgressPausedPaint = new Paint(1);
             chat_radialProgressPausedSeekbarPaint = new Paint(1);
+            chat_videoProgressPaint = new Paint(1);
             chat_messageBackgroundSelectedPaint = new Paint(1);
             chat_actionBackgroundPaint = new Paint(7);
             chat_actionBackgroundSelectedPaint = new Paint(7);
@@ -7150,7 +7152,7 @@ public abstract class Theme {
                 if (isCurrentThemeNight()) {
                     switchNightThemeDelay = 2000;
                     lastDelayUpdateTime = SystemClock.elapsedRealtime();
-                    AndroidUtilities.runOnUIThread(new MessagesController$$ExternalSyntheticLambda96(), 2100L);
+                    AndroidUtilities.runOnUIThread(new MessagesController$$ExternalSyntheticLambda100(), 2100L);
                 }
             }
             currentTheme = themeInfo;

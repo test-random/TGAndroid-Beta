@@ -450,7 +450,7 @@ public class ChatAttachAlertQuickRepliesLayout extends ChatAttachAlert.AttachAle
             Object obj = this.parentAlert.baseFragment;
             if (obj instanceof ChatActivityInterface) {
                 QuickRepliesController.getInstance(UserConfig.selectedAccount).sendQuickReplyTo(((ChatActivityInterface) obj).getDialogId(), (QuickRepliesController.QuickReply) item);
-                this.parentAlert.dismiss();
+                this.parentAlert.lambda$new$0();
             }
         }
     }

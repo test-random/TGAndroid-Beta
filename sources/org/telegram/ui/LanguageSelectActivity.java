@@ -225,7 +225,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.LanguageSelectActivity.lambda$createView$4(android.view.View, int):void");
     }
 
-    public void lambda$createView$5(LocaleController.LocaleInfo localeInfo, DialogInterface dialogInterface, int i) {
+    public void lambda$createView$5(LocaleController.LocaleInfo localeInfo, AlertDialog alertDialog, int i) {
         if (LocaleController.getInstance().deleteLanguage(localeInfo, this.currentAccount)) {
             fillLanguages();
             ArrayList arrayList = this.searchResult;
@@ -269,10 +269,10 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                 builder.setTitle(LocaleController.getString(R.string.DeleteLocalizationTitle));
                 builder.setMessage(AndroidUtilities.replaceTags(LocaleController.formatString("DeleteLocalizationText", R.string.DeleteLocalizationText, localeInfo.name)));
-                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        LanguageSelectActivity.this.lambda$createView$5(localeInfo, dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        LanguageSelectActivity.this.lambda$createView$5(localeInfo, alertDialog, i2);
                     }
                 });
                 builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -388,7 +388,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             @Override
             public void onItemClick(int i) {
                 if (i == -1) {
-                    LanguageSelectActivity.this.lambda$onBackPressed$321();
+                    LanguageSelectActivity.this.lambda$onBackPressed$323();
                 }
             }
         });

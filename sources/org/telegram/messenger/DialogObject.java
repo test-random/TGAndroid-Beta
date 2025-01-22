@@ -36,7 +36,15 @@ public class DialogObject {
     }
 
     public static boolean emojiStatusesEqual(TLRPC.EmojiStatus emojiStatus, TLRPC.EmojiStatus emojiStatus2) {
-        return getEmojiStatusDocumentId(emojiStatus) == getEmojiStatusDocumentId(emojiStatus2) && getEmojiStatusUntil(emojiStatus) == getEmojiStatusUntil(emojiStatus2);
+        return getEmojiStatusDocumentId(emojiStatus) == getEmojiStatusDocumentId(emojiStatus2) && getEmojiStatusCollectibleId(emojiStatus) == getEmojiStatusCollectibleId(emojiStatus2) && getEmojiStatusUntil(emojiStatus) == getEmojiStatusUntil(emojiStatus2);
+    }
+
+    public static TLRPC.EmojiStatus filterEmojiStatus(TLRPC.EmojiStatus emojiStatus) {
+        int emojiStatusUntil = getEmojiStatusUntil(emojiStatus);
+        if (emojiStatusUntil == 0 || emojiStatusUntil > ((int) (System.currentTimeMillis() / 1000))) {
+            return emojiStatus;
+        }
+        return null;
     }
 
     public static TLRPC.TL_username findUsername(String str, ArrayList<TLRPC.TL_username> arrayList) {
@@ -91,29 +99,70 @@ public class DialogObject {
         return setDialogPhotoTitle(null, null, tLObject);
     }
 
+    public static long getEmojiStatusCollectibleId(TLRPC.EmojiStatus emojiStatus) {
+        if (MessagesController.getInstance(UserConfig.selectedAccount).premiumFeaturesBlocked() || !(emojiStatus instanceof TLRPC.TL_emojiStatusCollectible)) {
+            return 0L;
+        }
+        TLRPC.TL_emojiStatusCollectible tL_emojiStatusCollectible = (TLRPC.TL_emojiStatusCollectible) emojiStatus;
+        if ((tL_emojiStatusCollectible.flags & 1) == 0 || tL_emojiStatusCollectible.until > ((int) (System.currentTimeMillis() / 1000))) {
+            return tL_emojiStatusCollectible.collectible_id;
+        }
+        return 0L;
+    }
+
+    public static long getEmojiStatusDocumentId(long j) {
+        TLRPC.EmojiStatus emojiStatus;
+        if (j >= 0) {
+            TLRPC.User user = MessagesController.getInstance(UserConfig.selectedAccount).getUser(Long.valueOf(j));
+            if (user == null) {
+                return 0L;
+            }
+            emojiStatus = user.emoji_status;
+        } else {
+            TLRPC.Chat chat = MessagesController.getInstance(UserConfig.selectedAccount).getChat(Long.valueOf(-j));
+            if (chat == null) {
+                return 0L;
+            }
+            emojiStatus = chat.emoji_status;
+        }
+        return getEmojiStatusDocumentId(emojiStatus);
+    }
+
     public static long getEmojiStatusDocumentId(TLRPC.EmojiStatus emojiStatus) {
         if (MessagesController.getInstance(UserConfig.selectedAccount).premiumFeaturesBlocked()) {
             return 0L;
         }
         if (emojiStatus instanceof TLRPC.TL_emojiStatus) {
-            return ((TLRPC.TL_emojiStatus) emojiStatus).document_id;
-        }
-        if (emojiStatus instanceof TLRPC.TL_emojiStatusUntil) {
-            TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = (TLRPC.TL_emojiStatusUntil) emojiStatus;
-            if (tL_emojiStatusUntil.until > ((int) (System.currentTimeMillis() / 1000))) {
-                return tL_emojiStatusUntil.document_id;
+            TLRPC.TL_emojiStatus tL_emojiStatus = (TLRPC.TL_emojiStatus) emojiStatus;
+            if ((tL_emojiStatus.flags & 1) == 0 || tL_emojiStatus.until > ((int) (System.currentTimeMillis() / 1000))) {
+                return tL_emojiStatus.document_id;
             }
+            return 0L;
+        }
+        if (!(emojiStatus instanceof TLRPC.TL_emojiStatusCollectible)) {
+            return 0L;
+        }
+        TLRPC.TL_emojiStatusCollectible tL_emojiStatusCollectible = (TLRPC.TL_emojiStatusCollectible) emojiStatus;
+        if ((tL_emojiStatusCollectible.flags & 1) == 0 || tL_emojiStatusCollectible.until > ((int) (System.currentTimeMillis() / 1000))) {
+            return tL_emojiStatusCollectible.document_id;
         }
         return 0L;
     }
 
     public static int getEmojiStatusUntil(TLRPC.EmojiStatus emojiStatus) {
-        if (!(emojiStatus instanceof TLRPC.TL_emojiStatusUntil)) {
+        if (emojiStatus instanceof TLRPC.TL_emojiStatus) {
+            TLRPC.TL_emojiStatus tL_emojiStatus = (TLRPC.TL_emojiStatus) emojiStatus;
+            if ((tL_emojiStatus.flags & 1) != 0) {
+                return tL_emojiStatus.until;
+            }
             return 0;
         }
-        TLRPC.TL_emojiStatusUntil tL_emojiStatusUntil = (TLRPC.TL_emojiStatusUntil) emojiStatus;
-        if (tL_emojiStatusUntil.until > ((int) (System.currentTimeMillis() / 1000))) {
-            return tL_emojiStatusUntil.until;
+        if (!(emojiStatus instanceof TLRPC.TL_emojiStatusCollectible)) {
+            return 0;
+        }
+        TLRPC.TL_emojiStatusCollectible tL_emojiStatusCollectible = (TLRPC.TL_emojiStatusCollectible) emojiStatus;
+        if ((tL_emojiStatusCollectible.flags & 1) != 0) {
+            return tL_emojiStatusCollectible.until;
         }
         return 0;
     }
@@ -129,6 +178,15 @@ public class DialogObject {
     public static long getLastMessageOrDraftDate(TLRPC.Dialog dialog, TLRPC.DraftMessage draftMessage) {
         int i;
         return (draftMessage == null || (i = draftMessage.date) < dialog.last_message_date) ? dialog.last_message_date : i;
+    }
+
+    public static String getName(long j) {
+        return getName(MessagesController.getInstance(UserConfig.selectedAccount).getUserOrChat(j));
+    }
+
+    public static String getName(TLObject tLObject) {
+        TLRPC.Chat chat;
+        return tLObject instanceof TLRPC.User ? UserObject.getUserName((TLRPC.User) tLObject) : (!(tLObject instanceof TLRPC.Chat) || (chat = (TLRPC.Chat) tLObject) == null) ? "" : chat.title;
     }
 
     public static long getPeerDialogId(TLRPC.InputPeer inputPeer) {
@@ -206,6 +264,15 @@ public class DialogObject {
         return str == null ? getPublicUsername(user.username, user.usernames, false) : getSimilarPublicUsername(user.username, user.usernames, str);
     }
 
+    public static String getShortName(long j) {
+        return getShortName(MessagesController.getInstance(UserConfig.selectedAccount).getUserOrChat(j));
+    }
+
+    public static String getShortName(TLObject tLObject) {
+        TLRPC.Chat chat;
+        return tLObject instanceof TLRPC.User ? UserObject.getForcedFirstName((TLRPC.User) tLObject) : (!(tLObject instanceof TLRPC.Chat) || (chat = (TLRPC.Chat) tLObject) == null) ? "" : chat.title;
+    }
+
     public static String getSimilarPublicUsername(String str, ArrayList<TLRPC.TL_username> arrayList, String str2) {
         double d = -1.0d;
         String str3 = null;
@@ -227,6 +294,10 @@ public class DialogObject {
             }
         }
         return str3;
+    }
+
+    public static boolean hasPhoto(TLObject tLObject) {
+        return tLObject instanceof TLRPC.User ? ((TLRPC.User) tLObject).photo != null : (tLObject instanceof TLRPC.Chat) && ((TLRPC.Chat) tLObject).photo != null;
     }
 
     public static void initDialog(TLRPC.Dialog dialog) {
@@ -261,6 +332,33 @@ public class DialogObject {
 
     public static boolean isChatDialog(long j) {
         return (isEncryptedDialog(j) || isFolderDialogId(j) || j >= 0) ? false : true;
+    }
+
+    public static boolean isEmojiStatusCollectible(long j) {
+        TLRPC.EmojiStatus emojiStatus;
+        MessagesController messagesController = MessagesController.getInstance(UserConfig.selectedAccount);
+        if (j >= 0) {
+            TLRPC.User user = messagesController.getUser(Long.valueOf(j));
+            if (user == null) {
+                return false;
+            }
+            emojiStatus = user.emoji_status;
+        } else {
+            TLRPC.Chat chat = messagesController.getChat(Long.valueOf(-j));
+            if (chat == null) {
+                return false;
+            }
+            emojiStatus = chat.emoji_status;
+        }
+        return isEmojiStatusCollectible(emojiStatus);
+    }
+
+    public static boolean isEmojiStatusCollectible(TLRPC.EmojiStatus emojiStatus) {
+        if (MessagesController.getInstance(UserConfig.selectedAccount).premiumFeaturesBlocked() || !(emojiStatus instanceof TLRPC.TL_emojiStatusCollectible)) {
+            return false;
+        }
+        TLRPC.TL_emojiStatusCollectible tL_emojiStatusCollectible = (TLRPC.TL_emojiStatusCollectible) emojiStatus;
+        return (tL_emojiStatusCollectible.flags & 1) == 0 || tL_emojiStatusCollectible.until > ((int) (System.currentTimeMillis() / 1000));
     }
 
     public static boolean isEncryptedDialog(long j) {

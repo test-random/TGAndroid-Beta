@@ -271,7 +271,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         AnonymousClass3() {
         }
 
-        public void lambda$onIdentityDone$0(String str, String str2, String str3, Runnable runnable, ErrorRunnable errorRunnable, DialogInterface dialogInterface, int i) {
+        public void lambda$onIdentityDone$0(String str, String str2, String str3, Runnable runnable, ErrorRunnable errorRunnable, AlertDialog alertDialog, int i) {
             PassportActivity.this.inputFields[0].setText(str);
             PassportActivity.this.inputFields[1].setText(str2);
             PassportActivity.this.inputFields[2].setText(str3);
@@ -279,7 +279,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             onIdentityDone(runnable, errorRunnable);
         }
 
-        public void lambda$onIdentityDone$1(int i, DialogInterface dialogInterface, int i2) {
+        public void lambda$onIdentityDone$1(int i, AlertDialog alertDialog, int i2) {
             PassportActivity passportActivity = PassportActivity.this;
             passportActivity.onFieldError(passportActivity.inputFields[i]);
         }
@@ -303,7 +303,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         }
 
         public void lambda$onItemClick$4() {
-            PassportActivity.this.lambda$onBackPressed$321();
+            PassportActivity.this.lambda$onBackPressed$323();
         }
 
         public void lambda$onItemClick$5(TLRPC.TL_error tL_error, Runnable runnable, ErrorRunnable errorRunnable, TL_account.verifyEmail verifyemail) {
@@ -1111,7 +1111,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             }
         }
 
-        public void lambda$onBackPressed$8(DialogInterface dialogInterface, int i) {
+        public void lambda$onBackPressed$8(AlertDialog alertDialog, int i) {
             onBackPressed(true);
             PassportActivity.this.setPage(0, true, null);
         }
@@ -1132,9 +1132,9 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             });
         }
 
-        public void lambda$resendCode$1(DialogInterface dialogInterface, int i) {
+        public void lambda$resendCode$1(AlertDialog alertDialog, int i) {
             onBackPressed(true);
-            PassportActivity.this.lambda$onBackPressed$321();
+            PassportActivity.this.lambda$onBackPressed$323();
         }
 
         public void lambda$resendCode$2(TLRPC.TL_error tL_error, Bundle bundle, TLObject tLObject, TLRPC.TL_auth_resendCode tL_auth_resendCode) {
@@ -1144,10 +1144,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             } else {
                 AlertDialog alertDialog = (AlertDialog) AlertsCreator.processError(((BaseFragment) PassportActivity.this).currentAccount, tL_error, PassportActivity.this, tL_auth_resendCode, new Object[0]);
                 if (alertDialog != null && tL_error.text.contains("PHONE_CODE_EXPIRED")) {
-                    alertDialog.setPositiveButtonListener(new DialogInterface.OnClickListener() {
+                    alertDialog.setPositiveButtonListener(new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i) {
-                            PassportActivity.PhoneConfirmationView.this.lambda$resendCode$1(dialogInterface, i);
+                        public final void onClick(AlertDialog alertDialog2, int i) {
+                            PassportActivity.PhoneConfirmationView.this.lambda$resendCode$1(alertDialog2, i);
                         }
                     });
                 }
@@ -1237,10 +1237,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
                 builder.setTitle(LocaleController.getString(R.string.AppName));
                 builder.setMessage(LocaleController.getString(R.string.StopVerification));
                 builder.setPositiveButton(LocaleController.getString(R.string.Continue), null);
-                builder.setNegativeButton(LocaleController.getString(R.string.Stop), new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(LocaleController.getString(R.string.Stop), new AlertDialog.OnButtonClickListener() {
                     @Override
-                    public final void onClick(DialogInterface dialogInterface, int i2) {
-                        PassportActivity.PhoneConfirmationView.this.lambda$onBackPressed$8(dialogInterface, i2);
+                    public final void onClick(AlertDialog alertDialog, int i2) {
+                        PassportActivity.PhoneConfirmationView.this.lambda$onBackPressed$8(alertDialog, i2);
                     }
                 });
                 PassportActivity.this.showDialog(builder.create());
@@ -1737,7 +1737,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             }
 
             @Override
-            public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i2, boolean z) {
+            public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int i2, boolean z, boolean z2) {
                 if (i2 < 0 || i2 >= PassportActivity.this.currentPhotoViewerLayout.getChildCount()) {
                     return null;
                 }
@@ -1968,10 +1968,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             return false;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-        builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.PassportDiscard), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                PassportActivity.this.lambda$checkDiscard$69(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                PassportActivity.this.lambda$checkDiscard$69(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -3122,7 +3122,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         PhotoViewer.getInstance().openPhoto(arrayList2, 0, this.provider);
     }
 
-    public void lambda$addDocumentView$56(SecureDocument secureDocument, int i, SecureDocumentCell secureDocumentCell, String str, DialogInterface dialogInterface, int i2) {
+    public void lambda$addDocumentView$56(SecureDocument secureDocument, int i, SecureDocumentCell secureDocumentCell, String str, AlertDialog alertDialog, int i2) {
         LinearLayout linearLayout;
         this.documentsCells.remove(secureDocument);
         if (i == 1) {
@@ -3169,10 +3169,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         builder.setMessage(LocaleController.getString(i == 1 ? R.string.PassportDeleteSelfie : R.string.PassportDeleteScan));
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         builder.setTitle(LocaleController.getString(R.string.AppName));
-        builder.setPositiveButton(LocaleController.getString(R.string.OK), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.OK), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i2) {
-                PassportActivity.this.lambda$addDocumentView$56(secureDocument, i, secureDocumentCell, str, dialogInterface, i2);
+            public final void onClick(AlertDialog alertDialog, int i2) {
+                PassportActivity.this.lambda$addDocumentView$56(secureDocument, i, secureDocumentCell, str, alertDialog, i2);
             }
         });
         showDialog(builder.create());
@@ -3187,7 +3187,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         needHideProgress();
     }
 
-    public void lambda$addField$63(TLRPC.TL_secureRequiredType tL_secureRequiredType, boolean z, DialogInterface dialogInterface, int i) {
+    public void lambda$addField$63(TLRPC.TL_secureRequiredType tL_secureRequiredType, boolean z, AlertDialog alertDialog, int i) {
         needShowProgress();
         deleteValueInternal(tL_secureRequiredType, null, null, true, new Runnable() {
             @Override
@@ -3206,8 +3206,8 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PassportActivity.lambda$addField$64(java.util.ArrayList, org.telegram.tgnet.TLRPC$TL_secureRequiredType, boolean, android.view.View):void");
     }
 
-    public void lambda$checkDiscard$69(DialogInterface dialogInterface, int i) {
-        lambda$onBackPressed$321();
+    public void lambda$checkDiscard$69(AlertDialog alertDialog, int i) {
+        lambda$onBackPressed$323();
     }
 
     public void lambda$checkNativeFields$58() {
@@ -3271,13 +3271,13 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         createDocumentDeleteAlert();
     }
 
-    public void lambda$createDocumentDeleteAlert$38(boolean[] zArr, DialogInterface dialogInterface, int i) {
+    public void lambda$createDocumentDeleteAlert$38(boolean[] zArr, AlertDialog alertDialog, int i) {
         if (!this.documentOnly) {
             this.currentValues.clear();
         }
         this.currentDocumentValues.clear();
         this.delegate.deleteValue(this.currentType, this.currentDocumentsType, this.availableDocumentTypes, zArr[0], null, null);
-        lambda$onBackPressed$321();
+        lambda$onBackPressed$323();
     }
 
     public static void lambda$createDocumentDeleteAlert$39(boolean[] zArr, View view) {
@@ -3448,7 +3448,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         editTextBoldCursor.setText(String.format(Locale.US, "%02d.%02d.%d", Integer.valueOf(i4), Integer.valueOf(i3 + 1), Integer.valueOf(i2)));
     }
 
-    public void lambda$createIdentityInterface$48(EditTextBoldCursor editTextBoldCursor, DialogInterface dialogInterface, int i) {
+    public void lambda$createIdentityInterface$48(EditTextBoldCursor editTextBoldCursor, AlertDialog alertDialog, int i) {
         int[] iArr = this.currentExpireDate;
         iArr[2] = 0;
         iArr[1] = 0;
@@ -3505,10 +3505,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
                     }
                 });
                 if (intValue == 8) {
-                    createDatePickerDialog.setNegativeButton(LocaleController.getString(R.string.PassportSelectNotExpire), new DialogInterface.OnClickListener() {
+                    createDatePickerDialog.setNegativeButton(LocaleController.getString(R.string.PassportSelectNotExpire), new AlertDialog.OnButtonClickListener() {
                         @Override
-                        public final void onClick(DialogInterface dialogInterface, int i7) {
-                            PassportActivity.this.lambda$createIdentityInterface$48(editTextBoldCursor, dialogInterface, i7);
+                        public final void onClick(AlertDialog alertDialog, int i7) {
+                            PassportActivity.this.lambda$createIdentityInterface$48(editTextBoldCursor, alertDialog, i7);
                         }
                     });
                 }
@@ -3627,7 +3627,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         });
     }
 
-    public void lambda$createManageInterface$20(DialogInterface dialogInterface, int i) {
+    public void lambda$createManageInterface$20(AlertDialog alertDialog, int i) {
         TL_account.deleteSecureValue deletesecurevalue = new TL_account.deleteSecureValue();
         for (int i2 = 0; i2 < this.currentForm.values.size(); i2++) {
             deletesecurevalue.types.add(this.currentForm.values.get(i2).type);
@@ -3645,10 +3645,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setTitle(LocaleController.getString(R.string.TelegramPassportDeleteTitle));
         builder.setMessage(LocaleController.getString(R.string.TelegramPassportDeleteAlert));
-        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.Delete), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                PassportActivity.this.lambda$createManageInterface$20(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                PassportActivity.this.lambda$createManageInterface$20(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
@@ -3673,7 +3673,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         });
     }
 
-    public void lambda$createPasswordInterface$11(DialogInterface dialogInterface, int i) {
+    public void lambda$createPasswordInterface$11(AlertDialog alertDialog, int i) {
         Browser.openUrl(getParentActivity(), "https://telegram.org/deactivate?phone=" + UserConfig.getInstance(this.currentAccount).getClientPhone());
     }
 
@@ -3693,10 +3693,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setPositiveButton(LocaleController.getString(R.string.OK), null);
-        builder.setNegativeButton(LocaleController.getString(R.string.RestorePasswordResetAccount), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(LocaleController.getString(R.string.RestorePasswordResetAccount), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                PassportActivity.this.lambda$createPasswordInterface$11(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                PassportActivity.this.lambda$createPasswordInterface$11(alertDialog, i);
             }
         });
         builder.setTitle(LocaleController.getString(R.string.RestorePasswordNoEmailTitle));
@@ -3718,7 +3718,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         return true;
     }
 
-    public void lambda$createPasswordInterface$8(TLRPC.TL_auth_passwordRecovery tL_auth_passwordRecovery, DialogInterface dialogInterface, int i) {
+    public void lambda$createPasswordInterface$8(TLRPC.TL_auth_passwordRecovery tL_auth_passwordRecovery, AlertDialog alertDialog, int i) {
         TL_account.Password password = this.currentPassword;
         password.email_unconfirmed_pattern = tL_auth_passwordRecovery.email_pattern;
         presentFragment(new TwoStepVerificationSetupActivity(this.currentAccount, 4, password));
@@ -3745,10 +3745,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
         builder.setMessage(LocaleController.formatString("RestoreEmailSent", R.string.RestoreEmailSent, tL_auth_passwordRecovery.email_pattern));
         builder.setTitle(LocaleController.getString(R.string.RestoreEmailSentTitle));
-        builder.setPositiveButton(LocaleController.getString(R.string.OK), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.OK), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                PassportActivity.this.lambda$createPasswordInterface$8(tL_auth_passwordRecovery, dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                PassportActivity.this.lambda$createPasswordInterface$8(tL_auth_passwordRecovery, alertDialog, i);
             }
         });
         Dialog showDialog = showDialog(builder.create());
@@ -3833,7 +3833,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         if (tL_error == null) {
             this.ignoreOnFailure = true;
             callCallback(true);
-            lambda$onBackPressed$321();
+            lambda$onBackPressed$323();
         } else {
             showEditDoneProgress(false, false);
             if ("APP_VERSION_OUTDATED".equals(tL_error.text)) {
@@ -4138,7 +4138,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PassportActivity.lambda$onPasswordDone$13(boolean, java.lang.String):void");
     }
 
-    public void lambda$onRequestPermissionsResultFragment$68(DialogInterface dialogInterface, int i) {
+    public void lambda$onRequestPermissionsResultFragment$68(AlertDialog alertDialog, int i) {
         try {
             Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
             intent.setData(Uri.parse("package:" + ApplicationLoader.applicationContext.getPackageName()));
@@ -5339,7 +5339,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             if ((i2 == 1 || i2 == 2) && (chatAttachAlert = this.chatAttachAlert) != null) {
                 try {
                     if (chatAttachAlert.isShowing()) {
-                        this.chatAttachAlert.dismiss();
+                        this.chatAttachAlert.lambda$new$0();
                     }
                 } catch (Exception unused) {
                 }
@@ -5758,10 +5758,10 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString(R.string.AppName));
             builder.setMessage(LocaleController.getString(R.string.PermissionNoAudioVideoWithHint));
-            builder.setNegativeButton(LocaleController.getString(R.string.PermissionOpenSettings), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(LocaleController.getString(R.string.PermissionOpenSettings), new AlertDialog.OnButtonClickListener() {
                 @Override
-                public final void onClick(DialogInterface dialogInterface, int i3) {
-                    PassportActivity.this.lambda$onRequestPermissionsResultFragment$68(dialogInterface, i3);
+                public final void onClick(AlertDialog alertDialog, int i3) {
+                    PassportActivity.this.lambda$onRequestPermissionsResultFragment$68(alertDialog, i3);
                 }
             });
             builder.setPositiveButton(LocaleController.getString(R.string.OK), null);

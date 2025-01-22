@@ -1,7 +1,6 @@
 package org.telegram.ui.Components;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -53,7 +52,7 @@ public abstract class GigagroupConvertAlert extends BottomSheet {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.GigagroupConvertAlert.<init>(android.content.Context, org.telegram.ui.ActionBar.BaseFragment):void");
     }
 
-    public void lambda$new$0(DialogInterface dialogInterface, int i) {
+    public void lambda$new$0(AlertDialog alertDialog, int i) {
         onCovert();
     }
 
@@ -62,10 +61,10 @@ public abstract class GigagroupConvertAlert extends BottomSheet {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(LocaleController.getString(R.string.GigagroupConvertAlertTitle));
         builder.setMessage(AndroidUtilities.replaceTags(LocaleController.getString(R.string.GigagroupConvertAlertText)));
-        builder.setPositiveButton(LocaleController.getString(R.string.GigagroupConvertAlertConver), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(LocaleController.getString(R.string.GigagroupConvertAlertConver), new AlertDialog.OnButtonClickListener() {
             @Override
-            public final void onClick(DialogInterface dialogInterface, int i) {
-                GigagroupConvertAlert.this.lambda$new$0(dialogInterface, i);
+            public final void onClick(AlertDialog alertDialog, int i) {
+                GigagroupConvertAlert.this.lambda$new$0(alertDialog, i);
             }
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);

@@ -117,6 +117,7 @@ public class DialogsBotsAdapter extends UniversalAdapter {
             this.bots.addAll(arrayList);
             this.cacheTime = j;
             this.lastOffset = str;
+            this.endReached = TextUtils.isEmpty(str);
             this.cacheLoaded = true;
             runnable.run();
         }
@@ -223,7 +224,11 @@ public class DialogsBotsAdapter extends UniversalAdapter {
             }
             this.savingCache = true;
             final long j = this.cacheTime;
-            final String str = this.lastOffset;
+            String str = this.lastOffset;
+            if (str == null) {
+                str = "";
+            }
+            final String str2 = str;
             final ArrayList arrayList = new ArrayList();
             for (int i = 0; i < this.bots.size(); i++) {
                 arrayList.add(Long.valueOf(((TLRPC.User) this.bots.get(i)).id));
@@ -232,7 +237,7 @@ public class DialogsBotsAdapter extends UniversalAdapter {
             messagesStorage.getStorageQueue().postRunnable(new Runnable() {
                 @Override
                 public final void run() {
-                    DialogsBotsAdapter.PopularBots.this.lambda$saveCache$3(messagesStorage, arrayList, j, str);
+                    DialogsBotsAdapter.PopularBots.this.lambda$saveCache$3(messagesStorage, arrayList, j, str2);
                 }
             });
         }
@@ -560,7 +565,18 @@ public class DialogsBotsAdapter extends UniversalAdapter {
             }
             hashSet.clear();
             this.topPeersEnd = arrayList.size();
-            if (!this.popular.bots.isEmpty()) {
+            if (this.popular.bots.isEmpty()) {
+                PopularBots popularBots = this.popular;
+                if (popularBots.loading || !popularBots.endReached) {
+                    if (!this.showOnlyPopular) {
+                        arrayList.add(UItem.asFlicker(30));
+                    }
+                    arrayList.add(UItem.asFlicker(29));
+                    arrayList.add(UItem.asFlicker(29));
+                    arrayList.add(UItem.asFlicker(29));
+                    arrayList.add(UItem.asFlicker(29));
+                }
+            } else {
                 if (!this.showOnlyPopular) {
                     arrayList.add(UItem.asGraySection(LocaleController.getString(R.string.SearchAppsPopular)));
                 }
@@ -574,20 +590,13 @@ public class DialogsBotsAdapter extends UniversalAdapter {
                     }
                     i++;
                 }
-                if (this.popular.loading) {
+                PopularBots popularBots2 = this.popular;
+                if (popularBots2.loading || !popularBots2.endReached) {
                     arrayList.add(UItem.asFlicker(29));
                     arrayList.add(UItem.asFlicker(29));
                     arrayList.add(UItem.asFlicker(29));
                 }
                 i = i4;
-            } else if (this.popular.loading) {
-                if (!this.showOnlyPopular) {
-                    arrayList.add(UItem.asFlicker(30));
-                }
-                arrayList.add(UItem.asFlicker(29));
-                arrayList.add(UItem.asFlicker(29));
-                arrayList.add(UItem.asFlicker(29));
-                arrayList.add(UItem.asFlicker(29));
             }
             if (i == 0) {
                 return;

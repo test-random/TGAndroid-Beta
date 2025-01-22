@@ -123,8 +123,8 @@ public class FilesMigrationService extends Service {
         }
 
         @Override
-        public void dismiss() {
-            super.dismiss();
+        public void lambda$new$0() {
+            super.lambda$new$0();
             FilesMigrationService.filesMigrationBottomSheet = null;
         }
 
