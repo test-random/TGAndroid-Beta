@@ -627,23 +627,34 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
                             i6 = R.string.Gift2ActionConvertRefundedText;
                         } else {
                             TLRPC.TL_textWithEntities tL_textWithEntities = tL_messageActionStarGift.message;
-                            if (tL_textWithEntities == null || TextUtils.isEmpty(tL_textWithEntities.text)) {
-                                if (z5) {
+                            if (tL_textWithEntities != null && !TextUtils.isEmpty(tL_textWithEntities.text)) {
+                                SpannableStringBuilder spannableStringBuilder3 = new SpannableStringBuilder(tL_messageActionStarGift.message.text);
+                                this.giftTextPaint.setTextSize(AndroidUtilities.dp(13.0f));
+                                MessageObject.addEntitiesToText(spannableStringBuilder3, tL_messageActionStarGift.message.entities, false, false, true, true);
+                                formatPluralStringComma = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji((CharSequence) spannableStringBuilder3, this.giftTextPaint.getFontMetricsInt(), false, (int[]) null), tL_messageActionStarGift.message.entities, this.giftTextPaint.getFontMetricsInt());
+                            } else if (z5) {
+                                if (!tL_messageActionStarGift.converted) {
                                     if (!z8 || j <= 0) {
                                         i7 = R.string.Gift2ActionInfoChannelNoConvert;
                                         formatString = LocaleController.getString(i7);
+                                        formatPluralStringComma = AndroidUtilities.replaceTags(formatString);
                                     } else {
                                         i5 = (int) j;
                                         str8 = "Gift2ActionInfoChannel";
                                         formatString = LocaleController.formatPluralStringComma(str8, i5);
+                                        formatPluralStringComma = AndroidUtilities.replaceTags(formatString);
                                     }
-                                } else if (z6) {
-                                    if (!tL_messageActionStarGift.converted || j <= 0) {
-                                        i7 = tL_messageActionStarGift.can_upgrade ? R.string.Gift2ActionSelfInfoUpgrade : R.string.Gift2ActionSelfInfoNoConvert;
-                                        formatString = LocaleController.getString(i7);
-                                    }
-                                    formatPluralStringComma = LocaleController.formatPluralStringComma("Gift2ActionConvertedInfo", (int) j);
-                                } else if (z7) {
+                                }
+                                formatPluralStringComma = LocaleController.formatPluralStringComma("Gift2ActionConvertedInfo", (int) j);
+                            } else if (z6) {
+                                if (!tL_messageActionStarGift.converted || j <= 0) {
+                                    i7 = tL_messageActionStarGift.can_upgrade ? R.string.Gift2ActionSelfInfoUpgrade : R.string.Gift2ActionSelfInfoNoConvert;
+                                    formatString = LocaleController.getString(i7);
+                                    formatPluralStringComma = AndroidUtilities.replaceTags(formatString);
+                                }
+                                formatPluralStringComma = LocaleController.formatPluralStringComma("Gift2ActionConvertedInfo", (int) j);
+                            } else {
+                                if (z7) {
                                     if (messageObject.isOutOwner()) {
                                         formatString = LocaleController.formatString(R.string.Gift2ActionUpgradeOut, UserObject.getForcedFirstName(user));
                                     } else {
@@ -667,11 +678,6 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
                                     formatPluralStringComma = LocaleController.formatPluralStringComma("Gift2ActionConvertedInfo", (int) j);
                                 }
                                 formatPluralStringComma = AndroidUtilities.replaceTags(formatString);
-                            } else {
-                                SpannableStringBuilder spannableStringBuilder3 = new SpannableStringBuilder(tL_messageActionStarGift.message.text);
-                                this.giftTextPaint.setTextSize(AndroidUtilities.dp(13.0f));
-                                MessageObject.addEntitiesToText(spannableStringBuilder3, tL_messageActionStarGift.message.entities, false, false, true, true);
-                                formatPluralStringComma = MessageObject.replaceAnimatedEmoji(Emoji.replaceEmoji((CharSequence) spannableStringBuilder3, this.giftTextPaint.getFontMetricsInt(), false, (int[]) null), tL_messageActionStarGift.message.entities, this.giftTextPaint.getFontMetricsInt());
                             }
                             string = formatPluralStringComma;
                             starGift = tL_messageActionStarGift.gift;

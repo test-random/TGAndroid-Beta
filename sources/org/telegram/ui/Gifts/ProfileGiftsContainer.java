@@ -237,7 +237,7 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
         sb.append("G  ");
         sb.append(LocaleController.getString(j < 0 ? R.string.ProfileGiftsSendChannel : R.string.ProfileGiftsSend));
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(sb.toString());
-        spannableStringBuilder.setSpan(new ColoredImageSpan(R.drawable.filled_gift_premium), 0, 1, 33);
+        spannableStringBuilder.setSpan(new ColoredImageSpan(R.drawable.filled_gift_simple), 0, 1, 33);
         buttonWithCounterView.setText(spannableStringBuilder, false);
         frameLayout2.addView(buttonWithCounterView, LayoutHelper.createFrame(-1, 48.0f, 119, 10.0f, (1.0f / AndroidUtilities.density) + 10.0f, 10.0f, 10.0f));
         buttonWithCounterView.setOnClickListener(new View.OnClickListener() {

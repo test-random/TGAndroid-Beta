@@ -485,9 +485,11 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
     public class Page extends FrameLayout {
         private int actionBarHeight;
         private ButtonWithCounterView button;
+        private CharSequence buttonCollectible;
         private FrameLayout buttonContainer;
         private CharSequence buttonLocked;
         int buttonRow;
+        private View buttonShadow;
         private CharSequence buttonUnlocked;
         int clearRow;
         int colorPickerRow;
@@ -787,7 +789,7 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
             }
         }
 
-        public Page(android.content.Context r14, final int r15) {
+        public Page(android.content.Context r19, final int r20) {
             throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.PeerColorActivity.Page.<init>(org.telegram.ui.PeerColorActivity, android.content.Context, int):void");
         }
 
@@ -879,7 +881,12 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
             if (!z) {
                 i = this.listView.getMeasuredHeight();
             }
-            this.buttonContainer.setTranslationY(Math.max(0, i - (this.listView.getMeasuredHeight() - AndroidUtilities.dp(76.0f))));
+            float max = Math.max(0, i - (this.listView.getMeasuredHeight() - AndroidUtilities.dp(76.66f)));
+            if (this.type == 1) {
+                this.buttonShadow.animate().alpha(max > 0.0f ? 0.0f : 1.0f).start();
+                max = 0.0f;
+            }
+            this.buttonContainer.setTranslationY(max);
         }
 
         public void updateMessages() {
@@ -1031,7 +1038,7 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
             if (this.button == null || PeerColorActivity.this.isChannel) {
                 return;
             }
-            this.button.setText(!PeerColorActivity.this.getUserConfig().isPremium() ? this.buttonLocked : this.buttonUnlocked, true);
+            this.button.setText(!PeerColorActivity.this.getUserConfig().isPremium() ? this.buttonLocked : this.selectedEmojiCollectible != null ? this.buttonCollectible : this.buttonUnlocked, true);
         }
 
         public boolean seesLoading() {
@@ -1135,6 +1142,7 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
             }
             updateProfilePreview(true);
             this.buttonContainer.setBackgroundColor(PeerColorActivity.this.getThemedColor(i));
+            this.buttonShadow.setBackgroundColor(PeerColorActivity.this.getThemedColor(Theme.key_divider));
             AndroidUtilities.forEachViews((RecyclerView) this.listView, new Consumer() {
                 @Override
                 public final void accept(Object obj) {
@@ -1171,6 +1179,9 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
                 } else {
                     PeerColorActivity.this.colorBar.setColor(((BaseFragment) PeerColorActivity.this).currentAccount, this.selectedColor, z);
                 }
+            }
+            if (this.button != null && !PeerColorActivity.this.isChannel) {
+                this.button.setText(!PeerColorActivity.this.getUserConfig().isPremium() ? this.buttonLocked : this.selectedEmojiCollectible != null ? this.buttonCollectible : this.buttonUnlocked, true);
             }
             checkResetColorButton();
             updateSelectedGift();

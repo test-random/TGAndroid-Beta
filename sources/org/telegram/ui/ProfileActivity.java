@@ -14786,7 +14786,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 this.collectibleHint.setTextTypeface(AndroidUtilities.bold());
                 this.collectibleHint.setText(tL_emojiStatusCollectible.title);
                 this.collectibleHint.setDuration(-1L);
-                this.collectibleHint.setInnerPadding(4.66f, 2.66f, 4.66f, 2.66f);
+                this.collectibleHint.setInnerPadding(6.66f, 2.66f, 6.66f, 2.66f);
                 this.collectibleHint.setArrowSize(4.0f, 2.66f);
                 this.collectibleHint.setRoundingWithCornerEffect(false);
                 this.collectibleHint.setRounding(16.0f);
