@@ -2622,7 +2622,7 @@ public class StarGiftSheet extends BottomSheet {
         if (i < i2) {
             message = new AlertDialog.Builder(getContext(), this.resourcesProvider).setTitle(LocaleController.getString(R.string.Gift2ExportTONUnlocksAlertTitle)).setMessage(LocaleController.formatPluralString("Gift2ExportTONUnlocksAlertText", Math.max(1, i3), new Object[0]));
         } else {
-            if (BuildVars.DEBUG_PRIVATE_VERSION) {
+            if (BuildVars.DEBUG_PRIVATE_VERSION || !BuildVars.DEBUG_VERSION) {
                 LinearLayout linearLayout = new LinearLayout(getContext());
                 linearLayout.setOrientation(1);
                 linearLayout.addView(new GiftTransferTopView(getContext(), tL_starGiftUnique), LayoutHelper.createLinear(-1, -2, 48, 0, -4, 0, 0));

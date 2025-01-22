@@ -64,6 +64,7 @@ public class DarkThemeResourceProvider implements Theme.ResourcesProvider {
         this.sparseIntArray.put(Theme.key_chat_messagePanelSend, -1);
         this.sparseIntArray.put(Theme.key_chat_emojiSearchBackground, ColorUtils.setAlphaComponent(-1, 30));
         this.sparseIntArray.put(Theme.key_chat_emojiPanelBackground, -1073741824);
+        this.sparseIntArray.put(Theme.key_actionBarActionModeDefaultIcon, -1);
         this.sparseIntArray.put(i, ColorUtils.blendARGB(-16777216, -1, 0.5f));
         this.sparseIntArray.put(i2, ColorUtils.setAlphaComponent(-1, 17));
         this.sparseIntArray.put(Theme.key_windowBackgroundWhiteGrayText, ColorUtils.setAlphaComponent(-1, 127));
@@ -164,6 +165,9 @@ public class DarkThemeResourceProvider implements Theme.ResourcesProvider {
         this.sparseIntArray.put(Theme.key_checkboxCheck, -1);
         this.sparseIntArray.put(Theme.key_avatar_backgroundSaved, -10703370);
         this.sparseIntArray.put(Theme.key_avatar_background2Saved, -12547121);
+        this.sparseIntArray.put(Theme.key_share_icon, -1);
+        this.sparseIntArray.put(Theme.key_share_linkText, -1207959553);
+        this.sparseIntArray.put(Theme.key_share_linkBackground, 352321535);
         appendColors();
         this.dividerPaint.setColor(getColor(i4));
     }

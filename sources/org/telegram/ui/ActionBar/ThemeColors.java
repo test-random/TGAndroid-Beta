@@ -765,6 +765,9 @@ public abstract class ThemeColors {
         sparseArray.put(Theme.key_dialogCardShadow, "dialogCardShadow");
         sparseArray.put(Theme.key_dialogGiftsBackground, "dialogGiftsBackground");
         sparseArray.put(Theme.key_dialogGiftsTabText, "dialogGiftsTabText");
+        sparseArray.put(Theme.key_share_icon, "share_icon");
+        sparseArray.put(Theme.key_share_linkText, "share_linkText");
+        sparseArray.put(Theme.key_share_linkBackground, "share_linkBackground");
         return sparseArray;
     }
 
@@ -834,6 +837,9 @@ public abstract class ThemeColors {
         iArr[Theme.key_bot_loadingIcon] = -855310;
         iArr[Theme.key_gift_ribbon] = -12147470;
         iArr[Theme.key_gift_ribbon_soldout] = -3389625;
+        iArr[Theme.key_share_icon] = -9538955;
+        iArr[Theme.key_share_linkText] = -14540254;
+        iArr[Theme.key_share_linkBackground] = 251658240;
         iArr[Theme.key_windowBackgroundWhite] = -1;
         iArr[Theme.key_windowBackgroundUnchecked] = -6445135;
         iArr[Theme.key_windowBackgroundChecked] = -11034919;

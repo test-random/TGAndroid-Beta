@@ -606,6 +606,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private StaticLayout performerLayout;
     private int performerX;
     private ImageReceiver photoImage;
+    private Path photoImageClipPath;
+    private float[] photoImageClipPathRadii;
     private boolean photoImageOutOfBounds;
     private boolean photoNotSet;
     private TLObject photoParentObject;
@@ -6580,6 +6582,49 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public void drawVideoTimestamps(Canvas canvas, int i) {
+        if (this.currentMessageObject == null || this.controlsAlpha <= 0.0f || !this.photoImage.getVisible()) {
+            return;
+        }
+        MessageObject messageObject = this.currentMessageObject;
+        float clamp01 = Utilities.clamp01((messageObject.openedInViewer || messageObject.getVideoStartsTimestamp() == -1) ? this.currentMessageObject.getVideoSavedProgress() : this.currentMessageObject.getVideoStartsTimestamp() / ((float) this.currentMessageObject.getDuration()));
+        if (clamp01 > 0.0f) {
+            int[] roundRadius = this.photoImage.getRoundRadius();
+            canvas.save();
+            if (roundRadius[0] > 0 || roundRadius[1] > 0 || roundRadius[2] > 0 || roundRadius[3] > 0) {
+                if (this.photoImageClipPath == null) {
+                    this.photoImageClipPath = new Path();
+                    this.photoImageClipPathRadii = new float[8];
+                }
+                float[] fArr = this.photoImageClipPathRadii;
+                float max = Math.max(0, roundRadius[0]);
+                fArr[1] = max;
+                fArr[0] = max;
+                float[] fArr2 = this.photoImageClipPathRadii;
+                float max2 = Math.max(0, roundRadius[1]);
+                fArr2[3] = max2;
+                fArr2[2] = max2;
+                float[] fArr3 = this.photoImageClipPathRadii;
+                float max3 = Math.max(0, roundRadius[2]);
+                fArr3[5] = max3;
+                fArr3[4] = max3;
+                float[] fArr4 = this.photoImageClipPathRadii;
+                float max4 = Math.max(0, roundRadius[3]);
+                fArr4[7] = max4;
+                fArr4[6] = max4;
+                this.photoImageClipPath.rewind();
+                this.photoImageClipPath.addRoundRect(this.photoImage.getImageX(), this.photoImage.getImageY(), this.photoImage.getImageX2(), this.photoImage.getImageY2(), this.photoImageClipPathRadii, Path.Direction.CW);
+                canvas.clipPath(this.photoImageClipPath);
+            } else {
+                canvas.clipRect(this.photoImage.getImageX(), this.photoImage.getImageY(), this.photoImage.getImageX2(), this.photoImage.getImageY2());
+            }
+            Theme.chat_videoProgressPaint.setColor(Theme.multAlpha(-1, this.controlsAlpha * 0.35f));
+            canvas.drawRect(this.photoImage.getImageX(), this.photoImage.getImageY2() - AndroidUtilities.dp(3.0f), this.photoImage.getImageX2(), this.photoImage.getImageY2(), Theme.chat_videoProgressPaint);
+            Theme.chat_videoProgressPaint.setColor(Theme.multAlpha(i, this.controlsAlpha));
+            RectF rectF = AndroidUtilities.rectTmp;
+            rectF.set(this.photoImage.getImageX() - AndroidUtilities.dp(2.0f), this.photoImage.getImageY2() - AndroidUtilities.dp(3.0f), this.photoImage.getImageX() + (this.photoImage.getImageWidth() * clamp01), this.photoImage.getImageY2());
+            canvas.drawRoundRect(rectF, AndroidUtilities.dp(2.0f), AndroidUtilities.dp(2.0f), Theme.chat_videoProgressPaint);
+            canvas.restore();
+        }
     }
 
     public void drawVoiceOnce(Canvas canvas, float f, Runnable runnable) {

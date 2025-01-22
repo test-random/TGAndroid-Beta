@@ -1003,6 +1003,9 @@ public abstract class Theme {
     public static final int key_returnToCallMutedBackground;
     public static final int key_returnToCallText;
     public static final int key_sessions_devicesImage;
+    public static final int key_share_icon;
+    public static final int key_share_linkBackground;
+    public static final int key_share_linkText;
     public static final int key_sharedMedia_linkPlaceholder;
     public static final int key_sharedMedia_linkPlaceholderText;
     public static final int key_sharedMedia_photoPlaceholder;
