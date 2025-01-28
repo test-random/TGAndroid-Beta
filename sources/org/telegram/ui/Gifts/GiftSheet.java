@@ -472,10 +472,12 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
             this.lockView.setVisibility(8);
             if (giftPremiumBottomSheet$GiftTier.getDiscount() > 0) {
                 this.ribbon.setVisibility(0);
+                this.ribbon.setBackdrop(null);
                 this.ribbon.setColors(-2535425, -8229377);
                 this.ribbon.setText(12, LocaleController.formatString(R.string.GiftPremiumOptionDiscount, Integer.valueOf(giftPremiumBottomSheet$GiftTier.getDiscount())), true);
             } else {
                 this.ribbon.setVisibility(8);
+                this.ribbon.setBackdrop(null);
             }
             this.priceView.setPadding(AndroidUtilities.dp(10.0f), 0, AndroidUtilities.dp(10.0f), 0);
             this.priceView.setTextSize(1, 12.0f);
@@ -516,6 +518,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
                 this.ribbon.setBackdrop(null);
                 this.ribbon.setText(LocaleController.getString(R.string.Gift2LimitedRibbon), false);
             } else {
+                this.ribbon.setBackdrop(null);
                 this.ribbon.setVisibility(8);
             }
             this.avatarView.setVisibility(8);
@@ -550,6 +553,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
 
         public void setBackdrop(TL_stars.starGiftAttributeBackdrop stargiftattributebackdrop) {
             this.drawable.setBackdrop(stargiftattributebackdrop, false);
+            invalidate();
         }
 
         public void setColor(int i) {

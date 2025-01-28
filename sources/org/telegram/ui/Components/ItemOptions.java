@@ -373,14 +373,14 @@ public class ItemOptions {
         dismiss();
     }
 
-    public void lambda$add$4(Runnable runnable, View view) {
+    public void lambda$add$5(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
         dismiss();
     }
 
-    public void lambda$addChat$3(Runnable runnable, View view) {
+    public void lambda$addChat$4(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
@@ -394,13 +394,21 @@ public class ItemOptions {
         dismiss();
     }
 
-    public static void lambda$addProfile$8(Runnable runnable, View view) {
+    public boolean lambda$addChecked$3(Runnable runnable, View view) {
+        if (runnable != null) {
+            runnable.run();
+        }
+        dismiss();
+        return true;
+    }
+
+    public static void lambda$addProfile$9(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
     }
 
-    public void lambda$addSpaceGap$6(KeyEvent keyEvent) {
+    public void lambda$addSpaceGap$7(KeyEvent keyEvent) {
         ActionBarPopupWindow actionBarPopupWindow;
         if (keyEvent.getKeyCode() == 4 && keyEvent.getRepeatCount() == 0 && (actionBarPopupWindow = this.actionBarPopupWindow) != null && actionBarPopupWindow.isShowing()) {
             dismiss();
@@ -414,7 +422,7 @@ public class ItemOptions {
         }
     }
 
-    public void lambda$putPremiumLock$5(Runnable runnable, View view) {
+    public void lambda$putPremiumLock$6(Runnable runnable, View view) {
         if (runnable != null) {
             int i = -this.shiftDp;
             this.shiftDp = i;
@@ -424,18 +432,18 @@ public class ItemOptions {
         }
     }
 
-    public void lambda$show$10(ValueAnimator valueAnimator) {
+    public static boolean lambda$show$10(View view) {
+        view.invalidate();
+        return true;
+    }
+
+    public void lambda$show$11(ValueAnimator valueAnimator) {
         View view = this.dimView;
         if (view != null) {
             if (this.scrimViewRoundRadius > 0 || this.scrimViewPadding > 0 || (this.blur && (view instanceof DimView) && ((DimView) view).clipTop < 1.0f)) {
                 view.invalidate();
             }
         }
-    }
-
-    public static boolean lambda$show$9(View view) {
-        view.invalidate();
-        return true;
     }
 
     public static ItemOptions makeOptions(ViewGroup viewGroup, View view) {
@@ -527,7 +535,7 @@ public class ItemOptions {
         actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                ItemOptions.this.lambda$add$4(runnable, view);
+                ItemOptions.this.lambda$add$5(runnable, view);
             }
         });
         int i2 = this.minWidthDp;
@@ -549,7 +557,11 @@ public class ItemOptions {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ItemOptions.addChat(org.telegram.tgnet.TLObject, boolean, java.lang.Runnable):org.telegram.ui.Components.ItemOptions");
     }
 
-    public ItemOptions addChecked(boolean z, CharSequence charSequence, final Runnable runnable) {
+    public ItemOptions addChecked(boolean z, CharSequence charSequence, Runnable runnable) {
+        return addChecked(z, charSequence, runnable, null);
+    }
+
+    public ItemOptions addChecked(boolean z, CharSequence charSequence, final Runnable runnable, final Runnable runnable2) {
         int i;
         if (this.context == null) {
             return this;
@@ -572,6 +584,16 @@ public class ItemOptions {
                 ItemOptions.this.lambda$addChecked$2(runnable, view);
             }
         });
+        if (runnable2 != null) {
+            actionBarMenuSubItem.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public final boolean onLongClick(View view) {
+                    boolean lambda$addChecked$3;
+                    lambda$addChecked$3 = ItemOptions.this.lambda$addChecked$3(runnable2, view);
+                    return lambda$addChecked$3;
+                }
+            });
+        }
         int i4 = this.minWidthDp;
         if (i4 > 0) {
             actionBarMenuSubItem.setMinimumWidth(AndroidUtilities.dp(i4));
@@ -583,8 +605,8 @@ public class ItemOptions {
         return this;
     }
 
-    public ItemOptions addCheckedIf(boolean z, boolean z2, CharSequence charSequence, Runnable runnable) {
-        return !z ? this : addChecked(z2, charSequence, runnable);
+    public ItemOptions addCheckedIf(boolean z, boolean z2, CharSequence charSequence, Runnable runnable, Runnable runnable2) {
+        return !z ? this : addChecked(z2, charSequence, runnable, runnable2);
     }
 
     public ItemOptions addGap() {
@@ -642,7 +664,7 @@ public class ItemOptions {
             frameLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    ItemOptions.lambda$addProfile$8(runnable, view);
+                    ItemOptions.lambda$addProfile$9(runnable, view);
                 }
             });
             addView(frameLayout, LayoutHelper.createLinear(-1, 52));
@@ -659,7 +681,7 @@ public class ItemOptions {
         frameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {
-                ItemOptions.lambda$addProfile$8(runnable, view);
+                ItemOptions.lambda$addProfile$9(runnable, view);
             }
         });
         addView(frameLayout, LayoutHelper.createLinear(-1, 52));
@@ -678,7 +700,7 @@ public class ItemOptions {
         actionBarPopupWindowLayout.setDispatchKeyEventListener(new ActionBarPopupWindow.OnDispatchKeyEventListener() {
             @Override
             public final void onDispatchKeyEvent(KeyEvent keyEvent) {
-                ItemOptions.this.lambda$addSpaceGap$6(keyEvent);
+                ItemOptions.this.lambda$addSpaceGap$7(keyEvent);
             }
         });
         this.layout.addView(this.lastLayout, LayoutHelper.createLinear(-1, -2, 0.0f, -8.0f, 0.0f, 0.0f));
@@ -887,7 +909,7 @@ public class ItemOptions {
             actionBarMenuSubItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public final void onClick(View view) {
-                    ItemOptions.this.lambda$putPremiumLock$5(runnable, view);
+                    ItemOptions.this.lambda$putPremiumLock$6(runnable, view);
                 }
             });
         }
@@ -1162,9 +1184,9 @@ public class ItemOptions {
                 this.preDrawListener = new ViewTreeObserver.OnPreDrawListener() {
                     @Override
                     public final boolean onPreDraw() {
-                        boolean lambda$show$9;
-                        lambda$show$9 = ItemOptions.lambda$show$9(dimView);
-                        return lambda$show$9;
+                        boolean lambda$show$10;
+                        lambda$show$10 = ItemOptions.lambda$show$10(dimView);
+                        return lambda$show$10;
                     }
                 };
                 viewGroup2.getViewTreeObserver().addOnPreDrawListener(this.preDrawListener);
@@ -1173,7 +1195,7 @@ public class ItemOptions {
                 this.dimView.animate().alpha(1.0f).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public final void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        ItemOptions.this.lambda$show$10(valueAnimator);
+                        ItemOptions.this.lambda$show$11(valueAnimator);
                     }
                 }).setDuration(150L);
             }

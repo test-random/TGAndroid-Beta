@@ -4488,23 +4488,42 @@ public class AndroidUtilities {
             }
             return charSequence;
         }
-        if (!(charSequence instanceof SpannableStringBuilder)) {
+        if (charSequence instanceof SpannableStringBuilder) {
+            SpannableStringBuilder spannableStringBuilder = (SpannableStringBuilder) charSequence;
+            int length2 = charSequence.length();
+            int i3 = 0;
+            while (i3 < length2 - 2) {
+                int i4 = i3 + 2;
+                spannableStringBuilder.getChars(i3, i4, cArr, 0);
+                if (cArr[0] == '\n' && cArr[1] == '\n') {
+                    spannableStringBuilder = spannableStringBuilder.replace(i3, i4, (CharSequence) "\n");
+                    i3--;
+                    length2--;
+                }
+                i3++;
+            }
+            return charSequence;
+        }
+        if (!(charSequence instanceof SpannableString)) {
             return charSequence.toString().replace("\n\n", "\n");
         }
-        SpannableStringBuilder spannableStringBuilder = (SpannableStringBuilder) charSequence;
-        int length2 = charSequence.length();
-        int i3 = 0;
-        while (i3 < length2 - 2) {
-            int i4 = i3 + 2;
-            spannableStringBuilder.getChars(i3, i4, cArr, 0);
-            if (cArr[0] == '\n' && cArr[1] == '\n') {
-                spannableStringBuilder = spannableStringBuilder.replace(i3, i4, (CharSequence) "\n");
-                i3--;
-                length2--;
-            }
-            i3++;
+        if (TextUtils.indexOf(charSequence, "\n\n") < 0) {
+            return charSequence;
         }
-        return charSequence;
+        SpannableStringBuilder spannableStringBuilder2 = new SpannableStringBuilder(charSequence);
+        int length3 = charSequence.length();
+        int i5 = 0;
+        while (i5 < length3 - 2) {
+            int i6 = i5 + 2;
+            spannableStringBuilder2.getChars(i5, i6, cArr, 0);
+            if (cArr[0] == '\n' && cArr[1] == '\n') {
+                spannableStringBuilder2 = spannableStringBuilder2.replace(i5, i6, (CharSequence) "\n");
+                i5--;
+                length3--;
+            }
+            i5++;
+        }
+        return spannableStringBuilder2;
     }
 
     public static void requestAdjustNothing(Activity activity, int i) {

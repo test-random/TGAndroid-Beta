@@ -549,6 +549,17 @@ public class TableView extends android.widget.TableLayout {
         final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(linksSimpleTextView, AndroidUtilities.dp(20.0f));
         swapAnimatedEmojiDrawable.setColor(Integer.valueOf(color));
         swapAnimatedEmojiDrawable.offset(AndroidUtilities.dp(12.0f), 0);
+        linksSimpleTextView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View view) {
+                swapAnimatedEmojiDrawable.attach();
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View view) {
+                swapAnimatedEmojiDrawable.detach();
+            }
+        });
         final Drawable mutate = getContext().getResources().getDrawable(R.drawable.msg_premium_liststar).mutate();
         mutate.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
         Utilities.Callback<Object[]> callback = new Utilities.Callback() {

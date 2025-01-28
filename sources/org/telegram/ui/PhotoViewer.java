@@ -11714,6 +11714,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         photoEntry.coverPhoto = null;
         photoEntry.coverPhotoParentObject = null;
         this.coverEditor.button.setLoading(false);
+        PhotoViewerProvider photoViewerProvider = this.placeProvider;
+        if (photoViewerProvider != null) {
+            photoViewerProvider.updatePhotoAtIndex(this.currentIndex);
+        }
         EditCoverButton editCoverButton = this.editCoverButton;
         if (editCoverButton != null) {
             editCoverButton.lambda$setImage$0(bitmap);
@@ -11804,6 +11808,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         photoEntry.coverPhoto = null;
         photoEntry.coverPhotoParentObject = null;
         this.coverEditor.button.setLoading(false);
+        PhotoViewerProvider photoViewerProvider = this.placeProvider;
+        if (photoViewerProvider != null) {
+            photoViewerProvider.updatePhotoAtIndex(this.currentIndex);
+        }
         EditCoverButton editCoverButton = this.editCoverButton;
         if (editCoverButton != null) {
             editCoverButton.lambda$setImage$0(bitmap);

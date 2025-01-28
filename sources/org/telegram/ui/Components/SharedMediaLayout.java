@@ -714,18 +714,51 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             giftsList.invalidate(true);
         }
 
-        public void lambda$onClick$10() {
+        public static void lambda$onClick$10(StarsController.GiftsList giftsList) {
+            boolean z = giftsList.include_hidden;
+            if (!z || giftsList.include_displayed) {
+                giftsList.include_hidden = !z;
+            } else {
+                giftsList.include_hidden = false;
+                giftsList.include_displayed = true;
+            }
+            giftsList.invalidate(true);
+        }
+
+        public static void lambda$onClick$11(StarsController.GiftsList giftsList) {
+            giftsList.include_displayed = false;
+            giftsList.include_hidden = true;
+            giftsList.invalidate(true);
+        }
+
+        public void lambda$onClick$12() {
+            StoryRecorder.getInstance(SharedMediaLayout.this.profileActivity.getParentActivity(), SharedMediaLayout.this.profileActivity.getCurrentAccount()).openBot(SharedMediaLayout.this.dialog_id, SharedMediaLayout.this.botPreviewsContainer.getCurrentLang(), null);
+        }
+
+        public void lambda$onClick$13() {
+            SharedMediaLayout.this.botPreviewsContainer.selectAll();
+        }
+
+        public void lambda$onClick$14() {
+            if (SharedMediaLayout.this.botPreviewsContainer.isSelectedAll()) {
+                SharedMediaLayout.this.botPreviewsContainer.unselectAll();
+            } else {
+                SharedMediaLayout.this.botPreviewsContainer.selectAll();
+            }
+        }
+
+        public void lambda$onClick$15() {
             SharedMediaLayout.this.botPreviewsContainer.deleteLang(SharedMediaLayout.this.botPreviewsContainer.getCurrentLang());
         }
 
-        public void lambda$onClick$11() {
+        public void lambda$onClick$16() {
             SharedMediaLayout.this.profileActivity.getMessagesController().setSavedViewAs(false);
             Bundle bundle = new Bundle();
             bundle.putLong("user_id", SharedMediaLayout.this.profileActivity.getUserConfig().getClientUserId());
             SharedMediaLayout.this.profileActivity.presentFragment(new ChatActivity(bundle), true);
         }
 
-        public void lambda$onClick$12() {
+        public void lambda$onClick$17() {
             try {
                 SharedMediaLayout.this.profileActivity.getMediaDataController().installShortcut(SharedMediaLayout.this.profileActivity.getUserConfig().getClientUserId(), MediaDataController.SHORTCUT_TYPE_USER_OR_CHAT);
             } catch (Exception e) {
@@ -733,7 +766,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             }
         }
 
-        public void lambda$onClick$13(TLRPC.User user, boolean z) {
+        public void lambda$onClick$18(TLRPC.User user, boolean z) {
             SharedMediaLayout.this.profileActivity.lambda$onBackPressed$323();
             if (SharedMediaLayout.this.profileActivity instanceof NotificationCenter.NotificationCenterDelegate) {
                 SharedMediaLayout.this.profileActivity.getNotificationCenter().removeObserver((NotificationCenter.NotificationCenterDelegate) SharedMediaLayout.this.profileActivity, NotificationCenter.closeChats);
@@ -743,25 +776,37 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             SharedMediaLayout.this.profileActivity.getMessagesController().setSavedViewAs(false);
         }
 
-        public void lambda$onClick$14(Theme.ResourcesProvider resourcesProvider) {
+        public void lambda$onClick$19(Theme.ResourcesProvider resourcesProvider) {
             final TLRPC.User currentUser = SharedMediaLayout.this.profileActivity.getUserConfig().getCurrentUser();
             AlertsCreator.createClearOrDeleteDialogAlert(SharedMediaLayout.this.profileActivity, false, null, currentUser, false, true, true, new MessagesStorage.BooleanCallback() {
                 @Override
                 public final void run(boolean z) {
-                    SharedMediaLayout.AnonymousClass5.this.lambda$onClick$13(currentUser, z);
+                    SharedMediaLayout.AnonymousClass5.this.lambda$onClick$18(currentUser, z);
                 }
             }, resourcesProvider);
         }
 
-        public void lambda$onClick$15(View view) {
+        public static void lambda$onClick$2(StarsController.GiftsList giftsList) {
+            boolean z = giftsList.include_unlimited;
+            if (!z || giftsList.include_limited || giftsList.include_unique) {
+                giftsList.include_unlimited = !z;
+            } else {
+                giftsList.include_unlimited = false;
+                giftsList.include_limited = true;
+                giftsList.include_unique = true;
+            }
+            giftsList.invalidate(true);
+        }
+
+        public void lambda$onClick$20(View view) {
             SharedMediaLayout.this.zoomIn();
         }
 
-        public void lambda$onClick$16(View view) {
+        public void lambda$onClick$21(View view) {
             SharedMediaLayout.this.zoomOut();
         }
 
-        public void lambda$onClick$17(View view) {
+        public void lambda$onClick$22(View view) {
             Bundle bundle = new Bundle();
             bundle.putInt("type", 2);
             bundle.putLong("dialog_id", -SharedMediaLayout.this.info.id);
@@ -774,7 +819,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             }
         }
 
-        public void lambda$onClick$18(ActionBarMenuSubItem actionBarMenuSubItem, ActionBarMenuSubItem actionBarMenuSubItem2, StoriesAdapter storiesAdapter, View view) {
+        public void lambda$onClick$23(ActionBarMenuSubItem actionBarMenuSubItem, ActionBarMenuSubItem actionBarMenuSubItem2, StoriesAdapter storiesAdapter, View view) {
             if (SharedMediaLayout.this.changeTypeAnimation) {
                 return;
             }
@@ -791,7 +836,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             storiesList.updateFilters(actionBarMenuSubItem2.getCheckView().isChecked(), actionBarMenuSubItem.getCheckView().isChecked());
         }
 
-        public void lambda$onClick$19(ActionBarMenuSubItem actionBarMenuSubItem, ActionBarMenuSubItem actionBarMenuSubItem2, StoriesAdapter storiesAdapter, View view) {
+        public void lambda$onClick$24(ActionBarMenuSubItem actionBarMenuSubItem, ActionBarMenuSubItem actionBarMenuSubItem2, StoriesAdapter storiesAdapter, View view) {
             if (SharedMediaLayout.this.changeTypeAnimation) {
                 return;
             }
@@ -808,19 +853,14 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             storiesList.updateFilters(actionBarMenuSubItem.getCheckView().isChecked(), actionBarMenuSubItem2.getCheckView().isChecked());
         }
 
-        public static void lambda$onClick$2(StarsController.GiftsList giftsList) {
-            boolean z = giftsList.include_unlimited;
-            if (!z || giftsList.include_limited || giftsList.include_unique) {
-                giftsList.include_unlimited = !z;
-            } else {
-                giftsList.include_unlimited = false;
-                giftsList.include_limited = true;
-                giftsList.include_unique = true;
-            }
+        public static void lambda$onClick$3(StarsController.GiftsList giftsList) {
+            giftsList.include_unique = false;
+            giftsList.include_limited = false;
+            giftsList.include_unlimited = true;
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$3(StarsController.GiftsList giftsList) {
+        public static void lambda$onClick$4(StarsController.GiftsList giftsList) {
             boolean z = giftsList.include_limited;
             if (!z || giftsList.include_unlimited || giftsList.include_unique) {
                 giftsList.include_limited = !z;
@@ -832,7 +872,14 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$4(StarsController.GiftsList giftsList) {
+        public static void lambda$onClick$5(StarsController.GiftsList giftsList) {
+            giftsList.include_unique = false;
+            giftsList.include_limited = true;
+            giftsList.include_unlimited = false;
+            giftsList.invalidate(true);
+        }
+
+        public static void lambda$onClick$6(StarsController.GiftsList giftsList) {
             boolean z = giftsList.include_unique;
             if (!z || giftsList.include_limited || giftsList.include_unlimited) {
                 giftsList.include_unique = !z;
@@ -844,7 +891,14 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$5(StarsController.GiftsList giftsList) {
+        public static void lambda$onClick$7(StarsController.GiftsList giftsList) {
+            giftsList.include_unique = true;
+            giftsList.include_limited = false;
+            giftsList.include_unlimited = false;
+            giftsList.invalidate(true);
+        }
+
+        public static void lambda$onClick$8(StarsController.GiftsList giftsList) {
             boolean z = giftsList.include_displayed;
             if (!z || giftsList.include_hidden) {
                 giftsList.include_displayed = !z;
@@ -855,31 +909,10 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$6(StarsController.GiftsList giftsList) {
-            boolean z = giftsList.include_hidden;
-            if (!z || giftsList.include_displayed) {
-                giftsList.include_hidden = !z;
-            } else {
-                giftsList.include_hidden = false;
-                giftsList.include_displayed = true;
-            }
+        public static void lambda$onClick$9(StarsController.GiftsList giftsList) {
+            giftsList.include_displayed = true;
+            giftsList.include_hidden = false;
             giftsList.invalidate(true);
-        }
-
-        public void lambda$onClick$7() {
-            StoryRecorder.getInstance(SharedMediaLayout.this.profileActivity.getParentActivity(), SharedMediaLayout.this.profileActivity.getCurrentAccount()).openBot(SharedMediaLayout.this.dialog_id, SharedMediaLayout.this.botPreviewsContainer.getCurrentLang(), null);
-        }
-
-        public void lambda$onClick$8() {
-            SharedMediaLayout.this.botPreviewsContainer.selectAll();
-        }
-
-        public void lambda$onClick$9() {
-            if (SharedMediaLayout.this.botPreviewsContainer.isSelectedAll()) {
-                SharedMediaLayout.this.botPreviewsContainer.unselectAll();
-            } else {
-                SharedMediaLayout.this.botPreviewsContainer.selectAll();
-            }
         }
 
         @Override

@@ -1923,7 +1923,7 @@ public class MessageObject {
             int intValue = num.intValue();
             if (intValue >= 0 && intValue < spanned.length() && hashMap.containsKey(num)) {
                 int intValue2 = ((Integer) hashMap.get(num)).intValue();
-                if ((intValue2 & 1) != 0 && (intValue2 & 2) != 0 && spanned.charAt(intValue) != '\n' && (intValue - 1 <= 0 || spanned.charAt(i) != '\n')) {
+                if ((intValue2 & 17) != 0 && (intValue2 & 2) != 0 && spanned.charAt(intValue) != '\n' && (intValue - 1 <= 0 || spanned.charAt(i) != '\n')) {
                     it.remove();
                     hashMap.remove(num);
                 }

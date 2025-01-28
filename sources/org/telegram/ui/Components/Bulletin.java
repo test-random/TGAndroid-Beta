@@ -88,6 +88,7 @@ public class Bulletin {
     public int hash;
     public boolean hideAfterBottomSheet;
     private final Runnable hideRunnable;
+    private boolean ignoreDetach;
     public int lastBottomOffset;
     private final Layout layout;
     private Layout.Transition layoutTransition;
@@ -2706,7 +2707,7 @@ public class Bulletin {
             }
             int i = this.currentBottomOffset;
             this.currentBottomOffset = 0;
-            if (ViewCompat.isLaidOut(layout)) {
+            if (ViewCompat.isLaidOut(layout) || this.ignoreDetach) {
                 this.layout.removeCallbacks(this.hideRunnable);
                 if (z) {
                     Layout layout2 = this.layout;
@@ -2768,6 +2769,11 @@ public class Bulletin {
 
     public Bulletin hideAfterBottomSheet(boolean z) {
         this.hideAfterBottomSheet = z;
+        return this;
+    }
+
+    public Bulletin ignoreDetach() {
+        this.ignoreDetach = true;
         return this;
     }
 
@@ -2865,20 +2871,22 @@ public class Bulletin {
             this.containerLayoutListener = onLayoutChangeListener;
             frameLayout.addOnLayoutChangeListener(onLayoutChangeListener);
             this.layout.addOnLayoutChangeListener(new AnonymousClass2(z));
-            this.layout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-                AnonymousClass3() {
-                }
+            if (!this.ignoreDetach) {
+                this.layout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                    AnonymousClass3() {
+                    }
 
-                @Override
-                public void onViewAttachedToWindow(View view) {
-                }
+                    @Override
+                    public void onViewAttachedToWindow(View view) {
+                    }
 
-                @Override
-                public void onViewDetachedFromWindow(View view) {
-                    Bulletin.this.layout.removeOnAttachStateChangeListener(this);
-                    Bulletin.this.hide(false, 0L);
-                }
-            });
+                    @Override
+                    public void onViewDetachedFromWindow(View view) {
+                        Bulletin.this.layout.removeOnAttachStateChangeListener(this);
+                        Bulletin.this.hide(false, 0L);
+                    }
+                });
+            }
             this.containerLayout.addView(this.parentLayout);
         }
         return this;

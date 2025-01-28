@@ -399,7 +399,10 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                 if (photoEntryAtPosition == null) {
                     return;
                 }
-                if (photoEntryAtPosition.thumbPath != null) {
+                if (photoEntryAtPosition.coverPath != null) {
+                    imageView = cellForIndex.getImageView();
+                    sb2 = photoEntryAtPosition.coverPath;
+                } else if (photoEntryAtPosition.thumbPath != null) {
                     imageView = cellForIndex.getImageView();
                     sb2 = photoEntryAtPosition.thumbPath;
                 } else {

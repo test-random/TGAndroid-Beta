@@ -476,7 +476,7 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
     public static void lambda$showConnectAffiliateAlert$10(BottomSheet bottomSheet, TL_payments.starRefProgram starrefprogram, View view) {
         BaseFragment safeLastFragment = LaunchActivity.getSafeLastFragment();
         if (safeLastFragment != null) {
-            bottomSheet.dismiss();
+            bottomSheet.lambda$new$0();
             safeLastFragment.presentFragment(ProfileActivity.of(starrefprogram.bot_id));
         }
     }
@@ -495,7 +495,7 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         }
         TL_payments.connectedStarRefBots connectedstarrefbots = (TL_payments.connectedStarRefBots) tLObject;
         BotStarsController.getInstance(i).getChannelConnectedBots(j).apply(connectedstarrefbots);
-        bottomSheet.dismiss();
+        bottomSheet.lambda$new$0();
         while (true) {
             if (i2 >= connectedstarrefbots.connected_bots.size()) {
                 connectedbotstarref = null;
@@ -640,7 +640,7 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         if (userFull == null || userFull.starref_program == null) {
             return;
         }
-        bottomSheet.dismiss();
+        bottomSheet.lambda$new$0();
         showConnectAffiliateAlert(context, i, userFull.starref_program, j, resourcesProvider, true);
     }
 
@@ -676,7 +676,7 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         if (userFull == null || userFull.starref_program == null) {
             return;
         }
-        bottomSheet.dismiss();
+        bottomSheet.lambda$new$0();
         showConnectAffiliateAlert(context, i, userFull.starref_program, j, resourcesProvider, true);
     }
 
@@ -691,7 +691,7 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
 
     public static void lambda$showShareAffiliateAlert$26(final int i, TL_payments.connectedBotStarRef connectedbotstarref, final BottomSheet bottomSheet, final Context context, final long j, final Theme.ResourcesProvider resourcesProvider, TL_payments.connectedBotStarRef connectedbotstarref2) {
         if (connectedbotstarref2 != null) {
-            bottomSheet.dismiss();
+            bottomSheet.lambda$new$0();
             showShareAffiliateAlert(context, i, connectedbotstarref2, j, resourcesProvider);
         } else {
             TLRPC.User user = MessagesController.getInstance(i).getUser(Long.valueOf(connectedbotstarref.bot_id));

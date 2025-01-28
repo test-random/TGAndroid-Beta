@@ -106,16 +106,16 @@ public class DownloadsInfoBottomSheet extends BottomSheet {
     }
 
     public void lambda$new$0(View view) {
-        dismiss();
+        lambda$new$0();
     }
 
     public void lambda$new$1(BaseFragment baseFragment, View view) {
-        dismiss();
+        lambda$new$0();
         baseFragment.presentFragment(new CacheControlActivity());
     }
 
     public void lambda$new$2(View view) {
-        dismiss();
+        lambda$new$0();
         DownloadController.getInstance(this.currentAccount).clearRecentDownloadedFiles();
     }
 
