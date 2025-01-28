@@ -57,6 +57,7 @@ import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.IMapsProvider;
+import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.LocationController;
 import org.telegram.messenger.MessageObject;
@@ -715,8 +716,28 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 Paint paint = new Paint(1);
                 RectF rectF = new RectF();
                 canvas.save();
+                canvas.save();
+                AvatarDrawable avatarDrawable = new AvatarDrawable();
+                TLRPC.User user2 = liveLocation.user;
+                if (user2 != null) {
+                    avatarDrawable.setInfo(this.currentAccount, user2);
+                } else {
+                    TLRPC.Chat chat2 = liveLocation.chat;
+                    if (chat2 != null) {
+                        avatarDrawable.setInfo(this.currentAccount, chat2);
+                    }
+                }
+                canvas.translate(AndroidUtilities.dp(6.0f), AndroidUtilities.dp(6.0f));
+                avatarDrawable.setBounds(0, 0, AndroidUtilities.dp(50.0f), AndroidUtilities.dp(50.0f));
+                avatarDrawable.draw(canvas);
+                canvas.restore();
                 if (fileLocation != null) {
-                    Bitmap decodeFile = BitmapFactory.decodeFile(getFileLoader().getPathToAttach(fileLocation, true).toString());
+                    int i = this.currentAccount;
+                    TLObject tLObject = liveLocation.user;
+                    if (tLObject == null) {
+                        tLObject = liveLocation.chat;
+                    }
+                    Bitmap decodeFile = BitmapFactory.decodeFile(ImageReceiver.getAvatarLocalFile(i, tLObject).toString());
                     if (decodeFile != null) {
                         Shader.TileMode tileMode = Shader.TileMode.CLAMP;
                         BitmapShader bitmapShader = new BitmapShader(decodeFile, tileMode, tileMode);
@@ -729,20 +750,6 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                         rectF.set(AndroidUtilities.dp(6.0f), AndroidUtilities.dp(6.0f), AndroidUtilities.dp(56.0f), AndroidUtilities.dp(56.0f));
                         canvas.drawRoundRect(rectF, AndroidUtilities.dp(25.0f), AndroidUtilities.dp(25.0f), paint);
                     }
-                } else {
-                    AvatarDrawable avatarDrawable = new AvatarDrawable();
-                    TLRPC.User user2 = liveLocation.user;
-                    if (user2 != null) {
-                        avatarDrawable.setInfo(this.currentAccount, user2);
-                    } else {
-                        TLRPC.Chat chat2 = liveLocation.chat;
-                        if (chat2 != null) {
-                            avatarDrawable.setInfo(this.currentAccount, chat2);
-                        }
-                    }
-                    canvas.translate(AndroidUtilities.dp(6.0f), AndroidUtilities.dp(6.0f));
-                    avatarDrawable.setBounds(0, 0, AndroidUtilities.dp(50.0f), AndroidUtilities.dp(50.0f));
-                    avatarDrawable.draw(canvas);
                 }
                 canvas.restore();
                 try {

@@ -571,6 +571,10 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
         imageReceiver.drawDrawable(canvas2, drawable2, i4, bitmapShader2, i5, i6, i7, backgroundThreadDrawHolder2);
     }
 
+    public static java.io.File getAvatarLocalFile(int r6, org.telegram.tgnet.TLObject r7) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.ImageReceiver.getAvatarLocalFile(int, org.telegram.tgnet.TLObject):java.io.File");
+    }
+
     private boolean hasRoundRadius() {
         return true;
     }

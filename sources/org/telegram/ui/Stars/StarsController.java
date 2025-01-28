@@ -30,6 +30,7 @@ import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BillingController;
+import org.telegram.messenger.BirthdayController;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.FileLog;
@@ -1308,6 +1309,9 @@ public class StarsController {
         invalidateTransactions(true);
         if (callback2 != null) {
             callback2.run(Boolean.TRUE, null);
+        }
+        if (BirthdayController.getInstance(this.currentAccount).contains(j2)) {
+            MessagesController.getInstance(this.currentAccount).getMainSettings().edit().putBoolean(Calendar.getInstance().get(1) + "bdayhint_" + j2, false).apply();
         }
         if (j2 < 0) {
             if (lastFragment instanceof ProfileActivity) {

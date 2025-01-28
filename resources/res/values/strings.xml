@@ -6008,6 +6008,8 @@
     <string name="ProfileGiftsCount_one">%d gift</string>
     <string name="ProfileGiftsCount_other">%d gifts</string>
     <string name="ProfileGiftsInfo">These gifts were sent to you by other users.\nTap on a gift to convert it to Stars or change its privacy settings.</string>
+    <string name="ProfileGiftsNotFoundButton">View All Gifts</string>
+    <string name="ProfileGiftsNotFoundTitle">No matching gifts</string>
     <string name="ProfileGiftsSend">Send Gifts to Friends</string>
     <string name="ProfileGiftsSendChannel">Send Gifts to Channel</string>
     <string name="ProfileHoursCopy">Copy hours</string>

@@ -1518,6 +1518,40 @@ public class FileLoader extends BaseController {
         return i;
     }
 
+    public File getLocalFile(ImageLocation imageLocation) {
+        String attachFileName;
+        if (imageLocation == null) {
+            return null;
+        }
+        TLRPC.TL_fileLocationToBeDeprecated tL_fileLocationToBeDeprecated = imageLocation.location;
+        if (tL_fileLocationToBeDeprecated != null) {
+            attachFileName = getAttachFileName(tL_fileLocationToBeDeprecated, null);
+        } else {
+            TLObject tLObject = imageLocation.document;
+            attachFileName = (tLObject == null && (tLObject = imageLocation.webFile) == null) ? null : getAttachFileName(tLObject);
+        }
+        if (attachFileName == null) {
+            return null;
+        }
+        File file = new File(getDirectory(4), attachFileName);
+        if (file.exists()) {
+            return file;
+        }
+        File file2 = new File(getDirectory(0), attachFileName);
+        if (file2.exists()) {
+            return file2;
+        }
+        File file3 = new File(getDirectory(2), attachFileName);
+        if (file3.exists()) {
+            return file3;
+        }
+        File file4 = new File(getDirectory(5), attachFileName);
+        if (file4.exists()) {
+            return file4;
+        }
+        return null;
+    }
+
     public Object getParentObject(int i) {
         return this.parentObjectReferences.get(Integer.valueOf(i));
     }

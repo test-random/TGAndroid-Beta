@@ -317,6 +317,11 @@ public class BirthdayController {
         return (state == null || state.isTodayEmpty()) ? false : true;
     }
 
+    public boolean contains(long j) {
+        BirthdayState state = getState();
+        return state != null && state.contains(j);
+    }
+
     public BirthdayState getState() {
         BirthdayState birthdayState = this.state;
         if (birthdayState == null || this.hiddenDays.contains(birthdayState.todayKey)) {
