@@ -1496,7 +1496,7 @@ public class MessageObject {
     public static void addPhoneLinks(CharSequence charSequence) {
     }
 
-    public static void addUrlsByPattern(boolean r16, java.lang.CharSequence r17, boolean r18, int r19, int r20, boolean r21) {
+    public static void addUrlsByPattern(boolean r17, java.lang.CharSequence r18, boolean r19, int r20, int r21, boolean r22) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessageObject.addUrlsByPattern(boolean, java.lang.CharSequence, boolean, int, int, boolean):void");
     }
 
@@ -4637,7 +4637,7 @@ public class MessageObject {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessageObject.generatePinMessageText(org.telegram.tgnet.TLRPC$User, org.telegram.tgnet.TLRPC$Chat):void");
     }
 
-    public void generateThumbs(boolean r8) {
+    public void generateThumbs(boolean r9) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.MessageObject.generateThumbs(boolean):void");
     }
 
@@ -5486,6 +5486,18 @@ public class MessageObject {
         }
     }
 
+    public TLRPC.Photo getVideoCover() {
+        TLRPC.WebPage webPage;
+        TLRPC.MessageMedia media = getMedia(this);
+        if (media instanceof TLRPC.TL_messageMediaDocument) {
+            return ((TLRPC.TL_messageMediaDocument) media).video_cover;
+        }
+        if (media == null || (webPage = media.webpage) == null || !webPage.video_cover_photo) {
+            return null;
+        }
+        return webPage.photo;
+    }
+
     public float getVideoSavedProgress() {
         if (this.cachedSavedTimestamp != null) {
             return PhotoViewer.getSavedProgressFast(this);
@@ -5726,6 +5738,10 @@ public class MessageObject {
             }
         }
         return false;
+    }
+
+    public boolean hasVideoCover() {
+        return getVideoCover() != null;
     }
 
     public boolean hasVideoQualities() {

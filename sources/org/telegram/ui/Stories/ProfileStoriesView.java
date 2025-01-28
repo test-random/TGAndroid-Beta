@@ -693,6 +693,10 @@ public abstract class ProfileStoriesView extends View implements NotificationCen
         updateStories(true, false);
     }
 
+    public void update() {
+        updateStories(true, true);
+    }
+
     @Override
     protected boolean verifyDrawable(Drawable drawable) {
         return drawable == this.titleDrawable || super.verifyDrawable(drawable);

@@ -367,9 +367,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
 
             @Override
             public boolean canPerformReply() {
-                boolean canPerformActions;
-                canPerformActions = canPerformActions();
-                return canPerformActions;
+                return canPerformActions();
             }
 
             @Override
@@ -521,8 +519,8 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             }
 
             @Override
-            public void didPressImage(org.telegram.ui.Cells.ChatMessageCell r11, float r12, float r13) {
-                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChannelAdminLogActivity.ChatActivityAdapter.AnonymousClass1.didPressImage(org.telegram.ui.Cells.ChatMessageCell, float, float):void");
+            public void didPressImage(org.telegram.ui.Cells.ChatMessageCell r11, float r12, float r13, boolean r14) {
+                throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChannelAdminLogActivity.ChatActivityAdapter.AnonymousClass1.didPressImage(org.telegram.ui.Cells.ChatMessageCell, float, float, boolean):void");
             }
 
             @Override
@@ -766,7 +764,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
 
             @Override
             public void didPressWebPage(ChatMessageCell chatMessageCell, TLRPC.WebPage webPage, String str, boolean z) {
-                Browser.openUrl(chatMessageCell.getContext(), str);
+                ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressWebPage(this, chatMessageCell, webPage, str, z);
             }
 
             @Override

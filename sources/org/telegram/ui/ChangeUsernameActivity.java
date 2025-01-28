@@ -569,9 +569,9 @@ public class ChangeUsernameActivity extends BaseFragment {
             this.usernameView.setEllipsizeByGradient(true);
             addView(this.usernameView, LayoutHelper.createFrame(-1, -2.0f, 48, 70.0f, 9.0f, 0.0f, 50.0f));
             this.loadingView = new ImageView(getContext());
-            CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(AndroidUtilities.dp(7.0f), AndroidUtilities.dp(1.35f), Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, resourcesProvider));
-            this.loadingDrawable = circularProgressDrawable;
-            this.loadingView.setImageDrawable(circularProgressDrawable);
+            this.loadingDrawable = new CircularProgressDrawable(AndroidUtilities.dp(7.0f), AndroidUtilities.dp(1.35f), Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, resourcesProvider));
+            this.loadingView.setScaleType(ImageView.ScaleType.CENTER);
+            this.loadingView.setImageDrawable(this.loadingDrawable);
             this.loadingView.setAlpha(0.0f);
             this.loadingView.setVisibility(0);
             this.loadingDrawable.setBounds(0, 0, AndroidUtilities.dp(14.0f), AndroidUtilities.dp(14.0f));

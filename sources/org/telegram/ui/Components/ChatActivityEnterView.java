@@ -10902,7 +10902,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             }
             SendMessagesHelper sendMessagesHelper = SendMessagesHelper.getInstance(this.currentAccount);
             MessageObject messageObject8 = this.editingMessageObject;
-            sendMessagesHelper.editMessage(messageObject8, null, null, null, null, null, false, messageObject8.hasMediaSpoilers(), null);
+            sendMessagesHelper.editMessage(messageObject8, null, null, null, null, null, null, false, messageObject8.hasMediaSpoilers(), null);
         }
         setEditingMessageObject(null, null, false);
     }

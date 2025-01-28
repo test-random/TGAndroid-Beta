@@ -1709,8 +1709,20 @@ public class AndroidUtilities {
     public static String formatTimestamp(int i) {
         int i2 = i / 3600;
         int i3 = (i / 60) % 60;
-        int i4 = i % 60;
-        return i2 > 0 ? String.format(Locale.US, "%dh%02dm%02ds", Integer.valueOf(i2), Integer.valueOf(i3), Integer.valueOf(i4)) : i3 > 0 ? i4 > 0 ? String.format(Locale.US, "%dm%02ds", Integer.valueOf(i3), Integer.valueOf(i4)) : String.format(Locale.US, "%dm", Integer.valueOf(i3)) : String.format(Locale.US, "%d", Integer.valueOf(i4));
+        String str = "";
+        if (i2 > 0) {
+            str = "" + String.format(Locale.US, "%dh", Integer.valueOf(i2));
+        }
+        if (i3 > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(str);
+            sb.append(String.format(Locale.US, i2 > 0 ? "%02dm" : "%dm", Integer.valueOf(i3)));
+            str = sb.toString();
+        }
+        StringBuilder sb2 = new StringBuilder();
+        sb2.append(str);
+        sb2.append(String.format(Locale.US, (i2 > 0 || i3 > 0) ? "%02ds" : "%ds", Integer.valueOf(i3)));
+        return sb2.toString();
     }
 
     public static String formatVideoDuration(int i, int i2) {

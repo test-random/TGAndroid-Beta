@@ -483,6 +483,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
                 }
                 sendingMediaInfo.path = str;
                 sendingMediaInfo.thumbPath = photoEntry.thumbPath;
+                sendingMediaInfo.coverPath = photoEntry.coverPath;
                 sendingMediaInfo.videoEditedInfo = photoEntry.editedInfo;
                 sendingMediaInfo.isVideo = photoEntry.isVideo;
                 CharSequence charSequence = photoEntry.caption;
@@ -499,6 +500,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
                     sendingMediaInfo.searchImage = searchImage;
                 }
                 sendingMediaInfo.thumbPath = searchImage.thumbPath;
+                sendingMediaInfo.coverPath = searchImage.coverPath;
                 sendingMediaInfo.videoEditedInfo = searchImage.editedInfo;
                 CharSequence charSequence2 = searchImage.caption;
                 sendingMediaInfo.caption = charSequence2 != null ? charSequence2.toString() : null;

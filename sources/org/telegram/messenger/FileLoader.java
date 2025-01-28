@@ -1547,6 +1547,10 @@ public class FileLoader extends BaseController {
     }
 
     public File getPathToMessage(TLRPC.Message message, boolean z) {
+        return getPathToMessage(message, false, z);
+    }
+
+    public File getPathToMessage(TLRPC.Message message, boolean z, boolean z2) {
         TLRPC.PhotoSize closestPhotoSizeWithSize;
         TLRPC.PhotoSize closestPhotoSizeWithSize2;
         TLRPC.PhotoSize closestPhotoSizeWithSize3;
@@ -1558,30 +1562,30 @@ public class FileLoader extends BaseController {
             if (photo != null) {
                 ArrayList<TLRPC.PhotoSize> arrayList = photo.sizes;
                 if (arrayList.size() > 0 && (closestPhotoSizeWithSize3 = getClosestPhotoSizeWithSize(arrayList, AndroidUtilities.getPhotoSize())) != null) {
-                    return getPathToAttach(closestPhotoSizeWithSize3, null, false, z);
+                    return getPathToAttach(closestPhotoSizeWithSize3, null, z, z2);
                 }
             }
         } else {
             if (MessageObject.getMedia(message) instanceof TLRPC.TL_messageMediaDocument) {
-                return getPathToAttach(MessageObject.getMedia(message).document, null, MessageObject.getMedia(message).ttl_seconds != 0, z);
+                return getPathToAttach(MessageObject.getMedia(message).document, null, z || MessageObject.getMedia(message).ttl_seconds != 0, z2);
             }
             if (MessageObject.getMedia(message) instanceof TLRPC.TL_messageMediaPhoto) {
                 ArrayList<TLRPC.PhotoSize> arrayList2 = MessageObject.getMedia(message).photo.sizes;
                 if (arrayList2.size() > 0 && (closestPhotoSizeWithSize2 = getClosestPhotoSizeWithSize(arrayList2, AndroidUtilities.getPhotoSize(), false, null, true)) != null) {
-                    return getPathToAttach(closestPhotoSizeWithSize2, null, MessageObject.getMedia(message).ttl_seconds != 0, z);
+                    return getPathToAttach(closestPhotoSizeWithSize2, null, z || MessageObject.getMedia(message).ttl_seconds != 0, z2);
                 }
             } else if (MessageObject.getMedia(message) instanceof TLRPC.TL_messageMediaWebPage) {
                 if (MessageObject.getMedia(message).webpage.document != null) {
-                    return getPathToAttach(MessageObject.getMedia(message).webpage.document, null, false, z);
+                    return getPathToAttach(MessageObject.getMedia(message).webpage.document, null, z, z2);
                 }
                 if (MessageObject.getMedia(message).webpage.photo != null) {
                     ArrayList<TLRPC.PhotoSize> arrayList3 = MessageObject.getMedia(message).webpage.photo.sizes;
                     if (arrayList3.size() > 0 && (closestPhotoSizeWithSize = getClosestPhotoSizeWithSize(arrayList3, AndroidUtilities.getPhotoSize())) != null) {
-                        return getPathToAttach(closestPhotoSizeWithSize, null, false, z);
+                        return getPathToAttach(closestPhotoSizeWithSize, null, z, z2);
                     }
                 }
             } else if (MessageObject.getMedia(message) instanceof TLRPC.TL_messageMediaInvoice) {
-                return getPathToAttach(((TLRPC.TL_messageMediaInvoice) MessageObject.getMedia(message)).photo, null, true, z);
+                return getPathToAttach(((TLRPC.TL_messageMediaInvoice) MessageObject.getMedia(message)).photo, null, true, z2);
             }
         }
         return new File("");

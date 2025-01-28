@@ -864,10 +864,88 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         private BotButton() {
         }
 
+        static TLRPC.KeyboardButton access$1100(BotButton botButton) {
+            return botButton.button;
+        }
+
+        static TLRPC.KeyboardButton access$1102(BotButton botButton, TLRPC.KeyboardButton keyboardButton) {
+            botButton.button = keyboardButton;
+            return keyboardButton;
+        }
+
+        static int access$1802(BotButton botButton, int i) {
+            botButton.y = i;
+            return i;
+        }
+
+        static float access$1900(BotButton botButton) {
+            return botButton.x;
+        }
+
+        static float access$1902(BotButton botButton, float f) {
+            botButton.x = f;
+            return f;
+        }
+
+        static float access$2000(BotButton botButton) {
+            return botButton.width;
+        }
+
+        static float access$2002(BotButton botButton, float f) {
+            botButton.width = f;
+            return f;
+        }
+
+        static int access$2102(BotButton botButton, int i) {
+            botButton.height = i;
+            return i;
+        }
+
+        static float access$3400(BotButton botButton) {
+            return botButton.progressAlpha;
+        }
+
+        static float access$3402(BotButton botButton, float f) {
+            botButton.progressAlpha = f;
+            return f;
+        }
+
+        static int access$3500(BotButton botButton) {
+            return botButton.angle;
+        }
+
+        static int access$3502(BotButton botButton, int i) {
+            botButton.angle = i;
+            return i;
+        }
+
+        static long access$3600(BotButton botButton) {
+            return botButton.lastUpdateTime;
+        }
+
+        static long access$3602(BotButton botButton, long j) {
+            botButton.lastUpdateTime = j;
+            return j;
+        }
+
         static int access$3776(BotButton botButton, int i) {
             int i2 = i | botButton.positionFlags;
             botButton.positionFlags = i2;
             return i2;
+        }
+
+        static Text access$3800(BotButton botButton) {
+            return botButton.title;
+        }
+
+        static Text access$3802(BotButton botButton, Text text) {
+            botButton.title = text;
+            return text;
+        }
+
+        static boolean access$3902(BotButton botButton, boolean z) {
+            botButton.isInviteButton = z;
+            return z;
         }
 
         public float getPressScale() {
@@ -1012,7 +1090,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             public static void $default$didPressHint(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, int i) {
             }
 
-            public static void $default$didPressImage(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, float f, float f2) {
+            public static void $default$didPressImage(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, float f, float f2, boolean z) {
             }
 
             public static void $default$didPressInstantButton(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, int i) {
@@ -1064,6 +1142,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
 
             public static void $default$didPressVoteButtons(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, ArrayList arrayList, int i, int i2, int i3) {
+            }
+
+            public static void $default$didPressWebPage(ChatMessageCellDelegate chatMessageCellDelegate, ChatMessageCell chatMessageCell, TLRPC.WebPage webPage, String str, boolean z) {
+                Browser.openUrl(chatMessageCell.getContext(), str);
             }
 
             public static void $default$didStartVideoStream(ChatMessageCellDelegate chatMessageCellDelegate, MessageObject messageObject) {
@@ -1214,7 +1296,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
         void didPressHint(ChatMessageCell chatMessageCell, int i);
 
-        void didPressImage(ChatMessageCell chatMessageCell, float f, float f2);
+        void didPressImage(ChatMessageCell chatMessageCell, float f, float f2, boolean z);
 
         void didPressInstantButton(ChatMessageCell chatMessageCell, int i);
 
@@ -1452,16 +1534,103 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         public int x;
         public int y;
 
+        static TLRPC.PollAnswer access$1200(PollButton pollButton) {
+            return pollButton.answer;
+        }
+
+        static TLRPC.PollAnswer access$1202(PollButton pollButton, TLRPC.PollAnswer pollAnswer) {
+            pollButton.answer = pollAnswer;
+            return pollAnswer;
+        }
+
+        static int access$1302(PollButton pollButton, int i) {
+            pollButton.count = i;
+            return i;
+        }
+
+        static int access$2400(PollButton pollButton) {
+            return pollButton.percent;
+        }
+
+        static int access$2402(PollButton pollButton, int i) {
+            pollButton.percent = i;
+            return i;
+        }
+
         static int access$2412(PollButton pollButton, int i) {
             int i2 = pollButton.percent + i;
             pollButton.percent = i2;
             return i2;
         }
 
+        static int access$2500(PollButton pollButton) {
+            return pollButton.prevPercent;
+        }
+
+        static int access$2502(PollButton pollButton, int i) {
+            pollButton.prevPercent = i;
+            return i;
+        }
+
+        static float access$2600(PollButton pollButton) {
+            return pollButton.percentProgress;
+        }
+
+        static float access$2602(PollButton pollButton, float f) {
+            pollButton.percentProgress = f;
+            return f;
+        }
+
+        static float access$2700(PollButton pollButton) {
+            return pollButton.prevPercentProgress;
+        }
+
+        static float access$2702(PollButton pollButton, float f) {
+            pollButton.prevPercentProgress = f;
+            return f;
+        }
+
+        static StaticLayout access$2800(PollButton pollButton) {
+            return pollButton.title;
+        }
+
+        static StaticLayout access$2802(PollButton pollButton, StaticLayout staticLayout) {
+            pollButton.title = staticLayout;
+            return staticLayout;
+        }
+
+        static boolean access$2900(PollButton pollButton) {
+            return pollButton.chosen;
+        }
+
+        static boolean access$2902(PollButton pollButton, boolean z) {
+            pollButton.chosen = z;
+            return z;
+        }
+
+        static boolean access$3002(PollButton pollButton, boolean z) {
+            pollButton.correct = z;
+            return z;
+        }
+
+        static float access$3100(PollButton pollButton) {
+            return pollButton.decimal;
+        }
+
+        static float access$3102(PollButton pollButton, float f) {
+            pollButton.decimal = f;
+            return f;
+        }
+
         static float access$3124(PollButton pollButton, float f) {
             float f2 = pollButton.decimal - f;
             pollButton.decimal = f2;
             return f2;
+        }
+
+        static boolean access$3202(PollButton pollButton, boolean z) {
+            pollButton.prevChosen = z;
+            return z;
         }
     }
 
@@ -2714,33 +2883,32 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private boolean checkLinkPreviewMotionEvent(MotionEvent motionEvent) {
         int i;
         MessageObject messageObject;
-        int i2;
         TLRPC.TL_channelAdminLogEvent tL_channelAdminLogEvent;
+        int i2;
         int i3;
         int i4;
         int i5;
-        int i6;
         int dp;
         int dp2;
-        int i7;
+        int i6;
         int themedColor;
         MessageObject messageObject2;
-        int i8 = this.currentMessageObject.type;
-        if ((i8 != 0 && i8 != 24) || !this.hasLinkPreview) {
+        int i7 = this.currentMessageObject.type;
+        if ((i7 != 0 && i7 != 24) || !this.hasLinkPreview) {
             return false;
         }
         int x = (int) motionEvent.getX();
         int y = (int) motionEvent.getY();
-        int i9 = this.unmovedTextX;
-        if (x >= i9 && x <= (i9 + this.backgroundWidth) - AndroidUtilities.dp(14.0f) && y >= (i = this.linkPreviewY)) {
+        int i8 = this.unmovedTextX;
+        if (x >= i8 && x <= (i8 + this.backgroundWidth) - AndroidUtilities.dp(14.0f) && y >= (i = this.linkPreviewY)) {
             if (y <= i + this.linkPreviewHeight + AndroidUtilities.dp((this.drawInstantView ? 46 : 0) + 8)) {
                 if (motionEvent.getAction() == 0) {
                     if (this.descriptionLayout != null && y >= this.descriptionY && !this.currentMessageObject.preview) {
                         try {
                             int dp3 = x - ((this.unmovedTextX + AndroidUtilities.dp(10.0f)) + this.descriptionX);
-                            int i10 = y - this.descriptionY;
-                            if (i10 <= this.descriptionLayout.getHeight()) {
-                                int lineForVertical = this.descriptionLayout.getLineForVertical(i10);
+                            int i9 = y - this.descriptionY;
+                            if (i9 <= this.descriptionLayout.getHeight()) {
+                                int lineForVertical = this.descriptionLayout.getLineForVertical(i9);
                                 float f = dp3;
                                 int offsetForHorizontal = this.descriptionLayout.getOffsetForHorizontal(lineForVertical, f);
                                 float lineLeft = this.descriptionLayout.getLineLeft(lineForVertical);
@@ -2784,11 +2952,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     }
                     if (this.pressedLink == null) {
                         int dp4 = AndroidUtilities.dp(48.0f);
-                        if (this.miniButtonState >= 0 && x >= (dp2 = this.buttonX + (dp = AndroidUtilities.dp(27.0f))) && x <= dp2 + dp4 && y >= (i7 = this.buttonY + dp) && y <= i7 + dp4) {
+                        if (this.miniButtonState >= 0 && x >= (dp2 = this.buttonX + (dp = AndroidUtilities.dp(27.0f))) && x <= dp2 + dp4 && y >= (i6 = this.buttonY + dp) && y <= i6 + dp4) {
                             this.miniButtonPressed = 1;
                         } else {
-                            if (!this.drawVideoImageButton || this.buttonState == -1 || x < (i5 = this.videoButtonX) || x > i5 + AndroidUtilities.dp(34.0f) + Math.max(this.infoWidth, this.docTitleWidth) || y < (i6 = this.videoButtonY) || y > i6 + AndroidUtilities.dp(30.0f)) {
-                                if (!(this.drawPhotoImage && this.currentMessageObject.sponsoredMedia != null && this.photoImage.isInsideImage(x, y)) && (!this.drawPhotoImage || !this.drawImageButton || this.buttonState == -1 || ((this.checkOnlyButtonPressed || !this.photoImage.isInsideImage(x, y)) && (x < (i3 = this.buttonX) || x > i3 + AndroidUtilities.dp(48.0f) || y < (i4 = this.buttonY) || y > i4 + AndroidUtilities.dp(48.0f) || this.radialProgress.getIcon() == 4)))) {
+                            if (!this.drawVideoImageButton || this.buttonState == -1 || x < (i4 = this.videoButtonX) || x > i4 + AndroidUtilities.dp(34.0f) + Math.max(this.infoWidth, this.docTitleWidth) || y < (i5 = this.videoButtonY) || y > i5 + AndroidUtilities.dp(30.0f)) {
+                                if (!(this.drawPhotoImage && this.currentMessageObject.sponsoredMedia != null && this.photoImage.isInsideImage(x, y)) && (!this.drawPhotoImage || !this.drawImageButton || this.buttonState == -1 || ((this.checkOnlyButtonPressed || !this.photoImage.isInsideImage(x, y)) && (x < (i2 = this.buttonX) || x > i2 + AndroidUtilities.dp(48.0f) || y < (i3 = this.buttonY) || y > i3 + AndroidUtilities.dp(48.0f) || this.radialProgress.getIcon() == 4)))) {
                                     this.instantPressed = true;
                                     this.selectorDrawableMaskType[0] = 0;
                                     if (Build.VERSION.SDK_INT >= 21) {
@@ -2842,38 +3010,36 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     }
                 } else if (motionEvent.getAction() == 1) {
                     if (this.instantPressed) {
-                        if (this.documentAttachType == 7) {
+                        int i10 = this.documentAttachType;
+                        if (i10 == 7) {
                             if (!MediaController.getInstance().isPlayingMessage(this.currentMessageObject) || MediaController.getInstance().isMessagePaused()) {
                                 this.delegate.needPlayMessage(this, this.currentMessageObject, false);
                             } else {
                                 MediaController.getInstance().lambda$startAudioAgain$7(this.currentMessageObject);
                             }
-                        } else if (this.drawInstantView || !(((messageObject = this.currentMessageObject) == null || (tL_channelAdminLogEvent = messageObject.currentEvent) == null || !(tL_channelAdminLogEvent.action instanceof TLRPC.TL_channelAdminLogEventActionEditMessage)) && (messageObject == null || MessageObject.getMedia(messageObject) == null || MessageObject.getMedia(this.currentMessageObject).webpage == null || TextUtils.isEmpty(MessageObject.getMedia(this.currentMessageObject).webpage.url)))) {
+                        } else if (this.drawInstantView || !((messageObject = this.currentMessageObject) == null || (tL_channelAdminLogEvent = messageObject.currentEvent) == null || !(tL_channelAdminLogEvent.action instanceof TLRPC.TL_channelAdminLogEventActionEditMessage))) {
                             ChatMessageCellDelegate chatMessageCellDelegate = this.delegate;
                             if (chatMessageCellDelegate != null) {
                                 chatMessageCellDelegate.didPressInstantButton(this, this.drawInstantViewType);
                             }
-                        } else if (this.drawPhotoImage && ((i2 = this.documentAttachType) == 2 || i2 == 4 || (this.authorLayout == null && this.titleLayout == null && this.descriptionLayout == null && this.siteNameLayout == null))) {
+                        } else if (this.drawPhotoImage && (i10 == 2 || i10 == 4 || (this.authorLayout == null && this.titleLayout == null && this.descriptionLayout == null && this.siteNameLayout == null))) {
                             ChatMessageCellDelegate chatMessageCellDelegate2 = this.delegate;
                             if (chatMessageCellDelegate2 != null) {
-                                chatMessageCellDelegate2.didPressImage(this, this.lastTouchX, this.lastTouchY);
+                                chatMessageCellDelegate2.didPressImage(this, this.lastTouchX, this.lastTouchY, true);
                             }
-                        } else {
-                            MessageObject messageObject3 = this.currentMessageObject;
-                            if (!messageObject3.preview) {
-                                TLRPC.WebPage webPage = MessageObject.getMedia(messageObject3.messageOwner).webpage;
-                                if (webPage != null && !TextUtils.isEmpty(webPage.embed_url)) {
-                                    ChatMessageCellDelegate chatMessageCellDelegate3 = this.delegate;
-                                    if (chatMessageCellDelegate3 != null) {
-                                        chatMessageCellDelegate3.needOpenWebView(this.currentMessageObject, webPage.embed_url, webPage.site_name, webPage.title, webPage.url, webPage.embed_width, webPage.embed_height);
-                                    }
-                                } else if (webPage != null) {
-                                    ChatMessageCellDelegate chatMessageCellDelegate4 = this.delegate;
-                                    if (chatMessageCellDelegate4 != null) {
-                                        chatMessageCellDelegate4.didPressWebPage(this, webPage, webPage.url, MessageObject.getMedia(this.currentMessageObject.messageOwner).safe);
-                                    } else {
-                                        Browser.openUrl(getContext(), webPage.url);
-                                    }
+                        } else if (!messageObject.preview) {
+                            TLRPC.WebPage webPage = MessageObject.getMedia(messageObject.messageOwner).webpage;
+                            if (webPage != null && !TextUtils.isEmpty(webPage.embed_url)) {
+                                ChatMessageCellDelegate chatMessageCellDelegate3 = this.delegate;
+                                if (chatMessageCellDelegate3 != null) {
+                                    chatMessageCellDelegate3.needOpenWebView(this.currentMessageObject, webPage.embed_url, webPage.site_name, webPage.title, webPage.url, webPage.embed_width, webPage.embed_height);
+                                }
+                            } else if (webPage != null) {
+                                ChatMessageCellDelegate chatMessageCellDelegate4 = this.delegate;
+                                if (chatMessageCellDelegate4 != null) {
+                                    chatMessageCellDelegate4.didPressWebPage(this, webPage, webPage.url, MessageObject.getMedia(this.currentMessageObject.messageOwner).safe);
+                                } else {
+                                    Browser.openUrl(getContext(), webPage.url);
                                 }
                             }
                         }
@@ -2932,20 +3098,20 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                                                 invalidate();
                                                 playSoundEffect(0);
                                             } else {
-                                                this.delegate.didPressImage(this, this.lastTouchX, this.lastTouchY);
+                                                this.delegate.didPressImage(this, this.lastTouchX, this.lastTouchY, false);
                                             }
                                         } else if (i11 == 2 || i11 == 0) {
                                             didPressButton(true, false);
                                             playSoundEffect(0);
                                         }
                                     } else {
-                                        MessageObject messageObject4 = this.currentMessageObject;
-                                        if (!messageObject4.preview) {
-                                            TLRPC.WebPage webPage2 = MessageObject.getMedia(messageObject4.messageOwner).webpage;
+                                        MessageObject messageObject3 = this.currentMessageObject;
+                                        if (!messageObject3.preview) {
+                                            TLRPC.WebPage webPage2 = MessageObject.getMedia(messageObject3.messageOwner).webpage;
                                             if (webPage2 == null || TextUtils.isEmpty(webPage2.embed_url)) {
                                                 int i12 = this.buttonState;
                                                 if (i12 == -1 || i12 == 3) {
-                                                    this.delegate.didPressImage(this, this.lastTouchX, this.lastTouchY);
+                                                    this.delegate.didPressImage(this, this.lastTouchX, this.lastTouchY, false);
                                                     playSoundEffect(0);
                                                 } else if (webPage2 != null) {
                                                     ChatMessageCellDelegate chatMessageCellDelegate5 = this.delegate;
@@ -4048,7 +4214,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             return;
         }
         chatMessageCellDelegate = this.delegate;
-        chatMessageCellDelegate.didPressImage(this, this.lastTouchX, this.lastTouchY);
+        chatMessageCellDelegate.didPressImage(this, this.lastTouchX, this.lastTouchY, false);
     }
 
     private void didPressButton(boolean r31, boolean r32) {
@@ -5148,7 +5314,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         buttonBounce.setPressed(z);
     }
 
-    private void setMessageContent(org.telegram.messenger.MessageObject r86, org.telegram.messenger.MessageObject.GroupedMessages r87, boolean r88, boolean r89) {
+    private void setMessageContent(org.telegram.messenger.MessageObject r88, org.telegram.messenger.MessageObject.GroupedMessages r89, boolean r90, boolean r91) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Cells.ChatMessageCell.setMessageContent(org.telegram.messenger.MessageObject, org.telegram.messenger.MessageObject$GroupedMessages, boolean, boolean):void");
     }
 

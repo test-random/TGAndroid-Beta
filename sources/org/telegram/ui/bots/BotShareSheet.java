@@ -29,7 +29,6 @@ import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
-import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
@@ -186,9 +185,7 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
 
             @Override
             public boolean canPerformReply() {
-                boolean canPerformActions;
-                canPerformActions = canPerformActions();
-                return canPerformActions;
+                return canPerformActions();
             }
 
             @Override
@@ -307,8 +304,8 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
             }
 
             @Override
-            public void didPressImage(ChatMessageCell chatMessageCell2, float f, float f2) {
-                ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressImage(this, chatMessageCell2, f, f2);
+            public void didPressImage(ChatMessageCell chatMessageCell2, float f, float f2, boolean z) {
+                ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressImage(this, chatMessageCell2, f, f2, z);
             }
 
             @Override
@@ -398,7 +395,7 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
 
             @Override
             public void didPressWebPage(ChatMessageCell chatMessageCell2, TLRPC.WebPage webPage, String str2, boolean z) {
-                Browser.openUrl(chatMessageCell2.getContext(), str2);
+                ChatMessageCell.ChatMessageCellDelegate.CC.$default$didPressWebPage(this, chatMessageCell2, webPage, str2, z);
             }
 
             @Override

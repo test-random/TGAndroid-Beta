@@ -1086,11 +1086,13 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     public static class MediaEditState {
         public long averageDuration;
         public CharSequence caption;
+        public String coverPath;
+        public TLRPC.Photo coverPhoto;
+        public Object coverPhotoParentObject;
+        public long coverSavedPosition;
         public CropState cropState;
         public ArrayList<VideoEditedInfo.MediaEntity> croppedMediaEntities;
         public String croppedPaintPath;
-        public boolean customThumb;
-        public long customThumbSavedPosition;
         public VideoEditedInfo editedInfo;
         public long effectId;
         public ArrayList<TLRPC.MessageEntity> entities;
@@ -1135,6 +1137,9 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
 
         public void reset() {
             this.caption = null;
+            this.coverPath = null;
+            this.coverPhoto = null;
+            this.coverPhotoParentObject = null;
             this.thumbPath = null;
             this.filterPath = null;
             this.imagePath = null;

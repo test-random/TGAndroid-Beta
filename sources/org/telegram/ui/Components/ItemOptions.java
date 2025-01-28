@@ -583,6 +583,10 @@ public class ItemOptions {
         return this;
     }
 
+    public ItemOptions addCheckedIf(boolean z, boolean z2, CharSequence charSequence, Runnable runnable) {
+        return !z ? this : addChecked(z2, charSequence, runnable);
+    }
+
     public ItemOptions addGap() {
         ActionBarPopupWindow.GapView gapView = new ActionBarPopupWindow.GapView(this.context, this.resourcesProvider);
         gapView.setTag(R.id.fit_width_tag, 1);
@@ -592,6 +596,10 @@ public class ItemOptions {
         }
         addView(gapView, LayoutHelper.createLinear(-1, 8));
         return this;
+    }
+
+    public ItemOptions addGapIf(boolean z) {
+        return !z ? this : addGap();
     }
 
     public ItemOptions addIf(boolean z, int i, Drawable drawable, CharSequence charSequence, Runnable runnable) {

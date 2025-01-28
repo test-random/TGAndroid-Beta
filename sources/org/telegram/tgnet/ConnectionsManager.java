@@ -804,6 +804,7 @@ public class ConnectionsManager extends BaseController {
         TLObject tLObject2;
         TLRPC.TL_error tL_error;
         int i8;
+        String str2;
         try {
             if (j2 != 0) {
                 NativeByteBuffer wrap = NativeByteBuffer.wrap(j2);
@@ -850,7 +851,18 @@ public class ConnectionsManager extends BaseController {
                 tLObject2.networkType = i6;
             }
             if (BuildVars.LOGS_ENABLED) {
-                FileLog.d("java received " + tLObject2 + " error = " + tL_error + " messageId = " + j4);
+                StringBuilder sb = new StringBuilder();
+                sb.append("java received ");
+                sb.append(tLObject2);
+                if (tL_error != null) {
+                    str2 = " error = " + tL_error;
+                } else {
+                    str2 = "";
+                }
+                sb.append(str2);
+                sb.append(" messageId = 0x");
+                sb.append(Long.toHexString(j4));
+                FileLog.d(sb.toString());
             }
             FileLog.dumpResponseAndRequest(this.currentAccount, tLObject, tLObject2, tL_error, j4, j, i4);
             final TLObject tLObject3 = tLObject2;

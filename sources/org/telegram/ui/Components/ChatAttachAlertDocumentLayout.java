@@ -2252,6 +2252,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
                 }
                 sendingMediaInfo.path = str;
                 sendingMediaInfo.thumbPath = photoEntry.thumbPath;
+                sendingMediaInfo.coverPath = photoEntry.coverPath;
                 sendingMediaInfo.videoEditedInfo = photoEntry.editedInfo;
                 sendingMediaInfo.isVideo = photoEntry.isVideo;
                 CharSequence charSequence = photoEntry.caption;

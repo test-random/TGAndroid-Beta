@@ -7,6 +7,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -26,9 +27,11 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserObject;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.AvatarSpan;
+import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.ButtonSpan;
 import org.telegram.ui.Components.LinkSpanDrawable;
@@ -280,10 +283,11 @@ public class TableView extends android.widget.TableLayout {
         spoilersTextView.setTextSize(1, 14.0f);
         spoilersTextView.setText(Emoji.replaceEmoji(charSequence, spoilersTextView.getPaint().getFontMetricsInt(), false));
         NotificationCenter.listenEmojiLoading(spoilersTextView);
+        spoilersTextView.setPadding(AndroidUtilities.dp(12.66f), AndroidUtilities.dp(9.33f), AndroidUtilities.dp(12.66f), AndroidUtilities.dp(9.33f));
         TableRow tableRow = new TableRow(getContext());
         TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(-2, -1);
         layoutParams.span = 2;
-        TableRowFullContent tableRowFullContent = new TableRowFullContent(this, spoilersTextView);
+        TableRowFullContent tableRowFullContent = new TableRowFullContent(this, spoilersTextView, true);
         tableRow.addView(tableRowFullContent, layoutParams);
         addView(tableRow);
         return tableRowFullContent;
@@ -484,8 +488,81 @@ public class TableView extends android.widget.TableLayout {
         return addRowUnpadded(charSequence, textViewButtons);
     }
 
-    public android.widget.TableRow addRowUserWithEmojiStatus(java.lang.CharSequence r16, final int r17, final long r18, final java.lang.Runnable r20) {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.TableView.addRowUserWithEmojiStatus(java.lang.CharSequence, int, long, java.lang.Runnable):android.widget.TableRow");
+    public TableRow addRowUserWithEmojiStatus(CharSequence charSequence, final int i, final long j, final Runnable runnable) {
+        String str;
+        String str2;
+        boolean z;
+        final LinkSpanDrawable.LinksSimpleTextView linksSimpleTextView = new LinkSpanDrawable.LinksSimpleTextView(getContext(), this.resourcesProvider);
+        linksSimpleTextView.setPadding(AndroidUtilities.dp(12.66f), AndroidUtilities.dp(9.33f), AndroidUtilities.dp(12.66f), AndroidUtilities.dp(9.33f));
+        int i2 = Theme.key_chat_messageLinkIn;
+        linksSimpleTextView.setTextColor(Theme.getColor(i2, this.resourcesProvider));
+        linksSimpleTextView.setLinkTextColor(Theme.getColor(i2, this.resourcesProvider));
+        linksSimpleTextView.setTextSize(14);
+        AvatarSpan avatarSpan = new AvatarSpan(linksSimpleTextView, i, 24.0f);
+        if (j == 2666000) {
+            str2 = LocaleController.getString(R.string.StarsTransactionHidden);
+            CombinedDrawable platformDrawable = StarsIntroActivity.StarsTransactionView.getPlatformDrawable("anonymous");
+            platformDrawable.setIconSize(AndroidUtilities.dp(16.0f), AndroidUtilities.dp(16.0f));
+            avatarSpan.setImageDrawable(platformDrawable);
+            z = false;
+        } else {
+            if (UserObject.isService(j)) {
+                str2 = LocaleController.getString(R.string.StarsTransactionUnknown);
+                CombinedDrawable platformDrawable2 = StarsIntroActivity.StarsTransactionView.getPlatformDrawable("fragment");
+                platformDrawable2.setIconSize(AndroidUtilities.dp(16.0f), AndroidUtilities.dp(16.0f));
+                avatarSpan.setImageDrawable(platformDrawable2);
+            } else {
+                MessagesController messagesController = MessagesController.getInstance(i);
+                if (j >= 0) {
+                    TLRPC.User user = messagesController.getUser(Long.valueOf(j));
+                    str = UserObject.getUserName(user);
+                    avatarSpan.setUser(user);
+                } else {
+                    TLRPC.Chat chat = messagesController.getChat(Long.valueOf(-j));
+                    str = chat == null ? "" : chat.title;
+                    avatarSpan.setChat(chat);
+                }
+                str2 = str;
+            }
+            z = true;
+        }
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder("x  " + ((Object) str2));
+        spannableStringBuilder.setSpan(avatarSpan, 0, 1, 33);
+        if (z) {
+            linksSimpleTextView.setClickable(true);
+            spannableStringBuilder.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(View view) {
+                    Runnable runnable2 = runnable;
+                    if (runnable2 != null) {
+                        runnable2.run();
+                    }
+                }
+
+                @Override
+                public void updateDrawState(TextPaint textPaint) {
+                    textPaint.setUnderlineText(false);
+                }
+            }, 3, spannableStringBuilder.length(), 33);
+        }
+        final int color = Theme.getColor(Theme.key_featuredStickers_addButton, this.resourcesProvider);
+        final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable swapAnimatedEmojiDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(linksSimpleTextView, AndroidUtilities.dp(20.0f));
+        swapAnimatedEmojiDrawable.setColor(Integer.valueOf(color));
+        swapAnimatedEmojiDrawable.offset(AndroidUtilities.dp(12.0f), 0);
+        final Drawable mutate = getContext().getResources().getDrawable(R.drawable.msg_premium_liststar).mutate();
+        mutate.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+        Utilities.Callback<Object[]> callback = new Utilities.Callback() {
+            @Override
+            public final void run(Object obj) {
+                TableView.lambda$addRowUserWithEmojiStatus$1(j, i, swapAnimatedEmojiDrawable, linksSimpleTextView, mutate, color, (Object[]) obj);
+            }
+        };
+        callback.run(null);
+        linksSimpleTextView.setRightDrawable(swapAnimatedEmojiDrawable);
+        NotificationCenter.getInstance(i).listen(linksSimpleTextView, NotificationCenter.updateInterfaces, callback);
+        NotificationCenter.getInstance(i).listen(linksSimpleTextView, NotificationCenter.userEmojiStatusUpdated, callback);
+        linksSimpleTextView.setText(spannableStringBuilder);
+        return addRowUnpadded(charSequence, linksSimpleTextView);
     }
 
     public TableRow addWalletAddressRow(CharSequence charSequence, final CharSequence charSequence2, final Runnable runnable) {

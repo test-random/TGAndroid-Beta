@@ -3428,11 +3428,13 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                 AccountInstance accountInstance;
                 String str;
                 VideoEditedInfo videoEditedInfo2;
+                String str2;
+                TLRPC.Photo photo;
                 MessageObject messageObject;
                 MessageObject messageObject2;
                 ChatActivity.ReplyQuote replyQuote;
                 MessageObject messageObject3;
-                String str2;
+                String str3;
                 if (photoEntry == null) {
                     return;
                 }
@@ -3444,28 +3446,32 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                 storyItem.dialogId = peerStoriesView.dialogId;
                 if (photoEntry.isVideo) {
                     AccountInstance accountInstance2 = PeerStoriesView.this.getAccountInstance();
-                    String str3 = photoEntry.path;
+                    String str4 = photoEntry.path;
                     long j = PeerStoriesView.this.dialogId;
                     ArrayList<TLRPC.MessageEntity> arrayList = photoEntry.entities;
                     int i2 = photoEntry.ttl;
                     boolean z3 = photoEntry.hasSpoiler;
                     CharSequence charSequence = photoEntry.caption;
                     if (videoEditedInfo != null) {
+                        str2 = null;
+                        photo = null;
                         messageObject = null;
                         messageObject2 = null;
                         replyQuote = null;
                         messageObject3 = null;
-                        str2 = null;
+                        str3 = null;
                         videoEditedInfo2 = videoEditedInfo;
                     } else {
                         videoEditedInfo2 = null;
+                        str2 = null;
+                        photo = null;
                         messageObject = null;
                         messageObject2 = null;
                         replyQuote = null;
                         messageObject3 = null;
-                        str2 = null;
+                        str3 = null;
                     }
-                    SendMessagesHelper.prepareSendingVideo(accountInstance2, str3, videoEditedInfo2, j, messageObject, messageObject2, storyItem, replyQuote, arrayList, i2, messageObject3, z, i, z2, z3, charSequence, str2, 0, 0L);
+                    SendMessagesHelper.prepareSendingVideo(accountInstance2, str4, videoEditedInfo2, str2, photo, j, messageObject, messageObject2, storyItem, replyQuote, arrayList, i2, messageObject3, z, i, z2, z3, charSequence, str3, 0, 0L);
                 } else {
                     if (photoEntry.imagePath != null) {
                         accountInstance = PeerStoriesView.this.getAccountInstance();
@@ -3474,8 +3480,8 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                         accountInstance = PeerStoriesView.this.getAccountInstance();
                         str = photoEntry.path;
                     }
-                    String str4 = str;
-                    SendMessagesHelper.prepareSendingPhoto(accountInstance, str4, photoEntry.thumbPath, null, PeerStoriesView.this.dialogId, null, null, storyItem, null, photoEntry.entities, photoEntry.stickers, null, photoEntry.ttl, null, videoEditedInfo, z, i, 0, z2, photoEntry.caption, null, 0, 0L);
+                    String str5 = str;
+                    SendMessagesHelper.prepareSendingPhoto(accountInstance, str5, photoEntry.thumbPath, null, PeerStoriesView.this.dialogId, null, null, storyItem, null, photoEntry.entities, photoEntry.stickers, null, photoEntry.ttl, null, videoEditedInfo, z, i, 0, z2, photoEntry.caption, null, 0, 0L);
                 }
                 PeerStoriesView.this.afterMessageSend();
             }
@@ -3587,6 +3593,7 @@ public abstract class PeerStoriesView extends SizeNotifierFrameLayout implements
                                         sendingMediaInfo.path = str;
                                     }
                                     sendingMediaInfo.thumbPath = photoEntry.thumbPath;
+                                    sendingMediaInfo.coverPath = photoEntry.coverPath;
                                     sendingMediaInfo.isVideo = z6;
                                     CharSequence charSequence = photoEntry.caption;
                                     sendingMediaInfo.caption = charSequence != null ? charSequence.toString() : null;

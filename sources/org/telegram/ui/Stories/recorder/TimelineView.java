@@ -78,6 +78,7 @@ public class TimelineView extends View {
     private long coverEnd;
     private long coverStart;
     private TimelineDelegate delegate;
+    private float dragSpeed;
     private boolean dragged;
     private boolean draggingProgress;
     private final LinearGradient ellipsizeGradient;
@@ -838,6 +839,7 @@ public class TimelineView extends View {
         this.pressHandleCollageIndex = -1;
         this.pressType = -1;
         this.pressCollageIndex = -1;
+        this.dragSpeed = 1.0f;
         this.scrollingVideo = true;
         this.scrollingCollage = -1;
         this.scrolling = false;
@@ -1290,6 +1292,14 @@ public class TimelineView extends View {
 
     public boolean isDragging() {
         return this.dragged;
+    }
+
+    public void normalizeScrollByVideo() {
+        long min = Math.min(getBaseDuration(), getMaxScrollDuration());
+        Track track = this.videoTrack;
+        float f = (track.right + track.left) / 2.0f;
+        this.scroll = Utilities.clamp((f * ((float) r5)) - (((float) min) / 2.0f), track.duration - min, 0L);
+        invalidate();
     }
 
     public boolean onBackPressed() {

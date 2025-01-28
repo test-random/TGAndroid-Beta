@@ -70482,6 +70482,7 @@ public class TLRPC {
             int readInt32 = inputSerializedData.readInt32(z);
             this.flags = readInt32;
             this.has_large_media = (readInt32 & 8192) != 0;
+            this.video_cover_photo = (readInt32 & 16384) != 0;
             this.id = inputSerializedData.readInt64(z);
             this.url = inputSerializedData.readString(z);
             this.display_url = inputSerializedData.readString(z);
@@ -70538,7 +70539,11 @@ public class TLRPC {
         @Override
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-392411726);
-            outputSerializedData.writeInt32(this.flags);
+            int i = this.has_large_media ? this.flags | 8192 : this.flags & (-8193);
+            this.flags = i;
+            int i2 = this.video_cover_photo ? i | 16384 : i & (-16385);
+            this.flags = i2;
+            outputSerializedData.writeInt32(i2);
             outputSerializedData.writeInt64(this.id);
             outputSerializedData.writeString(this.url);
             outputSerializedData.writeString(this.display_url);
@@ -72506,6 +72511,7 @@ public class TLRPC {
         public String title;
         public String type;
         public String url;
+        public boolean video_cover_photo;
 
         public static WebPage TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
             WebPage tL_webPageNotModified_layer110;

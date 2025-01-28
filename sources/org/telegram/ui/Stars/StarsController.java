@@ -1862,11 +1862,13 @@ public class StarsController {
         });
     }
 
-    public static void lambda$getUserStarGift$128(AlertDialog alertDialog, TLObject tLObject, TL_stars.InputSavedStarGift inputSavedStarGift, Utilities.Callback callback) {
+    public void lambda$getUserStarGift$128(AlertDialog alertDialog, TLObject tLObject, TL_stars.InputSavedStarGift inputSavedStarGift, Utilities.Callback callback) {
         TL_stars.SavedStarGift savedStarGift;
         alertDialog.dismiss();
         if (tLObject instanceof TL_stars.TL_payments_savedStarGifts) {
             TL_stars.TL_payments_savedStarGifts tL_payments_savedStarGifts = (TL_stars.TL_payments_savedStarGifts) tLObject;
+            MessagesController.getInstance(this.currentAccount).putUsers(tL_payments_savedStarGifts.users, false);
+            MessagesController.getInstance(this.currentAccount).putChats(tL_payments_savedStarGifts.chats, false);
             for (int i = 0; i < tL_payments_savedStarGifts.gifts.size(); i++) {
                 savedStarGift = tL_payments_savedStarGifts.gifts.get(i);
                 if (((inputSavedStarGift instanceof TL_stars.TL_inputSavedStarGiftUser) && ((TL_stars.TL_inputSavedStarGiftUser) inputSavedStarGift).msg_id == savedStarGift.msg_id) || ((inputSavedStarGift instanceof TL_stars.TL_inputSavedStarGiftChat) && ((TL_stars.TL_inputSavedStarGiftChat) inputSavedStarGift).saved_id == savedStarGift.saved_id)) {
@@ -1878,11 +1880,11 @@ public class StarsController {
         callback.run(savedStarGift);
     }
 
-    public static void lambda$getUserStarGift$129(final AlertDialog alertDialog, final TL_stars.InputSavedStarGift inputSavedStarGift, final Utilities.Callback callback, final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$getUserStarGift$129(final AlertDialog alertDialog, final TL_stars.InputSavedStarGift inputSavedStarGift, final Utilities.Callback callback, final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                StarsController.lambda$getUserStarGift$128(AlertDialog.this, tLObject, inputSavedStarGift, callback);
+                StarsController.this.lambda$getUserStarGift$128(alertDialog, tLObject, inputSavedStarGift, callback);
             }
         });
     }
@@ -3316,7 +3318,7 @@ public class StarsController {
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(getsavedstargift, new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                StarsController.lambda$getUserStarGift$129(AlertDialog.this, inputSavedStarGift, callback, tLObject, tL_error);
+                StarsController.this.lambda$getUserStarGift$129(alertDialog, inputSavedStarGift, callback, tLObject, tL_error);
             }
         });
     }

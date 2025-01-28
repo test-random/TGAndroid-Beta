@@ -255,7 +255,7 @@ public class MessagesController extends BaseController implements NotificationCe
     public HashMap<Long, ArrayList<TLRPC.TL_sendMessageEmojiInteraction>> emojiInteractions;
     private final SharedPreferences emojiPreferences;
     public HashMap<String, EmojiSound> emojiSounds;
-    private LongSparseArray emojiStatusUntilValues;
+    private final ConcurrentHashMap<Long, Integer> emojiStatusUntilValues;
     public boolean enableJoined;
     private final ConcurrentHashMap<Integer, TLRPC.EncryptedChat> encryptedChats;
     public Set<String> exportGroupUri;
@@ -983,6 +983,8 @@ public class MessagesController extends BaseController implements NotificationCe
         public final ArrayList<TLRPC.Photo> photos = new ArrayList<>();
         public boolean fromCache = true;
         public boolean loaded = false;
+        private int lastLoadOffset = -1;
+        private int lastLoadCount = -1;
 
         public DialogPhotos(long j) {
             this.dialogId = j;
@@ -1036,6 +1038,8 @@ public class MessagesController extends BaseController implements NotificationCe
 
         public void lambda$loadCache$4(int i, HashMap hashMap) {
             this.photos.clear();
+            this.lastLoadOffset = -1;
+            this.lastLoadCount = -1;
             for (int i2 = 0; i2 < i; i2++) {
                 this.photos.add(null);
             }
@@ -1237,7 +1241,12 @@ public class MessagesController extends BaseController implements NotificationCe
             if (this.loading || i2 <= 0 || i < 0) {
                 return;
             }
+            if (i2 == this.lastLoadCount && i == this.lastLoadOffset) {
+                return;
+            }
             this.loading = true;
+            this.lastLoadOffset = i;
+            this.lastLoadCount = i2;
             long j = this.dialogId;
             if (j < 0) {
                 TLRPC.TL_messages_search tL_messages_search = new TLRPC.TL_messages_search();
@@ -1363,6 +1372,8 @@ public class MessagesController extends BaseController implements NotificationCe
 
         public void reset() {
             this.photos.clear();
+            this.lastLoadOffset = -1;
+            this.lastLoadCount = -1;
             this.fromCache = true;
             saveCache();
         }
@@ -2261,7 +2272,7 @@ public class MessagesController extends BaseController implements NotificationCe
         this.showAnnualPerMonth = false;
         this.starrefStartParamPrefixes = new HashSet();
         this.directPaymentsCurrency = new ArrayList();
-        this.emojiStatusUntilValues = new LongSparseArray();
+        this.emojiStatusUntilValues = new ConcurrentHashMap<>();
         this.photoSuggestion = new SparseArray<>();
         this.dialogDateComparator = new Comparator() {
             @Override
@@ -13680,7 +13691,7 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public SponsoredMessagesInfo getSponsoredMessages(final long j) {
         SponsoredMessagesInfo sponsoredMessagesInfo = (SponsoredMessagesInfo) this.sponsoredMessages.get(j);
-        if (sponsoredMessagesInfo != null && (sponsoredMessagesInfo.loading || Math.abs(SystemClock.elapsedRealtime() - sponsoredMessagesInfo.loadTime) <= 5000)) {
+        if (sponsoredMessagesInfo != null && (sponsoredMessagesInfo.loading || Math.abs(SystemClock.elapsedRealtime() - sponsoredMessagesInfo.loadTime) <= 300000)) {
             return sponsoredMessagesInfo;
         }
         if (j >= 0 ? !UserObject.isBot(getUser(Long.valueOf(j))) : !ChatObject.isChannel(getChat(Long.valueOf(-j)))) {
@@ -17015,16 +17026,14 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void updateEmojiStatusUntil() {
         int currentTimeMillis = (int) (System.currentTimeMillis() / 1000);
+        Iterator<Long> it = this.emojiStatusUntilValues.keySet().iterator();
         Long l = null;
-        int i = 0;
-        while (i < this.emojiStatusUntilValues.size()) {
-            if (((Integer) this.emojiStatusUntilValues.valueAt(i)).intValue() > currentTimeMillis) {
+        while (it.hasNext()) {
+            if (this.emojiStatusUntilValues.get(it.next()).intValue() > currentTimeMillis) {
                 l = Long.valueOf(Math.min(l == null ? Long.MAX_VALUE : l.longValue(), r5 - currentTimeMillis));
             } else {
-                this.emojiStatusUntilValues.removeAt(i);
-                i--;
+                it.remove();
             }
-            i++;
         }
         if (l == null) {
             Runnable runnable = this.recentEmojiStatusUpdateRunnable;
@@ -17056,11 +17065,11 @@ public class MessagesController extends BaseController implements NotificationCe
     public void updateEmojiStatusUntilUpdate(long j, TLRPC.EmojiStatus emojiStatus) {
         int emojiStatusUntil = DialogObject.getEmojiStatusUntil(emojiStatus);
         if (emojiStatusUntil != 0) {
-            this.emojiStatusUntilValues.put(j, Integer.valueOf(emojiStatusUntil));
-        } else if (!this.emojiStatusUntilValues.containsKey(j)) {
+            this.emojiStatusUntilValues.put(Long.valueOf(j), Integer.valueOf(emojiStatusUntil));
+        } else if (!this.emojiStatusUntilValues.containsKey(Long.valueOf(j))) {
             return;
         } else {
-            this.emojiStatusUntilValues.remove(j);
+            this.emojiStatusUntilValues.remove(Long.valueOf(j));
         }
         updateEmojiStatusUntil();
     }

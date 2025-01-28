@@ -999,6 +999,20 @@ public class ImageLoader {
         }
     }
 
+    public static class PhotoSizeFromPhoto extends TLRPC.PhotoSize {
+        public final TLRPC.InputPhoto inputPhoto;
+        public final TLRPC.Photo photo;
+
+        public PhotoSizeFromPhoto(TLRPC.Photo photo) {
+            this.photo = photo;
+            TLRPC.TL_inputPhoto tL_inputPhoto = new TLRPC.TL_inputPhoto();
+            tL_inputPhoto.id = photo.id;
+            tL_inputPhoto.file_reference = photo.file_reference;
+            tL_inputPhoto.access_hash = photo.access_hash;
+            this.inputPhoto = tL_inputPhoto;
+        }
+    }
+
     public static class ThumbGenerateInfo {
         private boolean big;
         private String filter;

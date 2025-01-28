@@ -471,6 +471,10 @@ public class FileRefController extends BaseController {
         return "FILEREF_EXPIRED".equals(str) || "FILE_REFERENCE_EXPIRED".equals(str) || "FILE_REFERENCE_EMPTY".equals(str) || (str != null && str.startsWith("FILE_REFERENCE_"));
     }
 
+    public static boolean isFileRefErrorCover(String str) {
+        return str != null && isFileRefError(str) && str.endsWith("COVER_EXPIRED");
+    }
+
     private boolean isSameReference(byte[] bArr, byte[] bArr2) {
         return Arrays.equals(bArr, bArr2);
     }

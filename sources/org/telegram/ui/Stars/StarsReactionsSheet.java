@@ -1081,11 +1081,11 @@ public class StarsReactionsSheet extends BottomSheet {
         int i7 = Theme.key_windowBackgroundWhiteBlackText;
         textView.setTextColor(Theme.getColor(i7));
         textView.setTextSize(1, 20.0f);
-        textView.setGravity(3);
+        textView.setGravity(19);
         textView.setText(LocaleController.getString(R.string.StarsReactionTitle));
         textView.setTypeface(AndroidUtilities.bold());
         textView.setMaxLines(2);
-        linearLayout2.addView(textView, LayoutHelper.createLinear(-2, -2, 1.0f, 51, 6, 0, 6, 0));
+        linearLayout2.addView(textView, LayoutHelper.createLinear(-2, -2, 1.0f, 19, 18, 0, 6, 0));
         ScaleStateListAnimator.apply(starsBalanceView);
         starsBalanceView.setOnClickListener(new View.OnClickListener() {
             @Override

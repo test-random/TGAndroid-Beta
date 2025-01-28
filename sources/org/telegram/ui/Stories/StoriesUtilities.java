@@ -420,7 +420,8 @@ public abstract class StoriesUtilities {
         }
 
         public void setChat(TLRPC.Chat chat, boolean z) {
-            setColorId(-1, z);
+            TLRPC.TL_peerColor tL_peerColor;
+            setColorId((chat == null || (tL_peerColor = chat.profile_color) == null) ? -1 : tL_peerColor.color, z);
         }
 
         public void setColor(MessagesController.PeerColor peerColor, boolean z) {

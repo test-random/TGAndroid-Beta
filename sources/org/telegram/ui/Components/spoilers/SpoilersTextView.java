@@ -37,6 +37,7 @@ public class SpoilersTextView extends TextView implements TextSelectionHelper.Si
     public int cacheType;
     private boolean clearLinkOnLongPress;
     private SpoilersClickDetector clickDetector;
+    protected boolean disablePaddingInLinks;
     private boolean disablePaddingsOffset;
     private boolean disablePaddingsOffsetX;
     private boolean disablePaddingsOffsetY;
@@ -75,6 +76,7 @@ public class SpoilersTextView extends TextView implements TextSelectionHelper.Si
         this.cacheType = 0;
         this.useAlphaForEmoji = true;
         this.clearLinkOnLongPress = true;
+        this.disablePaddingInLinks = true;
         this.lastLayout = null;
         this.links = new LinkSpanDrawable.LinkCollector(this);
         this.resourcesProvider = resourcesProvider;
@@ -162,7 +164,7 @@ public class SpoilersTextView extends TextView implements TextSelectionHelper.Si
                 int spanStart = spannableString.getSpanStart(this.pressedLink.getSpan());
                 int spanEnd = spannableString.getSpanEnd(this.pressedLink.getSpan());
                 LinkPath obtainNewPath = this.pressedLink.obtainNewPath();
-                obtainNewPath.setCurrentLayout(layout, spanStart, getPaddingTop());
+                obtainNewPath.setCurrentLayout(layout, spanStart, this.disablePaddingInLinks ? 0.0f : getPaddingTop());
                 layout.getSelectionPath(spanStart, spanEnd, obtainNewPath);
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
@@ -238,7 +240,7 @@ public class SpoilersTextView extends TextView implements TextSelectionHelper.Si
         int paddingTop = getPaddingTop();
         canvas.save();
         if (!this.disablePaddingsOffset) {
-            canvas.translate(this.disablePaddingsOffsetX ? 0.0f : getPaddingLeft(), this.disablePaddingsOffsetY ? 0.0f : getPaddingTop());
+            canvas.translate(this.disablePaddingsOffsetX ? 0.0f : paddingLeft, this.disablePaddingsOffsetY ? 0.0f : paddingTop);
         }
         LinkSpanDrawable.LinkCollector linkCollector = this.links;
         if (linkCollector != null && linkCollector.draw(canvas)) {
@@ -269,7 +271,7 @@ public class SpoilersTextView extends TextView implements TextSelectionHelper.Si
         updateAnimatedEmoji(false);
         if (this.animatedEmoji != null) {
             canvas.save();
-            canvas.translate(getPaddingLeft(), getPaddingTop());
+            canvas.translate(paddingLeft, paddingTop);
             AnimatedEmojiSpan.drawAnimatedEmojis(canvas, getLayout(), this.animatedEmoji, 0.0f, this.spoilers, 0.0f, getHeight(), 0.0f, 1.0f, this.animatedEmojiColorFilter);
             canvas.restore();
         }
@@ -282,7 +284,7 @@ public class SpoilersTextView extends TextView implements TextSelectionHelper.Si
         } else {
             canvas.save();
         }
-        canvas.translate(getPaddingLeft(), getPaddingTop() + AndroidUtilities.dp(2.0f));
+        canvas.translate(paddingLeft, paddingTop + AndroidUtilities.dp(2.0f));
         for (SpoilerEffect spoilerEffect : this.spoilers) {
             spoilerEffect.setColor(getPaint().getColor());
             spoilerEffect.draw(canvas);

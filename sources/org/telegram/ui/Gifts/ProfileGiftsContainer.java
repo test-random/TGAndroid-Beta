@@ -117,6 +117,7 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
         this.fragment = baseFragment;
         this.currentAccount = i;
         this.dialogId = j;
+        StarsController.getInstance(i).invalidateProfileGifts(j);
         StarsController.GiftsList profileGiftsList = StarsController.getInstance(i).getProfileGiftsList(j);
         this.list = profileGiftsList;
         profileGiftsList.shown = true;
@@ -234,7 +235,7 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
         ButtonWithCounterView buttonWithCounterView = new ButtonWithCounterView(context, resourcesProvider);
         this.button = buttonWithCounterView;
         StringBuilder sb = new StringBuilder();
-        sb.append("G  ");
+        sb.append("G ");
         sb.append(LocaleController.getString(j < 0 ? R.string.ProfileGiftsSendChannel : R.string.ProfileGiftsSend));
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(sb.toString());
         spannableStringBuilder.setSpan(new ColoredImageSpan(R.drawable.filled_gift_simple), 0, 1, 33);
@@ -317,7 +318,7 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
             protected BulletinFactory getBulletinFactory() {
                 return BulletinFactory.of(ProfileGiftsContainer.this.fragment);
             }
-        }.set(savedStarGift).onSharePressed(null);
+        }.set(savedStarGift, (StarsController.GiftsList) null).onSharePressed(null);
     }
 
     public void lambda$onItemLongPress$7(TL_stars.SavedStarGift savedStarGift) {
@@ -326,10 +327,14 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
             protected BulletinFactory getBulletinFactory() {
                 return BulletinFactory.of(ProfileGiftsContainer.this.fragment);
             }
-        }.set(savedStarGift).openTransfer();
+        }.set(savedStarGift, (StarsController.GiftsList) null).openTransfer();
     }
 
     public boolean canFilter() {
+        return this.dialogId < 0;
+    }
+
+    public boolean canFilterHidden() {
         if (this.dialogId >= 0) {
             return false;
         }
@@ -526,7 +531,7 @@ public abstract class ProfileGiftsContainer extends FrameLayout implements Notif
     public void onItemClick(UItem uItem, View view, int i, float f, float f2) {
         Object obj = uItem.object;
         if (obj instanceof TL_stars.SavedStarGift) {
-            new StarGiftSheet(getContext(), this.currentAccount, this.dialogId, this.resourcesProvider).set((TL_stars.SavedStarGift) obj).show();
+            new StarGiftSheet(getContext(), this.currentAccount, this.dialogId, this.resourcesProvider).set((TL_stars.SavedStarGift) obj, this.list).show();
         }
     }
 

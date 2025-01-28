@@ -1137,6 +1137,14 @@ public class MessageStatisticActivity extends BaseFragment implements Notificati
         }
         this.actionBar.addView(this.avatarContainer, 0, LayoutHelper.createFrame(-2, -1.0f, 51, !this.inPreviewMode ? i3 : 0.0f, 0.0f, 40.0f, 0.0f));
         setAvatarAndTitle();
+        this.avatarContainer.setTitleColors(Theme.getColor(i, getResourceProvider()), Theme.getColor(i2, getResourceProvider()));
+        View subtitleTextView = this.avatarContainer.getSubtitleTextView();
+        if (subtitleTextView instanceof SimpleTextView) {
+            ((SimpleTextView) subtitleTextView).setLinkTextColor(Theme.getColor(i2, getResourceProvider()));
+        }
+        this.actionBar.setItemsColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, getResourceProvider()), false);
+        this.actionBar.setItemsBackgroundColor(Theme.getColor(Theme.key_actionBarActionModeDefaultSelector, getResourceProvider()), false);
+        this.actionBar.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
         this.actionBar.setBackButtonDrawable(new BackDrawable(false));
         this.actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
@@ -1150,14 +1158,6 @@ public class MessageStatisticActivity extends BaseFragment implements Notificati
                 }
             }
         });
-        this.avatarContainer.setTitleColors(Theme.getColor(i, getResourceProvider()), Theme.getColor(i2, getResourceProvider()));
-        View subtitleTextView = this.avatarContainer.getSubtitleTextView();
-        if (subtitleTextView instanceof SimpleTextView) {
-            ((SimpleTextView) subtitleTextView).setLinkTextColor(Theme.getColor(i2, getResourceProvider()));
-        }
-        this.actionBar.setItemsColor(Theme.getColor(i, getResourceProvider()), false);
-        this.actionBar.setItemsBackgroundColor(Theme.getColor(Theme.key_actionBarActionModeDefaultSelector, getResourceProvider()), false);
-        this.actionBar.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite, getResourceProvider()));
         this.avatarContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public final void onClick(View view) {

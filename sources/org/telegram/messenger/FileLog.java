@@ -106,7 +106,8 @@ public class FileLog {
         if (gson == null) {
             HashSet<String> hashSet = new HashSet<>();
             privateFields = hashSet;
-            hashSet.add("phone");
+            hashSet.add("message");
+            privateFields.add("phone");
             privateFields.add("about");
             privateFields.add("status_text");
             privateFields.add("bytes");

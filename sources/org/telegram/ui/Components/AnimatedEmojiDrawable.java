@@ -72,6 +72,34 @@ public class AnimatedEmojiDrawable extends Drawable {
     private Boolean canOverrideColorCached = null;
     private Boolean isDefaultStatusEmojiCached = null;
 
+    public class AnonymousClass1 extends ImageReceiver {
+        AnonymousClass1() {
+        }
+
+        @Override
+        public void invalidate() {
+            AnimatedEmojiDrawable.this.invalidate();
+            super.invalidate();
+        }
+
+        @Override
+        public boolean setImageBitmapByKey(Drawable drawable, String str, int i, boolean z, int i2) {
+            AnimatedEmojiDrawable.this.invalidate();
+            boolean imageBitmapByKey = super.setImageBitmapByKey(drawable, str, i, z, i2);
+            if (AnimatedEmojiDrawable.this.preloading && hasImageLoaded()) {
+                final AnimatedEmojiDrawable animatedEmojiDrawable = AnimatedEmojiDrawable.this;
+                animatedEmojiDrawable.preloading = false;
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public final void run() {
+                        AnimatedEmojiDrawable.access$200(AnimatedEmojiDrawable.this);
+                    }
+                });
+            }
+            return imageBitmapByKey;
+        }
+    }
+
     public static class EmojiDocumentFetcher {
         private final int currentAccount;
         private HashMap emojiDocumentsCache;
@@ -907,23 +935,15 @@ public class AnimatedEmojiDrawable extends Drawable {
         initDocument(false);
     }
 
+    public static void access$200(AnimatedEmojiDrawable animatedEmojiDrawable) {
+        animatedEmojiDrawable.updateAttachState();
+    }
+
     private void createImageReceiver() {
         if (this.imageReceiver == null) {
-            ImageReceiver imageReceiver = new ImageReceiver() {
-                @Override
-                public void invalidate() {
-                    AnimatedEmojiDrawable.this.invalidate();
-                    super.invalidate();
-                }
-
-                @Override
-                public boolean setImageBitmapByKey(Drawable drawable, String str, int i, boolean z, int i2) {
-                    AnimatedEmojiDrawable.this.invalidate();
-                    return super.setImageBitmapByKey(drawable, str, i, z, i2);
-                }
-            };
-            this.imageReceiver = imageReceiver;
-            imageReceiver.setAllowLoadingOnAttachedOnly(true);
+            AnonymousClass1 anonymousClass1 = new AnonymousClass1();
+            this.imageReceiver = anonymousClass1;
+            anonymousClass1.setAllowLoadingOnAttachedOnly(true);
             if (this.cacheType == 12) {
                 this.imageReceiver.ignoreNotifications = true;
             }
@@ -1104,7 +1124,7 @@ public class AnimatedEmojiDrawable extends Drawable {
         }
     }
 
-    private void updateAttachState() {
+    public void updateAttachState() {
         ArrayList arrayList;
         if (this.imageReceiver == null) {
             return;

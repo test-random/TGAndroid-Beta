@@ -1228,7 +1228,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
                 return;
             }
             TL_stars.StarGift starGift = (TL_stars.StarGift) objArr[0];
-            BulletinFactory.of(this.container, this.resourcesProvider).createEmojiBulletin(starGift.sticker, LocaleController.getString(R.string.Gift2SoldOutTitle), AndroidUtilities.replaceTags(LocaleController.formatPluralStringComma("Gift2SoldOut", starGift.availability_total))).show();
+            BulletinFactory.of(this.container, this.resourcesProvider).createEmojiBulletin(starGift.sticker, LocaleController.getString(R.string.Gift2SoldOutTitle), AndroidUtilities.replaceTags(LocaleController.formatPluralStringComma("Gift2SoldOutCount", starGift.availability_total))).show();
             universalAdapter = this.adapter;
             if (universalAdapter == null) {
                 return;
