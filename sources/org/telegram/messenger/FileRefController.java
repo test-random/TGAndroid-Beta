@@ -660,7 +660,7 @@ public class FileRefController extends BaseController {
         getSendMessagesHelper().performSendMessageRequest((TLObject) objArr[0], (MessageObject) objArr[1], (String) objArr[2], (SendMessagesHelper.DelayedMessage) objArr[3], ((Boolean) objArr[4]).booleanValue(), (SendMessagesHelper.DelayedMessage) objArr[5], null, null, ((Boolean) objArr[6]).booleanValue());
     }
 
-    private boolean onRequestComplete(java.lang.String r31, java.lang.String r32, org.telegram.tgnet.TLObject r33, org.telegram.tgnet.TLRPC.TL_error r34, boolean r35, boolean r36) {
+    private boolean onRequestComplete(java.lang.String r33, java.lang.String r34, org.telegram.tgnet.TLObject r35, org.telegram.tgnet.TLRPC.TL_error r36, boolean r37, boolean r38) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.FileRefController.onRequestComplete(java.lang.String, java.lang.String, org.telegram.tgnet.TLObject, org.telegram.tgnet.TLRPC$TL_error, boolean, boolean):boolean");
     }
 

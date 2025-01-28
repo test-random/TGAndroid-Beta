@@ -22061,7 +22061,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         sb.append("/");
                         sb.append(id);
                         sb.append("?t=");
-                        sb.append(i);
+                        sb.append(AndroidUtilities.formatTimestamp(i));
                         str2 = sb.toString();
                     }
                     str2 = null;
@@ -22075,7 +22075,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         sb.append("/");
                         sb.append(id);
                         sb.append("?t=");
-                        sb.append(i);
+                        sb.append(AndroidUtilities.formatTimestamp(i));
                         str2 = sb.toString();
                     }
                     str2 = null;

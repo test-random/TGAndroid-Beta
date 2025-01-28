@@ -53,6 +53,7 @@ public class ItemOptions {
     private int dimAlpha;
     private View dimView;
     private Runnable dismissListener;
+    public boolean dismissWithButtons;
     private boolean dontDismiss;
     private boolean drawScrim;
     private int fixedWidthDp;
@@ -264,6 +265,7 @@ public class ItemOptions {
         this.point = new float[2];
         this.drawScrim = true;
         this.viewAdditionalOffsets = new android.graphics.Rect();
+        this.dismissWithButtons = true;
         this.shiftDp = -4;
         if (viewGroup == null || viewGroup.getContext() == null) {
             return;
@@ -282,6 +284,7 @@ public class ItemOptions {
         this.point = new float[2];
         this.drawScrim = true;
         this.viewAdditionalOffsets = new android.graphics.Rect();
+        this.dismissWithButtons = true;
         this.shiftDp = -4;
         this.context = actionBarPopupWindowLayout.getContext();
         LinearLayout linearLayout = new LinearLayout(this.context);
@@ -295,6 +298,7 @@ public class ItemOptions {
         this.point = new float[2];
         this.drawScrim = true;
         this.viewAdditionalOffsets = new android.graphics.Rect();
+        this.dismissWithButtons = true;
         this.shiftDp = -4;
         if (baseFragment.getContext() == null) {
             return;
@@ -370,33 +374,44 @@ public class ItemOptions {
         if (runnable != null) {
             runnable.run();
         }
-        dismiss();
+        if (this.dismissWithButtons) {
+            dismiss();
+        }
     }
 
     public void lambda$add$5(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
-        dismiss();
+        if (this.dismissWithButtons) {
+            dismiss();
+        }
     }
 
     public void lambda$addChat$4(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
-        dismiss();
+        if (this.dismissWithButtons) {
+            dismiss();
+        }
     }
 
     public void lambda$addChecked$2(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
         }
-        dismiss();
+        if (this.dismissWithButtons) {
+            dismiss();
+        }
     }
 
     public boolean lambda$addChecked$3(Runnable runnable, View view) {
         if (runnable != null) {
             runnable.run();
+        }
+        if (!this.dismissWithButtons) {
+            return true;
         }
         dismiss();
         return true;
@@ -464,6 +479,27 @@ public class ItemOptions {
 
     public static ItemOptions makeOptions(BaseFragment baseFragment, View view, boolean z) {
         return new ItemOptions(baseFragment, view, z);
+    }
+
+    public ActionBarMenuSubItem add() {
+        int i;
+        ActionBarMenuSubItem actionBarMenuSubItem = new ActionBarMenuSubItem(this.context, false, false, this.resourcesProvider);
+        actionBarMenuSubItem.setPadding(AndroidUtilities.dp(18.0f), 0, AndroidUtilities.dp(18.0f), 0);
+        Integer num = this.textColor;
+        int intValue = num != null ? num.intValue() : Theme.getColor(Theme.key_actionBarDefaultSubmenuItem, this.resourcesProvider);
+        Integer num2 = this.iconColor;
+        actionBarMenuSubItem.setColors(intValue, num2 != null ? num2.intValue() : Theme.getColor(Theme.key_actionBarDefaultSubmenuItemIcon, this.resourcesProvider));
+        Integer num3 = this.selectorColor;
+        actionBarMenuSubItem.setSelectorColor(num3 != null ? num3.intValue() : Theme.multAlpha(Theme.getColor(Theme.key_actionBarDefaultSubmenuItem, this.resourcesProvider), 0.12f));
+        int i2 = this.minWidthDp;
+        if (i2 > 0) {
+            actionBarMenuSubItem.setMinimumWidth(AndroidUtilities.dp(i2));
+            i = this.minWidthDp;
+        } else {
+            i = -1;
+        }
+        addView(actionBarMenuSubItem, LayoutHelper.createLinear(i, -2));
+        return actionBarMenuSubItem;
     }
 
     public ItemOptions add(int i, Drawable drawable, CharSequence charSequence, int i2, int i3, final Runnable runnable) {
@@ -557,6 +593,29 @@ public class ItemOptions {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.ItemOptions.addChat(org.telegram.tgnet.TLObject, boolean, java.lang.Runnable):org.telegram.ui.Components.ItemOptions");
     }
 
+    public ActionBarMenuSubItem addChecked() {
+        int i;
+        int i2 = Theme.key_actionBarDefaultSubmenuItem;
+        int i3 = Theme.key_actionBarDefaultSubmenuItemIcon;
+        ActionBarMenuSubItem actionBarMenuSubItem = new ActionBarMenuSubItem(this.context, true, false, false, this.resourcesProvider);
+        actionBarMenuSubItem.setPadding(AndroidUtilities.dp(18.0f), 0, AndroidUtilities.dp(18.0f), 0);
+        Integer num = this.textColor;
+        int intValue = num != null ? num.intValue() : Theme.getColor(i2, this.resourcesProvider);
+        Integer num2 = this.iconColor;
+        actionBarMenuSubItem.setColors(intValue, num2 != null ? num2.intValue() : Theme.getColor(i3, this.resourcesProvider));
+        Integer num3 = this.selectorColor;
+        actionBarMenuSubItem.setSelectorColor(num3 != null ? num3.intValue() : Theme.multAlpha(Theme.getColor(i2, this.resourcesProvider), 0.12f));
+        int i4 = this.minWidthDp;
+        if (i4 > 0) {
+            actionBarMenuSubItem.setMinimumWidth(AndroidUtilities.dp(i4));
+            i = this.minWidthDp;
+        } else {
+            i = -1;
+        }
+        addView(actionBarMenuSubItem, LayoutHelper.createLinear(i, -2));
+        return actionBarMenuSubItem;
+    }
+
     public ItemOptions addChecked(boolean z, CharSequence charSequence, Runnable runnable) {
         return addChecked(z, charSequence, runnable, null);
     }
@@ -605,10 +664,6 @@ public class ItemOptions {
         return this;
     }
 
-    public ItemOptions addCheckedIf(boolean z, boolean z2, CharSequence charSequence, Runnable runnable, Runnable runnable2) {
-        return !z ? this : addChecked(z2, charSequence, runnable, runnable2);
-    }
-
     public ItemOptions addGap() {
         ActionBarPopupWindow.GapView gapView = new ActionBarPopupWindow.GapView(this.context, this.resourcesProvider);
         gapView.setTag(R.id.fit_width_tag, 1);
@@ -618,10 +673,6 @@ public class ItemOptions {
         }
         addView(gapView, LayoutHelper.createLinear(-1, 8));
         return this;
-    }
-
-    public ItemOptions addGapIf(boolean z) {
-        return !z ? this : addGap();
     }
 
     public ItemOptions addIf(boolean z, int i, Drawable drawable, CharSequence charSequence, Runnable runnable) {
@@ -973,6 +1024,11 @@ public class ItemOptions {
 
     public ItemOptions setDimAlpha(int i) {
         this.dimAlpha = i;
+        return this;
+    }
+
+    public ItemOptions setDismissWithButtons(boolean z) {
+        this.dismissWithButtons = z;
         return this;
     }
 

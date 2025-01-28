@@ -378,7 +378,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
             BackupImageView backupImageView = new BackupImageView(context);
             this.imageView = backupImageView;
             backupImageView.getImageReceiver().setAutoRepeat(0);
-            FrameLayout.LayoutParams createFrame = LayoutHelper.createFrame(96, 96.0f, 49, 0.0f, 2.0f, 0.0f, 2.0f);
+            FrameLayout.LayoutParams createFrame = LayoutHelper.createFrame(80, 80.0f, 49, 0.0f, 8.0f, 0.0f, 8.0f);
             this.imageViewLayoutParams = createFrame;
             frameLayout.addView(backupImageView, createFrame);
             PremiumLockIconView premiumLockIconView = new PremiumLockIconView(context, PremiumLockIconView.TYPE_GIFT_LOCK, resourcesProvider);

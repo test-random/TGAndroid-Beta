@@ -2741,7 +2741,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             StoryRecorder.destroyInstance();
             GroupCallActivity groupCallActivity = GroupCallActivity.groupCallInstance;
             if (groupCallActivity != null) {
-                groupCallActivity.dismiss();
+                groupCallActivity.lambda$new$0();
             }
             this.drawerLayoutContainer.setAllowOpenDrawer(false, false);
             if (AndroidUtilities.isTablet()) {
@@ -3515,7 +3515,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         StoryRecorder.destroyInstance();
                         GroupCallActivity groupCallActivity = GroupCallActivity.groupCallInstance;
                         if (groupCallActivity != null) {
-                            groupCallActivity.dismiss();
+                            groupCallActivity.lambda$new$0();
                         }
                         this.drawerLayoutContainer.setAllowOpenDrawer(false, false);
                         if (AndroidUtilities.isTablet()) {

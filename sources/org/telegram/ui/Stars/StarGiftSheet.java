@@ -27,6 +27,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -702,6 +703,7 @@ public class StarGiftSheet extends BottomSheetWithRecyclerListView implements No
 
         public void updateTranslations() {
             float pVar = top();
+            Log.i("lolkek", "a=" + ((BottomSheet) StarGiftSheet.this).containerView.isAttachedToWindow() + " top=" + pVar);
             StarGiftSheet.this.topView.setTranslationY(pVar);
             StarGiftSheet.this.infoLayout.setTranslationY(StarGiftSheet.this.topView.getRealHeight() + pVar);
             StarGiftSheet.this.upgradeLayout.setTranslationY(StarGiftSheet.this.topView.getRealHeight() + pVar);

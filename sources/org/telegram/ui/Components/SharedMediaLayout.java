@@ -92,6 +92,7 @@ import org.telegram.ui.Adapters.SearchAdapterHelper;
 import org.telegram.ui.Cells.ChatActionCell;
 import org.telegram.ui.Cells.ContextLinkCell;
 import org.telegram.ui.Cells.DialogCell;
+import org.telegram.ui.Cells.DividerCell;
 import org.telegram.ui.Cells.GraySectionCell;
 import org.telegram.ui.Cells.LoadingCell;
 import org.telegram.ui.Cells.ManageChatUserCell;
@@ -704,17 +705,24 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             this.val$context = context;
         }
 
-        public static void lambda$onClick$0(StarsController.GiftsList giftsList) {
-            giftsList.sort_by_date = true;
+        public static void lambda$onClick$0(ActionBarMenuSubItem actionBarMenuSubItem, StarsController.GiftsList giftsList, ActionBarMenuSubItem actionBarMenuSubItem2, ActionBarMenuSubItem actionBarMenuSubItem3, ActionBarMenuSubItem actionBarMenuSubItem4, boolean z, ActionBarMenuSubItem actionBarMenuSubItem5, ActionBarMenuSubItem actionBarMenuSubItem6) {
+            actionBarMenuSubItem.setTextAndIcon(LocaleController.getString(giftsList.sort_by_date ? R.string.Gift2FilterSortByValue : R.string.Gift2FilterSortByDate), giftsList.sort_by_date ? R.drawable.menu_sort_value : R.drawable.menu_sort_date);
+            actionBarMenuSubItem2.setChecked(giftsList.include_unlimited);
+            actionBarMenuSubItem3.setChecked(giftsList.include_limited);
+            actionBarMenuSubItem4.setChecked(giftsList.include_unique);
+            if (z) {
+                actionBarMenuSubItem5.setChecked(giftsList.include_displayed);
+                actionBarMenuSubItem6.setChecked(giftsList.include_hidden);
+            }
+        }
+
+        public static void lambda$onClick$1(StarsController.GiftsList giftsList, Runnable runnable, View view) {
+            giftsList.sort_by_date = !giftsList.sort_by_date;
+            runnable.run();
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$1(StarsController.GiftsList giftsList) {
-            giftsList.sort_by_date = false;
-            giftsList.invalidate(true);
-        }
-
-        public static void lambda$onClick$10(StarsController.GiftsList giftsList) {
+        public static void lambda$onClick$10(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             boolean z = giftsList.include_hidden;
             if (!z || giftsList.include_displayed) {
                 giftsList.include_hidden = !z;
@@ -722,13 +730,16 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                 giftsList.include_hidden = false;
                 giftsList.include_displayed = true;
             }
+            runnable.run();
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$11(StarsController.GiftsList giftsList) {
+        public static boolean lambda$onClick$11(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             giftsList.include_displayed = false;
             giftsList.include_hidden = true;
+            runnable.run();
             giftsList.invalidate(true);
+            return true;
         }
 
         public void lambda$onClick$12() {
@@ -786,7 +797,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             }, resourcesProvider);
         }
 
-        public static void lambda$onClick$2(StarsController.GiftsList giftsList) {
+        public static void lambda$onClick$2(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             boolean z = giftsList.include_unlimited;
             if (!z || giftsList.include_limited || giftsList.include_unique) {
                 giftsList.include_unlimited = !z;
@@ -795,6 +806,7 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                 giftsList.include_limited = true;
                 giftsList.include_unique = true;
             }
+            runnable.run();
             giftsList.invalidate(true);
         }
 
@@ -853,14 +865,16 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
             storiesList.updateFilters(actionBarMenuSubItem.getCheckView().isChecked(), actionBarMenuSubItem2.getCheckView().isChecked());
         }
 
-        public static void lambda$onClick$3(StarsController.GiftsList giftsList) {
-            giftsList.include_unique = false;
-            giftsList.include_limited = false;
+        public static boolean lambda$onClick$3(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             giftsList.include_unlimited = true;
+            giftsList.include_limited = false;
+            giftsList.include_unique = false;
+            runnable.run();
             giftsList.invalidate(true);
+            return true;
         }
 
-        public static void lambda$onClick$4(StarsController.GiftsList giftsList) {
+        public static void lambda$onClick$4(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             boolean z = giftsList.include_limited;
             if (!z || giftsList.include_unlimited || giftsList.include_unique) {
                 giftsList.include_limited = !z;
@@ -869,36 +883,44 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                 giftsList.include_unlimited = true;
                 giftsList.include_unique = true;
             }
+            runnable.run();
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$5(StarsController.GiftsList giftsList) {
-            giftsList.include_unique = false;
-            giftsList.include_limited = true;
+        public static boolean lambda$onClick$5(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             giftsList.include_unlimited = false;
+            giftsList.include_limited = true;
+            giftsList.include_unique = false;
+            runnable.run();
             giftsList.invalidate(true);
+            return true;
         }
 
-        public static void lambda$onClick$6(StarsController.GiftsList giftsList) {
-            boolean z = giftsList.include_unique;
-            if (!z || giftsList.include_limited || giftsList.include_unlimited) {
-                giftsList.include_unique = !z;
+        public static void lambda$onClick$6(StarsController.GiftsList giftsList, Runnable runnable, View view) {
+            boolean z;
+            boolean z2 = giftsList.include_unique;
+            if (!z2 || giftsList.include_limited || giftsList.include_unlimited) {
+                z = !z2;
             } else {
-                giftsList.include_unique = false;
                 giftsList.include_limited = true;
                 giftsList.include_unlimited = true;
+                z = false;
             }
+            giftsList.include_unique = z;
+            runnable.run();
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$7(StarsController.GiftsList giftsList) {
-            giftsList.include_unique = true;
-            giftsList.include_limited = false;
+        public static boolean lambda$onClick$7(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             giftsList.include_unlimited = false;
+            giftsList.include_limited = false;
+            giftsList.include_unique = true;
+            runnable.run();
             giftsList.invalidate(true);
+            return true;
         }
 
-        public static void lambda$onClick$8(StarsController.GiftsList giftsList) {
+        public static void lambda$onClick$8(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             boolean z = giftsList.include_displayed;
             if (!z || giftsList.include_hidden) {
                 giftsList.include_displayed = !z;
@@ -906,18 +928,358 @@ public abstract class SharedMediaLayout extends FrameLayout implements Notificat
                 giftsList.include_displayed = false;
                 giftsList.include_hidden = true;
             }
+            runnable.run();
             giftsList.invalidate(true);
         }
 
-        public static void lambda$onClick$9(StarsController.GiftsList giftsList) {
+        public static boolean lambda$onClick$9(StarsController.GiftsList giftsList, Runnable runnable, View view) {
             giftsList.include_displayed = true;
             giftsList.include_hidden = false;
+            runnable.run();
             giftsList.invalidate(true);
+            return true;
         }
 
         @Override
-        public void onClick(android.view.View r24) {
-            throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.Components.SharedMediaLayout.AnonymousClass5.onClick(android.view.View):void");
+        public void onClick(View view) {
+            final AnonymousClass5 anonymousClass5;
+            char c;
+            ActionBarMenuSubItem actionBarMenuSubItem;
+            TLRPC.Chat chat;
+            TLRPC.TL_chatAdminRights tL_chatAdminRights;
+            ActionBarMenuSubItem actionBarMenuSubItem2;
+            ActionBarMenuSubItem actionBarMenuSubItem3;
+            final int closestTab = SharedMediaLayout.this.getClosestTab();
+            boolean z = true;
+            char c2 = (closestTab == 8 || closestTab == 9) ? (char) 1 : (char) 0;
+            TLRPC.User user = MessagesController.getInstance(SharedMediaLayout.this.profileActivity.getCurrentAccount()).getUser(Long.valueOf(SharedMediaLayout.this.dialog_id));
+            if (closestTab == 14) {
+                final StarsController.GiftsList list = SharedMediaLayout.this.giftsContainer.getList();
+                final boolean canFilterHidden = SharedMediaLayout.this.giftsContainer.canFilterHidden();
+                ItemOptions makeOptions = ItemOptions.makeOptions(SharedMediaLayout.this.profileActivity, SharedMediaLayout.this.photoVideoOptionsItem);
+                final ActionBarMenuSubItem add = makeOptions.add();
+                makeOptions.addGap();
+                final ActionBarMenuSubItem addChecked = makeOptions.addChecked();
+                addChecked.setText(LocaleController.getString(R.string.Gift2FilterUnlimited));
+                final ActionBarMenuSubItem addChecked2 = makeOptions.addChecked();
+                addChecked2.setText(LocaleController.getString(R.string.Gift2FilterLimited));
+                final ActionBarMenuSubItem addChecked3 = makeOptions.addChecked();
+                addChecked3.setText(LocaleController.getString(R.string.Gift2FilterUnique));
+                if (canFilterHidden) {
+                    makeOptions.addGap();
+                    ActionBarMenuSubItem addChecked4 = makeOptions.addChecked();
+                    addChecked4.setText(LocaleController.getString(R.string.Gift2FilterDisplayed));
+                    ActionBarMenuSubItem addChecked5 = makeOptions.addChecked();
+                    addChecked5.setText(LocaleController.getString(R.string.Gift2FilterHidden));
+                    actionBarMenuSubItem3 = addChecked4;
+                    actionBarMenuSubItem2 = addChecked5;
+                } else {
+                    actionBarMenuSubItem2 = null;
+                    actionBarMenuSubItem3 = null;
+                }
+                final ActionBarMenuSubItem actionBarMenuSubItem4 = actionBarMenuSubItem2;
+                final ActionBarMenuSubItem actionBarMenuSubItem5 = actionBarMenuSubItem3;
+                final Runnable runnable = new Runnable() {
+                    @Override
+                    public final void run() {
+                        SharedMediaLayout.AnonymousClass5.lambda$onClick$0(ActionBarMenuSubItem.this, list, addChecked, addChecked2, addChecked3, canFilterHidden, actionBarMenuSubItem5, actionBarMenuSubItem4);
+                    }
+                };
+                runnable.run();
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public final void onClick(View view2) {
+                        SharedMediaLayout.AnonymousClass5.lambda$onClick$1(StarsController.GiftsList.this, runnable, view2);
+                    }
+                });
+                addChecked.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public final void onClick(View view2) {
+                        SharedMediaLayout.AnonymousClass5.lambda$onClick$2(StarsController.GiftsList.this, runnable, view2);
+                    }
+                });
+                addChecked.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public final boolean onLongClick(View view2) {
+                        boolean lambda$onClick$3;
+                        lambda$onClick$3 = SharedMediaLayout.AnonymousClass5.lambda$onClick$3(StarsController.GiftsList.this, runnable, view2);
+                        return lambda$onClick$3;
+                    }
+                });
+                addChecked2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public final void onClick(View view2) {
+                        SharedMediaLayout.AnonymousClass5.lambda$onClick$4(StarsController.GiftsList.this, runnable, view2);
+                    }
+                });
+                addChecked2.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public final boolean onLongClick(View view2) {
+                        boolean lambda$onClick$5;
+                        lambda$onClick$5 = SharedMediaLayout.AnonymousClass5.lambda$onClick$5(StarsController.GiftsList.this, runnable, view2);
+                        return lambda$onClick$5;
+                    }
+                });
+                addChecked3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public final void onClick(View view2) {
+                        SharedMediaLayout.AnonymousClass5.lambda$onClick$6(StarsController.GiftsList.this, runnable, view2);
+                    }
+                });
+                addChecked3.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public final boolean onLongClick(View view2) {
+                        boolean lambda$onClick$7;
+                        lambda$onClick$7 = SharedMediaLayout.AnonymousClass5.lambda$onClick$7(StarsController.GiftsList.this, runnable, view2);
+                        return lambda$onClick$7;
+                    }
+                });
+                if (canFilterHidden) {
+                    actionBarMenuSubItem5.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public final void onClick(View view2) {
+                            SharedMediaLayout.AnonymousClass5.lambda$onClick$8(StarsController.GiftsList.this, runnable, view2);
+                        }
+                    });
+                    actionBarMenuSubItem5.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public final boolean onLongClick(View view2) {
+                            boolean lambda$onClick$9;
+                            lambda$onClick$9 = SharedMediaLayout.AnonymousClass5.lambda$onClick$9(StarsController.GiftsList.this, runnable, view2);
+                            return lambda$onClick$9;
+                        }
+                    });
+                    actionBarMenuSubItem4.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public final void onClick(View view2) {
+                            SharedMediaLayout.AnonymousClass5.lambda$onClick$10(StarsController.GiftsList.this, runnable, view2);
+                        }
+                    });
+                    actionBarMenuSubItem4.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public final boolean onLongClick(View view2) {
+                            boolean lambda$onClick$11;
+                            lambda$onClick$11 = SharedMediaLayout.AnonymousClass5.lambda$onClick$11(StarsController.GiftsList.this, runnable, view2);
+                            return lambda$onClick$11;
+                        }
+                    });
+                }
+                makeOptions.setOnTopOfScrim().setDismissWithButtons(false).setDimAlpha(0).show();
+                return;
+            }
+            if (closestTab == 13 && user != null && user.bot && user.bot_has_main_app && user.bot_can_edit) {
+                anonymousClass5 = this;
+                if (SharedMediaLayout.this.botPreviewsContainer != null) {
+                    ItemOptions.makeOptions(SharedMediaLayout.this.profileActivity, SharedMediaLayout.this.photoVideoOptionsItem).addIf(SharedMediaLayout.this.botPreviewsContainer.getItemsCount() < SharedMediaLayout.this.profileActivity.getMessagesController().botPreviewMediasMax, R.drawable.msg_addbot, LocaleController.getString(R.string.ProfileBotAddPreview), new Runnable() {
+                        @Override
+                        public final void run() {
+                            SharedMediaLayout.AnonymousClass5.this.lambda$onClick$12();
+                        }
+                    }).addIf(SharedMediaLayout.this.botPreviewsContainer.getItemsCount() > 1 && !SharedMediaLayout.this.botPreviewsContainer.isSelectedAll(), R.drawable.tabs_reorder, LocaleController.getString(R.string.ProfileBotReorder), new Runnable() {
+                        @Override
+                        public final void run() {
+                            SharedMediaLayout.AnonymousClass5.this.lambda$onClick$13();
+                        }
+                    }).addIf(SharedMediaLayout.this.botPreviewsContainer.getItemsCount() > 0, R.drawable.msg_select, LocaleController.getString(SharedMediaLayout.this.botPreviewsContainer.isSelectedAll() ? R.string.ProfileBotUnSelect : R.string.ProfileBotSelect), new Runnable() {
+                        @Override
+                        public final void run() {
+                            SharedMediaLayout.AnonymousClass5.this.lambda$onClick$14();
+                        }
+                    }).addIf(!TextUtils.isEmpty(SharedMediaLayout.this.botPreviewsContainer.getCurrentLang()), R.drawable.msg_delete, (CharSequence) LocaleController.formatString(R.string.ProfileBotRemoveLang, TranslateAlert2.languageName(SharedMediaLayout.this.botPreviewsContainer.getCurrentLang())), true, new Runnable() {
+                        @Override
+                        public final void run() {
+                            SharedMediaLayout.AnonymousClass5.this.lambda$onClick$15();
+                        }
+                    }).translate(0.0f, -AndroidUtilities.dp(52.0f)).setDimAlpha(0).show();
+                    return;
+                }
+            } else {
+                anonymousClass5 = this;
+            }
+            if (SharedMediaLayout.this.getSelectedTab() == 11) {
+                ItemOptions add2 = ItemOptions.makeOptions(SharedMediaLayout.this.profileActivity, SharedMediaLayout.this.photoVideoOptionsItem).add(R.drawable.msg_discussion, LocaleController.getString(R.string.SavedViewAsMessages), new Runnable() {
+                    @Override
+                    public final void run() {
+                        SharedMediaLayout.AnonymousClass5.this.lambda$onClick$16();
+                    }
+                }).addGap().add(R.drawable.msg_home, LocaleController.getString(R.string.AddShortcut), new Runnable() {
+                    @Override
+                    public final void run() {
+                        SharedMediaLayout.AnonymousClass5.this.lambda$onClick$17();
+                    }
+                });
+                int i = R.drawable.msg_delete;
+                String string = LocaleController.getString(R.string.DeleteAll);
+                final Theme.ResourcesProvider resourcesProvider = anonymousClass5.val$resourcesProvider;
+                add2.add(i, string, new Runnable() {
+                    @Override
+                    public final void run() {
+                        SharedMediaLayout.AnonymousClass5.this.lambda$onClick$19(resourcesProvider);
+                    }
+                }).translate(0.0f, -AndroidUtilities.dp(52.0f)).setDimAlpha(0).show();
+                return;
+            }
+            final DividerCell dividerCell = new DividerCell(anonymousClass5.val$context);
+            ActionBarPopupWindow.ActionBarPopupWindowLayout actionBarPopupWindowLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(anonymousClass5.val$context, anonymousClass5.val$resourcesProvider) {
+                @Override
+                public void onMeasure(int i2, int i3) {
+                    if (dividerCell.getParent() != null) {
+                        dividerCell.setVisibility(8);
+                        super.onMeasure(i2, i3);
+                        dividerCell.getLayoutParams().width = getMeasuredWidth() - AndroidUtilities.dp(16.0f);
+                        dividerCell.setVisibility(0);
+                    }
+                    super.onMeasure(i2, i3);
+                }
+            };
+            SharedMediaLayout.this.mediaZoomInItem = new ActionBarMenuSubItem(anonymousClass5.val$context, true, false, anonymousClass5.val$resourcesProvider);
+            SharedMediaLayout.this.mediaZoomOutItem = new ActionBarMenuSubItem(anonymousClass5.val$context, false, false, anonymousClass5.val$resourcesProvider);
+            SharedMediaLayout.this.mediaZoomInItem.setTextAndIcon(LocaleController.getString("MediaZoomIn", R.string.MediaZoomIn), R.drawable.msg_zoomin);
+            SharedMediaLayout.this.mediaZoomInItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public final void onClick(View view2) {
+                    SharedMediaLayout.AnonymousClass5.this.lambda$onClick$20(view2);
+                }
+            });
+            actionBarPopupWindowLayout.addView(SharedMediaLayout.this.mediaZoomInItem);
+            SharedMediaLayout.this.mediaZoomOutItem.setTextAndIcon(LocaleController.getString("MediaZoomOut", R.string.MediaZoomOut), R.drawable.msg_zoomout);
+            SharedMediaLayout.this.mediaZoomOutItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public final void onClick(View view2) {
+                    SharedMediaLayout.AnonymousClass5.this.lambda$onClick$21(view2);
+                }
+            });
+            actionBarPopupWindowLayout.addView(SharedMediaLayout.this.mediaZoomOutItem);
+            if (c2 == 0 || !SharedMediaLayout.this.allowStoriesSingleColumn) {
+                if (SharedMediaLayout.this.mediaColumnsCount[c2] == 2) {
+                    c = 0;
+                    SharedMediaLayout.this.mediaZoomInItem.setEnabled(false);
+                    actionBarMenuSubItem = SharedMediaLayout.this.mediaZoomInItem;
+                } else {
+                    c = 0;
+                    if (SharedMediaLayout.this.mediaColumnsCount[c2] == 9) {
+                        SharedMediaLayout.this.mediaZoomOutItem.setEnabled(false);
+                        actionBarMenuSubItem = SharedMediaLayout.this.mediaZoomOutItem;
+                    }
+                }
+                actionBarMenuSubItem.setAlpha(0.5f);
+            } else {
+                SharedMediaLayout.this.mediaZoomInItem.setEnabled(false);
+                SharedMediaLayout.this.mediaZoomInItem.setAlpha(0.5f);
+                SharedMediaLayout.this.mediaZoomOutItem.setEnabled(false);
+                SharedMediaLayout.this.mediaZoomOutItem.setAlpha(0.5f);
+                c = 0;
+            }
+            boolean z2 = (c2 == 0 && (!SharedMediaLayout.this.sharedMediaData[c].hasPhotos || !SharedMediaLayout.this.sharedMediaData[c].hasVideos) && SharedMediaLayout.this.sharedMediaData[c].endReached[c] && SharedMediaLayout.this.sharedMediaData[c].endReached[1] && SharedMediaLayout.this.sharedMediaData[c].startReached) ? false : true;
+            if (!DialogObject.isEncryptedDialog(SharedMediaLayout.this.dialog_id) && (user == null || !user.bot)) {
+                ActionBarMenuSubItem actionBarMenuSubItem6 = new ActionBarMenuSubItem(anonymousClass5.val$context, false, false, anonymousClass5.val$resourcesProvider);
+                actionBarMenuSubItem6.setTextAndIcon(LocaleController.getString("Calendar", R.string.Calendar), R.drawable.msg_calendar2);
+                actionBarPopupWindowLayout.addView(actionBarMenuSubItem6);
+                actionBarMenuSubItem6.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view2) {
+                        SharedMediaLayout.this.showMediaCalendar(closestTab, false);
+                        ActionBarPopupWindow actionBarPopupWindow = SharedMediaLayout.this.optionsWindow;
+                        if (actionBarPopupWindow != null) {
+                            actionBarPopupWindow.dismiss();
+                        }
+                    }
+                });
+                if (SharedMediaLayout.this.info != null && !SharedMediaLayout.this.isStoriesView() && (chat = MessagesController.getInstance(SharedMediaLayout.this.profileActivity.getCurrentAccount()).getChat(Long.valueOf(SharedMediaLayout.this.info.id))) != null && (tL_chatAdminRights = chat.admin_rights) != null && tL_chatAdminRights.edit_stories) {
+                    ActionBarMenuSubItem actionBarMenuSubItem7 = new ActionBarMenuSubItem(anonymousClass5.val$context, false, true, anonymousClass5.val$resourcesProvider);
+                    actionBarMenuSubItem7.setTextAndIcon(LocaleController.getString(R.string.OpenChannelArchiveStories), R.drawable.msg_archive);
+                    actionBarMenuSubItem7.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public final void onClick(View view2) {
+                            SharedMediaLayout.AnonymousClass5.this.lambda$onClick$22(view2);
+                        }
+                    });
+                    actionBarPopupWindowLayout.addView(actionBarMenuSubItem7);
+                }
+                if (z2) {
+                    actionBarPopupWindowLayout.addView(dividerCell);
+                    final ActionBarMenuSubItem actionBarMenuSubItem8 = new ActionBarMenuSubItem(anonymousClass5.val$context, true, false, false, anonymousClass5.val$resourcesProvider);
+                    final ActionBarMenuSubItem actionBarMenuSubItem9 = new ActionBarMenuSubItem(anonymousClass5.val$context, true, false, true, anonymousClass5.val$resourcesProvider);
+                    actionBarMenuSubItem8.setTextAndIcon(LocaleController.getString("MediaShowPhotos", R.string.MediaShowPhotos), 0);
+                    actionBarPopupWindowLayout.addView(actionBarMenuSubItem8);
+                    actionBarMenuSubItem9.setTextAndIcon(LocaleController.getString("MediaShowVideos", R.string.MediaShowVideos), 0);
+                    actionBarPopupWindowLayout.addView(actionBarMenuSubItem9);
+                    if (c2 != 0) {
+                        final StoriesAdapter storiesAdapter = closestTab == 8 ? SharedMediaLayout.this.storiesAdapter : SharedMediaLayout.this.archivedStoriesAdapter;
+                        StoriesController.StoriesList storiesList = storiesAdapter.storiesList;
+                        if (storiesList != null) {
+                            actionBarMenuSubItem8.setChecked(storiesList.showPhotos());
+                            actionBarMenuSubItem9.setChecked(storiesAdapter.storiesList.showVideos());
+                        }
+                        actionBarMenuSubItem8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public final void onClick(View view2) {
+                                SharedMediaLayout.AnonymousClass5.this.lambda$onClick$23(actionBarMenuSubItem9, actionBarMenuSubItem8, storiesAdapter, view2);
+                            }
+                        });
+                        actionBarMenuSubItem9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public final void onClick(View view2) {
+                                SharedMediaLayout.AnonymousClass5.this.lambda$onClick$24(actionBarMenuSubItem8, actionBarMenuSubItem9, storiesAdapter, view2);
+                            }
+                        });
+                    } else {
+                        actionBarMenuSubItem8.setChecked(SharedMediaLayout.this.sharedMediaData[0].filterType == 0 || SharedMediaLayout.this.sharedMediaData[0].filterType == 1);
+                        actionBarMenuSubItem8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view2) {
+                                SharedMediaData sharedMediaData;
+                                if (SharedMediaLayout.this.changeTypeAnimation) {
+                                    return;
+                                }
+                                if (!actionBarMenuSubItem9.getCheckView().isChecked() && actionBarMenuSubItem8.getCheckView().isChecked()) {
+                                    ActionBarMenuSubItem actionBarMenuSubItem10 = actionBarMenuSubItem8;
+                                    SharedMediaLayout sharedMediaLayout = SharedMediaLayout.this;
+                                    AndroidUtilities.shakeViewSpring(actionBarMenuSubItem10, sharedMediaLayout.shiftDp = -sharedMediaLayout.shiftDp);
+                                    return;
+                                }
+                                actionBarMenuSubItem8.setChecked(!r3.getCheckView().isChecked());
+                                int i2 = 0;
+                                if (actionBarMenuSubItem8.getCheckView().isChecked() && actionBarMenuSubItem9.getCheckView().isChecked()) {
+                                    sharedMediaData = SharedMediaLayout.this.sharedMediaData[0];
+                                } else {
+                                    sharedMediaData = SharedMediaLayout.this.sharedMediaData[0];
+                                    i2 = 2;
+                                }
+                                sharedMediaData.filterType = i2;
+                                SharedMediaLayout.this.changeMediaFilterType();
+                            }
+                        });
+                        if (SharedMediaLayout.this.sharedMediaData[0].filterType != 0 && SharedMediaLayout.this.sharedMediaData[0].filterType != 2) {
+                            z = false;
+                        }
+                        actionBarMenuSubItem9.setChecked(z);
+                        actionBarMenuSubItem9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view2) {
+                                if (SharedMediaLayout.this.changeTypeAnimation) {
+                                    return;
+                                }
+                                if (!actionBarMenuSubItem8.getCheckView().isChecked() && actionBarMenuSubItem9.getCheckView().isChecked()) {
+                                    ActionBarMenuSubItem actionBarMenuSubItem10 = actionBarMenuSubItem9;
+                                    SharedMediaLayout sharedMediaLayout = SharedMediaLayout.this;
+                                    AndroidUtilities.shakeViewSpring(actionBarMenuSubItem10, sharedMediaLayout.shiftDp = -sharedMediaLayout.shiftDp);
+                                    return;
+                                }
+                                actionBarMenuSubItem9.setChecked(!r3.getCheckView().isChecked());
+                                if (actionBarMenuSubItem8.getCheckView().isChecked() && actionBarMenuSubItem9.getCheckView().isChecked()) {
+                                    SharedMediaLayout.this.sharedMediaData[0].filterType = 0;
+                                } else {
+                                    SharedMediaLayout.this.sharedMediaData[0].filterType = 1;
+                                }
+                                SharedMediaLayout.this.changeMediaFilterType();
+                            }
+                        });
+                    }
+                }
+            }
+            SharedMediaLayout sharedMediaLayout = SharedMediaLayout.this;
+            sharedMediaLayout.optionsWindow = AlertsCreator.showPopupMenu(actionBarPopupWindowLayout, sharedMediaLayout.photoVideoOptionsItem, 0, -AndroidUtilities.dp(56.0f));
         }
     }
 

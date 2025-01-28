@@ -1314,6 +1314,13 @@ public class StarsController {
             MessagesController.getInstance(this.currentAccount).getMainSettings().edit().putBoolean(Calendar.getInstance().get(1) + "bdayhint_" + j2, false).apply();
         }
         if (j2 < 0) {
+            long j3 = -j2;
+            TLRPC.ChatFull chatFull = MessagesController.getInstance(this.currentAccount).getChatFull(j3);
+            if (chatFull != null) {
+                chatFull.stargifts_count++;
+                chatFull.flags2 |= 262144;
+                MessagesController.getInstance(this.currentAccount).putChatFull(chatFull);
+            }
             if (lastFragment instanceof ProfileActivity) {
                 ProfileActivity profileActivity = (ProfileActivity) lastFragment;
                 if (profileActivity.getDialogId() == j2) {
@@ -1327,7 +1334,7 @@ public class StarsController {
                 }
             }
             Bundle bundle = new Bundle();
-            bundle.putLong("chat_id", -j2);
+            bundle.putLong("chat_id", j3);
             bundle.putBoolean("open_gifts", true);
             final ProfileActivity profileActivity2 = new ProfileActivity(bundle);
             profileActivity2.whenFullyVisible(new Runnable() {
