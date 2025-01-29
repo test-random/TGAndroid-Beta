@@ -697,20 +697,19 @@ public class VideoEditedInfo {
     }
 
     public boolean needConvert() {
-        int i;
         MediaController.CropState cropState;
-        if (this.isStory) {
-            if (this.fromCamera && this.mixedSoundInfos.isEmpty() && this.mediaEntities == null && this.paintPath == null && this.blurPath == null && this.filterState == null && (((cropState = this.cropState) == null || cropState.isEmpty()) && this.startTime <= 0)) {
+        if (!this.isStory) {
+            if (this.mixedSoundInfos.isEmpty() && this.mediaEntities == null && this.paintPath == null && this.blurPath == null && this.filterState == null && this.cropState == null && !this.roundVideo && this.startTime <= 0) {
                 long j = this.endTime;
-                if ((j == -1 || j == this.estimatedDuration) && this.originalHeight == this.resultHeight && this.originalWidth == this.resultWidth) {
+                if (j == -1 || j == this.estimatedDuration) {
                     return false;
                 }
             }
             return true;
         }
-        if (this.mixedSoundInfos.isEmpty() && this.mediaEntities == null && this.paintPath == null && this.blurPath == null && this.filterState == null && this.cropState == null && !this.roundVideo && this.startTime <= 0) {
+        if (this.fromCamera && this.mixedSoundInfos.isEmpty() && this.mediaEntities == null && this.paintPath == null && this.blurPath == null && this.filterState == null && (((cropState = this.cropState) == null || cropState.isEmpty()) && this.startTime <= 0)) {
             long j2 = this.endTime;
-            if ((j2 == -1 || j2 == this.estimatedDuration) && this.originalHeight == this.resultHeight && this.originalWidth == this.resultWidth && ((i = this.bitrate) == -1 || this.originalBitrate == i)) {
+            if ((j2 == -1 || j2 == this.estimatedDuration) && this.originalHeight == this.resultHeight && this.originalWidth == this.resultWidth) {
                 return false;
             }
         }

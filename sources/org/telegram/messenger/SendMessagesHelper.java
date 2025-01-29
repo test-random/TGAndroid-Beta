@@ -113,6 +113,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         public Object parentObject;
         public ArrayList<Object> parentObjects;
         public long peer;
+        public boolean performCoverUpload;
         public boolean performMediaUpload;
         public TLRPC.PhotoSize photoSize;
         ArrayList<DelayedMessageSendAfterRequest> requests;
