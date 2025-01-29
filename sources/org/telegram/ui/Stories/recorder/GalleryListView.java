@@ -83,8 +83,8 @@ import org.telegram.ui.Stories.recorder.GalleryListView;
 public abstract class GalleryListView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
     private static final MediaController.AlbumEntry draftsAlbum = new MediaController.AlbumEntry(-1, null, null);
     private final float ASPECT_RATIO;
-    private final ActionBar actionBar;
-    private boolean actionBarShown;
+    public final ActionBar actionBar;
+    public boolean actionBarShown;
     private final AnimatedFloat actionBarT;
     public final Adapter adapter;
     private final Paint backgroundPaint;

@@ -5,10 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.view.MotionEvent;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
+import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.ActionBar.BottomSheet;
@@ -30,7 +33,7 @@ public class GallerySheet extends BottomSheet {
         GalleryListView galleryListView = new GalleryListView(UserConfig.selectedAccount, context, new DarkThemeResourceProvider(), null, true, f) {
             @Override
             public String getTitle() {
-                return "Choose cover";
+                return LocaleController.getString(R.string.VideoChooseCover);
             }
         };
         this.listView = galleryListView;
@@ -127,6 +130,11 @@ public class GallerySheet extends BottomSheet {
     }
 
     @Override
+    public boolean canDismissWithSwipe() {
+        return !this.listView.actionBarShown;
+    }
+
+    @Override
     public void lambda$new$0() {
         animate(false, new Runnable() {
             @Override
@@ -135,6 +143,15 @@ public class GallerySheet extends BottomSheet {
             }
         });
         super.lambda$new$0();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent motionEvent) {
+        if (motionEvent.getAction() != 0 || motionEvent.getY() >= this.listView.top()) {
+            return super.dispatchTouchEvent(motionEvent);
+        }
+        lambda$new$0();
+        return true;
     }
 
     public void setOnGalleryImage(Utilities.Callback callback) {

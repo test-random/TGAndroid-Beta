@@ -1100,8 +1100,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
 
             @Override
-            public void lambda$new$0() {
-                super.lambda$new$0();
+            public void dismiss() {
+                super.dismiss();
                 if (PhotoViewer.this.masksAlert == this) {
                     PhotoViewer.this.masksAlert = null;
                 }
@@ -15165,6 +15165,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         this.qualityChooseViewAnimation.start();
         if (this.muteButton.getVisibility() == 0) {
             this.muteButton.animate().scaleX(z2 ? 0.25f : 1.0f).scaleY(z2 ? 0.25f : 1.0f).alpha(z2 ? 0.0f : 1.0f).setDuration(200L);
+        }
+        if (this.editCoverButton.getVisibility() == 0) {
+            this.editCoverButton.animate().scaleX(z2 ? 0.25f : 1.0f).scaleY(z2 ? 0.25f : 1.0f).alpha(z2 ? 0.0f : 1.0f).setDuration(200L);
         }
     }
 
