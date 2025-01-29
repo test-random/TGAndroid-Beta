@@ -1721,32 +1721,32 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             InstantCameraView.this.videoEditedInfo.originalHeight = 360;
             videoEditedInfo3.resultHeight = 360;
             InstantCameraView.this.videoEditedInfo.originalPath = this.videoFile.getAbsolutePath();
+            final VideoEditedInfo videoEditedInfo4 = InstantCameraView.this.videoEditedInfo;
             if (i != 1) {
                 setupVideoPlayer(this.videoFile);
-                InstantCameraView.this.videoEditedInfo.estimatedDuration = InstantCameraView.this.recordedTime;
-                NotificationCenter.getInstance(InstantCameraView.this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.audioDidSent, Integer.valueOf(InstantCameraView.this.recordingGuid), InstantCameraView.this.videoEditedInfo, this.videoFile.getAbsolutePath(), this.keyframeThumbs);
+                videoEditedInfo4.estimatedDuration = InstantCameraView.this.recordedTime;
+                NotificationCenter.getInstance(InstantCameraView.this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.audioDidSent, Integer.valueOf(InstantCameraView.this.recordingGuid), videoEditedInfo4, this.videoFile.getAbsolutePath(), this.keyframeThumbs);
+            } else if (InstantCameraView.this.delegate.isInScheduleMode()) {
+                AlertsCreator.createScheduleDatePickerDialog(InstantCameraView.this.delegate.getParentActivity(), InstantCameraView.this.delegate.getDialogId(), new AlertsCreator.ScheduleDatePickerDelegate() {
+                    @Override
+                    public final void didSelectDate(boolean z, int i2) {
+                        InstantCameraView.VideoRecorder.this.lambda$handleStopRecording$8(sendOptions, videoEditedInfo4, z, i2);
+                    }
+                }, new Runnable() {
+                    @Override
+                    public final void run() {
+                        InstantCameraView.VideoRecorder.this.lambda$handleStopRecording$9();
+                    }
+                }, InstantCameraView.this.resourcesProvider);
             } else {
-                if (InstantCameraView.this.delegate.isInScheduleMode()) {
-                    AlertsCreator.createScheduleDatePickerDialog(InstantCameraView.this.delegate.getParentActivity(), InstantCameraView.this.delegate.getDialogId(), new AlertsCreator.ScheduleDatePickerDelegate() {
-                        @Override
-                        public final void didSelectDate(boolean z, int i2) {
-                            InstantCameraView.VideoRecorder.this.lambda$handleStopRecording$8(sendOptions, z, i2);
-                        }
-                    }, new Runnable() {
-                        @Override
-                        public final void run() {
-                            InstantCameraView.VideoRecorder.this.lambda$handleStopRecording$9();
-                        }
-                    }, InstantCameraView.this.resourcesProvider);
-                    return;
-                }
                 MediaController.PhotoEntry photoEntry = new MediaController.PhotoEntry(0, 0, 0L, this.videoFile.getAbsolutePath(), 0, true, 0, 0, 0L);
                 if (sendOptions != null) {
                     photoEntry.ttl = sendOptions.ttl;
                     photoEntry.effectId = sendOptions.effectId;
                 }
-                InstantCameraView.this.delegate.sendMedia(photoEntry, InstantCameraView.this.videoEditedInfo, sendOptions == null || sendOptions.notify, sendOptions != null ? sendOptions.scheduleDate : 0, false);
+                InstantCameraView.this.delegate.sendMedia(photoEntry, videoEditedInfo4, sendOptions == null || sendOptions.notify, sendOptions != null ? sendOptions.scheduleDate : 0, false);
             }
+            InstantCameraView.this.videoEditedInfo = null;
         }
 
         public void lambda$handleStopRecording$11() {
@@ -1800,13 +1800,13 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             countDownLatch.countDown();
         }
 
-        public void lambda$handleStopRecording$8(SendOptions sendOptions, boolean z, int i) {
+        public void lambda$handleStopRecording$8(SendOptions sendOptions, VideoEditedInfo videoEditedInfo, boolean z, int i) {
             MediaController.PhotoEntry photoEntry = new MediaController.PhotoEntry(0, 0, 0L, this.videoFile.getAbsolutePath(), 0, true, 0, 0, 0L);
             if (sendOptions != null) {
                 photoEntry.ttl = sendOptions.ttl;
                 photoEntry.effectId = sendOptions.effectId;
             }
-            InstantCameraView.this.delegate.sendMedia(photoEntry, InstantCameraView.this.videoEditedInfo, z || sendOptions == null || sendOptions.notify, i != 0 ? i : sendOptions != null ? sendOptions.scheduleDate : 0, false);
+            InstantCameraView.this.delegate.sendMedia(photoEntry, videoEditedInfo, z || sendOptions == null || sendOptions.notify, i != 0 ? i : sendOptions != null ? sendOptions.scheduleDate : 0, false);
             InstantCameraView.this.startAnimation(false, false);
         }
 

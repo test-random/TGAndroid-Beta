@@ -1632,7 +1632,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             if (inputMedia instanceof TLRPC.TL_inputMediaDocument) {
                 i = inputMedia.flags | 8;
             }
-            if (inputMedia.thumb == null || (photoSize = delayedMessage.photoSize) == null || photoSize.location == null || !((messageObject = delayedMessage.obj) == null || (videoEditedInfo = messageObject.videoEditedInfo) == null || !videoEditedInfo.isSticker)) {
+            if (delayedMessage.performMediaUpload || inputMedia.thumb != null || (photoSize = delayedMessage.photoSize) == null || photoSize.location == null || !((messageObject = delayedMessage.obj) == null || (videoEditedInfo = messageObject.videoEditedInfo) == null || !videoEditedInfo.isSticker)) {
                 performSendMessageRequest(delayedMessage.sendRequest, delayedMessage.obj, delayedMessage.originalPath, delayedMessage, delayedMessage.parentObject, null, delayedMessage.scheduled);
             } else {
                 performSendDelayedMessage(delayedMessage);
@@ -1642,7 +1642,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         i = inputMedia.flags | 64;
         inputMedia.flags = i;
         inputMedia.video_cover = tL_inputPhoto;
-        if (inputMedia.thumb == null) {
+        if (delayedMessage.performMediaUpload) {
         }
         performSendMessageRequest(delayedMessage.sendRequest, delayedMessage.obj, delayedMessage.originalPath, delayedMessage, delayedMessage.parentObject, null, delayedMessage.scheduled);
     }

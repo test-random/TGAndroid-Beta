@@ -699,7 +699,7 @@ public class VideoEditedInfo {
     public boolean needConvert() {
         MediaController.CropState cropState;
         if (!this.isStory) {
-            if (this.mixedSoundInfos.isEmpty() && this.mediaEntities == null && this.paintPath == null && this.blurPath == null && this.filterState == null && this.cropState == null && !this.roundVideo && this.startTime <= 0) {
+            if (this.mixedSoundInfos.isEmpty() && this.mediaEntities == null && this.paintPath == null && this.blurPath == null && this.filterState == null && this.cropState == null && this.roundVideo && this.startTime <= 0) {
                 long j = this.endTime;
                 if (j == -1 || j == this.estimatedDuration) {
                     return false;
