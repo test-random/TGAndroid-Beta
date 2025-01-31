@@ -20,8 +20,8 @@ public abstract class SequencesKt__SequenceBuilderKt {
         Intrinsics.checkNotNullParameter(block, "block");
         return new Sequence() {
             @Override
-            public java.util.Iterator iterator() {
-                throw new UnsupportedOperationException("Method not decompiled: kotlin.sequences.SequencesKt__SequenceBuilderKt$sequence$$inlined$Sequence$1.iterator():java.util.Iterator");
+            public Iterator iterator() {
+                return SequencesKt__SequenceBuilderKt.iterator(Function2.this);
             }
         };
     }

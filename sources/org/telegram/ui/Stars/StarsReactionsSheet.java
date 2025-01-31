@@ -966,7 +966,7 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                 }
                 Sender sender2 = (Sender) this.senders.get(i);
                 for (int i2 = 0; i2 < arrayList.size(); i2++) {
-                    if (arrayList.get(i2).my == sender2.my || arrayList.get(i2).did == sender2.did) {
+                    if ((arrayList.get(i2).my && sender2.my) || arrayList.get(i2).did == sender2.did) {
                         senderData = arrayList.get(i2);
                         break;
                     }
@@ -983,7 +983,7 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
             for (int i3 = 0; i3 < arrayList.size(); i3++) {
                 SenderData senderData2 = arrayList.get(i3);
                 for (int i4 = 0; i4 < this.senders.size(); i4++) {
-                    if (((Sender) this.senders.get(i4)).my == senderData2.my || ((Sender) this.senders.get(i4)).did == senderData2.did) {
+                    if ((((Sender) this.senders.get(i4)).my && senderData2.my) || ((Sender) this.senders.get(i4)).did == senderData2.did) {
                         sender = (Sender) this.senders.get(i4);
                         break;
                     }
@@ -991,7 +991,7 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                 sender = null;
                 if (sender == null) {
                     for (int i5 = 0; i5 < this.oldSenders.size(); i5++) {
-                        if (((Sender) this.oldSenders.get(i5)).my == senderData2.my || ((Sender) this.oldSenders.get(i5)).did == senderData2.did) {
+                        if ((((Sender) this.oldSenders.get(i5)).my && senderData2.my) || ((Sender) this.oldSenders.get(i5)).did == senderData2.did) {
                             sender = (Sender) this.oldSenders.get(i5);
                             break;
                         }
@@ -1221,7 +1221,7 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
         this.checkBox = checkBox2;
         checkBox2.setColor(Theme.key_radioBackgroundChecked, Theme.key_checkboxDisabled, Theme.key_checkboxCheck);
         checkBox2.setDrawUnchecked(true);
-        checkBox2.setChecked(this.peer == 2666000, false);
+        checkBox2.setChecked(this.peer != 2666000, false);
         TopSendersView topSendersView2 = this.topSendersView;
         if (topSendersView2 != null) {
             topSendersView2.setMyPrivacy(this.peer);
@@ -1583,7 +1583,7 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
 
     public void lambda$new$2(View view) {
         this.checkBox.setChecked(!r3.isChecked(), true);
-        this.peer = this.checkBox.isChecked() ? 2666000L : this.lastSelectedPeer;
+        this.peer = this.checkBox.isChecked() ? this.lastSelectedPeer : 2666000L;
         updatePeerDialog();
         TopSendersView topSendersView = this.topSendersView;
         if (topSendersView != null) {
@@ -1644,7 +1644,7 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
         this.lastSelectedPeer = j;
         this.peer = j;
         updatePeerDialog();
-        this.checkBox.setChecked(false, true);
+        this.checkBox.setChecked(true, true);
         TopSendersView topSendersView = this.topSendersView;
         if (topSendersView != null) {
             topSendersView.setMyPrivacy(this.peer);
@@ -1668,7 +1668,8 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                 }
             }
             if (j2 != j) {
-                makeOptions.addChat(tLObject, j2 == this.peer, new Runnable() {
+                long j3 = this.peer;
+                makeOptions.addChat(tLObject, j2 == j3 || (j3 == 0 && j2 == UserConfig.getInstance(i).getClientUserId()), new Runnable() {
                     @Override
                     public final void run() {
                         StarsReactionsSheet.this.lambda$new$6(j2);

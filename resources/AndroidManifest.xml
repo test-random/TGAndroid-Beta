@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="56919"
+    android:versionCode="56929"
     android:versionName="11.7.2"
     android:installLocation="auto"
     android:compileSdkVersion="34"
