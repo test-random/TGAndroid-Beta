@@ -1,4 +1,7 @@
 package kotlin.jvm.internal;
 
-public interface FunctionBase {
+import kotlin.Function;
+
+public interface FunctionBase extends Function {
+    int getArity();
 }

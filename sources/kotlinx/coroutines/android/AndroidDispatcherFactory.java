@@ -7,7 +7,7 @@ import kotlinx.coroutines.internal.MainDispatcherFactory;
 
 public final class AndroidDispatcherFactory implements MainDispatcherFactory {
     @Override
-    public MainCoroutineDispatcher createDispatcher(List<? extends MainDispatcherFactory> list) {
+    public MainCoroutineDispatcher createDispatcher(List list) {
         Looper mainLooper = Looper.getMainLooper();
         if (mainLooper != null) {
             return new HandlerContext(HandlerDispatcherKt.asHandler(mainLooper, true), null, 2, null);

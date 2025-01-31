@@ -26,6 +26,7 @@ public final class MainDispatcherLoader {
         Sequence asSequence;
         List list;
         Object next;
+        MainCoroutineDispatcher tryCreateDispatcher;
         try {
             asSequence = SequencesKt__SequencesKt.asSequence(ServiceLoader.load(MainDispatcherFactory.class, MainDispatcherFactory.class.getClassLoader()).iterator());
             list = SequencesKt___SequencesKt.toList(asSequence);
@@ -47,8 +48,10 @@ public final class MainDispatcherLoader {
                 next = null;
             }
             MainDispatcherFactory mainDispatcherFactory = (MainDispatcherFactory) next;
-            MainCoroutineDispatcher tryCreateDispatcher = mainDispatcherFactory == null ? null : MainDispatchersKt.tryCreateDispatcher(mainDispatcherFactory, list);
-            return tryCreateDispatcher == null ? MainDispatchersKt.createMissingDispatcher$default(null, null, 3, null) : tryCreateDispatcher;
+            if (mainDispatcherFactory != null && (tryCreateDispatcher = MainDispatchersKt.tryCreateDispatcher(mainDispatcherFactory, list)) != null) {
+                return tryCreateDispatcher;
+            }
+            return MainDispatchersKt.createMissingDispatcher$default(null, null, 3, null);
         } catch (Throwable th) {
             return MainDispatchersKt.createMissingDispatcher$default(th, null, 2, null);
         }

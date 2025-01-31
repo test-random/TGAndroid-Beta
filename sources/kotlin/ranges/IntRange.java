@@ -13,6 +13,10 @@ public final class IntRange extends IntProgression {
         public Companion(DefaultConstructorMarker defaultConstructorMarker) {
             this();
         }
+
+        public final IntRange getEMPTY() {
+            return IntRange.EMPTY;
+        }
     }
 
     public IntRange(int i, int i2) {
@@ -23,6 +27,7 @@ public final class IntRange extends IntProgression {
         return getFirst() <= i && i <= getLast();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof IntRange) {
             if (!isEmpty() || !((IntRange) obj).isEmpty()) {
@@ -35,6 +40,15 @@ public final class IntRange extends IntProgression {
         return false;
     }
 
+    public Integer getEndInclusive() {
+        return Integer.valueOf(getLast());
+    }
+
+    public Integer getStart() {
+        return Integer.valueOf(getFirst());
+    }
+
+    @Override
     public int hashCode() {
         if (isEmpty()) {
             return -1;
@@ -42,10 +56,12 @@ public final class IntRange extends IntProgression {
         return (getFirst() * 31) + getLast();
     }
 
+    @Override
     public boolean isEmpty() {
         return getFirst() > getLast();
     }
 
+    @Override
     public String toString() {
         return getFirst() + ".." + getLast();
     }

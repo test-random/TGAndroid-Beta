@@ -938,7 +938,8 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
         };
         runnable.run();
         if (view != null) {
-            BotStarsController.getInstance(i).loadAdmined();
+            BotStarsController.getInstance(i).loadAdminedBots();
+            BotStarsController.getInstance(i).loadAdminedChannels();
             final View view4 = view;
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1199,7 +1200,8 @@ public class ChannelAffiliateProgramsFragment extends GradientHeaderActivity imp
             }
         });
         if (view != null) {
-            BotStarsController.getInstance(i).loadAdmined();
+            BotStarsController.getInstance(i).loadAdminedBots();
+            BotStarsController.getInstance(i).loadAdminedChannels();
             final View view3 = view;
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

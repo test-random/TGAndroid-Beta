@@ -7328,7 +7328,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
     }
 
     public void lambda$fillNextCodeParams$27(final Bundle bundle, final TLRPC.auth_SentCode auth_sentcode, final boolean z) {
-        Task addOnSuccessListener;
+        Task<IntegrityTokenResponse> addOnSuccessListener;
         OnFailureListener onFailureListener;
         TLRPC.auth_SentCodeType auth_sentcodetype = auth_sentcode.type;
         int i = 1;

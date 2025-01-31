@@ -33,6 +33,12 @@ public final class EmptyCoroutineContext implements CoroutineContext, Serializab
         return this;
     }
 
+    @Override
+    public CoroutineContext plus(CoroutineContext context) {
+        Intrinsics.checkNotNullParameter(context, "context");
+        return context;
+    }
+
     public String toString() {
         return "EmptyCoroutineContext";
     }

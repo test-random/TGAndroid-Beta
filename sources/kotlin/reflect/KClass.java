@@ -1,4 +1,5 @@
 package kotlin.reflect;
 
-public interface KClass {
+public interface KClass extends KDeclarationContainer {
+    String getSimpleName();
 }

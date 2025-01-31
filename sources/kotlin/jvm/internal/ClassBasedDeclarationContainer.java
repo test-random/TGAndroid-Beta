@@ -1,5 +1,7 @@
 package kotlin.jvm.internal;
 
-public interface ClassBasedDeclarationContainer {
+import kotlin.reflect.KDeclarationContainer;
+
+public interface ClassBasedDeclarationContainer extends KDeclarationContainer {
     Class getJClass();
 }

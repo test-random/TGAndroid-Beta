@@ -2374,7 +2374,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             });
             if (i2 < 0) {
                 onHeightChangedListener.setPredictiveCount(this.val$finalCount);
-                this.val$reactedView.setSeenCallback(new ChatActivity$$ExternalSyntheticLambda169(onHeightChangedListener));
+                this.val$reactedView.setSeenCallback(new ChatActivity$$ExternalSyntheticLambda173(onHeightChangedListener));
             }
             viewGroup.addView(onHeightChangedListener);
             this.val$cachedViews.put(i, onHeightChangedListener);
@@ -18175,16 +18175,25 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private void gotChatInfo() {
         TLRPC.ChatFull chatFull = this.chatInfo;
         if (chatFull != null && chatFull.paid_reactions_available) {
-            getMessagesController().arePaidReactionsAnonymous();
+            getMessagesController().getPaidReactionsDialogId();
             if (!StarsController.getInstance(this.currentAccount).balanceAvailable()) {
                 StarsController.getInstance(this.currentAccount).getBalance();
             }
         }
         TLRPC.ChatFull chatFull2 = this.chatInfo;
-        if (chatFull2 == null || chatFull2.bot_verification == null) {
-            return;
+        if (chatFull2 != null && chatFull2.bot_verification != null) {
+            updateTopPanel(true);
         }
-        updateTopPanel(true);
+        TLRPC.ChatFull chatFull3 = this.chatInfo;
+        boolean z = false;
+        boolean z2 = chatFull3 != null && chatFull3.stargifts_available;
+        ImageView imageView = this.bottomGiftButton;
+        if (imageView != null && imageView.getVisibility() == 0) {
+            z = true;
+        }
+        if (z2 != z) {
+            updateBottomOverlay(true);
+        }
     }
 
     private boolean hasSelectedNoforwardsMessage() {
@@ -26781,7 +26790,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public void updateBottomOverlay() {
-        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.updateBottomOverlay():void");
+        updateBottomOverlay(false);
+    }
+
+    private void updateBottomOverlay(boolean r21) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.updateBottomOverlay(boolean):void");
     }
 
     public void updateBulletinLayout() {

@@ -12,8 +12,9 @@ public class LockFreeTaskQueue {
     }
 
     public final boolean addLast(Object obj) {
+        AtomicReferenceFieldUpdater atomicReferenceFieldUpdater = _cur$FU;
         while (true) {
-            LockFreeTaskQueueCore lockFreeTaskQueueCore = (LockFreeTaskQueueCore) this._cur;
+            LockFreeTaskQueueCore lockFreeTaskQueueCore = (LockFreeTaskQueueCore) atomicReferenceFieldUpdater.get(this);
             int addLast = lockFreeTaskQueueCore.addLast(obj);
             if (addLast == 0) {
                 return true;
@@ -27,8 +28,9 @@ public class LockFreeTaskQueue {
     }
 
     public final void close() {
+        AtomicReferenceFieldUpdater atomicReferenceFieldUpdater = _cur$FU;
         while (true) {
-            LockFreeTaskQueueCore lockFreeTaskQueueCore = (LockFreeTaskQueueCore) this._cur;
+            LockFreeTaskQueueCore lockFreeTaskQueueCore = (LockFreeTaskQueueCore) atomicReferenceFieldUpdater.get(this);
             if (lockFreeTaskQueueCore.close()) {
                 return;
             } else {
@@ -38,12 +40,13 @@ public class LockFreeTaskQueue {
     }
 
     public final int getSize() {
-        return ((LockFreeTaskQueueCore) this._cur).getSize();
+        return ((LockFreeTaskQueueCore) _cur$FU.get(this)).getSize();
     }
 
     public final Object removeFirstOrNull() {
+        AtomicReferenceFieldUpdater atomicReferenceFieldUpdater = _cur$FU;
         while (true) {
-            LockFreeTaskQueueCore lockFreeTaskQueueCore = (LockFreeTaskQueueCore) this._cur;
+            LockFreeTaskQueueCore lockFreeTaskQueueCore = (LockFreeTaskQueueCore) atomicReferenceFieldUpdater.get(this);
             Object removeFirstOrNull = lockFreeTaskQueueCore.removeFirstOrNull();
             if (removeFirstOrNull != LockFreeTaskQueueCore.REMOVE_FROZEN) {
                 return removeFirstOrNull;

@@ -1,4 +1,6 @@
 package kotlin.jvm.functions;
 
-public interface Function18 {
+import kotlin.Function;
+
+public interface Function18 extends Function {
 }

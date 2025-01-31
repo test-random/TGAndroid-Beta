@@ -24,9 +24,14 @@ public abstract class SystemPropsKt__SystemProps_commonKt {
         throw new IllegalStateException(("System property '" + str + "' should be in range " + j2 + ".." + j3 + ", but is '" + longValue + '\'').toString());
     }
 
+    public static final String systemProp(String str, String str2) {
+        String systemProp = SystemPropsKt.systemProp(str);
+        return systemProp == null ? str2 : systemProp;
+    }
+
     public static final boolean systemProp(String str, boolean z) {
         String systemProp = SystemPropsKt.systemProp(str);
-        return systemProp == null ? z : Boolean.parseBoolean(systemProp);
+        return systemProp != null ? Boolean.parseBoolean(systemProp) : z;
     }
 
     public static int systemProp$default(String str, int i, int i2, int i3, int i4, Object obj) {

@@ -9,6 +9,11 @@ public abstract class Lambda implements FunctionBase, Serializable {
         this.arity = i;
     }
 
+    @Override
+    public int getArity() {
+        return this.arity;
+    }
+
     public String toString() {
         String renderLambdaToString = Reflection.renderLambdaToString(this);
         Intrinsics.checkNotNullExpressionValue(renderLambdaToString, "renderLambdaToString(this)");

@@ -10,6 +10,7 @@ import java.util.concurrent.locks.LockSupport;
 import kotlin.Unit;
 import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
+import kotlin.jvm.internal.Ref$ObjectRef;
 import kotlin.random.Random;
 import kotlin.ranges.RangesKt___RangesKt;
 import kotlinx.coroutines.AbstractTimeSourceKt;
@@ -19,7 +20,7 @@ import kotlinx.coroutines.internal.Symbol;
 
 public final class CoroutineScheduler implements Executor, Closeable {
     private volatile int _isTerminated;
-    volatile long controlState;
+    private volatile long controlState;
     public final int corePoolSize;
     public final GlobalQueue globalBlockingQueue;
     public final GlobalQueue globalCpuQueue;
@@ -29,10 +30,10 @@ public final class CoroutineScheduler implements Executor, Closeable {
     public final String schedulerName;
     public final ResizableAtomicArray workers;
     public static final Companion Companion = new Companion(null);
-    public static final Symbol NOT_IN_STACK = new Symbol("NOT_IN_STACK");
     private static final AtomicLongFieldUpdater parkedWorkersStack$FU = AtomicLongFieldUpdater.newUpdater(CoroutineScheduler.class, "parkedWorkersStack");
-    static final AtomicLongFieldUpdater controlState$FU = AtomicLongFieldUpdater.newUpdater(CoroutineScheduler.class, "controlState");
+    private static final AtomicLongFieldUpdater controlState$FU = AtomicLongFieldUpdater.newUpdater(CoroutineScheduler.class, "controlState");
     private static final AtomicIntegerFieldUpdater _isTerminated$FU = AtomicIntegerFieldUpdater.newUpdater(CoroutineScheduler.class, "_isTerminated");
+    public static final Symbol NOT_IN_STACK = new Symbol("NOT_IN_STACK");
 
     public static final class Companion {
         private Companion() {
@@ -48,17 +49,32 @@ public final class CoroutineScheduler implements Executor, Closeable {
 
         static {
             int[] iArr = new int[WorkerState.values().length];
-            iArr[WorkerState.PARKING.ordinal()] = 1;
-            iArr[WorkerState.BLOCKING.ordinal()] = 2;
-            iArr[WorkerState.CPU_ACQUIRED.ordinal()] = 3;
-            iArr[WorkerState.DORMANT.ordinal()] = 4;
-            iArr[WorkerState.TERMINATED.ordinal()] = 5;
+            try {
+                iArr[WorkerState.PARKING.ordinal()] = 1;
+            } catch (NoSuchFieldError unused) {
+            }
+            try {
+                iArr[WorkerState.BLOCKING.ordinal()] = 2;
+            } catch (NoSuchFieldError unused2) {
+            }
+            try {
+                iArr[WorkerState.CPU_ACQUIRED.ordinal()] = 3;
+            } catch (NoSuchFieldError unused3) {
+            }
+            try {
+                iArr[WorkerState.DORMANT.ordinal()] = 4;
+            } catch (NoSuchFieldError unused4) {
+            }
+            try {
+                iArr[WorkerState.TERMINATED.ordinal()] = 5;
+            } catch (NoSuchFieldError unused5) {
+            }
             $EnumSwitchMapping$0 = iArr;
         }
     }
 
     public final class Worker extends Thread {
-        static final AtomicIntegerFieldUpdater workerCtl$FU = AtomicIntegerFieldUpdater.newUpdater(Worker.class, "workerCtl");
+        private static final AtomicIntegerFieldUpdater workerCtl$FU = AtomicIntegerFieldUpdater.newUpdater(Worker.class, "workerCtl");
         private volatile int indexInArray;
         public final WorkQueue localQueue;
         public boolean mayHaveLocalTasks;
@@ -66,19 +82,20 @@ public final class CoroutineScheduler implements Executor, Closeable {
         private volatile Object nextParkedWorker;
         private int rngState;
         public WorkerState state;
+        private final Ref$ObjectRef stolenTask;
         private long terminationDeadline;
-        volatile int workerCtl;
+        private volatile int workerCtl;
 
         private Worker() {
             setDaemon(true);
             this.localQueue = new WorkQueue();
+            this.stolenTask = new Ref$ObjectRef();
             this.state = WorkerState.DORMANT;
-            this.workerCtl = 0;
             this.nextParkedWorker = CoroutineScheduler.NOT_IN_STACK;
             this.rngState = Random.Default.nextInt();
         }
 
-        public Worker(int i) {
+        public Worker(CoroutineScheduler coroutineScheduler, int i) {
             this();
             setIndexInArray(i);
         }
@@ -128,7 +145,16 @@ public final class CoroutineScheduler implements Executor, Closeable {
                     return pollGlobalQueues3;
                 }
             }
-            return trySteal(false);
+            return trySteal(3);
+        }
+
+        private final Task findBlockingTask() {
+            Task pollBlocking = this.localQueue.pollBlocking();
+            if (pollBlocking != null) {
+                return pollBlocking;
+            }
+            Task task = (Task) CoroutineScheduler.this.globalBlockingQueue.removeFirstOrNull();
+            return task == null ? trySteal(1) : task;
         }
 
         private final void idleReset(int i) {
@@ -203,8 +229,9 @@ public final class CoroutineScheduler implements Executor, Closeable {
                 return true;
             }
             CoroutineScheduler coroutineScheduler = CoroutineScheduler.this;
+            AtomicLongFieldUpdater atomicLongFieldUpdater = CoroutineScheduler.controlState$FU;
             do {
-                j = coroutineScheduler.controlState;
+                j = atomicLongFieldUpdater.get(coroutineScheduler);
                 if (((int) ((9223367638808264704L & j) >> 42)) == 0) {
                     return false;
                 }
@@ -218,39 +245,38 @@ public final class CoroutineScheduler implements Executor, Closeable {
                 CoroutineScheduler.this.parkedWorkersStackPush(this);
                 return;
             }
-            this.workerCtl = -1;
-            while (inStack() && this.workerCtl == -1 && !CoroutineScheduler.this.isTerminated() && this.state != WorkerState.TERMINATED) {
+            workerCtl$FU.set(this, -1);
+            while (inStack() && workerCtl$FU.get(this) == -1 && !CoroutineScheduler.this.isTerminated() && this.state != WorkerState.TERMINATED) {
                 tryReleaseCpu(WorkerState.PARKING);
                 Thread.interrupted();
                 park();
             }
         }
 
-        private final Task trySteal(boolean z) {
-            int i = (int) (CoroutineScheduler.this.controlState & 2097151);
-            if (i < 2) {
+        private final Task trySteal(int i) {
+            int i2 = (int) (CoroutineScheduler.controlState$FU.get(CoroutineScheduler.this) & 2097151);
+            if (i2 < 2) {
                 return null;
             }
-            int nextInt = nextInt(i);
+            int nextInt = nextInt(i2);
             CoroutineScheduler coroutineScheduler = CoroutineScheduler.this;
-            int i2 = 0;
             long j = Long.MAX_VALUE;
-            while (i2 < i) {
-                i2++;
+            for (int i3 = 0; i3 < i2; i3++) {
                 nextInt++;
-                if (nextInt > i) {
+                if (nextInt > i2) {
                     nextInt = 1;
                 }
                 Worker worker = (Worker) coroutineScheduler.workers.get(nextInt);
                 if (worker != null && worker != this) {
-                    WorkQueue workQueue = this.localQueue;
-                    WorkQueue workQueue2 = worker.localQueue;
-                    long tryStealBlockingFrom = z ? workQueue.tryStealBlockingFrom(workQueue2) : workQueue.tryStealFrom(workQueue2);
-                    if (tryStealBlockingFrom == -1) {
-                        return this.localQueue.poll();
+                    long trySteal = worker.localQueue.trySteal(i, this.stolenTask);
+                    if (trySteal == -1) {
+                        Ref$ObjectRef ref$ObjectRef = this.stolenTask;
+                        Task task = (Task) ref$ObjectRef.element;
+                        ref$ObjectRef.element = null;
+                        return task;
                     }
-                    if (tryStealBlockingFrom > 0) {
-                        j = Math.min(j, tryStealBlockingFrom);
+                    if (trySteal > 0) {
+                        j = Math.min(j, trySteal);
                     }
                 }
             }
@@ -268,21 +294,21 @@ public final class CoroutineScheduler implements Executor, Closeable {
                     if (coroutineScheduler.isTerminated()) {
                         return;
                     }
-                    if (((int) (coroutineScheduler.controlState & 2097151)) <= coroutineScheduler.corePoolSize) {
+                    if (((int) (CoroutineScheduler.controlState$FU.get(coroutineScheduler) & 2097151)) <= coroutineScheduler.corePoolSize) {
                         return;
                     }
                     if (workerCtl$FU.compareAndSet(this, -1, 1)) {
-                        int indexInArray = getIndexInArray();
+                        int i = this.indexInArray;
                         setIndexInArray(0);
-                        coroutineScheduler.parkedWorkersStackTopUpdate(this, indexInArray, 0);
+                        coroutineScheduler.parkedWorkersStackTopUpdate(this, i, 0);
                         int andDecrement = (int) (2097151 & CoroutineScheduler.controlState$FU.getAndDecrement(coroutineScheduler));
-                        if (andDecrement != indexInArray) {
+                        if (andDecrement != i) {
                             Object obj = coroutineScheduler.workers.get(andDecrement);
                             Intrinsics.checkNotNull(obj);
                             Worker worker = (Worker) obj;
-                            coroutineScheduler.workers.setSynchronized(indexInArray, worker);
-                            worker.setIndexInArray(indexInArray);
-                            coroutineScheduler.parkedWorkersStackTopUpdate(worker, andDecrement, indexInArray);
+                            coroutineScheduler.workers.setSynchronized(i, worker);
+                            worker.setIndexInArray(i);
+                            coroutineScheduler.parkedWorkersStackTopUpdate(worker, andDecrement, i);
                         }
                         coroutineScheduler.workers.setSynchronized(andDecrement, null);
                         Unit unit = Unit.INSTANCE;
@@ -295,14 +321,7 @@ public final class CoroutineScheduler implements Executor, Closeable {
         }
 
         public final Task findTask(boolean z) {
-            Task task;
-            if (tryAcquireCpuPermit()) {
-                return findAnyTask(z);
-            }
-            if (!z || (task = this.localQueue.poll()) == null) {
-                task = (Task) CoroutineScheduler.this.globalBlockingQueue.removeFirstOrNull();
-            }
-            return task == null ? trySteal(true) : task;
+            return tryAcquireCpuPermit() ? findAnyTask(z) : findBlockingTask();
         }
 
         public final int getIndexInArray() {
@@ -381,8 +400,7 @@ public final class CoroutineScheduler implements Executor, Closeable {
         }
         this.globalCpuQueue = new GlobalQueue();
         this.globalBlockingQueue = new GlobalQueue();
-        this.parkedWorkersStack = 0L;
-        this.workers = new ResizableAtomicArray(i + 1);
+        this.workers = new ResizableAtomicArray((i + 1) * 2);
         this.controlState = i << 42;
         this._isTerminated = 0;
     }
@@ -394,39 +412,45 @@ public final class CoroutineScheduler implements Executor, Closeable {
     private final int createNewWorker() {
         int coerceAtLeast;
         synchronized (this.workers) {
-            if (isTerminated()) {
-                return -1;
+            try {
+                if (isTerminated()) {
+                    return -1;
+                }
+                AtomicLongFieldUpdater atomicLongFieldUpdater = controlState$FU;
+                long j = atomicLongFieldUpdater.get(this);
+                int i = (int) (j & 2097151);
+                coerceAtLeast = RangesKt___RangesKt.coerceAtLeast(i - ((int) ((j & 4398044413952L) >> 21)), 0);
+                if (coerceAtLeast >= this.corePoolSize) {
+                    return 0;
+                }
+                if (i >= this.maxPoolSize) {
+                    return 0;
+                }
+                int i2 = ((int) (controlState$FU.get(this) & 2097151)) + 1;
+                if (i2 <= 0 || this.workers.get(i2) != null) {
+                    throw new IllegalArgumentException("Failed requirement.".toString());
+                }
+                Worker worker = new Worker(this, i2);
+                this.workers.setSynchronized(i2, worker);
+                if (i2 != ((int) (2097151 & atomicLongFieldUpdater.incrementAndGet(this)))) {
+                    throw new IllegalArgumentException("Failed requirement.".toString());
+                }
+                int i3 = coerceAtLeast + 1;
+                worker.start();
+                return i3;
+            } catch (Throwable th) {
+                throw th;
             }
-            long j = this.controlState;
-            int i = (int) (j & 2097151);
-            coerceAtLeast = RangesKt___RangesKt.coerceAtLeast(i - ((int) ((j & 4398044413952L) >> 21)), 0);
-            if (coerceAtLeast >= this.corePoolSize) {
-                return 0;
-            }
-            if (i >= this.maxPoolSize) {
-                return 0;
-            }
-            int i2 = ((int) (this.controlState & 2097151)) + 1;
-            if (i2 <= 0 || this.workers.get(i2) != null) {
-                throw new IllegalArgumentException("Failed requirement.".toString());
-            }
-            Worker worker = new Worker(i2);
-            this.workers.setSynchronized(i2, worker);
-            if (i2 != ((int) (2097151 & controlState$FU.incrementAndGet(this)))) {
-                throw new IllegalArgumentException("Failed requirement.".toString());
-            }
-            worker.start();
-            return coerceAtLeast + 1;
         }
     }
 
     private final Worker currentWorker() {
         Thread currentThread = Thread.currentThread();
         Worker worker = currentThread instanceof Worker ? (Worker) currentThread : null;
-        if (worker != null && Intrinsics.areEqual(CoroutineScheduler.this, this)) {
-            return worker;
+        if (worker == null || !Intrinsics.areEqual(CoroutineScheduler.this, this)) {
+            return null;
         }
-        return null;
+        return worker;
     }
 
     public static void dispatch$default(CoroutineScheduler coroutineScheduler, Runnable runnable, TaskContext taskContext, boolean z, int i, Object obj) {
@@ -456,8 +480,9 @@ public final class CoroutineScheduler implements Executor, Closeable {
     }
 
     private final Worker parkedWorkersStackPop() {
+        AtomicLongFieldUpdater atomicLongFieldUpdater = parkedWorkersStack$FU;
         while (true) {
-            long j = this.parkedWorkersStack;
+            long j = atomicLongFieldUpdater.get(this);
             Worker worker = (Worker) this.workers.get((int) (2097151 & j));
             if (worker == null) {
                 return null;
@@ -471,9 +496,8 @@ public final class CoroutineScheduler implements Executor, Closeable {
         }
     }
 
-    private final void signalBlockingWork(boolean z) {
-        long addAndGet = controlState$FU.addAndGet(this, 2097152L);
-        if (z || tryUnpark() || tryCreateWorker(addAndGet)) {
+    private final void signalBlockingWork(long j, boolean z) {
+        if (z || tryUnpark() || tryCreateWorker(j)) {
             return;
         }
         tryUnpark();
@@ -507,7 +531,7 @@ public final class CoroutineScheduler implements Executor, Closeable {
 
     static boolean tryCreateWorker$default(CoroutineScheduler coroutineScheduler, long j, int i, Object obj) {
         if ((i & 1) != 0) {
-            j = coroutineScheduler.controlState;
+            j = controlState$FU.get(coroutineScheduler);
         }
         return coroutineScheduler.tryCreateWorker(j);
     }
@@ -543,14 +567,19 @@ public final class CoroutineScheduler implements Executor, Closeable {
     public final void dispatch(Runnable runnable, TaskContext taskContext, boolean z) {
         AbstractTimeSourceKt.getTimeSource();
         Task createTask = createTask(runnable, taskContext);
+        boolean z2 = false;
+        boolean z3 = createTask.taskContext.getTaskMode() == 1;
+        long addAndGet = z3 ? controlState$FU.addAndGet(this, 2097152L) : 0L;
         Worker currentWorker = currentWorker();
         Task submitToLocalQueue = submitToLocalQueue(currentWorker, createTask, z);
         if (submitToLocalQueue != null && !addToGlobalQueue(submitToLocalQueue)) {
-            throw new RejectedExecutionException(Intrinsics.stringPlus(this.schedulerName, " was terminated"));
+            throw new RejectedExecutionException(this.schedulerName + " was terminated");
         }
-        boolean z2 = z && currentWorker != null;
-        if (createTask.taskContext.getTaskMode() != 0) {
-            signalBlockingWork(z2);
+        if (z && currentWorker != null) {
+            z2 = true;
+        }
+        if (z3) {
+            signalBlockingWork(addAndGet, z2);
         } else {
             if (z2) {
                 return;
@@ -565,7 +594,7 @@ public final class CoroutineScheduler implements Executor, Closeable {
     }
 
     public final boolean isTerminated() {
-        return this._isTerminated;
+        return _isTerminated$FU.get(this) != 0;
     }
 
     public final boolean parkedWorkersStackPush(Worker worker) {
@@ -574,8 +603,9 @@ public final class CoroutineScheduler implements Executor, Closeable {
         if (worker.getNextParkedWorker() != NOT_IN_STACK) {
             return false;
         }
+        AtomicLongFieldUpdater atomicLongFieldUpdater = parkedWorkersStack$FU;
         do {
-            j = this.parkedWorkersStack;
+            j = atomicLongFieldUpdater.get(this);
             indexInArray = worker.getIndexInArray();
             worker.setNextParkedWorker(this.workers.get((int) (2097151 & j)));
         } while (!parkedWorkersStack$FU.compareAndSet(this, j, ((2097152 + j) & (-2097152)) | indexInArray));
@@ -583,8 +613,9 @@ public final class CoroutineScheduler implements Executor, Closeable {
     }
 
     public final void parkedWorkersStackTopUpdate(Worker worker, int i, int i2) {
+        AtomicLongFieldUpdater atomicLongFieldUpdater = parkedWorkersStack$FU;
         while (true) {
-            long j = this.parkedWorkersStack;
+            long j = atomicLongFieldUpdater.get(this);
             int i3 = (int) (2097151 & j);
             long j2 = (2097152 + j) & (-2097152);
             if (i3 == i) {
@@ -608,15 +639,15 @@ public final class CoroutineScheduler implements Executor, Closeable {
 
     public final void shutdown(long j) {
         int i;
+        Task task;
         if (_isTerminated$FU.compareAndSet(this, 0, 1)) {
             Worker currentWorker = currentWorker();
             synchronized (this.workers) {
-                i = (int) (this.controlState & 2097151);
+                i = (int) (controlState$FU.get(this) & 2097151);
             }
             if (1 <= i) {
                 int i2 = 1;
                 while (true) {
-                    int i3 = i2 + 1;
                     Object obj = this.workers.get(i2);
                     Intrinsics.checkNotNull(obj);
                     Worker worker = (Worker) obj;
@@ -630,25 +661,31 @@ public final class CoroutineScheduler implements Executor, Closeable {
                     if (i2 == i) {
                         break;
                     } else {
-                        i2 = i3;
+                        i2++;
                     }
                 }
             }
             this.globalBlockingQueue.close();
             this.globalCpuQueue.close();
             while (true) {
-                Task findTask = currentWorker == null ? null : currentWorker.findTask(true);
-                if (findTask == null && (findTask = (Task) this.globalCpuQueue.removeFirstOrNull()) == null && (findTask = (Task) this.globalBlockingQueue.removeFirstOrNull()) == null) {
-                    break;
-                } else {
-                    runSafely(findTask);
+                if (currentWorker != null) {
+                    task = currentWorker.findTask(true);
+                    if (task != null) {
+                        continue;
+                        runSafely(task);
+                    }
                 }
+                task = (Task) this.globalCpuQueue.removeFirstOrNull();
+                if (task == null && (task = (Task) this.globalBlockingQueue.removeFirstOrNull()) == null) {
+                    break;
+                }
+                runSafely(task);
             }
             if (currentWorker != null) {
                 currentWorker.tryReleaseCpu(WorkerState.TERMINATED);
             }
-            this.parkedWorkersStack = 0L;
-            this.controlState = 0L;
+            parkedWorkersStack$FU.set(this, 0L);
+            controlState$FU.set(this, 0L);
         }
     }
 
@@ -669,32 +706,30 @@ public final class CoroutineScheduler implements Executor, Closeable {
         int i3 = 0;
         int i4 = 0;
         int i5 = 0;
-        int i6 = 1;
-        while (i6 < currentLength) {
-            int i7 = i6 + 1;
+        for (int i6 = 1; i6 < currentLength; i6++) {
             Worker worker = (Worker) this.workers.get(i6);
             if (worker != null) {
                 int size$kotlinx_coroutines_core = worker.localQueue.getSize$kotlinx_coroutines_core();
-                int i8 = WhenMappings.$EnumSwitchMapping$0[worker.state.ordinal()];
-                if (i8 != 1) {
-                    if (i8 == 2) {
+                int i7 = WhenMappings.$EnumSwitchMapping$0[worker.state.ordinal()];
+                if (i7 != 1) {
+                    if (i7 == 2) {
                         i2++;
                         sb = new StringBuilder();
                         sb.append(size$kotlinx_coroutines_core);
                         c = 'b';
-                    } else if (i8 == 3) {
+                    } else if (i7 == 3) {
                         i++;
                         sb = new StringBuilder();
                         sb.append(size$kotlinx_coroutines_core);
                         c = 'c';
-                    } else if (i8 == 4) {
+                    } else if (i7 == 4) {
                         i4++;
                         if (size$kotlinx_coroutines_core > 0) {
                             sb = new StringBuilder();
                             sb.append(size$kotlinx_coroutines_core);
                             c = 'd';
                         }
-                    } else if (i8 == 5) {
+                    } else if (i7 == 5) {
                         i5++;
                     }
                     sb.append(c);
@@ -703,9 +738,8 @@ public final class CoroutineScheduler implements Executor, Closeable {
                     i3++;
                 }
             }
-            i6 = i7;
         }
-        long j = this.controlState;
+        long j = controlState$FU.get(this);
         return this.schedulerName + '@' + DebugStringsKt.getHexAddress(this) + "[Pool Size {core = " + this.corePoolSize + ", max = " + this.maxPoolSize + "}, Worker States {CPU = " + i + ", blocking = " + i2 + ", parked = " + i3 + ", dormant = " + i4 + ", terminated = " + i5 + "}, running workers queues = " + arrayList + ", global CPU queue size = " + this.globalCpuQueue.getSize() + ", global blocking queue size = " + this.globalBlockingQueue.getSize() + ", Control State {created workers= " + ((int) (2097151 & j)) + ", blocking tasks = " + ((int) ((4398044413952L & j) >> 21)) + ", CPUs acquired = " + (this.corePoolSize - ((int) ((9223367638808264704L & j) >> 42))) + "}]";
     }
 }

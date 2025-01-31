@@ -1,4 +1,6 @@
 package kotlin.jvm.functions;
 
-public interface Function9 {
+import kotlin.Function;
+
+public interface Function9 extends Function {
 }

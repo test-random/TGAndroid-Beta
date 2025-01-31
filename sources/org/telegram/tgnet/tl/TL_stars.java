@@ -2,6 +2,7 @@ package org.telegram.tgnet.tl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.telegram.messenger.DialogObject;
 import org.telegram.tgnet.InputSerializedData;
 import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
@@ -23,6 +24,34 @@ public class TL_stars {
                 tL_inputSavedStarGiftUser.readParams(inputSerializedData, z);
             }
             return tL_inputSavedStarGiftUser;
+        }
+    }
+
+    public static class PaidReactionPrivacy extends TLObject {
+        public TLRPC.InputPeer peer;
+
+        public static PaidReactionPrivacy TLdeserialize(InputSerializedData inputSerializedData, int i, boolean z) {
+            PaidReactionPrivacy paidreactionprivacydefault = i != -596837136 ? i != 520887001 ? i != 543872158 ? null : new paidReactionPrivacyDefault() : new paidReactionPrivacyAnonymous() : new paidReactionPrivacyPeer();
+            if (paidreactionprivacydefault == null && z) {
+                throw new RuntimeException(String.format("can't parse magic %x in PaidReactionPrivacy", Integer.valueOf(i)));
+            }
+            if (paidreactionprivacydefault != null) {
+                paidreactionprivacydefault.readParams(inputSerializedData, z);
+            }
+            return paidreactionprivacydefault;
+        }
+
+        public long getDialogId() {
+            if (this instanceof paidReactionPrivacyDefault) {
+                return 0L;
+            }
+            if (this instanceof paidReactionPrivacyAnonymous) {
+                return 2666000L;
+            }
+            if (this instanceof paidReactionPrivacyPeer) {
+                return DialogObject.getPeerDialogId(this.peer);
+            }
+            return 0L;
         }
     }
 
@@ -143,6 +172,7 @@ public class TL_stars {
         public long convert_stars;
         public int first_sale_date;
         public int flags;
+        public String gift_address;
         public long id;
         public int last_sale_date;
         public boolean limited;
@@ -164,7 +194,7 @@ public class TL_stars {
                     tL_starGift_layer190 = new TL_starGift_layer190();
                     break;
                 case -218202550:
-                    tL_starGift_layer190 = new TL_starGiftUnique();
+                    tL_starGift_layer190 = new TL_starGiftUnique_layer198();
                     break;
                 case 46953416:
                     tL_starGift_layer190 = new TL_starGift();
@@ -174,6 +204,9 @@ public class TL_stars {
                     break;
                 case 1237678029:
                     tL_starGift_layer190 = new TL_starGift_layer195();
+                    break;
+                case 1549979985:
+                    tL_starGift_layer190 = new TL_starGiftUnique();
                     break;
                 case 1779697613:
                     tL_starGift_layer190 = new TL_starGiftUnique_layer196();
@@ -942,7 +975,7 @@ public class TL_stars {
     }
 
     public static class TL_starGiftUnique extends StarGift {
-        public static final int constructor = -218202550;
+        public static final int constructor = 1549979985;
 
         @Override
         public void readParams(InputSerializedData inputSerializedData, boolean z) {
@@ -963,11 +996,14 @@ public class TL_stars {
             this.attributes = Vector.deserialize(inputSerializedData, new TL_stars$TL_starGiftUnique$$ExternalSyntheticLambda0(), z);
             this.availability_issued = inputSerializedData.readInt32(z);
             this.availability_total = inputSerializedData.readInt32(z);
+            if ((this.flags & 8) != 0) {
+                this.gift_address = inputSerializedData.readString(z);
+            }
         }
 
         @Override
         public void serializeToStream(OutputSerializedData outputSerializedData) {
-            outputSerializedData.writeInt32(-218202550);
+            outputSerializedData.writeInt32(1549979985);
             outputSerializedData.writeInt32(this.flags);
             outputSerializedData.writeInt64(this.id);
             outputSerializedData.writeString(this.title);
@@ -985,6 +1021,9 @@ public class TL_stars {
             Vector.serialize(outputSerializedData, this.attributes);
             outputSerializedData.writeInt32(this.availability_issued);
             outputSerializedData.writeInt32(this.availability_total);
+            if ((this.flags & 8) != 0) {
+                outputSerializedData.writeString(this.gift_address);
+            }
         }
     }
 
@@ -1053,6 +1092,53 @@ public class TL_stars {
             }
             if ((this.flags & 2) != 0) {
                 outputSerializedData.writeString(this.owner_name);
+            }
+            Vector.serialize(outputSerializedData, this.attributes);
+            outputSerializedData.writeInt32(this.availability_issued);
+            outputSerializedData.writeInt32(this.availability_total);
+        }
+    }
+
+    public static class TL_starGiftUnique_layer198 extends TL_starGiftUnique {
+        public static final int constructor = -218202550;
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.flags = inputSerializedData.readInt32(z);
+            this.id = inputSerializedData.readInt64(z);
+            this.title = inputSerializedData.readString(z);
+            this.slug = inputSerializedData.readString(z);
+            this.num = inputSerializedData.readInt32(z);
+            if ((this.flags & 1) != 0) {
+                this.owner_id = TLRPC.Peer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+            }
+            if ((this.flags & 2) != 0) {
+                this.owner_name = inputSerializedData.readString(z);
+            }
+            if ((this.flags & 4) != 0) {
+                this.owner_address = inputSerializedData.readString(z);
+            }
+            this.attributes = Vector.deserialize(inputSerializedData, new TL_stars$TL_starGiftUnique$$ExternalSyntheticLambda0(), z);
+            this.availability_issued = inputSerializedData.readInt32(z);
+            this.availability_total = inputSerializedData.readInt32(z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-218202550);
+            outputSerializedData.writeInt32(this.flags);
+            outputSerializedData.writeInt64(this.id);
+            outputSerializedData.writeString(this.title);
+            outputSerializedData.writeString(this.slug);
+            outputSerializedData.writeInt32(this.num);
+            if ((this.flags & 1) != 0) {
+                this.owner_id.serializeToStream(outputSerializedData);
+            }
+            if ((this.flags & 2) != 0) {
+                outputSerializedData.writeString(this.owner_name);
+            }
+            if ((this.flags & 4) != 0) {
+                outputSerializedData.writeString(this.owner_address);
             }
             Vector.serialize(outputSerializedData, this.attributes);
             outputSerializedData.writeInt32(this.availability_issued);
@@ -2506,6 +2592,39 @@ public class TL_stars {
         public void serializeToStream(OutputSerializedData outputSerializedData) {
             outputSerializedData.writeInt32(-1583919758);
             outputSerializedData.writeString(this.slug);
+        }
+    }
+
+    public static class paidReactionPrivacyAnonymous extends PaidReactionPrivacy {
+        public static final int constructor = 520887001;
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(520887001);
+        }
+    }
+
+    public static class paidReactionPrivacyDefault extends PaidReactionPrivacy {
+        public static final int constructor = 543872158;
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(543872158);
+        }
+    }
+
+    public static class paidReactionPrivacyPeer extends PaidReactionPrivacy {
+        public static final int constructor = -596837136;
+
+        @Override
+        public void readParams(InputSerializedData inputSerializedData, boolean z) {
+            this.peer = TLRPC.InputPeer.TLdeserialize(inputSerializedData, inputSerializedData.readInt32(z), z);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData outputSerializedData) {
+            outputSerializedData.writeInt32(-596837136);
+            this.peer.serializeToStream(outputSerializedData);
         }
     }
 

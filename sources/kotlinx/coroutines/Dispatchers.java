@@ -13,6 +13,10 @@ public final class Dispatchers {
     private Dispatchers() {
     }
 
+    public static final CoroutineDispatcher getDefault() {
+        return Default;
+    }
+
     public static final CoroutineDispatcher getIO() {
         return IO;
     }

@@ -17,6 +17,10 @@ public abstract class SystemPropsKt {
         return SystemPropsKt__SystemPropsKt.systemProp(str);
     }
 
+    public static final String systemProp(String str, String str2) {
+        return SystemPropsKt__SystemProps_commonKt.systemProp(str, str2);
+    }
+
     public static final boolean systemProp(String str, boolean z) {
         return SystemPropsKt__SystemProps_commonKt.systemProp(str, z);
     }

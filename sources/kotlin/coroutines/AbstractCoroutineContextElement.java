@@ -13,13 +13,13 @@ public abstract class AbstractCoroutineContextElement implements CoroutineContex
     }
 
     @Override
-    public <R> R fold(R r, Function2 function2) {
-        return (R) CoroutineContext.Element.DefaultImpls.fold(this, r, function2);
+    public Object fold(Object obj, Function2 function2) {
+        return CoroutineContext.Element.DefaultImpls.fold(this, obj, function2);
     }
 
     @Override
-    public <E extends CoroutineContext.Element> E get(CoroutineContext.Key key) {
-        return (E) CoroutineContext.Element.DefaultImpls.get(this, key);
+    public CoroutineContext.Element get(CoroutineContext.Key key) {
+        return CoroutineContext.Element.DefaultImpls.get(this, key);
     }
 
     @Override
@@ -32,6 +32,7 @@ public abstract class AbstractCoroutineContextElement implements CoroutineContex
         return CoroutineContext.Element.DefaultImpls.minusKey(this, key);
     }
 
+    @Override
     public CoroutineContext plus(CoroutineContext coroutineContext) {
         return CoroutineContext.Element.DefaultImpls.plus(this, coroutineContext);
     }

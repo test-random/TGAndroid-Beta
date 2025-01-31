@@ -1,5 +1,7 @@
 package kotlin.jvm.functions;
 
-public interface Function0 {
+import kotlin.Function;
+
+public interface Function0 extends Function {
     Object invoke();
 }

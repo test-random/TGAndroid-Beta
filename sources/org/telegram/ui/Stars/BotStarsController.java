@@ -428,7 +428,7 @@ public class BotStarsController {
         });
     }
 
-    public void lambda$loadAdmined$6(TLObject tLObject) {
+    public void lambda$loadAdminedBots$6(TLObject tLObject) {
         this.adminedBots = new ArrayList();
         this.loadingAdminedBots = false;
         if (tLObject instanceof Vector) {
@@ -440,30 +440,31 @@ public class BotStarsController {
         }
     }
 
-    public void lambda$loadAdmined$7(final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$loadAdminedBots$7(final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BotStarsController.this.lambda$loadAdmined$6(tLObject);
+                BotStarsController.this.lambda$loadAdminedBots$6(tLObject);
             }
         });
     }
 
-    public void lambda$loadAdmined$8(TLObject tLObject) {
+    public void lambda$loadAdminedChannels$8(TLObject tLObject) {
         this.adminedChannels = new ArrayList();
-        this.loadingAdminedBots = false;
+        this.loadingAdminedChannels = false;
         if (tLObject instanceof TLRPC.messages_Chats) {
             TLRPC.messages_Chats messages_chats = (TLRPC.messages_Chats) tLObject;
             MessagesController.getInstance(this.currentAccount).putChats(messages_chats.chats, false);
             this.adminedChannels.addAll(messages_chats.chats);
         }
+        NotificationCenter.getInstance(this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.adminedChannelsLoaded, new Object[0]);
     }
 
-    public void lambda$loadAdmined$9(final TLObject tLObject, TLRPC.TL_error tL_error) {
+    public void lambda$loadAdminedChannels$9(final TLObject tLObject, TLRPC.TL_error tL_error) {
         AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public final void run() {
-                BotStarsController.this.lambda$loadAdmined$8(tLObject);
+                BotStarsController.this.lambda$loadAdminedChannels$8(tLObject);
             }
         });
     }
@@ -511,7 +512,8 @@ public class BotStarsController {
     }
 
     public ArrayList getAdmined() {
-        loadAdmined();
+        loadAdminedBots();
+        loadAdminedChannels();
         ArrayList arrayList = new ArrayList();
         ArrayList arrayList2 = this.adminedBots;
         if (arrayList2 != null) {
@@ -520,6 +522,16 @@ public class BotStarsController {
         ArrayList arrayList3 = this.adminedChannels;
         if (arrayList3 != null) {
             arrayList.addAll(arrayList3);
+        }
+        return arrayList;
+    }
+
+    public ArrayList getAdminedChannels() {
+        loadAdminedChannels();
+        ArrayList arrayList = new ArrayList();
+        ArrayList arrayList2 = this.adminedChannels;
+        if (arrayList2 != null) {
+            arrayList.addAll(arrayList2);
         }
         return arrayList;
     }
@@ -681,24 +693,28 @@ public class BotStarsController {
         return getTONRevenueStats(j, false) != null;
     }
 
-    public void loadAdmined() {
-        if (!this.loadingAdminedBots || this.adminedBots != null) {
-            this.loadingAdminedBots = true;
-            ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_bots.getAdminedBots(), new RequestDelegate() {
-                @Override
-                public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    BotStarsController.this.lambda$loadAdmined$7(tLObject, tL_error);
-                }
-            });
+    public void loadAdminedBots() {
+        if (this.loadingAdminedBots || this.adminedBots != null) {
+            return;
         }
-        if (this.loadingAdminedChannels && this.adminedChannels == null) {
+        this.loadingAdminedBots = true;
+        ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TL_bots.getAdminedBots(), new RequestDelegate() {
+            @Override
+            public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
+                BotStarsController.this.lambda$loadAdminedBots$7(tLObject, tL_error);
+            }
+        });
+    }
+
+    public void loadAdminedChannels() {
+        if (this.loadingAdminedChannels || this.adminedChannels != null) {
             return;
         }
         this.loadingAdminedChannels = true;
         ConnectionsManager.getInstance(this.currentAccount).sendRequest(new TLRPC.TL_channels_getAdminedPublicChannels(), new RequestDelegate() {
             @Override
             public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                BotStarsController.this.lambda$loadAdmined$9(tLObject, tL_error);
+                BotStarsController.this.lambda$loadAdminedChannels$9(tLObject, tL_error);
             }
         });
     }

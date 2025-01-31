@@ -381,8 +381,8 @@ public class MessagesController extends BaseController implements NotificationCe
     private boolean offlineSent;
     private Utilities.Callback<Boolean> onLoadedRemoteFilters;
     public ConcurrentHashMap<Long, Integer> onlinePrivacy;
-    public Boolean paidReactionsAnonymous;
-    public long paidReactionsAnonymousTime;
+    public Long paidReactionsPrivacy;
+    public long paidReactionsPrivacyTime;
     private Runnable passwordCheckRunnable;
     public PeerColors peerColors;
     private final long peerDialogRequestTimeout;
@@ -2565,8 +2565,12 @@ public class MessagesController extends BaseController implements NotificationCe
         this.starrefMinCommissionPermille = this.mainPreferences.getInt("starrefMinCommissionPermille", 1);
         this.starrefMaxCommissionPermille = this.mainPreferences.getInt("starrefMaxCommissionPermille", 400);
         this.botVerificationDescriptionLengthLimit = this.mainPreferences.getInt("botVerificationDescriptionLengthLimit", 70);
-        this.paidReactionsAnonymousTime = this.mainPreferences.getLong("paidReactionsAnonymousTime", 0L);
-        this.paidReactionsAnonymous = (!this.mainPreferences.contains("paidReactionsAnonymous") || System.currentTimeMillis() - this.paidReactionsAnonymousTime >= 7200000) ? null : Boolean.valueOf(this.mainPreferences.getBoolean("paidReactionsAnonymous", false));
+        this.paidReactionsPrivacyTime = this.mainPreferences.getLong("paidReactionsAnonymousTime", 0L);
+        System.currentTimeMillis();
+        this.paidReactionsPrivacy = null;
+        if (System.currentTimeMillis() - this.paidReactionsPrivacyTime < 7200000) {
+            this.paidReactionsPrivacy = Long.valueOf(this.mainPreferences.contains("paidReactionsDialogId") ? this.mainPreferences.getLong("paidReactionsDialogId", 0L) : this.mainPreferences.getBoolean("paidReactionsAnonymous", false) ? 2666000L : 0L);
+        }
         scheduleTranscriptionUpdate();
         BuildVars.GOOGLE_AUTH_CLIENT_ID = this.mainPreferences.getString("googleAuthClientId", BuildVars.GOOGLE_AUTH_CLIENT_ID);
         this.dcDomainName = this.mainPreferences.contains("dcDomainName2") ? this.mainPreferences.getString("dcDomainName2", "apv3.stel.com") : z ? "tapv3.stel.com" : "apv3.stel.com";
@@ -11021,14 +11025,6 @@ public class MessagesController extends BaseController implements NotificationCe
         }
     }
 
-    public Boolean arePaidReactionsAnonymous() {
-        if (this.paidReactionsAnonymous == null && !this.loadingArePaidReactionsAnonymous) {
-            this.loadingArePaidReactionsAnonymous = true;
-            getConnectionsManager().sendRequest(new TLRPC.TL_messages_getPaidReactionPrivacy(), null);
-        }
-        return this.paidReactionsAnonymous;
-    }
-
     public void blockPeer(long j) {
         TLRPC.Chat chat;
         TLRPC.User user = null;
@@ -13502,6 +13498,14 @@ public class MessagesController extends BaseController implements NotificationCe
                 MessagesController.this.lambda$getNextReactionMention$5(j2, j, consumer, i);
             }
         });
+    }
+
+    public Long getPaidReactionsDialogId() {
+        if (this.paidReactionsPrivacy == null && !this.loadingArePaidReactionsAnonymous) {
+            this.loadingArePaidReactionsAnonymous = true;
+            getConnectionsManager().sendRequest(new TLRPC.TL_messages_getPaidReactionPrivacy(), null);
+        }
+        return this.paidReactionsPrivacy;
     }
 
     public TLRPC.Peer getPeer(long j) {

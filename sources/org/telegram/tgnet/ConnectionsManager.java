@@ -43,6 +43,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BaseController;
 import org.telegram.messenger.BuildVars;
+import org.telegram.messenger.CaptchaController;
 import org.telegram.messenger.EmuDetector;
 import org.telegram.messenger.FileLoadOperation;
 import org.telegram.messenger.FileLoader;
@@ -939,6 +940,8 @@ public class ConnectionsManager extends BaseController {
 
     public static native void native_pauseNetwork(int i);
 
+    public static native void native_receivedCaptchaResult(int i, int[] iArr, String str);
+
     public static native void native_receivedIntegrityCheckClassic(int i, int i2, String str, String str2);
 
     public static native void native_resumeNetwork(int i, boolean z);
@@ -981,6 +984,10 @@ public class ConnectionsManager extends BaseController {
         } catch (Exception e) {
             FileLog.e(e);
         }
+    }
+
+    public static void onCaptchaCheck(int i, int i2, String str, String str2) {
+        CaptchaController.request(i, i2, str, str2);
     }
 
     public static void onConnectionStateChanged(final int i, final int i2) {

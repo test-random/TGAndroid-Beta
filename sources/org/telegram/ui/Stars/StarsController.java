@@ -291,7 +291,7 @@ public class StarsController {
         public boolean wasChosen;
         public boolean committed = false;
         public boolean cancelled = false;
-        public Boolean anonymous = null;
+        public Long peer = null;
 
         public PendingPaidReactions(MessageId messageId, MessageObject messageObject, ChatActivity chatActivity, long j, boolean z) {
             Runnable runnable = new Runnable() {
@@ -346,7 +346,7 @@ public class StarsController {
         }
 
         public void lambda$commit$0(long j) {
-            StarsController.this.sendPaidReaction(this.messageObject, this.chatActivity, j, true, true, this.anonymous);
+            StarsController.this.sendPaidReaction(this.messageObject, this.chatActivity, j, true, true, this.peer);
         }
 
         public static void lambda$commit$1(MessagesController messagesController, TLObject tLObject) {
@@ -354,7 +354,7 @@ public class StarsController {
         }
 
         public void lambda$commit$2(long j) {
-            StarsController.this.sendPaidReaction(this.messageObject, this.chatActivity, j, true, true, this.anonymous);
+            StarsController.this.sendPaidReaction(this.messageObject, this.chatActivity, j, true, true, this.peer);
         }
 
         public void lambda$commit$3(final TLObject tLObject, final MessagesController messagesController, TLRPC.TL_error tL_error, final long j) {
@@ -369,7 +369,7 @@ public class StarsController {
                 return;
             }
             if (tL_error != null) {
-                this.messageObject.addPaidReactions((int) (-this.amount), this.wasChosen, isAnonymous());
+                this.messageObject.addPaidReactions((int) (-this.amount), this.wasChosen, getPeerId());
                 NotificationCenter.getInstance(StarsController.this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.didUpdateReactions, Long.valueOf(this.messageObject.getDialogId()), Integer.valueOf(this.messageObject.getId()), this.messageObject.messageOwner.reactions);
                 if ("BALANCE_TOO_LOW".equals(tL_error.text)) {
                     long j2 = this.message.did;
@@ -428,7 +428,7 @@ public class StarsController {
             }
             if (z) {
                 this.applied = true;
-                this.messageObject.addPaidReactions((int) j, true, isAnonymous());
+                this.messageObject.addPaidReactions((int) j, true, getPeerId());
                 StarsController starsController = StarsController.this;
                 starsController.minus += j;
                 NotificationCenter.getInstance(starsController.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.didUpdateReactions, Long.valueOf(this.messageObject.getDialogId()), Integer.valueOf(this.messageObject.getId()), this.messageObject.messageOwner.reactions);
@@ -447,7 +447,7 @@ public class StarsController {
         public void apply() {
             if (!this.applied) {
                 this.applied = true;
-                this.messageObject.addPaidReactions((int) this.not_added, true, isAnonymous());
+                this.messageObject.addPaidReactions((int) this.not_added, true, getPeerId());
                 StarsController starsController = StarsController.this;
                 starsController.minus += this.not_added;
                 NotificationCenter.getInstance(starsController.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starBalanceUpdated, new Object[0]);
@@ -473,7 +473,7 @@ public class StarsController {
             if (starReactionsOverlay != null) {
                 starReactionsOverlay.hide();
             }
-            this.messageObject.addPaidReactions((int) (-this.amount), this.wasChosen, isAnonymous());
+            this.messageObject.addPaidReactions((int) (-this.amount), this.wasChosen, getPeerId());
             StarsController starsController = StarsController.this;
             starsController.minus -= this.amount;
             NotificationCenter.getInstance(starsController.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starBalanceUpdated, new Object[0]);
@@ -490,7 +490,7 @@ public class StarsController {
                 commit();
             } else {
                 this.cancelled = true;
-                this.messageObject.addPaidReactions((int) (-this.amount), this.wasChosen, isAnonymous());
+                this.messageObject.addPaidReactions((int) (-this.amount), this.wasChosen, getPeerId());
                 StarsController starsController = StarsController.this;
                 starsController.minus -= this.amount;
                 NotificationCenter.getInstance(starsController.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starBalanceUpdated, new Object[0]);
@@ -507,6 +507,7 @@ public class StarsController {
         }
 
         public void commit() {
+            TL_stars.PaidReactionPrivacy paidreactionprivacyanonymous;
             String str;
             if (this.committed || this.cancelled) {
                 return;
@@ -515,57 +516,80 @@ public class StarsController {
             final MessagesController messagesController = MessagesController.getInstance(StarsController.this.currentAccount);
             ConnectionsManager connectionsManager = ConnectionsManager.getInstance(StarsController.this.currentAccount);
             final long j = this.amount;
-            if (!starsController.balanceAvailable() || starsController.getBalance(false) >= j) {
-                this.committed = true;
-                TLRPC.TL_messages_sendPaidReaction tL_messages_sendPaidReaction = new TLRPC.TL_messages_sendPaidReaction();
-                tL_messages_sendPaidReaction.peer = messagesController.getInputPeer(this.message.did);
-                tL_messages_sendPaidReaction.msg_id = this.message.mid;
-                tL_messages_sendPaidReaction.random_id = this.random_id;
-                tL_messages_sendPaidReaction.count = (int) this.amount;
-                tL_messages_sendPaidReaction.isPrivate = Boolean.valueOf(isAnonymous());
-                StarsController.this.invalidateBalance();
-                connectionsManager.sendRequest(tL_messages_sendPaidReaction, new RequestDelegate() {
+            if (starsController.balanceAvailable() && starsController.getBalance(false) < j) {
+                this.cancelled = true;
+                this.messageObject.addPaidReactions((int) (-this.amount), this.wasChosen, getPeerId());
+                StarsController starsController2 = StarsController.this;
+                starsController2.minus = 0L;
+                NotificationCenter.getInstance(starsController2.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starBalanceUpdated, new Object[0]);
+                NotificationCenter.getInstance(StarsController.this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.didUpdateReactions, Long.valueOf(this.messageObject.getDialogId()), Integer.valueOf(this.messageObject.getId()), this.messageObject.messageOwner.reactions);
+                long j2 = this.message.did;
+                MessagesController messagesController2 = this.chatActivity.getMessagesController();
+                MessageId messageId = this.message;
+                if (j2 >= 0) {
+                    str = UserObject.getForcedFirstName(messagesController2.getUser(Long.valueOf(messageId.did)));
+                } else {
+                    TLRPC.Chat chat = messagesController2.getChat(Long.valueOf(-messageId.did));
+                    str = chat == null ? "" : chat.title;
+                }
+                String str2 = str;
+                Context context = this.chatActivity.getContext();
+                if (context == null) {
+                    context = LaunchActivity.instance;
+                }
+                if (context == null) {
+                    context = ApplicationLoader.applicationContext;
+                }
+                new StarsIntroActivity.StarsNeededSheet(context, this.chatActivity.getResourceProvider(), j, 5, str2, new Runnable() {
                     @Override
-                    public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                        StarsController.PendingPaidReactions.this.lambda$commit$4(messagesController, j, tLObject, tL_error);
+                    public final void run() {
+                        StarsController.PendingPaidReactions.this.lambda$commit$0(j);
                     }
-                });
+                }).show();
                 return;
             }
-            this.cancelled = true;
-            this.messageObject.addPaidReactions((int) (-this.amount), this.wasChosen, isAnonymous());
-            StarsController starsController2 = StarsController.this;
-            starsController2.minus = 0L;
-            NotificationCenter.getInstance(starsController2.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.starBalanceUpdated, new Object[0]);
-            NotificationCenter.getInstance(StarsController.this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.didUpdateReactions, Long.valueOf(this.messageObject.getDialogId()), Integer.valueOf(this.messageObject.getId()), this.messageObject.messageOwner.reactions);
-            long j2 = this.message.did;
-            MessagesController messagesController2 = this.chatActivity.getMessagesController();
-            MessageId messageId = this.message;
-            if (j2 >= 0) {
-                str = UserObject.getForcedFirstName(messagesController2.getUser(Long.valueOf(messageId.did)));
+            this.committed = true;
+            TLRPC.TL_messages_sendPaidReaction tL_messages_sendPaidReaction = new TLRPC.TL_messages_sendPaidReaction();
+            tL_messages_sendPaidReaction.peer = messagesController.getInputPeer(this.message.did);
+            tL_messages_sendPaidReaction.msg_id = this.message.mid;
+            tL_messages_sendPaidReaction.random_id = this.random_id;
+            tL_messages_sendPaidReaction.count = (int) this.amount;
+            tL_messages_sendPaidReaction.flags = 1 | tL_messages_sendPaidReaction.flags;
+            long peerId = getPeerId();
+            if (peerId == 0) {
+                paidreactionprivacyanonymous = new TL_stars.paidReactionPrivacyDefault();
             } else {
-                TLRPC.Chat chat = messagesController2.getChat(Long.valueOf(-messageId.did));
-                str = chat == null ? "" : chat.title;
-            }
-            String str2 = str;
-            Context context = this.chatActivity.getContext();
-            if (context == null) {
-                context = LaunchActivity.instance;
-            }
-            if (context == null) {
-                context = ApplicationLoader.applicationContext;
-            }
-            new StarsIntroActivity.StarsNeededSheet(context, this.chatActivity.getResourceProvider(), j, 5, str2, new Runnable() {
-                @Override
-                public final void run() {
-                    StarsController.PendingPaidReactions.this.lambda$commit$0(j);
+                if (peerId != 2666000) {
+                    TL_stars.paidReactionPrivacyPeer paidreactionprivacypeer = new TL_stars.paidReactionPrivacyPeer();
+                    tL_messages_sendPaidReaction.privacy = paidreactionprivacypeer;
+                    paidreactionprivacypeer.peer = messagesController.getInputPeer(peerId);
+                    StarsController.this.invalidateBalance();
+                    connectionsManager.sendRequest(tL_messages_sendPaidReaction, new RequestDelegate() {
+                        @Override
+                        public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
+                            StarsController.PendingPaidReactions.this.lambda$commit$4(messagesController, j, tLObject, tL_error);
+                        }
+                    });
                 }
-            }).show();
+                paidreactionprivacyanonymous = new TL_stars.paidReactionPrivacyAnonymous();
+            }
+            tL_messages_sendPaidReaction.privacy = paidreactionprivacyanonymous;
+            StarsController.this.invalidateBalance();
+            connectionsManager.sendRequest(tL_messages_sendPaidReaction, new RequestDelegate() {
+                @Override
+                public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
+                    StarsController.PendingPaidReactions.this.lambda$commit$4(messagesController, j, tLObject, tL_error);
+                }
+            });
+        }
+
+        public long getPeerId() {
+            Long l = this.peer;
+            return l != null ? l.longValue() : StarsController.this.getPaidReactionsDialogId(this.messageObject);
         }
 
         public boolean isAnonymous() {
-            Boolean bool = this.anonymous;
-            return bool != null ? bool.booleanValue() : StarsController.this.arePaidReactionsAnonymous(this.messageObject);
+            return getPeerId() == 2666000;
         }
 
         public void setOverlay(StarReactionsOverlay starReactionsOverlay) {
@@ -2522,12 +2546,12 @@ public class StarsController {
         }
     }
 
-    public void lambda$sendPaidReaction$98(MessageObject messageObject, ChatActivity chatActivity, long j, Boolean bool) {
-        sendPaidReaction(messageObject, chatActivity, j, true, true, bool);
+    public void lambda$sendPaidReaction$98(MessageObject messageObject, ChatActivity chatActivity, long j, Long l) {
+        sendPaidReaction(messageObject, chatActivity, j, true, true, l);
     }
 
-    public void lambda$sendPaidReaction$99(MessageObject messageObject, ChatActivity chatActivity, long j, Boolean bool) {
-        sendPaidReaction(messageObject, chatActivity, j, true, true, bool);
+    public void lambda$sendPaidReaction$99(MessageObject messageObject, ChatActivity chatActivity, long j, Long l) {
+        sendPaidReaction(messageObject, chatActivity, j, true, true, l);
     }
 
     public static void lambda$showStarsTopupInternal$24() {
@@ -2803,40 +2827,6 @@ public class StarsController {
                 StarsController.this.lambda$updateMediaPrice$97(runnable, z, dialogId, id, messageObject, j, tLObject, tL_error);
             }
         });
-    }
-
-    public boolean arePaidReactionsAnonymous(MessageObject messageObject) {
-        Boolean bool;
-        PendingPaidReactions pendingPaidReactions = this.currentPendingReactions;
-        if (pendingPaidReactions != null && pendingPaidReactions.message.equals(MessageId.from(messageObject)) && (bool = this.currentPendingReactions.anonymous) != null) {
-            return bool.booleanValue();
-        }
-        Boolean isMyPaidReactionAnonymous = messageObject == null ? null : messageObject.isMyPaidReactionAnonymous();
-        if (isMyPaidReactionAnonymous != null) {
-            return isMyPaidReactionAnonymous.booleanValue();
-        }
-        Boolean arePaidReactionsAnonymous = MessagesController.getInstance(this.currentAccount).arePaidReactionsAnonymous();
-        if (arePaidReactionsAnonymous != null) {
-            return arePaidReactionsAnonymous.booleanValue();
-        }
-        return false;
-    }
-
-    public boolean arePaidReactionsAnonymous(MessageId messageId, TLRPC.MessageReactions messageReactions) {
-        Boolean bool;
-        PendingPaidReactions pendingPaidReactions = this.currentPendingReactions;
-        if (pendingPaidReactions != null && pendingPaidReactions.message.equals(messageId) && (bool = this.currentPendingReactions.anonymous) != null) {
-            return bool.booleanValue();
-        }
-        Boolean isMyPaidReactionAnonymous = MessageObject.isMyPaidReactionAnonymous(messageReactions);
-        if (isMyPaidReactionAnonymous != null) {
-            return isMyPaidReactionAnonymous.booleanValue();
-        }
-        Boolean arePaidReactionsAnonymous = MessagesController.getInstance(this.currentAccount).arePaidReactionsAnonymous();
-        if (arePaidReactionsAnonymous != null) {
-            return arePaidReactionsAnonymous.booleanValue();
-        }
-        return false;
     }
 
     public boolean balanceAvailable() {
@@ -3208,6 +3198,40 @@ public class StarsController {
             }
         });
         return this.options;
+    }
+
+    public long getPaidReactionsDialogId(MessageObject messageObject) {
+        Long l;
+        PendingPaidReactions pendingPaidReactions = this.currentPendingReactions;
+        if (pendingPaidReactions != null && pendingPaidReactions.message.equals(MessageId.from(messageObject)) && (l = this.currentPendingReactions.peer) != null) {
+            return l.longValue();
+        }
+        Long myPaidReactionPeer = messageObject == null ? null : messageObject.getMyPaidReactionPeer();
+        if (myPaidReactionPeer != null) {
+            return myPaidReactionPeer.longValue();
+        }
+        Long paidReactionsDialogId = MessagesController.getInstance(this.currentAccount).getPaidReactionsDialogId();
+        if (paidReactionsDialogId != null) {
+            return paidReactionsDialogId.longValue();
+        }
+        return 0L;
+    }
+
+    public long getPaidReactionsDialogId(MessageId messageId, TLRPC.MessageReactions messageReactions) {
+        Long l;
+        PendingPaidReactions pendingPaidReactions = this.currentPendingReactions;
+        if (pendingPaidReactions != null && pendingPaidReactions.message.equals(messageId) && (l = this.currentPendingReactions.peer) != null) {
+            return l.longValue();
+        }
+        Long myPaidReactionPeer = MessageObject.getMyPaidReactionPeer(messageReactions);
+        if (myPaidReactionPeer != null) {
+            return myPaidReactionPeer.longValue();
+        }
+        Long paidReactionsDialogId = MessagesController.getInstance(this.currentAccount).getPaidReactionsDialogId();
+        if (paidReactionsDialogId != null) {
+            return paidReactionsDialogId.longValue();
+        }
+        return 0L;
     }
 
     public long getPendingPaidReactions(long j, int i) {
@@ -3664,7 +3688,7 @@ public class StarsController {
         });
     }
 
-    public PendingPaidReactions sendPaidReaction(final MessageObject messageObject, final ChatActivity chatActivity, final long j, boolean z, boolean z2, final Boolean bool) {
+    public PendingPaidReactions sendPaidReaction(final MessageObject messageObject, final ChatActivity chatActivity, final long j, boolean z, boolean z2, final Long l) {
         Context context;
         boolean z3;
         String str;
@@ -3686,7 +3710,7 @@ public class StarsController {
                 new StarsIntroActivity.StarsNeededSheet(context2, chatActivity.getResourceProvider(), j, 5, str3, new Runnable() {
                     @Override
                     public final void run() {
-                        StarsController.this.lambda$sendPaidReaction$98(messageObject, chatActivity, j, bool);
+                        StarsController.this.lambda$sendPaidReaction$98(messageObject, chatActivity, j, l);
                     }
                 }).show();
                 return null;
@@ -3696,7 +3720,7 @@ public class StarsController {
             new StarsIntroActivity.StarsNeededSheet(context2, chatActivity.getResourceProvider(), j, 5, str3, new Runnable() {
                 @Override
                 public final void run() {
-                    StarsController.this.lambda$sendPaidReaction$98(messageObject, chatActivity, j, bool);
+                    StarsController.this.lambda$sendPaidReaction$98(messageObject, chatActivity, j, l);
                 }
             }).show();
             return null;
@@ -3711,7 +3735,7 @@ public class StarsController {
             z3 = false;
             PendingPaidReactions pendingPaidReactions3 = new PendingPaidReactions(from, messageObject, chatActivity, ConnectionsManager.getInstance(this.currentAccount).getCurrentTime(), z);
             this.currentPendingReactions = pendingPaidReactions3;
-            pendingPaidReactions3.anonymous = bool;
+            pendingPaidReactions3.peer = l;
         } else {
             context = context2;
             z3 = false;
@@ -3724,7 +3748,7 @@ public class StarsController {
         if (!z2 || !starsController.balanceAvailable() || starsController.getBalance(z3) >= j2) {
             this.currentPendingReactions.add(j, !(messageObject == null || messageObject.doesPaidReactionExist()) || z);
             PendingPaidReactions pendingPaidReactions4 = this.currentPendingReactions;
-            pendingPaidReactions4.anonymous = bool;
+            pendingPaidReactions4.peer = l;
             return pendingPaidReactions4;
         }
         this.currentPendingReactions.cancel();
@@ -3737,7 +3761,7 @@ public class StarsController {
             new StarsIntroActivity.StarsNeededSheet(context, chatActivity.getResourceProvider(), j2, 5, str3, new Runnable() {
                 @Override
                 public final void run() {
-                    StarsController.this.lambda$sendPaidReaction$99(messageObject, chatActivity, j2, bool);
+                    StarsController.this.lambda$sendPaidReaction$99(messageObject, chatActivity, j2, l);
                 }
             }).show();
             return null;
@@ -3747,7 +3771,7 @@ public class StarsController {
         new StarsIntroActivity.StarsNeededSheet(context, chatActivity.getResourceProvider(), j2, 5, str3, new Runnable() {
             @Override
             public final void run() {
-                StarsController.this.lambda$sendPaidReaction$99(messageObject, chatActivity, j2, bool);
+                StarsController.this.lambda$sendPaidReaction$99(messageObject, chatActivity, j2, l);
             }
         }).show();
         return null;

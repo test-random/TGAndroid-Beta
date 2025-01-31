@@ -21,4 +21,11 @@ public abstract class CollectionsKt__CollectionsJVMKt {
         Intrinsics.checkNotNullExpressionValue(singletonList, "singletonList(element)");
         return singletonList;
     }
+
+    public static List shuffled(Iterable iterable) {
+        Intrinsics.checkNotNullParameter(iterable, "<this>");
+        List mutableList = CollectionsKt___CollectionsKt.toMutableList(iterable);
+        Collections.shuffle(mutableList);
+        return mutableList;
+    }
 }

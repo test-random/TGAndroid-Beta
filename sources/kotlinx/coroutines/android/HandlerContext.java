@@ -6,9 +6,12 @@ import java.util.concurrent.CancellationException;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
+import kotlin.ranges.RangesKt___RangesKt;
 import kotlinx.coroutines.Delay;
 import kotlinx.coroutines.Dispatchers;
+import kotlinx.coroutines.DisposableHandle;
 import kotlinx.coroutines.JobKt;
+import kotlinx.coroutines.NonDisposableHandle;
 
 public final class HandlerContext extends HandlerDispatcher implements Delay {
     private volatile HandlerContext _immediate;
@@ -44,6 +47,10 @@ public final class HandlerContext extends HandlerDispatcher implements Delay {
         Dispatchers.getIO().dispatch(coroutineContext, runnable);
     }
 
+    public static final void invokeOnTimeout$lambda$3(HandlerContext handlerContext, Runnable runnable) {
+        handlerContext.handler.removeCallbacks(runnable);
+    }
+
     @Override
     public void dispatch(CoroutineContext coroutineContext, Runnable runnable) {
         if (this.handler.post(runnable)) {
@@ -66,6 +73,23 @@ public final class HandlerContext extends HandlerDispatcher implements Delay {
     }
 
     @Override
+    public DisposableHandle invokeOnTimeout(long j, final Runnable runnable, CoroutineContext coroutineContext) {
+        long coerceAtMost;
+        Handler handler = this.handler;
+        coerceAtMost = RangesKt___RangesKt.coerceAtMost(j, 4611686018427387903L);
+        if (handler.postDelayed(runnable, coerceAtMost)) {
+            return new DisposableHandle() {
+                @Override
+                public final void dispose() {
+                    HandlerContext.invokeOnTimeout$lambda$3(HandlerContext.this, runnable);
+                }
+            };
+        }
+        cancelOnRejection(coroutineContext, runnable);
+        return NonDisposableHandle.INSTANCE;
+    }
+
+    @Override
     public boolean isDispatchNeeded(CoroutineContext coroutineContext) {
         return (this.invokeImmediately && Intrinsics.areEqual(Looper.myLooper(), this.handler.getLooper())) ? false : true;
     }
@@ -80,6 +104,9 @@ public final class HandlerContext extends HandlerDispatcher implements Delay {
         if (str == null) {
             str = this.handler.toString();
         }
-        return this.invokeImmediately ? Intrinsics.stringPlus(str, ".immediate") : str;
+        if (!this.invokeImmediately) {
+            return str;
+        }
+        return str + ".immediate";
     }
 }

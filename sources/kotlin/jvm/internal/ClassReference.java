@@ -55,6 +55,10 @@ public final class ClassReference implements KClass, ClassBasedDeclarationContai
         public Companion(DefaultConstructorMarker defaultConstructorMarker) {
             this();
         }
+
+        public final java.lang.String getClassSimpleName(java.lang.Class r8) {
+            throw new UnsupportedOperationException("Method not decompiled: kotlin.jvm.internal.ClassReference.Companion.getClassSimpleName(java.lang.Class):java.lang.String");
+        }
     }
 
     static {
@@ -159,6 +163,11 @@ public final class ClassReference implements KClass, ClassBasedDeclarationContai
     @Override
     public Class getJClass() {
         return this.jClass;
+    }
+
+    @Override
+    public String getSimpleName() {
+        return Companion.getClassSimpleName(getJClass());
     }
 
     public int hashCode() {

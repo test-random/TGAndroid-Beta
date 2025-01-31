@@ -94,6 +94,11 @@ public final class CombinedContext implements CoroutineContext, Serializable {
         return minusKey == this.left ? this : minusKey == EmptyCoroutineContext.INSTANCE ? this.element : new CombinedContext(minusKey, this.element);
     }
 
+    @Override
+    public CoroutineContext plus(CoroutineContext coroutineContext) {
+        return CoroutineContext.DefaultImpls.plus(this, coroutineContext);
+    }
+
     public String toString() {
         return '[' + ((String) fold("", new Function2() {
             @Override

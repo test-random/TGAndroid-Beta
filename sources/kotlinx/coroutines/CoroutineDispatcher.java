@@ -2,10 +2,13 @@ package kotlinx.coroutines;
 
 import kotlin.coroutines.AbstractCoroutineContextElement;
 import kotlin.coroutines.AbstractCoroutineContextKey;
+import kotlin.coroutines.Continuation;
 import kotlin.coroutines.ContinuationInterceptor;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.internal.DefaultConstructorMarker;
+import kotlin.jvm.internal.Intrinsics;
+import kotlinx.coroutines.internal.DispatchedContinuation;
 import kotlinx.coroutines.internal.LimitedDispatcher;
 import kotlinx.coroutines.internal.LimitedDispatcherKt;
 
@@ -41,6 +44,11 @@ public abstract class CoroutineDispatcher extends AbstractCoroutineContextElemen
         return ContinuationInterceptor.DefaultImpls.get(this, key);
     }
 
+    @Override
+    public final Continuation interceptContinuation(Continuation continuation) {
+        return new DispatchedContinuation(this, continuation);
+    }
+
     public boolean isDispatchNeeded(CoroutineContext coroutineContext) {
         return true;
     }
@@ -53,6 +61,12 @@ public abstract class CoroutineDispatcher extends AbstractCoroutineContextElemen
     @Override
     public CoroutineContext minusKey(CoroutineContext.Key key) {
         return ContinuationInterceptor.DefaultImpls.minusKey(this, key);
+    }
+
+    @Override
+    public final void releaseInterceptedContinuation(Continuation continuation) {
+        Intrinsics.checkNotNull(continuation, "null cannot be cast to non-null type kotlinx.coroutines.internal.DispatchedContinuation<*>");
+        ((DispatchedContinuation) continuation).release$kotlinx_coroutines_core();
     }
 
     public String toString() {

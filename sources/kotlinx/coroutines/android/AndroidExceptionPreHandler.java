@@ -42,11 +42,10 @@ public final class AndroidExceptionPreHandler extends AbstractCoroutineContextEl
             return;
         }
         Method preHandler = preHandler();
-        Object invoke = preHandler == null ? null : preHandler.invoke(null, null);
+        Object invoke = preHandler != null ? preHandler.invoke(null, null) : null;
         Thread.UncaughtExceptionHandler uncaughtExceptionHandler = invoke instanceof Thread.UncaughtExceptionHandler ? (Thread.UncaughtExceptionHandler) invoke : null;
-        if (uncaughtExceptionHandler == null) {
-            return;
+        if (uncaughtExceptionHandler != null) {
+            uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), th);
         }
-        uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), th);
     }
 }
