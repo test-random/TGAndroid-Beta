@@ -2104,7 +2104,7 @@ public class StarGiftSheet extends BottomSheetWithRecyclerListView implements No
 
     private void doUpgrade() {
         TL_stars.InputSavedStarGift inputStarGift;
-        final long j;
+        long j;
         if (this.button.isLoading() || (inputStarGift = getInputStarGift()) == null) {
             return;
         }
@@ -2124,6 +2124,7 @@ public class StarGiftSheet extends BottomSheetWithRecyclerListView implements No
                 j = savedStarGift.upgrade_stars;
             }
         }
+        final long j2 = 0;
         if (j > 0 || this.upgrade_form != null) {
             this.button.setLoading(true);
             if (j > 0) {
@@ -2152,12 +2153,17 @@ public class StarGiftSheet extends BottomSheetWithRecyclerListView implements No
             tL_inputInvoiceStarGiftUpgrade.keep_original_details = this.checkbox.isChecked();
             tL_inputInvoiceStarGiftUpgrade.stargift = inputStarGift;
             TL_stars.TL_payments_sendStarsForm tL_payments_sendStarsForm = new TL_stars.TL_payments_sendStarsForm();
-            tL_payments_sendStarsForm.form_id = this.upgrade_form.form_id;
+            TLRPC.PaymentForm paymentForm = this.upgrade_form;
+            tL_payments_sendStarsForm.form_id = paymentForm.form_id;
             tL_payments_sendStarsForm.invoice = tL_inputInvoiceStarGiftUpgrade;
+            Iterator<TLRPC.TL_labeledPrice> it = paymentForm.invoice.prices.iterator();
+            while (it.hasNext()) {
+                j2 += it.next().amount;
+            }
             ConnectionsManager.getInstance(this.currentAccount).sendRequest(tL_payments_sendStarsForm, new RequestDelegate() {
                 @Override
                 public final void run(TLObject tLObject, TLRPC.TL_error tL_error) {
-                    StarGiftSheet.this.lambda$doUpgrade$66(j, tLObject, tL_error);
+                    StarGiftSheet.this.lambda$doUpgrade$66(j2, tLObject, tL_error);
                 }
             });
         }

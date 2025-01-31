@@ -353,6 +353,16 @@ public class ImageLocation {
         return null;
     }
 
+    public static ImageLocation getForVideoPath(String str) {
+        if (str == null) {
+            return null;
+        }
+        ImageLocation imageLocation = new ImageLocation();
+        imageLocation.path = str;
+        imageLocation.imageType = 2;
+        return imageLocation;
+    }
+
     public static ImageLocation getForWebFile(WebFile webFile) {
         if (webFile == null) {
             return null;

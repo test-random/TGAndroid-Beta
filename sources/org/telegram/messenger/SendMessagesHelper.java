@@ -3398,7 +3398,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         performSendDelayedMessage(delayedMessage, -1);
     }
 
-    private void performSendDelayedMessage(final org.telegram.messenger.SendMessagesHelper.DelayedMessage r30, int r31) {
+    private void performSendDelayedMessage(final org.telegram.messenger.SendMessagesHelper.DelayedMessage r31, int r32) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.performSendDelayedMessage(org.telegram.messenger.SendMessagesHelper$DelayedMessage, int):void");
     }
 
