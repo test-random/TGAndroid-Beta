@@ -1614,37 +1614,8 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         getNotificationCenter().addObserver(this, NotificationCenter.fileLoadFailed);
     }
 
-    public void lambda$performSendDelayedMessage$35(TLObject tLObject, TLRPC.InputMedia inputMedia, DelayedMessage delayedMessage) {
-        int i;
-        TLRPC.PhotoSize photoSize;
-        MessageObject messageObject;
-        VideoEditedInfo videoEditedInfo;
-        if (!(tLObject instanceof TLRPC.TL_messageMediaPhoto)) {
-            delayedMessage.markAsError();
-            return;
-        }
-        TLRPC.Photo photo = ((TLRPC.TL_messageMediaPhoto) tLObject).photo;
-        TLRPC.TL_inputPhoto tL_inputPhoto = new TLRPC.TL_inputPhoto();
-        tL_inputPhoto.id = photo.id;
-        tL_inputPhoto.access_hash = photo.access_hash;
-        tL_inputPhoto.file_reference = photo.file_reference;
-        if (!(inputMedia instanceof TLRPC.TL_inputMediaUploadedDocument)) {
-            if (inputMedia instanceof TLRPC.TL_inputMediaDocument) {
-                i = inputMedia.flags | 8;
-            }
-            if (delayedMessage.performMediaUpload || inputMedia.thumb != null || (photoSize = delayedMessage.photoSize) == null || photoSize.location == null || !((messageObject = delayedMessage.obj) == null || (videoEditedInfo = messageObject.videoEditedInfo) == null || !videoEditedInfo.isSticker)) {
-                performSendMessageRequest(delayedMessage.sendRequest, delayedMessage.obj, delayedMessage.originalPath, delayedMessage, delayedMessage.parentObject, null, delayedMessage.scheduled);
-            } else {
-                performSendDelayedMessage(delayedMessage);
-                return;
-            }
-        }
-        i = inputMedia.flags | 64;
-        inputMedia.flags = i;
-        inputMedia.video_cover = tL_inputPhoto;
-        if (delayedMessage.performMediaUpload) {
-        }
-        performSendMessageRequest(delayedMessage.sendRequest, delayedMessage.obj, delayedMessage.originalPath, delayedMessage, delayedMessage.parentObject, null, delayedMessage.scheduled);
+    public void lambda$performSendDelayedMessage$35(org.telegram.tgnet.TLObject r9, org.telegram.tgnet.TLRPC.InputMedia r10, org.telegram.messenger.SendMessagesHelper.DelayedMessage r11) {
+        throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.lambda$performSendDelayedMessage$35(org.telegram.tgnet.TLObject, org.telegram.tgnet.TLRPC$InputMedia, org.telegram.messenger.SendMessagesHelper$DelayedMessage):void");
     }
 
     public void lambda$performSendDelayedMessage$36(final TLRPC.InputMedia inputMedia, final DelayedMessage delayedMessage, final TLObject tLObject, TLRPC.TL_error tL_error) {
@@ -1656,7 +1627,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         });
     }
 
-    public void lambda$performSendDelayedMessage$37(org.telegram.tgnet.TLObject r4, org.telegram.tgnet.TLRPC.InputMedia r5, org.telegram.messenger.SendMessagesHelper.DelayedMessage r6, java.lang.String r7, org.telegram.messenger.MessageObject r8) {
+    public void lambda$performSendDelayedMessage$37(org.telegram.tgnet.TLObject r5, org.telegram.tgnet.TLRPC.InputMedia r6, org.telegram.messenger.SendMessagesHelper.DelayedMessage r7, java.lang.String r8, org.telegram.messenger.MessageObject r9) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.messenger.SendMessagesHelper.lambda$performSendDelayedMessage$37(org.telegram.tgnet.TLObject, org.telegram.tgnet.TLRPC$InputMedia, org.telegram.messenger.SendMessagesHelper$DelayedMessage, java.lang.String, org.telegram.messenger.MessageObject):void");
     }
 

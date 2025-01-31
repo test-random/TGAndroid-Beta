@@ -7341,7 +7341,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         }
 
         @Override
-        public void lambda$new$0() {
+        public void dismiss() {
             dismiss(true);
         }
 
