@@ -824,6 +824,15 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                 canvas.restore();
             }
 
+            public void setAnonymous(boolean z) {
+                if (this.my || this.anonymous == z) {
+                    return;
+                }
+                this.anonymous = z;
+                this.text = new Text(z ? LocaleController.getString(R.string.StarsReactionAnonymous) : DialogObject.getShortName(this.did), 12.0f);
+                TopSendersView.this.invalidate();
+            }
+
             public void setPrivacy(long j) {
                 String str;
                 TLRPC.Chat chat;
@@ -966,7 +975,9 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                 }
                 Sender sender2 = (Sender) this.senders.get(i);
                 for (int i2 = 0; i2 < arrayList.size(); i2++) {
-                    if ((arrayList.get(i2).my && sender2.my) || arrayList.get(i2).did == sender2.did) {
+                    SenderData senderData2 = arrayList.get(i2);
+                    boolean z = senderData2.my;
+                    if ((z && sender2.my) || (!sender2.my && !z && senderData2.did == sender2.did)) {
                         senderData = arrayList.get(i2);
                         break;
                     }
@@ -981,9 +992,11 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                 i++;
             }
             for (int i3 = 0; i3 < arrayList.size(); i3++) {
-                SenderData senderData2 = arrayList.get(i3);
+                SenderData senderData3 = arrayList.get(i3);
                 for (int i4 = 0; i4 < this.senders.size(); i4++) {
-                    if ((((Sender) this.senders.get(i4)).my && senderData2.my) || ((Sender) this.senders.get(i4)).did == senderData2.did) {
+                    Sender sender3 = (Sender) this.senders.get(i4);
+                    boolean z2 = sender3.my;
+                    if ((z2 && senderData3.my) || (!z2 && !senderData3.my && sender3.did == senderData3.did)) {
                         sender = (Sender) this.senders.get(i4);
                         break;
                     }
@@ -991,7 +1004,9 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                 sender = null;
                 if (sender == null) {
                     for (int i5 = 0; i5 < this.oldSenders.size(); i5++) {
-                        if ((((Sender) this.oldSenders.get(i5)).my && senderData2.my) || ((Sender) this.oldSenders.get(i5)).did == senderData2.did) {
+                        Sender sender4 = (Sender) this.oldSenders.get(i5);
+                        boolean z3 = sender4.my;
+                        if ((z3 && senderData3.my) || (!z3 && !senderData3.my && sender4.did == senderData3.did)) {
                             sender = (Sender) this.oldSenders.get(i5);
                             break;
                         }
@@ -1003,14 +1018,16 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                     }
                 }
                 if (sender == null) {
-                    sender = new Sender(senderData2.my, senderData2.did);
+                    sender = new Sender(senderData3.my, senderData3.did);
                     sender.animatedScale.set(0.0f, true);
                     this.senders.add(sender);
                     sender.animatedPosition.set((arrayList.size() - 1) - i3, true);
                 }
-                sender.setStars(senderData2.stars);
-                if (senderData2.my) {
+                sender.setStars(senderData3.stars);
+                if (senderData3.my) {
                     sender.setPrivacy(StarsReactionsSheet.this.peer);
+                } else {
+                    sender.setAnonymous(senderData3.anonymous);
                 }
                 sender.index = (arrayList.size() - 1) - i3;
             }
@@ -1801,7 +1818,7 @@ public class StarsReactionsSheet extends BottomSheet implements NotificationCent
                                 arrayList.add(SenderData.of(z, false, j2, messageReactor.count));
                             }
                         } else {
-                            peerDialogId = -i;
+                            peerDialogId = (-i) - 1;
                         }
                     }
                     j2 = peerDialogId;
