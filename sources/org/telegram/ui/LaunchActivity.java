@@ -4862,6 +4862,13 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         long j = tL_attachMenuBot.bot_id;
         WebViewRequestProps of = WebViewRequestProps.of(i, j, j, tL_attachMenuBot.short_name, null, 1, 0, false, null, false, str, null, 2, false, false);
         if (getBottomSheetTabs() == null || getBottomSheetTabs().tryReopenTab(of) == null) {
+            TLRPC.User user = MessagesController.getInstance(this.currentAccount).getUser(Long.valueOf(tL_attachMenuBot.bot_id));
+            String restrictionReason = user == null ? null : MessagesController.getInstance(this.currentAccount).getRestrictionReason(user.restriction_reason);
+            if (!TextUtils.isEmpty(restrictionReason)) {
+                MessagesController.getInstance(this.currentAccount);
+                MessagesController.showCantOpenAlert(lastFragment, restrictionReason);
+                return;
+            }
             BotWebViewSheet botWebViewSheet = new BotWebViewSheet(this, lastFragment.getResourceProvider());
             botWebViewSheet.setNeedsContext(false);
             botWebViewSheet.setDefaultFullsize(z);

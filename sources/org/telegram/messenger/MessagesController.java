@@ -7890,6 +7890,11 @@ public class MessagesController extends BaseController implements NotificationCe
         if (zArr[0]) {
             return;
         }
+        String restrictionReason = getRestrictionReason(user.restriction_reason);
+        if (!TextUtils.isEmpty(restrictionReason)) {
+            showCantOpenAlert(safeLastFragment, restrictionReason);
+            return;
+        }
         if (user.bot_has_main_app) {
             if (safeLastFragment.getParentLayout() instanceof ActionBarLayout) {
                 safeLastFragment = ((ActionBarLayout) safeLastFragment.getParentLayout()).getSheetFragment();

@@ -1307,7 +1307,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
 
             @Override
             public void onStateChanged(boolean z, int i) {
-                if (InstantCameraView.this.videoPlayer != null && InstantCameraView.this.videoPlayer.isPlaying() && i == 4) {
+                if (InstantCameraView.this.videoPlayer != null && InstantCameraView.this.videoPlayer.isPlaying() && i == 4 && InstantCameraView.this.videoEditedInfo != null) {
                     InstantCameraView.this.videoPlayer.seekTo(InstantCameraView.this.videoEditedInfo.startTime > 0 ? InstantCameraView.this.videoEditedInfo.startTime : 0L);
                 }
             }
@@ -1726,7 +1726,9 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                 setupVideoPlayer(this.videoFile);
                 videoEditedInfo4.estimatedDuration = InstantCameraView.this.recordedTime;
                 NotificationCenter.getInstance(InstantCameraView.this.currentAccount).lambda$postNotificationNameOnUIThread$1(NotificationCenter.audioDidSent, Integer.valueOf(InstantCameraView.this.recordingGuid), videoEditedInfo4, this.videoFile.getAbsolutePath(), this.keyframeThumbs);
-            } else if (InstantCameraView.this.delegate.isInScheduleMode()) {
+                return;
+            }
+            if (InstantCameraView.this.delegate.isInScheduleMode()) {
                 AlertsCreator.createScheduleDatePickerDialog(InstantCameraView.this.delegate.getParentActivity(), InstantCameraView.this.delegate.getDialogId(), new AlertsCreator.ScheduleDatePickerDelegate() {
                     @Override
                     public final void didSelectDate(boolean z, int i2) {
@@ -2101,7 +2103,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
 
                 @Override
                 public void onStateChanged(boolean z, int i) {
-                    if (InstantCameraView.this.videoPlayer != null && InstantCameraView.this.videoPlayer.isPlaying() && i == 4) {
+                    if (InstantCameraView.this.videoPlayer != null && InstantCameraView.this.videoPlayer.isPlaying() && i == 4 && InstantCameraView.this.videoEditedInfo != null) {
                         InstantCameraView.this.videoPlayer.seekTo(InstantCameraView.this.videoEditedInfo.startTime > 0 ? InstantCameraView.this.videoEditedInfo.startTime : 0L);
                     }
                 }

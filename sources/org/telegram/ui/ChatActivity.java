@@ -22263,11 +22263,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public void lambda$processInlineBotWebView$105(TLRPC.TL_inlineBotWebView tL_inlineBotWebView) {
+        TLRPC.User foundContextBot = this.mentionContainer.getAdapter().getFoundContextBot();
         int i = this.currentAccount;
         TLRPC.User user = this.currentUser;
-        WebViewRequestProps of = WebViewRequestProps.of(i, user != null ? user.id : this.currentChat.id, this.mentionContainer.getAdapter().getFoundContextBot().id, tL_inlineBotWebView.text, tL_inlineBotWebView.url, 1, 0, false, null, false, null, null, 1, false, false);
+        WebViewRequestProps of = WebViewRequestProps.of(i, user != null ? user.id : this.currentChat.id, foundContextBot.id, tL_inlineBotWebView.text, tL_inlineBotWebView.url, 1, 0, false, null, false, null, null, 1, false, false);
         LaunchActivity launchActivity = LaunchActivity.instance;
         if (launchActivity == null || launchActivity.getBottomSheetTabs() == null || LaunchActivity.instance.getBottomSheetTabs().tryReopenTab(of) == null) {
+            String restrictionReason = MessagesController.getInstance(this.currentAccount).getRestrictionReason(foundContextBot.restriction_reason);
+            if (!TextUtils.isEmpty(restrictionReason)) {
+                MessagesController.getInstance(this.currentAccount);
+                MessagesController.showCantOpenAlert(this, restrictionReason);
+                return;
+            }
             BotWebViewSheet botWebViewSheet = new BotWebViewSheet(getContext(), getResourceProvider());
             botWebViewSheet.setDefaultFullsize(false);
             botWebViewSheet.setNeedsContext(true);
@@ -24654,7 +24661,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         processNewMessages(arrayList, true);
     }
 
-    private void processNewMessages(java.util.ArrayList r32, boolean r33) {
+    private void processNewMessages(java.util.ArrayList r31, boolean r32) {
         throw new UnsupportedOperationException("Method not decompiled: org.telegram.ui.ChatActivity.processNewMessages(java.util.ArrayList, boolean):void");
     }
 

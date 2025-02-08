@@ -12,7 +12,7 @@ import kotlin.coroutines.intrinsics.IntrinsicsKt__IntrinsicsKt;
 import kotlin.coroutines.jvm.internal.DebugProbesKt;
 import kotlin.jvm.internal.Intrinsics;
 
-public final class SequenceBuilderIterator extends SequenceScope implements Iterator, Continuation {
+final class SequenceBuilderIterator extends SequenceScope implements Iterator, Continuation {
     private Iterator nextIterator;
     private Continuation nextStep;
     private Object nextValue;
